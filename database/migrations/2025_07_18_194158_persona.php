@@ -76,8 +76,8 @@ return new class extends Migration
             $table->foreignId('Id_Usuario')
                   ->contrained('Usuario', 'Id_Usuario')
                   ->onDelete('cascade');
-           // $table->foreignId('Id_Pagos')->contrained('Pagos', 'Id_Pagos')->onDelete('cascade');
-           $table->timestamps();
+            $table->foreignId('Id_Pagos')->contrained('Pagos', 'Id_Pagos')->onDelete('cascade');
+            $table->timestamps();
         });
       
          Schema::create('Profesor', function(Blueprint $table){
@@ -89,7 +89,7 @@ return new class extends Migration
             $table->foreignId('Id_Usuario')
                   ->contrained('Usuario', 'Id_Usuario')
                   ->onDelete('cascade');
-             $table->foreignId('Cod_estudiante')
+            $table->foreignId('Cod_estudiante')
                   ->contrained('Usuario', 'Id_Usuario')
                   ->onDelete('cascade');
             $table->timestamps();
@@ -127,7 +127,7 @@ return new class extends Migration
         });
         
         Schema::create('Modelo', function(Blueprint $table){
-            $table->id('Id_Rol'); 
+            $table->id('Id_Modelo'); 
             $table->string('Nombre_modelo')->nullable();
             $table->foreignId('Id_programa')
                   ->constrained('Programa', 'Id_programa') 
@@ -207,7 +207,7 @@ return new class extends Migration
             $table->foreignId('Id_Tutor')
                   ->contrained('Tutor', 'Id_Tutor')
                   ->onDelete('cascade');
-           // $table->foreignId('Id_Evaluaciones')->contrained('Tutor', 'Id_Evaluaciones')->onDelete('cascade');
+            $table->foreignId('Id_Evaluaciones')->contrained('Tutor', 'Id_Evaluaciones')->onDelete('cascade');
             $table->timestamps();
         });
 
@@ -226,10 +226,10 @@ return new class extends Migration
             $table->integer('Nro_cuotas')->nullable();
             $table->date('fecha_plan_pagos')->nullable();
             $table->string('Estado_plan')->nullable();
-            $table->foreingId('Id_programa')
+            $table->foreignId('Id_programa')
                   ->constrained('Programa', 'Id_programa')
                   ->onDelete('cascade');
-            $table->foreingId('Id_pagos')
+            $table->foreignId('Id_pagos')
                   ->constrained('Pagos', 'Id_pagos')
                   ->onDelete('cascade');
             $table->foreignId('Id_tutor')
@@ -254,14 +254,23 @@ return new class extends Migration
         Schema::create('Graduados', function(Blueprint $table){
             $table->id('Id_graduado')->nullable();
             $table->date('Fecha_graduado')->nullable();
-            $table->foreingId('Cod_estudiante')
-                  ->constrained('Estudiantes','Cod_estudiante')
+            $table->foreignId('Cod_estudiante')
+                  ->constrained('Estudiante','Cod_estudiante')
                   ->onDelete('cascade');
             $table->foreignId('Id_programa')
                   ->constrained('Programa', 'Id_programa')
                   ->onDelete('cascade');
             $table->foreignId('Id_profesor')
                   ->constrained('Profesor', 'Id_profesor')
+                  ->onDelete('cascade');
+            $table->timestamps();
+        });
+
+        Schema::create('Ganancia', function(blueprint $table){
+            $table->id('Id_ganancia')->nullable();
+            $table->float('Total_ganancia')->nullable();
+            $table->foreignId('Id_egresos')
+                  ->constrained('Egresos', 'Id_egreso')
                   ->onDelete('cascade');
             $table->timestamps();
         });
@@ -291,5 +300,6 @@ return new class extends Migration
         Schema::dropIFExists('Plan_de_pagos');
         Schema::dropIFExists('Cuotas');
         Schema::dropIFExists('Graduados');
+        Schema::dropIfExists('Ganancia');
     }
 };
