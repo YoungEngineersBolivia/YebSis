@@ -153,6 +153,7 @@ return new class extends Migration
 
         Schema::create('Modelo', function (Blueprint $table) {
             $table->id('Id_Modelo');
+
             $table->string('Nombre_modelo')->nullable();
             $table->foreignId('Id_programa')
                   ->constrained('Programa', 'Id_Programa')
@@ -268,7 +269,6 @@ return new class extends Migration
             $table->id('Id_graduado');
             $table->date('Fecha_graduado')->nullable();
             $table->foreignId('Cod_estudiante')
-                  ->constrained('Estudiante', 'Cod_estudiante')
                   ->constrained('Estudiante','Cod_estudiante')
                   ->onDelete('cascade');
             $table->foreignId('Id_programa')
@@ -276,6 +276,15 @@ return new class extends Migration
                   ->onDelete('cascade');
             $table->foreignId('Id_profesor')
                   ->constrained('Profesor', 'Id_Profesor')
+                  ->onDelete('cascade');
+            $table->timestamps();
+        });
+
+        Schema::create('Ganancia', function(blueprint $table){
+            $table->id('Id_ganancia')->nullable();
+            $table->float('Total_ganancia')->nullable();
+            $table->foreignId('Id_egresos')
+                  ->constrained('Egresos', 'Id_egreso')
                   ->onDelete('cascade');
             $table->timestamps();
         });
