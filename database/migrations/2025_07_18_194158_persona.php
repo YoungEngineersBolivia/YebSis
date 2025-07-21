@@ -66,6 +66,7 @@ return new class extends Migration
             $table->foreignId('Id_Usuario')
                   ->constrained('Usuario', 'Id_Usuario')
                   ->onDelete('cascade');
+            // La columna Cod_estudiante fue eliminada de aquí en las correcciones previas
             $table->timestamps();
         });
 
@@ -107,21 +108,8 @@ return new class extends Migration
             $table->foreignId('Id_Usuario')
                   ->constrained('Usuario', 'Id_Usuario')
                   ->onDelete('cascade');
-            $table->foreignId('Id_Pagos')->contrained('Pagos', 'Id_Pagos')->onDelete('cascade');
-            $table->timestamps();
-        });
-      
-         Schema::create('Profesor', function(Blueprint $table){
-            $table->id('Id_Profesor');
-            $table->string('Profesion')->nullable();
-            $table->foreignId('Id_Persona')
-                  ->contrained('Persona', 'Id_Persona')
-                  ->onDelete('cascade');
-            $table->foreignId('Id_Usuario')
-                  ->contrained('Usuario', 'Id_Usuario')
-                  ->onDelete('cascade');
-            $table->foreignId('Cod_estudiante')
-                  ->contrained('Usuario', 'Id_Usuario')
+            $table->foreignId('Id_Pagos')
+                  ->constrained('Pagos', 'Id_pagos')
                   ->onDelete('cascade');
             $table->timestamps();
         });
@@ -187,6 +175,8 @@ return new class extends Migration
             $table->foreignId('Id_respuesta')
                   ->constrained('Respuesta', 'Id_respuesta')
                   ->onDelete('cascade');
+            // La columna Id_modelo está comentada para evitar conflictos si no es necesaria
+            // $table->foreignId('Id_modelo')->constrained('Modelo', 'Id_Modelo')->onDelete('cascade');
             $table->foreignId('Id_profesor')
                   ->constrained('Profesor', 'Id_Profesor')
                   ->onDelete('cascade');
@@ -220,7 +210,6 @@ return new class extends Migration
             $table->foreignId('Id_Evaluaciones')
                   ->constrained('Evaluacion', 'Id_evaluacion')
                   ->onDelete('cascade');
-            $table->foreignId('Id_Evaluaciones')->contrained('Tutor', 'Id_Evaluaciones')->onDelete('cascade');
             $table->timestamps();
         });
 
@@ -240,7 +229,7 @@ return new class extends Migration
             $table->date('fecha_plan_pagos')->nullable();
             $table->string('Estado_plan')->nullable();
             $table->foreignId('Id_programa')
-                  ->constrained('Programa', 'Id_programa')
+                  ->constrained('Programa', 'Id_Programa')
                   ->onDelete('cascade');
             $table->foreignId('Id_pagos')
                   ->constrained('Pagos', 'Id_pagos')
@@ -269,7 +258,6 @@ return new class extends Migration
             $table->date('Fecha_graduado')->nullable();
             $table->foreignId('Cod_estudiante')
                   ->constrained('Estudiante', 'Cod_estudiante')
-                  ->constrained('Estudiante','Cod_estudiante')
                   ->onDelete('cascade');
             $table->foreignId('Id_programa')
                   ->constrained('Programa', 'Id_Programa')
@@ -280,8 +268,8 @@ return new class extends Migration
             $table->timestamps();
         });
 
-        Schema::create('Ganancia', function(blueprint $table){
-            $table->id('Id_ganancia')->nullable();
+        Schema::create('Ganancia', function(Blueprint $table){
+            $table->id('Id_ganancia'); 
             $table->float('Total_ganancia')->nullable();
             $table->foreignId('Id_egresos')
                   ->constrained('Egresos', 'Id_egreso')
@@ -292,7 +280,7 @@ return new class extends Migration
 
     public function down(): void
     {
-        Schema::dropIfExists('Graduados');
+        Schema::dropIfExists('Ganancia'); 
         Schema::dropIfExists('Cuotas');
         Schema::dropIfExists('Plan_de_pagos');
         Schema::dropIfExists('Egresos');
@@ -313,6 +301,5 @@ return new class extends Migration
         Schema::dropIfExists('Programa');
         Schema::dropIfExists('Persona');
         Schema::dropIfExists('Rol');
-        Schema::dropIfExists('Ganancia');
     }
 };

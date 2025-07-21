@@ -3,9 +3,10 @@
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
-    return view('welcome');
+    return view('/administrador/HomeAdministrador');
 });
 
-Route::get('/indexClientes', function() {
-    return view('indexClientes');
+
+Route::get('/administrador/inicioAdministrador', function () {
+    return view('/administrador/inicioAdministrador'); 
 });
