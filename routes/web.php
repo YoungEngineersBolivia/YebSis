@@ -3,9 +3,9 @@
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
-    return view('welcome');
+    return view('/administrador/HomeAdministrador');
 });
 
-Route::get('/navbarClientes', function() {
-    return view('navbarClientes');
+Route::get('/administrador/inicioAdministrador', function () {
+    return view('/administrador/inicioAdministrador'); 
 });
