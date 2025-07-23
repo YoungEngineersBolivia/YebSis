@@ -11,6 +11,7 @@ Route::get('/administrador/inicioAdministrador', function () {
 });
 Route::get('/administrador/egresosAdministrador', function () {
     return view('/administrador/egresosAdministrador');
+});
 Route::get('/administrador/registrosAdministrador', function () {
     return view('/administrador/registrosAdministradores'); 
 });
