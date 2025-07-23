@@ -258,7 +258,7 @@ return new class extends Migration
             $table->id('Id_graduado');
             $table->date('Fecha_graduado')->nullable();
             $table->foreignId('Cod_estudiante')
-                  ->constrained('Estudiante','Cod_estudiante')
+                  ->constrained('Estudiante', 'Cod_estudiante')
                   ->onDelete('cascade');
             $table->foreignId('Id_programa')
                   ->constrained('Programa', 'Id_Programa')
