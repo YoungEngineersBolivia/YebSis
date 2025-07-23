@@ -4,36 +4,83 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@yield('title', 'Mi Aplicación Laravel')</title>
-    <!-- Aquí puedes incluir tus CSS globales -->
     <link rel="stylesheet" href="{{ asset('css/app.css') }}">
-    @yield('head_extra') {{-- Para CSS o meta tags adicionales en el head --}}
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
 </head>
 <body class="font-sans antialiased">
-    <header>
-        <nav>
-            <!-- Barra de navegación común a todas las páginas -->
-            <ul>
-                <li><a href="/">Inicio</a></li>
-                <li><a href="/administrador/inicioAdministrador">Administrador</a></li>
-                <li><a href="/contacto">Contacto</a></li>
-                <li><a href="/prueba">PEPE/a></li>
-            </ul>
-        </nav>
-    </header>
-
-    <main>
-        <div class="container">
-            @yield('content') {{-- Esta es la sección principal de contenido --}}
+    
+    <div class="d-flex flex-column flex-shrink-0 p-3 bg-light" style="width: 280px; min-height: 100vh;">
+        <a href="/" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto link-dark text-decoration-none">
+            <img src="{{ Vite::asset('resources/img/ES_logo-02.png') }}" alt="Logo YE Bolivia" width="250px" class="me-2">
+        </a>
+        <hr>
+        <ul class="nav nav-pills flex-column mb-auto">
+            <li class="nav-link link-dark d-flex align-items-center gap-2">
+                <a href="#" class="nav-link active" aria-current="page">
+                    <i class="bi bi-clipboard-data"></i>
+                    Dashboard
+                </a>
+            </li>
+            <li>
+                <a href="#" class="nav-link link-dark d-flex align-items-center gap-2">
+                    <i class="bi bi-journal-text"></i>
+                    Registros
+                </a>
+            </li>
+            <li>
+                <a href="#" class="nav-link link-dark d-flex align-items-center gap-2">
+                    <i class="bi bi-person-workspace"></i>
+                    Tutores
+                </a>
+            </li>
+            <li>
+                <a href="#" class="nav-link link-dark d-flex align-items-center gap-2">
+                    <i class="bi bi-people-fill"></i>
+                    Usuarios
+                </a>
+            </li>
+            <li>
+                <a href="#" class="nav-link link-dark d-flex align-items-center gap-2">
+                    <i class="bi bi-calendar-week"></i>
+                    Horarios
+                </a>
+            </li>
+            <li>
+                <a href="#" class="nav-link link-dark d-flex align-items-center gap-2">
+                    <i class="bi bi-person-fill"></i>
+                    Estudiantes
+                </a>
+            </li>
+            <li>
+                <a href="#" class="nav-link link-dark d-flex align-items-center gap-2">
+                    <i class="bi bi-send-fill"></i>
+                    Publicar y Notificar
+                </a>
+            </li>
+            <li>
+                <a href="#" class="nav-link link-dark d-flex align-items-center gap-2">
+                    <i class="bi bi-folder-fill"></i>
+                    Programas
+                </a>
+            </li>
+            <li>
+                <a href="#" class="nav-link link-dark d-flex align-items-center gap-2">
+                    <i class="bi bi-patch-check-fill"></i>
+                    Graduados
+                </a>
+            </li>
+        </ul>
+        <hr>
+        
+        <div>
+            <a href="#" class="d-flex align-items-center link-dark text-decoration-none gap-2">
+                <button type="button" class="btn btn-danger w-75">Cerrar sesión</button>
+                <img src="https://github.com/mdo.png" alt="perfil" width="32" height="32" class="rounded-circle">
+            </a>
         </div>
-    </main>
+    </div>
 
-    <footer>
-        <!-- Pie de página común a todas las páginas -->
-        <p>&copy; {{ date('Y') }} Mi Aplicación Laravel. Todos los derechos reservados.</p>
-    </footer>
-
-    <!-- Aquí puedes incluir tus JS globales -->
-    <script src="{{ asset('js/app.js') }}"></script>
-    @yield('scripts_extra') {{-- Para scripts JS adicionales al final del body --}}
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 </body>
 </html>

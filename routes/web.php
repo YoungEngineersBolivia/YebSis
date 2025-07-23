@@ -6,7 +6,6 @@ Route::get('/', function () {
     return view('/administrador/HomeAdministrador');
 });
 
-
 Route::get('/administrador/inicioAdministrador', function () {
     return view('/administrador/inicioAdministrador'); 
 });
