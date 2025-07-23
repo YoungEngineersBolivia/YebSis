@@ -16,8 +16,8 @@
         </a>
         <hr>
         <ul class="nav nav-pills flex-column mb-auto">
-            <li class="nav-link link-dark d-flex align-items-center gap-2">
-                <a href="#" class="nav-link active" aria-current="page">
+            <li>
+                <a href="#" class="nav-link link-dark d-flex align-items-center gap-2">
                     <i class="bi bi-clipboard-data"></i>
                     Dashboard
                 </a>
