@@ -91,84 +91,9 @@
             <a href="#" class="d-flex align-items-center link-dark text-decoration-none gap-2">
                 <button type="button" class="btn btn-danger w-75">Cerrar sesión</button>
                 <img src="https://github.com/mdo.png" alt="perfil" width="32" height="32" class="rounded-circle">
-            </a>
-            <hr>
-            <ul class="nav nav-pills flex-column mb-auto">
-                <li>
-                    <a href="#" class="nav-link link-dark d-flex align-items-center gap-2">
-                        <i class="bi bi-clipboard-data"></i>
-                        Dashboard
-                    </a>
-                </li>
-                <li>
-                    <a href="/administrador/registrosAdministrador" class="nav-link link-dark d-flex align-items-center gap-2">
-                        <i class="bi bi-journal-text"></i>
-                        Registrar
-                    </a>
-                </li>
-                <li>
-                    <a href="/administrador/tutoresAdministrador" class="nav-link link-dark d-flex align-items-center gap-2">
-                        <i class="bi bi-person-workspace"></i>
-                        Tutores
-                    </a>
-                </li>
-                <li>
-                    <a href="/administrador/usuariosAdministrador" class="nav-link link-dark d-flex align-items-center gap-2">
-                        <i class="bi bi-people-fill"></i>
-                        Usuarios
-                    </a>
-                </li>
-                <li>
-                    <a href="/administrador/horariosAdministrador" class="nav-link link-dark d-flex align-items-center gap-2">
-                        <i class="bi bi-calendar-week"></i>
-                        Horarios
-                    </a>
-                </li>
-                <li>
-                    <a href="#" class="nav-link link-dark d-flex align-items-center gap-2">
-                        <i class="bi bi-person-fill"></i>
-                        Estudiantes
-                    </a>
-                </li>
-                <li>
-                    <a href="#" class="nav-link link-dark d-flex align-items-center gap-2">
-                        <i class="bi bi-send-fill"></i>
-                        Publicar y Notificar
-                    </a>
-                </li>
-                <li>
-                    <a href="#" class="nav-link link-dark d-flex align-items-center gap-2">
-                        <i class="bi bi-folder-fill"></i>
-                        Programas
-                    </a>
-                </li>
-                <li>
-                    <a href="#" class="nav-link link-dark d-flex align-items-center gap-2">
-                        <i class="bi bi-patch-check-fill"></i>
-                        Graduados
-                    </a>
-                </li>
-                <li>
-                    <a href="#" class="nav-link link-dark d-flex align-items-center gap-2">
-                        <i class="bi bi-cash-coin"></i>
-                        Pagos
-                    </a>
-                </li>
-            </ul>
-            <hr>
-            
-            <div>
-                <a href="#" class="d-flex align-items-center link-dark text-decoration-none gap-2">
-                    <button type="button" class="btn btn-danger w-75">Cerrar sesión</button>
-                    <img src="https://github.com/mdo.png" alt="perfil" width="32" height="32" class="rounded-circle">
-                </a>
-            </div>
-        </div>
-        <div class="flex-grow-1 p-4" style="margin-left: 280px;">
-            <div class="container-fluid p-4">
-                @yield('content')
-            </div>
-        </div>
+
+               
+       
     </div>
     </div>
      <div class="flex-grow-1" style="margin-left: 280px;">
@@ -176,6 +101,7 @@
                 @yield('content')
             </div>
         </div>
+
 
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>

@@ -26,6 +26,7 @@ Route::get('/administrador/usuariosAdministrador', function () {
 
 Route::get('/administrador/horariosAdministrador', function () {
     return view('/administrador/horariosAdministrador'); 
+
 });
 
 Route::get('administrador/estudiantesAdministrador', function () {
@@ -47,3 +48,4 @@ Route::get('/administrador/graduadosAdministrador', function () {
 Route::get('/administrador/pagosAdministrador',function () {
     return view('/administrador/pagosAdministrador');
 });
+
