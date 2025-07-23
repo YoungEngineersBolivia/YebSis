@@ -1,5 +1,5 @@
 @extends('/administrador/baseAdministrador')
-@section('title', 'Pagina de Inicio')
+@section('title', 'Estudiantes')
 @section('content')
     <h1>Estudiantes</h1>
 
