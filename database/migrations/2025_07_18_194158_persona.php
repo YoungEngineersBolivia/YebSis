@@ -8,14 +8,14 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('Rol', function (Blueprint $table) {
-            $table->id('Id_Rol');
+        Schema::create('roles', function (Blueprint $table) {
+            $table->id('Id_roles');
             $table->string('Nombre_rol')->nullable();
             $table->timestamps();
         });
 
-        Schema::create('Persona', function (Blueprint $table) {
-            $table->id('Id_Persona');
+        Schema::create('personas', function (Blueprint $table) {
+            $table->id('Id_personas');
             $table->string('Nombre')->nullable();
             $table->string('Apellido')->unique()->nullable();
             $table->string('Genero')->nullable();
@@ -23,14 +23,14 @@ return new class extends Migration
             $table->date('Fecha_nacimiento')->nullable();
             $table->date('Fecha_registro')->nullable();
             $table->string('Celular')->nullable();
-            $table->foreignId('Id_Rol')
-                  ->constrained('Rol', 'Id_Rol')
+            $table->foreignId('Id_roles')
+                  ->constrained('roles', 'Id_roles')
                   ->onDelete('cascade');
             $table->timestamps();
         });
 
-        Schema::create('Programa', function (Blueprint $table) {
-            $table->id('Id_Programa');
+        Schema::create('programas', function (Blueprint $table) {
+            $table->id('Id_programas');
             $table->string('Nombre')->nullable();
             $table->string('Descripcion')->nullable();
             $table->string('Foto')->nullable();
@@ -40,54 +40,55 @@ return new class extends Migration
             $table->timestamps();
         });
 
-        Schema::create('Sucursal', function (Blueprint $table) {
-            $table->id('Id_Sucursal');
+        Schema::create('sucursales', function (Blueprint $table) {
+            $table->id('Id_Sucursales');
             $table->string('Nombre')->nullable();
             $table->string('Direccion')->nullable();
             $table->timestamps();
         });
 
-        Schema::create('Usuario', function (Blueprint $table) {
-            $table->id('Id_Usuario');
+        Schema::create('usuarios', function (Blueprint $table) {
+            $table->id('Id_Usuarios');
             $table->string('Correo')->nullable();
             $table->string('Contrasania')->nullable();
-            $table->foreignId('Id_Persona')
-                  ->constrained('Persona', 'Id_Persona')
+            $table->foreignId('Id_personas')
+                  ->constrained('personas', 'Id_personas')
                   ->onDelete('cascade');
             $table->timestamps();
         });
 
-        Schema::create('Profesor', function (Blueprint $table) {
-            $table->id('Id_Profesor');
+        Schema::create('profesores', function (Blueprint $table) {
+            $table->id('Id_profesores');
             $table->string('Profesion')->nullable();
-            $table->foreignId('Id_Persona')
-                  ->constrained('Persona', 'Id_Persona')
+            $table->foreignId('Id_personas')
+                  ->constrained('personas', 'Id_personas')
                   ->onDelete('cascade');
-            $table->foreignId('Id_Usuario')
-                  ->constrained('Usuario', 'Id_Usuario')
+            $table->foreignId('Id_usuarios')
+                  ->constrained('usuarios', 'Id_usuarios')
                   ->onDelete('cascade');
             $table->timestamps();
         });
 
-        Schema::create('Estudiante', function (Blueprint $table) {
-            $table->id('Cod_estudiante');
+        Schema::create('estudiantes', function (Blueprint $table) {
+            $table->id('Id_estudiantes');
+            $table->string('Cod_estudiante') ;
             $table->string('Estado')->nullable();
-            $table->foreignId('Id_Persona')
-                  ->constrained('Persona', 'Id_Persona')
+            $table->foreignId('Id_Personas')
+                  ->constrained('personas', 'Id_personas')
                   ->onDelete('cascade');
-            $table->foreignId('Id_Profesor')
-                  ->constrained('Profesor', 'Id_Profesor')
+            $table->foreignId('Id_profesores')
+                  ->constrained('profesores', 'Id_profesores')
                   ->onDelete('cascade');
-            $table->foreignId('Id_Programa')
-                  ->constrained('Programa', 'Id_Programa')
+            $table->foreignId('Id_programas')
+                  ->constrained('programas', 'Id_programas')
                   ->onDelete('cascade');
-            $table->foreignId('Id_Sucursal')
-                  ->constrained('Sucursal', 'Id_Sucursal')
+            $table->foreignId('Id_sucursales')
+                  ->constrained('sucursales', 'Id_sucursales')
                   ->onDelete('cascade');
             $table->timestamps();
         });
 
-        Schema::create('Pagos', function (Blueprint $table) {
+        Schema::create('pagos', function (Blueprint $table) {
             $table->id('Id_pagos');
             $table->string('Descripcion')->nullable();
             $table->string('Comprobante')->nullable();
@@ -96,136 +97,123 @@ return new class extends Migration
             $table->timestamps();
         });
 
-        Schema::create('Tutor', function (Blueprint $table) {
-            $table->id('Id_Tutor');
+        Schema::create('tutores', function (Blueprint $table) {
+            $table->id('Id_tutores');
             $table->string('Descuento')->nullable();
             $table->string('Parentezco')->nullable();
             $table->string('Nit')->nullable();
-            $table->foreignId('Id_Persona')
-                  ->constrained('Persona', 'Id_Persona')
+            $table->foreignId('Id_personas')
+                  ->constrained('personas', 'Id_personas')
                   ->onDelete('cascade');
-            $table->foreignId('Id_Usuario')
-                  ->constrained('Usuario', 'Id_Usuario')
+            $table->foreignId('Id_usuarios')
+                  ->constrained('usuarios', 'Id_usuarios')
                   ->onDelete('cascade');
-            $table->foreignId('Id_Pagos')->contrained('Pagos', 'Id_Pagos')->onDelete('cascade');
-            $table->timestamps();
-        });
-      
-         Schema::create('Profesor', function(Blueprint $table){
-            $table->id('Id_Profesor');
-            $table->string('Profesion')->nullable();
-            $table->foreignId('Id_Persona')
-                  ->contrained('Persona', 'Id_Persona')
-                  ->onDelete('cascade');
-            $table->foreignId('Id_Usuario')
-                  ->contrained('Usuario', 'Id_Usuario')
-                  ->onDelete('cascade');
-            $table->foreignId('Cod_estudiante')
-                  ->contrained('Usuario', 'Id_Usuario')
+            $table->foreignId('Id_pagos')
+                  ->constrained('pagos', 'Id_pagos')
                   ->onDelete('cascade');
             $table->timestamps();
         });
 
-        Schema::create('Clase_de_Prueba', function (Blueprint $table) {
-            $table->id('Id_Clase_Prueba');
+        Schema::create('clases_de_Prueba', function (Blueprint $table) {
+            $table->id('Id_clases_Prueba');
             $table->date('Fecha_prueba')->nullable();
             $table->time('Hora_prueba')->nullable();
             $table->string('Nombre_estudiante')->nullable();
-            $table->foreignId('Id_Persona')
-                  ->constrained('Persona', 'Id_Persona')
+            $table->foreignId('Id_personas')
+                  ->constrained('personas', 'Id_personas')
                   ->onDelete('cascade');
             $table->timestamps();
         });
 
-        Schema::create('Publicaciones', function (Blueprint $table) {
-            $table->id('Id_Publicaciones');
+        Schema::create('publicaciones', function (Blueprint $table) {
+            $table->id('Id_publicaciones');
             $table->string('Imagen')->nullable();
             $table->string('Nombre')->nullable();
             $table->string('Descripcion')->nullable();
             $table->date('Fecha')->nullable();
             $table->time('Hora')->nullable();
             $table->boolean('Estado')->nullable();
-            $table->foreignId('Id_Tutor')
-                  ->constrained('Tutor', 'Id_Tutor')
+            $table->foreignId('Id_tutores')
+                  ->constrained('tutores', 'Id_tutores')
                   ->onDelete('cascade');
             $table->timestamps();
         });
 
-        Schema::create('Modelo', function (Blueprint $table) {
-            $table->id('Id_Modelo');
+        Schema::create('modelos', function (Blueprint $table) {
+            $table->id('Id_modelos');
 
             $table->string('Nombre_modelo')->nullable();
             $table->foreignId('Id_programa')
-                  ->constrained('Programa', 'Id_Programa')
+                  ->constrained('programas', 'Id_programas')
                   ->onDelete('cascade');
             $table->timestamps();
         });
 
-        Schema::create('Pregunta', function (Blueprint $table) {
-            $table->id('Id_pregunta');
+        Schema::create('preguntas', function (Blueprint $table) {
+            $table->id('Id_preguntas');
             $table->string('Pregunta')->nullable();
-            $table->foreignId('Id_programa')
-                  ->constrained('Programa', 'Id_Programa')
+            $table->foreignId('Id_programas')
+                  ->constrained('programas', 'Id_programas')
                   ->onDelete('cascade');
             $table->timestamps();
         });
 
-        Schema::create('Respuesta', function (Blueprint $table) {
-            $table->id('Id_respuesta');
+        Schema::create('respuestas', function (Blueprint $table) {
+            $table->id('Id_respuestas');
             $table->string('Respuesta')->nullable();
             $table->timestamps();
         });
 
-        Schema::create('Evaluacion', function (Blueprint $table) {
-            $table->id('Id_evaluacion');
+        Schema::create('evaluaciones', function (Blueprint $table) {
+            $table->id('Id_evaluaciones');
             $table->date('fecha_evaluacion')->nullable();
-            $table->foreignId('Cod_estudiante')
-                  ->constrained('Estudiante', 'Cod_estudiante')
+            $table->foreignId('Id_estudiantes')
+                  ->constrained('estudiantes', 'Id_estudiantes')
                   ->onDelete('cascade');
-            $table->foreignId('Id_pregunta')
-                  ->constrained('Pregunta', 'Id_pregunta')
+            $table->foreignId('Id_preguntas')
+                  ->constrained('Preguntas', 'Id_preguntas')
                   ->onDelete('cascade');
-            $table->foreignId('Id_respuesta')
-                  ->constrained('Respuesta', 'Id_respuesta')
+            $table->foreignId('Id_respuestas')
+                  ->constrained('Respuestas', 'Id_respuestas')
                   ->onDelete('cascade');
-            $table->foreignId('Id_profesor')
-                  ->constrained('Profesor', 'Id_Profesor')
+            $table->foreignId('Id_modelos')->constrained('modelos', 'Id_modelos')->onDelete('cascade');
+            $table->foreignId('Id_profesores')
+                  ->constrained('profesores', 'Id_profesores')
                   ->onDelete('cascade');
-            $table->foreignId('Id_programa')
-                  ->constrained('Programa', 'Id_Programa')
+            $table->foreignId('Id_programas')
+                  ->constrained('programas', 'Id_programas')
                   ->onDelete('cascade');
             $table->timestamps();
         });
 
-        Schema::create('Horario', function (Blueprint $table) {
-            $table->id('Id_horario');
+        Schema::create('horarios', function (Blueprint $table) {
+            $table->id('Id_horarios');
             $table->time('Hora_clase')->nullable();
             $table->string('Dia_clase')->nullable();
-            $table->foreignId('Id_programa')
-                  ->constrained('Programa', 'Id_Programa')
+            $table->foreignId('Id_programas')
+                  ->constrained('programas', 'Id_programas')
                   ->onDelete('cascade');
-            $table->foreignId('Id_profesor')
-                  ->constrained('Profesor', 'Id_Profesor')
+            $table->foreignId('Id_profesores')
+                  ->constrained('profesores', 'Id_profesores')
                   ->onDelete('cascade');
             $table->timestamps();
         });
 
-        Schema::create('Citas', function (Blueprint $table) {
+        Schema::create('citas', function (Blueprint $table) {
             $table->id('Id_citas');
             $table->date('Fecha')->nullable();
             $table->time('Hora')->nullable();
             $table->boolean('Nombre')->nullable();
-            $table->foreignId('Id_Tutor')
-                  ->constrained('Tutor', 'Id_Tutor')
+            $table->foreignId('Id_tutores')
+                  ->constrained('tutores', 'Id_tutores')
                   ->onDelete('cascade');
-            $table->foreignId('Id_Evaluaciones')
-                  ->constrained('Evaluacion', 'Id_evaluacion')
+            $table->foreignId('Id_evaluaciones')
+                  ->constrained('evaluaciones', 'Id_evaluaciones')
                   ->onDelete('cascade');
-            $table->foreignId('Id_Evaluaciones')->contrained('Tutor', 'Id_Evaluaciones')->onDelete('cascade');
             $table->timestamps();
         });
 
-        Schema::create('Egresos', function (Blueprint $table) {
+        Schema::create('egresos', function (Blueprint $table) {
             $table->id('Id_egreso');
             $table->string('Tipo')->nullable();
             $table->string('Descripcion_egreso')->nullable();
@@ -234,94 +222,86 @@ return new class extends Migration
             $table->timestamps();
         });
 
-        Schema::create('Plan_de_pagos', function (Blueprint $table) {
-            $table->id('Id_plan_pagos');
+        Schema::create('planes_pagos', function (Blueprint $table) {
+            $table->id('Id_planes_pagos');
             $table->float('Monto_total')->nullable();
             $table->integer('Nro_cuotas')->nullable();
             $table->date('fecha_plan_pagos')->nullable();
             $table->string('Estado_plan')->nullable();
-            $table->foreignId('Id_programa')
-                  ->constrained('Programa', 'Id_programa')
+            $table->foreignId('Id_programas')
+                  ->constrained('programas', 'Id_programas')
                   ->onDelete('cascade');
             $table->foreignId('Id_pagos')
-                  ->constrained('Pagos', 'Id_pagos')
+                  ->constrained('pagos', 'Id_pagos')
                   ->onDelete('cascade');
-            $table->foreignId('Id_tutor')
-                  ->constrained('Tutor', 'Id_Tutor')
+            $table->foreignId('Id_tutores')
+                  ->constrained('tutores', 'Id_tutores')
                   ->onDelete('cascade');
             $table->timestamps();
         });
 
-        Schema::create('Cuotas', function (Blueprint $table) {
+        Schema::create('cuotas', function (Blueprint $table) {
             $table->id('Id_cuotas');
             $table->integer('Nro_de_cuota')->nullable();
             $table->date('Fecha_vencimiento')->nullable();
             $table->float('Monto_cuota')->nullable();
             $table->float('Monto_pagado')->nullable();
             $table->string('Estado_cuota')->nullable();
-            $table->foreignId('Id_plan_pagos')
-                  ->constrained('Plan_de_pagos', 'Id_plan_pagos')
+            $table->foreignId('Id_planes_pagos')
+                  ->constrained('planes_pagos', 'Id_planes_pagos')
                   ->onDelete('cascade');
             $table->timestamps();
         });
 
-        Schema::create('Graduados', function (Blueprint $table) {
+        Schema::create('graduados', function (Blueprint $table) {
             $table->id('Id_graduado');
             $table->date('Fecha_graduado')->nullable();
-            $table->foreignId('Cod_estudiante')
-                  ->constrained('Estudiante','Cod_estudiante')
+            $table->foreignId('Id_estudiantes')
+                  ->constrained('estudiantes', 'Id_estudiantes')
                   ->onDelete('cascade');
-            $table->foreignId('Id_programa')
-                  ->constrained('Programa', 'Id_Programa')
+            $table->foreignId('Id_programas')
+                  ->constrained('programas', 'Id_programas')
                   ->onDelete('cascade');
-            $table->foreignId('Id_profesor')
-                  ->constrained('Profesor', 'Id_Profesor')
-                  ->onDelete('cascade');
-            $table->timestamps();
-        });
-
-        Schema::create('Ganancia', function(blueprint $table){
-            $table->id('Id_ganancia')->nullable();
-            $table->float('Total_ganancia')->nullable();
-            $table->foreignId('Id_egresos')
-                  ->constrained('Egresos', 'Id_egreso')
+            $table->foreignId('Id_profesores')
+                  ->constrained('profesores', 'Id_profesores')
                   ->onDelete('cascade');
             $table->timestamps();
         });
 
-        Schema::create('Ganancia', function(blueprint $table){
-            $table->id('Id_ganancia')->nullable();
+        Schema::create('ganancias', function(Blueprint $table){
+            $table->id('Id_ganancias'); 
             $table->float('Total_ganancia')->nullable();
             $table->foreignId('Id_egresos')
-                  ->constrained('Egresos', 'Id_egreso')
+                  ->constrained('egresos', 'Id_egreso')
                   ->onDelete('cascade');
             $table->timestamps();
         });
+
+
     }
 
     public function down(): void
     {
-        Schema::dropIfExists('Graduados');
-        Schema::dropIfExists('Cuotas');
-        Schema::dropIfExists('Plan_de_pagos');
-        Schema::dropIfExists('Egresos');
-        Schema::dropIfExists('Citas');
-        Schema::dropIfExists('Horario');
-        Schema::dropIfExists('Evaluacion');
-        Schema::dropIfExists('Respuesta');
-        Schema::dropIfExists('Pregunta');
-        Schema::dropIfExists('Modelo');
-        Schema::dropIfExists('Publicaciones');
-        Schema::dropIfExists('Clase_de_Prueba');
-        Schema::dropIfExists('Tutor');
-        Schema::dropIfExists('Pagos');
-        Schema::dropIfExists('Estudiante');
-        Schema::dropIfExists('Profesor');
-        Schema::dropIfExists('Usuario');
-        Schema::dropIfExists('Sucursal');
-        Schema::dropIfExists('Programa');
-        Schema::dropIfExists('Persona');
-        Schema::dropIfExists('Rol');
-        Schema::dropIfExists('Ganancia');
+        Schema::dropIfExists('ganancias'); 
+        Schema::dropIfExists('cuotas');
+        Schema::dropIfExists('plan_de_pagos');
+        Schema::dropIfExists('egresos');
+        Schema::dropIfExists('citas');
+        Schema::dropIfExists('horarios');
+        Schema::dropIfExists('evaluaciones');
+        Schema::dropIfExists('respuestas');
+        Schema::dropIfExists('preguntas');
+        Schema::dropIfExists('modelos');
+        Schema::dropIfExists('publicaciones');
+        Schema::dropIfExists('clases_de_Prueba');
+        Schema::dropIfExists('tutores');
+        Schema::dropIfExists('pagos');
+        Schema::dropIfExists('estudiantes');
+        Schema::dropIfExists('profesores');
+        Schema::dropIfExists('usuarios');
+        Schema::dropIfExists('sucursales');
+        Schema::dropIfExists('programas');
+        Schema::dropIfExists('personas');
+        Schema::dropIfExists('roles');
     }
 };
