@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\EstudianteController;
 
 Route::get('/', function () {
     return view('/administrador/baseAdministrador');
@@ -31,6 +32,9 @@ Route::get('/administrador/horariosAdministrador', function () {
 Route::get('administrador/estudiantesAdministrador', function () {
     return view('/administrador/estudiantesAdministrador');
 });
+
+Route::get('/administrador/estudiantesAdministrador', [EstudianteController::class, 'index'])->name('admin.estudiantes');
+
 Route::get('administrador/pubnotAdministrador', function () {
     return view('/administrador/pubnotAdministrador');
 });
@@ -47,3 +51,8 @@ Route::get('/administrador/graduadosAdministrador', function () {
 Route::get('/administrador/pagosAdministrador',function () {
     return view('/administrador/pagosAdministrador');
 });
+
+Route::get('/administrador/sucursalesAdministrador',function (){
+    return view('/administrador/sucursalesAdministrador');
+});
+
