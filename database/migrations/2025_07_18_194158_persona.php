@@ -278,14 +278,6 @@ return new class extends Migration
             $table->timestamps();
         });
 
-        Schema::create('Ganancia', function(blueprint $table){
-            $table->id('Id_ganancia')->nullable();
-            $table->float('Total_ganancia')->nullable();
-            $table->foreignId('Id_egresos')
-                  ->constrained('Egresos', 'Id_egreso')
-                  ->onDelete('cascade');
-            $table->timestamps();
-        });
     }
 
     public function down(): void

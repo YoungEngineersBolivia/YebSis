@@ -1,14 +1,14 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\RegistroAdministradorController;
 
 Route::get('/', function () {
     return view('/administrador/baseAdministrador');
 });
 
-Route::get('/administrador/registrosAdministrador', function () {
-    return view('/administrador/registrosAdministradores'); 
-});
+// Cambia esta ruta para que coincida con la POST
+Route::get('/administrador/registrosAdministrador', [RegistroAdministradorController::class, 'index']);
 
 Route::get('/administrador/tutoresAdministrador', function () {
     return view('/administrador/tutoresAdministrador'); 
@@ -21,3 +21,7 @@ Route::get('/administrador/usuariosAdministrador', function () {
 Route::get('/administrador/horariosAdministrador', function () {
     return view('/administrador/horariosAdministrador'); 
 });
+
+// POST ROUTES
+Route::post('/administrador/registrosAdministrador', [RegistroAdministradorController::class, 'registrarAdmin'])
+    ->name('registroAdmin.registrarAdmin');

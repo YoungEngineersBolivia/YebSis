@@ -22,12 +22,20 @@
                         Dashboard
                     </a>
                 </li>
-                <li>
-                    <a href="/administrador/registrosAdministrador" class="nav-link link-dark d-flex align-items-center gap-2">
-                        <i class="bi bi-journal-text"></i>
+                <div class="nav-link link-dark d-flex align-items-center gap-2">
+                    <i class="bi bi-journal-text"></i>
+                    <a class="text-muted text-decoration-none dropdown-toggle" href="#" role="button" id="dropdownRol"
+                    data-bs-toggle="dropdown" aria-expanded="false" style="font-weight: 500;">
                         Registrar
                     </a>
-                </li>
+                    <ul class="dropdown-menu" aria-labelledby="dropdownRol">
+                        <li><a class="dropdown-item" href="#">Tutor</a></li>
+                        <li><a class="dropdown-item" href="#">Estudiante</a></li>
+                        <li><a class="dropdown-item" href="#">Profesor</a></li>
+                        <li><a class="dropdown-item" href="/administrador/registrosAdministrador">Administrador</a></li>
+                        <li><a class="dropdown-item" href="#">Comercial</a></li>
+                    </ul>
+                </div>
                 <li>
                     <a href="/administrador/tutoresAdministrador" class="nav-link link-dark d-flex align-items-center gap-2">
                         <i class="bi bi-person-workspace"></i>
