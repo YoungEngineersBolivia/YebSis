@@ -84,6 +84,12 @@
                     Egresos
                 </a>
             </li>
+            <li>
+                <a href="/administrador/sucursalesAdministrador" class="nav-link link-dark d-flex align-items-center gap-2">
+                    <i class="bi bi-building"></i>
+                    Sucursal
+                </a>
+            </li>
         </ul>
         <hr>
         
@@ -91,16 +97,17 @@
             <a href="#" class="d-flex align-items-center link-dark text-decoration-none gap-2">
                 <button type="button" class="btn btn-danger w-75">Cerrar sesión</button>
                 <img src="https://github.com/mdo.png" alt="perfil" width="32" height="32" class="rounded-circle">
-
-               
-       
+            </a>
+        <hr>
+          
+        
     </div>
     </div>
      <div class="flex-grow-1" style="margin-left: 280px;">
             <div class="container-fluid p-4">
                 @yield('content')
             </div>
-        </div>
+    </div>
 
 
 
