@@ -7,8 +7,15 @@ Route::get('/', function () {
     return view('/administrador/baseAdministrador');
 });
 
-// Cambia esta ruta para que coincida con la POST
-Route::get('/administrador/registrosAdministrador', [RegistroAdministradorController::class, 'index']);
+Route::get('/administrador/inicioAdministrador', function () {
+    return view('/administrador/inicioAdministrador'); 
+});
+Route::get('/administrador/egresosAdministrador', function () {
+    return view('/administrador/egresosAdministrador');
+});
+Route::get('/administrador/registrosAdministrador', function () {
+    return view('/administrador/registrosAdministradores'); 
+});
 
 Route::get('/administrador/tutoresAdministrador', function () {
     return view('/administrador/tutoresAdministrador'); 
@@ -25,3 +32,24 @@ Route::get('/administrador/horariosAdministrador', function () {
 // POST ROUTES
 Route::post('/administrador/registrosAdministrador', [RegistroAdministradorController::class, 'registrarAdmin'])
     ->name('registroAdmin.registrarAdmin');
+
+Route::get('administrador/estudiantesAdministrador', function () {
+    return view('/administrador/estudiantesAdministrador');
+});
+Route::get('administrador/pubnotAdministrador', function () {
+    return view('/administrador/pubnotAdministrador');
+});
+Route::get('/administrador/programasAdministrador', function () {
+    return view('/administrador/programasAdministrador');
+});
+Route::get('/administrador/programasAdministrador', function () {
+    return view('/administrador/programasAdministrador');
+});
+Route::get('/administrador/graduadosAdministrador', function () {
+    return view('/administrador/graduadosAdministrador'); 
+});
+
+Route::get('/administrador/pagosAdministrador',function () {
+    return view('/administrador/pagosAdministrador');
+});
+
