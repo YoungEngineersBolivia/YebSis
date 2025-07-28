@@ -6,12 +6,17 @@ use App\Http\Controllers\EstudianteController;
 use App\Http\Controllers\AdministradorController;
 
 // POST ROUTES
-    
+
 Route::post('/administradores/registrar', [AdministradorController::class, 'registrarAdmin'])->name('administrador.registrar');
+
+Route::post('/administradores/registrarC', [AdministradorController::class, 'registrarComercial'])->name('administrador.registrarC');
 
 //GET ROUTES
 
-Route::get('/administradores/registro', [AdministradorController::class, 'index'])->name('administrador.formulario');
+
+Route::get('/administrador/registrarComercial', function() {
+    return view('/administrador/registrarComercial');
+});
 
 Route::get('/', function () {
     return view('/administrador/baseAdministrador');
