@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\ProgramaController;
 use App\Http\Controllers\RegistroAdministradorController;
 use App\Http\Controllers\EstudianteController;
 use App\Http\Controllers\AdministradorController;
@@ -55,11 +56,10 @@ Route::get('/administrador/estudiantesAdministrador', [EstudianteController::cla
 Route::get('administrador/pubnotAdministrador', function () {
     return view('/administrador/pubnotAdministrador');
 });
-Route::get('/administrador/programasAdministrador', function () {
-    return view('/administrador/programasAdministrador');
-});
-Route::get('/administrador/programasAdministrador', function () {
-    return view('/administrador/programasAdministrador');
+
+Route::get('/administrador/programasAdministrador', [ProgramaController::class, 'index']);
+Route::get('administrador/nuevosProgramasAdministrador', function(){
+    return view('administrador.nuevoProgramaAdministrador');
 });
 Route::get('/administrador/graduadosAdministrador', function () {
     return view('/administrador/graduadosAdministrador'); 
