@@ -2,20 +2,22 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Persona extends Model
 {
-    use HasFactory;
-
     protected $table = 'personas';
     protected $primaryKey = 'Id_personas';
-    public $incrementing = true;
-    protected $keyType = 'int';
+    public $timestamps = true;
 
-    public function estudiantes()
-    {
-        return $this->hasMany(Estudiante::class, 'Id_personas', 'Id_personas');
-    }
+    protected $fillable = [
+        'Nombre',
+        'Apellido',
+        'Genero',
+        'Direccion_domicilio',
+        'Fecha_nacimiento',
+        'Fecha_registro',
+        'Celular',
+        'Id_roles'
+    ];
 }

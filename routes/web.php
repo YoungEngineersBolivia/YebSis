@@ -2,7 +2,17 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProgramaController;
+use App\Http\Controllers\RegistroAdministradorController;
 use App\Http\Controllers\EstudianteController;
+use App\Http\Controllers\AdministradorController;
+
+// POST ROUTES
+    
+Route::post('/administradores/registrar', [AdministradorController::class, 'registrarAdmin'])->name('administrador.registrar');
+
+//GET ROUTES
+
+Route::get('/administradores/registro', [AdministradorController::class, 'index'])->name('administrador.formulario');
 
 Route::get('/', function () {
     return view('/administrador/baseAdministrador');
@@ -14,6 +24,7 @@ Route::get('/administrador/inicioAdministrador', function () {
 Route::get('/administrador/egresosAdministrador', function () {
     return view('/administrador/egresosAdministrador');
 });
+
 Route::get('/administrador/registrosAdministrador', function () {
     return view('/administrador/registrosAdministradores'); 
 });
@@ -29,6 +40,7 @@ Route::get('/administrador/usuariosAdministrador', function () {
 Route::get('/administrador/horariosAdministrador', function () {
     return view('/administrador/horariosAdministrador'); 
 });
+
 
 Route::get('administrador/estudiantesAdministrador', function () {
     return view('/administrador/estudiantesAdministrador');

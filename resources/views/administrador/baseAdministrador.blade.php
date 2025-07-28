@@ -98,7 +98,6 @@
                 <button type="button" class="btn btn-danger w-75">Cerrar sesión</button>
                 <img src="https://github.com/mdo.png" alt="perfil" width="32" height="32" class="rounded-circle">
             </a>
-        <hr>
           
         
     </div>
@@ -108,6 +107,7 @@
                 @yield('content')
             </div>
     </div>
+
 
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
