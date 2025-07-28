@@ -53,10 +53,8 @@ Route::get('administrador/pubnotAdministrador', function () {
 });
 
 Route::get('/administrador/programasAdministrador', [ProgramaController::class, 'index']);
-
-
-Route::get('/administrador/programasAdministrador', function () {
-    return view('/administrador/programasAdministrador');
+Route::get('administrador/nuevosProgramasAdministrador', function(){
+    return view('administrador.nuevoProgramaAdministrador');
 });
 Route::get('/administrador/graduadosAdministrador', function () {
     return view('/administrador/graduadosAdministrador'); 

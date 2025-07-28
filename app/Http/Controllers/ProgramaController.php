@@ -9,7 +9,7 @@ class ProgramaController extends Controller
 {
     public function index()
     {
-        $programas = Programa::all();
+        $programas = Programa::paginate(10);
         return view('administrador.programasAdministrador', compact('programas'));
     }
 }
