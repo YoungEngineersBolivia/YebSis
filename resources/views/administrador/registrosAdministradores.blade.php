@@ -7,11 +7,25 @@
     <h1 class="me-2">Registrar administrador</h1>
 </div>
 
-<form action="{{ route('registroAdmin.registrarAdmin') }}" method="POST">
+<form action="/administradores/registrar" method="POST">
+
     @csrf
 
-    <input type="text" name="nombre" class="form-control mb-2" placeholder="Nombre" required>
-    <input type="text" name="apellido" class="form-control mb-2" placeholder="Apellido" required>
+    <div class="mb-3">
+    <label for="nombre" class="form-label">Nombre</label>
+    <div class="input">
+        <input type="text" name="nombre"class="form-control" aria-describedby="basic-addon3 basic-addon4" required>
+    </div>
+    </div>
+
+    <div class="mb-3">
+    <label for="nombre" class="form-label">Apellido</label>
+    <div class="input">
+        <input type="text" name="apellido"class="form-control" aria-describedby="basic-addon3 basic-addon4" required>
+    </div>
+    </div>
+
+
     <input type="email" name="correo" class="form-control mb-2" placeholder="Correo" required>
 
     <div class="d-flex gap-3 mb-2">

@@ -1,17 +1,23 @@
 <?php
-
 namespace App\Http\Controllers;
+
 use App\Models\Persona;
 use App\Models\Usuario;
 use App\Models\Rol;
+use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\ClaveGeneradaAdmin;
-use Illuminate\Http\Request;
 
-class RegistroAdministradorController extends Controller
+class AdministradorController extends Controller
 {
-    public function registrarAdmin(Request $request){
+    public function index()
+    {
+        return view('administrador.registrosAdministrador');
+    }
+
+    public function registrarAdmin(Request $request)
+    {
         $request->validate([
             'nombre' => 'required|string|max:255',
             'apellido' => 'required|string|max:255',
@@ -21,14 +27,16 @@ class RegistroAdministradorController extends Controller
             'celular' => 'required|string|max:20',
             'direccion_domicilio' => 'required|string|max:255',
         ]);
-    
-        $rolAdmin = Rol::where('Nombre_rol', 'Administrador')->firstOrFail();
-    
-        // Generar contraseña aleatoria
+
+        $rolAdmin = Rol::where('Nombre_rol', 'Administrador')->first();
+
+        if (!$rolAdmin) {
+            return back()->withErrors(['Rol de administrador no encontrado']);
+        }
+
         $clave = Str::random(10);
-    
-        // Crear persona
-        $persona = Rersona::create([
+
+        $persona = Persona::create([
             'Nombre' => $request->nombre,
             'Apellido' => $request->apellido,
             'Genero' => $request->genero,
@@ -36,29 +44,22 @@ class RegistroAdministradorController extends Controller
             'Fecha_nacimiento' => $request->fecha_nacimiento,
             'Fecha_registro' => now(),
             'Celular' => $request->celular,
-            'Id_Rol' => $rolAdmin->Id_Rol,
+            'Id_roles' => $rolAdmin->Id_roles,
         ]);
-    
-        // Crear usuario
+
         Usuario::create([
             'Correo' => $request->correo,
             'Contrasania' => bcrypt($clave),
-            'Id_Persona' => $persona->Id_Persona
+            'Id_personas' => $persona->Id_personas,
         ]);
-    
-        // Enviar correo con clave
+
+        // Enviar correo con la contraseña generada
         Mail::to($request->correo)->send(new ClaveGeneradaAdmin(
             $request->nombre,
             $request->correo,
             $clave
         ));
-    
-        return redirect()->back()->with('success', 'Administrador registrado y correo enviado.');
-    }
 
-    public function index()
-    {
-        return view('administrador.registrosAdministradores');
+        return redirect()->back()->with('success', 'Administrador registrado correctamente. La contraseña fue enviada al correo.');
     }
 }
-

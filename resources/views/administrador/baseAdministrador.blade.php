@@ -98,7 +98,6 @@
                 <button type="button" class="btn btn-danger w-75">Cerrar sesión</button>
                 <img src="https://github.com/mdo.png" alt="perfil" width="32" height="32" class="rounded-circle">
             </a>
-        <hr>
           
         
     </div>
