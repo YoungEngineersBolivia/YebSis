@@ -2,34 +2,22 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Notifications\Notifiable;
+use Illuminate\Database\Eloquent\Model;
 
 class Persona extends Model
 {
-    use HasFactory;
-    use Notifiable;
-    protected $fillable = [
-        'nombre',
-        'apellido',
-        'genero',
-        'fecha_nacimiento',
-        'fecha_registro',
-        'celular',
-        'direccion_domicilio',
-    ];
-
-    protected $hidden = [
-    ];
-    protected function casts(): array
-    {
-        return [
-            'fecha_nacimiento' => 'datetime',
-        ];
-    }
-    protected $table = 'Personas'; 
-    protected $primaryKey = 'id_Persona';
+    protected $table = 'personas';
+    protected $primaryKey = 'Id_personas';
     public $timestamps = true;
+
+    protected $fillable = [
+        'Nombre',
+        'Apellido',
+        'Genero',
+        'Direccion_domicilio',
+        'Fecha_nacimiento',
+        'Fecha_registro',
+        'Celular',
+        'Id_roles'
+    ];
 }
