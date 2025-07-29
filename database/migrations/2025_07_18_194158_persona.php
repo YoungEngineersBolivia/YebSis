@@ -100,16 +100,13 @@ return new class extends Migration
         Schema::create('tutores', function (Blueprint $table) {
             $table->id('Id_tutores');
             $table->string('Descuento')->nullable();
-            $table->string('Parentezco')->nullable();
+            $table->string('Parentesco')->nullable();
             $table->string('Nit')->nullable();
             $table->foreignId('Id_personas')
                   ->constrained('personas', 'Id_personas')
                   ->onDelete('cascade');
             $table->foreignId('Id_usuarios')
                   ->constrained('usuarios', 'Id_usuarios')
-                  ->onDelete('cascade');
-            $table->foreignId('Id_pagos')
-                  ->constrained('pagos', 'Id_pagos')
                   ->onDelete('cascade');
             $table->timestamps();
         });

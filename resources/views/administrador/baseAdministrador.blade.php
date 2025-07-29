@@ -34,10 +34,20 @@
                 </a>
             </li>
             <li>
-                <a href="/administrador/registrosAdministrador" class="nav-link link-dark d-flex align-items-center gap-2">
+                <a class="nav-link link-dark d-flex align-items-center gap-2" data-bs-toggle="collapse" href="#submenuRegistrar" role="button" aria-expanded="false" aria-controls="submenuRegistrar">
                     <i class="bi bi-journal-text"></i>
-                    Registros
+                    Registrar
+                    <i class="bi bi-caret-down-fill ms-auto"></i>
                 </a>
+                <div class="collapse ps-4" id="submenuRegistrar">
+                    <ul class="nav flex-column">
+                        <li><a class="nav-link" href="/administrador/registrosAdministrador">Administrador</a></li>
+                        <li><a class="nav-link" href="/administrador/registrarComercial">Comercial</a></li>
+                        <li><a class="nav-link" href="/administrador/registrarTutor">Tutor</a></li>
+                        <li><a class="nav-link" href="/administrador/registrarEstudiante">Estudiante</a></li>
+                        <li><a class="nav-link" href="/administrador/registrarProfesor">Profesor</a></li>
+                    </ul>
+                </div>
             </li>
             <li>
                 <a href="/administrador/tutoresAdministrador" class="nav-link link-dark d-flex align-items-center gap-2">

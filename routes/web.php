@@ -12,8 +12,12 @@ Route::post('/administradores/registrar', [AdministradorController::class, 'regi
 
 Route::post('/administradores/registrarC', [AdministradorController::class, 'registrarComercial'])->name('administrador.registrarC');
 
+Route::post('/administradores/registrarT', [AdministradorController::class, 'registrarTutor'])->name('administrador.registrarT');
 //GET ROUTES
 
+Route::get('/administrador/registrarTutor', function(){
+    return view('/administrador/registrarTutor');
+});
 
 Route::get('/administrador/registrarComercial', function() {
     return view('/administrador/registrarComercial');
