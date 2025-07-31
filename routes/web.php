@@ -7,12 +7,31 @@ use App\Http\Controllers\EstudianteController;
 use App\Http\Controllers\AdministradorController;
 
 // POST ROUTES
-    
+
 Route::post('/administradores/registrar', [AdministradorController::class, 'registrarAdmin'])->name('administrador.registrar');
+
+Route::post('/administradores/registrarC', [AdministradorController::class, 'registrarComercial'])->name('administrador.registrarC');
+
+Route::post('/administradores/registrarT', [AdministradorController::class, 'registrarTutor'])->name('administrador.registrarT');
+
+Route::post('/administradores/registrarP', [AdministradorController::class, 'registrarProfesor'])->name('administrador.registrarP');
+
+Route::get('/estudiantes/registrar', [EstudianteController::class, 'mostrarFormulario'])->name('estudiantes.formulario');
+Route::post('/estudiantes/registrar', [EstudianteController::class, 'registrar'])->name('estudiantes.registrar');
 
 //GET ROUTES
 
-Route::get('/administradores/registro', [AdministradorController::class, 'index'])->name('administrador.formulario');
+Route::get('/administrador/registrarProfesor', function(){
+    return view('/administrador/registrarProfesor');
+});
+
+Route::get('/administrador/registrarTutor', function(){
+    return view('/administrador/registrarTutor');
+});
+
+Route::get('/administrador/registrarComercial', function() {
+    return view('/administrador/registrarComercial');
+});
 
 Route::get('/', function () {
     return view('/administrador/baseAdministrador');
@@ -88,3 +107,4 @@ Route::get('/administrador/sucursalesAdministrador',function (){
     return view('/administrador/sucursalesAdministrador');
 });
 
+Route::get('/estudiantes', [EstudianteController::class, 'index'])->name('estudiantes.index');

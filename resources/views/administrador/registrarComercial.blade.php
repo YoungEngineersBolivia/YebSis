@@ -4,10 +4,10 @@
 
 @section('content')
 <div class="d-flex align-items-center gap-3">
-    <h1 class="me-2">Registrar administrador</h1>
+    <h1 class="me-2">Registrar comercial</h1>
 </div>
 
-<form action="/administradores/registrar" method="POST">
+<form action="/administradores/registrarC" method="POST">
     @csrf
 
     <div class="d-flex align-items-end gap-3 mb-3">

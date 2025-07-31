@@ -4,10 +4,10 @@
 
 @section('content')
 <div class="d-flex align-items-center gap-3">
-    <h1 class="me-2">Registrar administrador</h1>
+    <h1 class="me-2">Registrar Profesor</h1>
 </div>
 
-<form action="/administradores/registrar" method="POST">
+<form action="/administradores/registrarP" method="POST">
     @csrf
 
     <div class="d-flex align-items-end gap-3 mb-3">
@@ -71,6 +71,12 @@
             <label for="correo" class="form-label">Correo</label>
             <input type="email" id="correo" name="correo" class="form-control" 
                    value="{{ old('correo') }}" required>
+        </div>
+
+        <div style="width: 220px;">
+            <label for="profesion" class="form-label">Profesion</label>
+            <input type="string" id="profesion" name="profesion" class="form-control" 
+                   value="{{ old('profesion') }}" required>
         </div>
 
         <div>

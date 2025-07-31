@@ -4,10 +4,10 @@
 
 @section('content')
 <div class="d-flex align-items-center gap-3">
-    <h1 class="me-2">Registrar administrador</h1>
+    <h1 class="me-2">Registrar estudiante</h1>
 </div>
 
-<form action="/administradores/registrar" method="POST">
+<form action="/estudiantes/registrar" method="POST">
     @csrf
 
     <div class="d-flex align-items-end gap-3 mb-3">
@@ -67,16 +67,39 @@
     </div>
 
     <div class="d-flex align-items-end gap-3">
+
+        <div style="width: 150px;">
+            <label for="codigo_estudiante" class="form-label">Código</label>
+            <input type="text" id="codigo_estudiante" name="codigo_estudiante" class="form-control" 
+                value="{{ old('codigo_estudiante') }}" required>
+        </div>
+
         <div style="width: 220px;">
-            <label for="correo" class="form-label">Correo</label>
-            <input type="email" id="correo" name="correo" class="form-control" 
-                   value="{{ old('correo') }}" required>
+            <label for="programa" class="form-label">Programa</label>
+            <select id="programa" name="programa" class="form-select" required>
+                <option value="" selected disabled>Seleccione un programa...</option>
+                @foreach($programas as $programa)
+                    <option value="{{ $programa->Id_programas }}">{{ $programa->Nombre }}</option>
+                @endforeach
+            </select>
+        </div>
+
+        <div style="width: 220px;">
+            <label for="sucursal" class="form-label">Sucursal</label>
+            <select id="sucursal" name="sucursal" class="form-select" required>
+                <option value="" selected disabled>Seleccione una sucursal...</option>
+                @foreach($sucursales as $sucursal)
+                    <option value="{{ $sucursal->Id_Sucursales }}">{{ $sucursal->Nombre }}</option>
+                @endforeach
+            </select>
         </div>
 
         <div>
             <button type="submit" class="btn btn-primary">Registrar</button>
         </div>
+
     </div>
+
 </form>
 
 @endsection
