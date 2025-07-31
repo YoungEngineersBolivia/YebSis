@@ -33,7 +33,7 @@ return new class extends Migration
                   $table->id('Id_programas');
                   $table->string('Nombre')->nullable();
                   $table->string('Descripcion')->nullable();
-                  $table->mediumBlob('Foto')->nullable();
+                  $table->binary('Foto')->nullable();
                   $table->string('Duracion')->nullable();
                   $table->string('Rango_edad')->nullable();
                   $table->float('Costo')->nullable();
@@ -48,7 +48,7 @@ return new class extends Migration
         });
 
         Schema::create('usuarios', function (Blueprint $table) {
-            $table->id('Id_Usuarios');
+            $table->id('Id_usuarios');
             $table->string('Correo')->nullable();
             $table->string('Contrasania')->nullable();
             $table->foreignId('Id_personas')
@@ -102,13 +102,10 @@ return new class extends Migration
             $table->string('Descuento')->nullable();
             $table->string('Parentesco')->nullable();
             $table->string('Nit')->nullable();
-            $table->foreignId('Id_personas')
-                  ->constrained('personas', 'Id_personas')
-                  ->onDelete('cascade');
-            $table->foreignId('Id_usuarios')
-                  ->constrained('usuarios', 'Id_usuarios')
-                  ->onDelete('cascade');
+            $table->foreignId('Id_personas');
+            $table->foreignId('Id_usuarios');
             $table->timestamps();
+      
         });
 
         Schema::create('clases_de_Prueba', function (Blueprint $table) {
@@ -124,7 +121,7 @@ return new class extends Migration
 
         Schema::create('publicaciones', function (Blueprint $table) {
             $table->id('Id_publicaciones');
-            $table->string('Imagen')->nullable();
+            $table->binary('Imagen')->nullable();
             $table->string('Nombre')->nullable();
             $table->string('Descripcion')->nullable();
             $table->date('Fecha')->nullable();
@@ -200,7 +197,6 @@ return new class extends Migration
             $table->id('Id_citas');
             $table->date('Fecha')->nullable();
             $table->time('Hora')->nullable();
-            $table->boolean('Nombre')->nullable();
             $table->foreignId('Id_tutores')
                   ->constrained('tutores', 'Id_tutores')
                   ->onDelete('cascade');
@@ -216,7 +212,7 @@ return new class extends Migration
             $table->string('Descripcion_egreso')->nullable();
             $table->date('Fecha_egreso')->nullable();
             $table->float('Monto_egreso')->nullable();
-            $table->timestamps();
+      
         });
 
         Schema::create('planes_pagos', function (Blueprint $table) {
