@@ -18,7 +18,6 @@ class EstudianteController extends Controller
         return view('administrador.estudiantesAdministrador', compact('estudiantes'));
     }
 
-    // Mostrar formulario
     public function mostrarFormulario()
     {
         $programas = Programa::all();
@@ -26,8 +25,6 @@ class EstudianteController extends Controller
         return view('administrador.registrarEstudiante', compact('programas', 'sucursales'));
     }
 
-
-    // Registrar estudiante
     public function registrar(Request $request)
     {
         $request->validate([

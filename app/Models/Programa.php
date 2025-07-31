@@ -9,7 +9,7 @@ class Programa extends Model
 {
     use HasFactory;
 
-    protected $table = 'programas'; // Nombre de la tabla
+    protected $table = 'programas'; 
 
     protected $fillable = [
         'Nombre',
@@ -50,5 +50,5 @@ class Programa extends Model
         }
         return $query;
     }
-    
+
 }

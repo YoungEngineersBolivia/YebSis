@@ -2,7 +2,7 @@
 
 @section('title', 'Programas')
 @section('styles')
-<link href="{{ asset('css/programasAdministrador.css') }}" rel="stylesheet">
+<link href="{{ asset('css/style.css') }}" rel="stylesheet">
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 @endsection
 
@@ -179,7 +179,24 @@
             </div>
         </div>
     </div>
+    <!-- Modal para editar -->
+        <div class="modal fade" id="modalPrograma" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Editar Programa</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="modalProgramaBody">
+                <!-- Aquí se cargará el contenido desde el controlador -->
+            </div>
+            </div>
+        </div>
+        </div>
+
 </div>
+
+
 @endsection
 
 @section('scripts')

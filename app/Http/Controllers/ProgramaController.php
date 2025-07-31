@@ -3,15 +3,12 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\Programa; // Asegúrate de que tengas el modelo Programa
+use App\Models\Programa; 
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class ProgramaController extends Controller
 {
-    /**
-     * Mostrar la lista de programas
-     */
     public function index()
     {
         $programas = Programa::orderBy('Id_programas', 'desc')->paginate(10);
@@ -59,28 +56,18 @@ class ProgramaController extends Controller
         }
     }
 
-    /**
-     * Mostrar un programa específico
-     */
     public function show($id)
     {
         $programa = Programa::findOrFail($id);
         return response()->json($programa);
     }
 
-    /**
-     * Mostrar el formulario de edición
-     */
     public function edit($id)
 {
     $programa = Programa::findOrFail($id);
     return view('programas.partials.form_edit', compact('programa'));
 }
 
-
-    /**
-     * Actualizar un programa
-     */
     public function update(Request $request, $id)
     {
         // Validar los datos
@@ -102,9 +89,9 @@ class ProgramaController extends Controller
             $programa->Duracion = $request->duracion;
             $programa->Descripcion = $request->descripcion;
 
-            // Manejar la actualización de foto
+            
             if ($request->hasFile('foto')) {
-                // Eliminar la foto anterior si existe
+                
                 if ($programa->Foto && Storage::disk('public')->exists($programa->Foto)) {
                     Storage::disk('public')->delete($programa->Foto);
                 }
@@ -124,15 +111,12 @@ class ProgramaController extends Controller
         }
     }
 
-    /**
-     * Eliminar un programa
-     */
-    public function destroy($id)
+        public function destroy($id)
     {
         try {
             $programa = Programa::findOrFail($id);
 
-            // Eliminar la foto si existe
+            
             if ($programa->Foto && Storage::disk('public')->exists($programa->Foto)) {
                 Storage::disk('public')->delete($programa->Foto);
             }
