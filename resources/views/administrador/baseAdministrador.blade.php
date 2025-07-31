@@ -44,7 +44,7 @@
                         <li><a class="nav-link" href="/administrador/registrosAdministrador">Administrador</a></li>
                         <li><a class="nav-link" href="/administrador/registrarComercial">Comercial</a></li>
                         <li><a class="nav-link" href="/administrador/registrarTutor">Tutor</a></li>
-                        <li><a class="nav-link" href="/administrador/registrarEstudiante">Estudiante</a></li>
+                        <li><a class="nav-link" href="/estudiantes/registrar">Estudiante</a></li>
                         <li><a class="nav-link" href="/administrador/registrarProfesor">Profesor</a></li>
                     </ul>
                 </div>

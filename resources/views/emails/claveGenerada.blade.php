@@ -6,7 +6,7 @@
 </head>
 <body>
     <h2>Hola {{ $nombre }}</h2>
-    <p>Su cuenta como administrador ha sido creada correctamente.</p>
+    <p>Su cuenta para Young Engineers ha sido creada correctamente.</p>
 
     <p><strong>Correo:</strong> {{ $correo }}</p>
     <p><strong>Contraseña temporal:</strong> {{ $clave }}</p>
