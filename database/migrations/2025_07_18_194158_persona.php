@@ -29,16 +29,16 @@ return new class extends Migration
             $table->timestamps();
         });
 
-        Schema::create('programas', function (Blueprint $table) {
-            $table->id('Id_programas');
-            $table->string('Nombre')->nullable();
-            $table->string('Descripcion')->nullable();
-            $table->string('Foto')->nullable();
-            $table->string('Duracion')->nullable();
-            $table->string('Rango_edad')->nullable();
-            $table->float('Costo')->nullable();
-            $table->timestamps();
-        });
+            Schema::create('programas', function (Blueprint $table) {
+                  $table->id('Id_programas');
+                  $table->string('Nombre')->nullable();
+                  $table->string('Descripcion')->nullable();
+                  $table->mediumBlob('Foto')->nullable();
+                  $table->string('Duracion')->nullable();
+                  $table->string('Rango_edad')->nullable();
+                  $table->float('Costo')->nullable();
+                  $table->timestamps();
+            });
 
         Schema::create('sucursales', function (Blueprint $table) {
             $table->id('Id_Sucursales');

@@ -1,0 +1,183 @@
+
+.pagination {
+    font-size: 0.85rem;
+}
+
+.pagination .page-link {
+    padding: 0.25rem 0.5rem !important; 
+    font-size: 0.85rem !important;      
+    line-height: 1.2 !important;        
+}
+.container-fluid {
+    padding: 0 2rem;
+}
+
+h1 {
+    font-size: 1.8rem;
+    font-weight: 600;
+    color: #333;
+}
+
+.btn-primary {
+    background-color: #007bff;
+    border-color: #007bff;
+    border-radius: 6px;
+    font-weight: 500;
+    padding: 8px 16px;
+}
+
+.btn-primary:hover {
+    background-color: #0056b3;
+    border-color: #0056b3;
+}
+
+
+.input-group-text {
+    background-color: #ffffff;
+    border-color: #ffffff;
+    color: #ffffff;
+}
+
+.form-control {
+    border-color: #ced4da;
+}
+
+.form-control:focus {
+    border-color: #80bdff;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+/* Estilos de la tabla */
+.table {
+    margin-bottom: 0;
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.table-light {
+    background-color: #f8f9fa;
+    border-bottom: 2px solid #e9ecef;
+}
+
+.table-light th {
+    padding: 12px 16px;
+    font-size: 0.875rem;
+    vertical-align: middle;
+    border-color: #e9ecef;
+}
+
+.table tbody td {
+    padding: 16px;
+    vertical-align: middle;
+    border-color: #e9ecef;
+    font-size: 0.875rem;
+}
+
+.fw-bold {
+    font-weight: 600 !important;
+    color: #ffffff !important;
+}
+
+.text-muted {
+    color: #ffffff !important;
+}
+
+
+.table-hover tbody tr:hover {
+    background-color: #f8f9fa;
+}
+
+.btn-sm {
+    padding: 4px 8px;
+    font-size: 0.75rem;
+    border-radius: 4px;
+    width: 32px;
+    height: 32px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-outline-danger {
+    color: #dc3545;
+    border-color: #dc3545;
+}
+
+.btn-outline-danger:hover {
+    background-color: #dc3545;
+    border-color: #dc3545;
+    color: white;
+}
+
+.btn-outline-primary {
+    color: #007bff;
+    border-color: #007bff;
+}
+
+.btn-outline-primary:hover {
+    background-color: #007bff;
+    border-color: #007bff;
+    color: white;
+}
+
+.btn-outline-secondary {
+    color: #6c757d;
+    border-color: #6c757d;
+}
+
+.btn-outline-secondary:hover {
+    background-color: #6c757d;
+    border-color: #6c757d;
+    color: white;
+}
+
+.fa-sort {
+    font-size: 0.7rem;
+    opacity: 0.5;
+}
+
+th:hover .fa-sort {
+    opacity: 1;
+    cursor: pointer;
+}
+.modal-header {
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.modal-title {
+    font-weight: 600;
+    color: #333;
+}
+
+.modal-body {
+    padding: 1.5rem;
+}
+
+.modal-footer {
+    background-color: #f8f9fa;
+    border-top: 1px solid #e9ecef;
+}
+
+.btn, .form-control, .table tbody tr {
+    transition: all 0.2s ease-in-out;
+}
+
+
+.form-label {
+    font-weight: 500;
+    color: #333;
+    margin-bottom: 0.5rem;
+}
+
+.form-control, .form-select {
+    border-radius: 6px;
+    border: 1px solid #ced4da;
+    padding: 0.5rem 0.75rem;
+}
+
+.form-control:focus, .form-select:focus {
+    border-color: #80bdff;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}

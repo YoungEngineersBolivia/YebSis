@@ -72,6 +72,26 @@ Route::get('administrador/pubnotAdministrador', function () {
 });
 
 Route::get('/administrador/programasAdministrador', [ProgramaController::class, 'index']);
+
+ Route::get('/programas', [ProgramaController::class, 'index'])->name('programas.index');
+    
+    // Ruta para crear un nuevo programa
+    Route::post('/programas', [ProgramaController::class, 'store'])->name('programas.store');
+    
+    // Ruta para mostrar un programa específico
+    Route::get('/programas/{id}', [ProgramaController::class, 'show'])->name('programas.show');
+    
+    // Ruta para mostrar el formulario de edición
+     Route::get('/admin/programas/{id}/edit', [ProgramaController::class, 'edit'])->name('programas.edit');
+
+    
+    // Ruta para actualizar un programa
+    Route::put('/programas/{id}', [ProgramaController::class, 'update'])->name('programas.update');
+    
+    // Ruta para eliminar un programa
+    Route::delete('/programas/{id}', [ProgramaController::class, 'destroy'])->name('programas.destroy');
+
+
 Route::get('administrador/nuevosProgramasAdministrador', function(){
     return view('administrador.nuevoProgramaAdministrador');
 });
