@@ -14,12 +14,17 @@ class Estudiante extends Model
     public $incrementing = true;
     protected $keyType = 'int';
 
-    // Relación con persona
-    // app/Models/Estudiante.php
-public function persona()
-{
-    return $this->belongsTo(Persona::class, 'Id_Persona', 'Id_Persona');
-}
+    protected $fillable = [
+        'Cod_estudiante',
+        'Estado',
+        'Id_Personas',
+        'Id_profesores',
+        'Id_programas',
+        'Id_sucursales',
+    ];
 
-    // También podrías añadir relaciones con profesor, programa, etc.
+    public function persona()
+    {
+        return $this->belongsTo(Persona::class, 'Id_Personas', 'Id_personas');
+    }
 }

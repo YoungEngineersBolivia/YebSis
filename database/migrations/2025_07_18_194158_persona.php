@@ -71,7 +71,7 @@ return new class extends Migration
 
         Schema::create('estudiantes', function (Blueprint $table) {
             $table->id('Id_estudiantes');
-            $table->string('Cod_estudiante')->unique;
+            $table->string('Cod_estudiante')->unique();
             $table->string('Estado')->nullable();
             $table->foreignId('Id_Personas')
                   ->constrained('personas', 'Id_personas')

@@ -5,6 +5,7 @@ use App\Models\Persona;
 use App\Models\Usuario;
 use App\Models\Tutores;
 use App\Models\Rol;  
+use App\Models\Profesor;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Mail;
@@ -180,6 +181,59 @@ class AdministradorController extends Controller
             \Log::error('Stack trace: ' . $e->getTraceAsString());
             return back()->withErrors(['error' => 'Error al registrar el tutor: ' . $e->getMessage()])->withInput();
         }
+    }
+
+    public function registrarProfesor(Request $request)
+    {
+        $request->validate([
+            'nombre' => 'required|string|max:255',
+            'apellido' => 'required|string|max:255',
+            'correo' => 'required|email|unique:usuarios,Correo',
+            'genero' => 'required|in:M,F',
+            'fecha_nacimiento' => 'required|date',
+            'celular' => 'required|string|max:20',
+            'direccion_domicilio' => 'required|string|max:255',
+            'profesion' => 'required|string|max:255',
+        ]);
+
+        $rolProfesor = Rol::where('Nombre_rol', 'Profesor')->first();
+
+        if (!$rolProfesor) {
+            return back()->withErrors(['error' => 'Rol de profesor no encontrado.']);
+        }
+
+        $clave = Str::random(10);
+
+        $persona = Persona::create([
+            'Nombre' => $request->nombre,
+            'Apellido' => $request->apellido,
+            'Genero' => $request->genero,
+            'Direccion_domicilio' => $request->direccion_domicilio,
+            'Fecha_nacimiento' => $request->fecha_nacimiento,
+            'Fecha_registro' => now(),
+            'Celular' => $request->celular,
+            'Id_roles' => $rolProfesor->Id_roles, 
+        ]);
+
+        $usuario = Usuario::create([
+            'Correo' => $request->correo,
+            'Contrasania' => bcrypt($clave),
+            'Id_personas' => $persona->Id_personas,
+        ]);
+
+        Profesor::create([
+            'Profesion' => $request->profesion,
+            'Id_personas' => $persona->Id_personas,
+            'Id_usuarios' => $usuario->Id_Usuarios,
+        ]);
+
+        Mail::to($request->correo)->send(new ClaveGeneradaAdmin(
+            $request->nombre,
+            $request->correo,
+            $clave
+        ));
+
+        return redirect()->back()->with('success', 'Profesor registrado correctamente. La contraseña fue enviada al correo.');
     }
 
 }
