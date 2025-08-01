@@ -14,8 +14,6 @@
             <i class="fas fa-plus me-2"></i>Añadir Programa
         </button>
     </div>
-
-    <!-- Mostrar mensajes de éxito o error -->
     @if(session('success'))
         <div class="alert alert-success alert-dismissible fade show" role="alert">
             {{ session('success') }}
@@ -123,7 +121,6 @@
         </div>
     @endif
 
-    <!-- Modal para nuevo programa -->
     <div class="modal fade" id="nuevoProgramaModal" tabindex="-1" aria-labelledby="nuevoProgramaLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg">
             <div class="modal-content" id="modalContent">
@@ -188,7 +185,7 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body" id="modalProgramaBody">
-                <!-- Aquí se cargará el contenido desde el controlador -->
+               
             </div>
             </div>
         </div>

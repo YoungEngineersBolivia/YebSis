@@ -73,12 +73,13 @@ return new class extends Migration
             $table->id('Id_estudiantes');
             $table->string('Cod_estudiante')->unique();
             $table->string('Estado')->nullable();
-            $table->foreignId('Id_Personas')
+            $table->foreignId('Id_personas')
                   ->constrained('personas', 'Id_personas')
                   ->onDelete('cascade');
             $table->foreignId('Id_profesores')
+                  ->nullable()
                   ->constrained('profesores', 'Id_profesores')
-                  ->onDelete('cascade');
+                  ->onDelete('set null');
             $table->foreignId('Id_programas')
                   ->constrained('programas', 'Id_programas')
                   ->onDelete('cascade');

@@ -9,10 +9,11 @@
 @section('content')
     <div class="container-fluid mt-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1 class="mb-0">Lista de Tutores</h1>
-        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#nuevoProgramaModal">
-            <i class="fas fa-plus me-2"></i>Añadir Programasssssssss
-        </button>
+        <h1 class="mb-0">Lista de Estudiantes</h1>
+        <a href="{{ route('estudiantes.registrar') }}" class="btn btn-primary">
+            <i class="fas fa-plus me-2"></i>Registrar Estudiante
+        </a>
+
     </div>
 
     @if(session('success'))
@@ -83,6 +84,9 @@
                                             <button class="btn btn-sm btn-outline-danger" title="Eliminar">
                                                 <i class="fas fa-trash"></i>
                                             </button>
+                                            <button class="btn btn-sm btn-outline-secondary" >
+                                        <i class="fas fa-user"></i>
+                                    </button>
                                         </div>
                                     </td>
                                 </tr>
