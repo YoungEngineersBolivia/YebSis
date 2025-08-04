@@ -14,6 +14,7 @@ return new class extends Migration
             $table->timestamps();
         });
 
+         
         Schema::create('personas', function (Blueprint $table) {
             $table->id('Id_personas');
             $table->string('Nombre')->nullable();
@@ -69,21 +70,35 @@ return new class extends Migration
             $table->timestamps();
         });
 
+          Schema::create('tutores', function (Blueprint $table) {
+            $table->id('Id_tutores');
+            $table->string('Descuento')->nullable();
+            $table->string('Parentesco')->nullable();
+            $table->string('Nit')->nullable();
+            $table->foreignId('Id_personas');
+            $table->foreignId('Id_usuarios');
+            $table->timestamps();
+      
+        });
         Schema::create('estudiantes', function (Blueprint $table) {
             $table->id('Id_estudiantes');
             $table->string('Cod_estudiante')->unique();
             $table->string('Estado')->nullable();
-            $table->foreignId('Id_Personas')
+            $table->foreignId('Id_personas')
                   ->constrained('personas', 'Id_personas')
                   ->onDelete('cascade');
             $table->foreignId('Id_profesores')
+                  ->nullable()
                   ->constrained('profesores', 'Id_profesores')
-                  ->onDelete('cascade');
+                  ->onDelete('set null');
             $table->foreignId('Id_programas')
                   ->constrained('programas', 'Id_programas')
                   ->onDelete('cascade');
             $table->foreignId('Id_sucursales')
                   ->constrained('sucursales', 'Id_sucursales')
+                  ->onDelete('cascade');
+            $table->foreignId('Id_tutores')
+                  ->constrained('tutores', 'Id_tutores')
                   ->onDelete('cascade');
             $table->timestamps();
         });
@@ -97,16 +112,7 @@ return new class extends Migration
             $table->timestamps();
         });
 
-        Schema::create('tutores', function (Blueprint $table) {
-            $table->id('Id_tutores');
-            $table->string('Descuento')->nullable();
-            $table->string('Parentesco')->nullable();
-            $table->string('Nit')->nullable();
-            $table->foreignId('Id_personas');
-            $table->foreignId('Id_usuarios');
-            $table->timestamps();
-      
-        });
+     
 
         Schema::create('clases_de_Prueba', function (Blueprint $table) {
             $table->id('Id_clases_Prueba');
@@ -118,9 +124,23 @@ return new class extends Migration
                   ->onDelete('cascade');
             $table->timestamps();
         });
+        //////revisar
 
         Schema::create('publicaciones', function (Blueprint $table) {
             $table->id('Id_publicaciones');
+            $table->binary('Imagen')->nullable();
+            $table->string('Nombre')->nullable();
+            $table->string('Descripcion')->nullable();
+            $table->date('Fecha')->nullable();
+            $table->time('Hora')->nullable();
+            $table->boolean('Estado')->nullable();
+            $table ->foreignId('Id_personas')
+                   ->contrained('personas','Id_personas')
+                   ->onDelete('cascade');
+            $table->timestamps();
+        });
+        Schema::create('notificaciones', function (Blueprint $table) {
+            $table->id('Id_notificaciones');
             $table->binary('Imagen')->nullable();
             $table->string('Nombre')->nullable();
             $table->string('Descripcion')->nullable();
@@ -132,10 +152,9 @@ return new class extends Migration
                   ->onDelete('cascade');
             $table->timestamps();
         });
-
+/////////revisar 
         Schema::create('modelos', function (Blueprint $table) {
             $table->id('Id_modelos');
-
             $table->string('Nombre_modelo')->nullable();
             $table->foreignId('Id_programa')
                   ->constrained('programas', 'Id_programas')
@@ -227,8 +246,8 @@ return new class extends Migration
             $table->foreignId('Id_pagos')
                   ->constrained('pagos', 'Id_pagos')
                   ->onDelete('cascade');
-            $table->foreignId('Id_tutores')
-                  ->constrained('tutores', 'Id_tutores')
+             $table->foreignId('Id_estudiantes')
+                  ->constrained('estudiantes', 'Id_estudiantes')
                   ->onDelete('cascade');
             $table->timestamps();
         });

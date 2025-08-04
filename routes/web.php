@@ -5,6 +5,8 @@ use App\Http\Controllers\ProgramaController;
 use App\Http\Controllers\RegistroAdministradorController;
 use App\Http\Controllers\EstudianteController;
 use App\Http\Controllers\AdministradorController;
+use App\Http\Controllers\GraduadoController;
+use App\Http\Controllers\SucursalController;
 
 // POST ROUTES
 
@@ -95,16 +97,15 @@ Route::get('/administrador/programasAdministrador', [ProgramaController::class, 
 Route::get('administrador/nuevosProgramasAdministrador', function(){
     return view('administrador.nuevoProgramaAdministrador');
 });
-Route::get('/administrador/graduadosAdministrador', function () {
-    return view('/administrador/graduadosAdministrador'); 
-});
+
+Route::get('/administrador/graduadosAdministrador', [GraduadoController::class, 'index'])->name('graduados.index');
 
 Route::get('/administrador/pagosAdministrador',function () {
     return view('/administrador/pagosAdministrador');
 });
 
-Route::get('/administrador/sucursalesAdministrador',function (){
-    return view('/administrador/sucursalesAdministrador');
-});
+Route::get('/administrador/sucursalesAdministrador', [SucursalController::class, 'index'])->name('sucursales.index');
+Route::post('/administrador/sucursalesAdministrador', [SucursalController::class, 'store'])->name('sucursales.store');
+
 
 Route::get('/estudiantes', [EstudianteController::class, 'index'])->name('estudiantes.index');
