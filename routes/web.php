@@ -6,6 +6,7 @@ use App\Http\Controllers\RegistroAdministradorController;
 use App\Http\Controllers\EstudianteController;
 use App\Http\Controllers\AdministradorController;
 use App\Http\Controllers\TutoresController;
+use App\Http\Controllers\UsuariosController;
 
 // POST ROUTES
 
@@ -58,11 +59,16 @@ Route::get('/admin/tutores/{id}/edit', [TutoresController::class, 'edit'])->name
 Route::put('/admin/tutores/{id}', [TutoresController::class, 'update'])->name('tutores.update');
 Route::delete('/admin/tutores/{id}', [TutoresController::class, 'destroy'])->name('tutores.destroy');
 
-//
+//USUARIOS
+Route::get('/administrador/usuariosAdministrador', [UsuariosController::class, 'index'])->name('usuarios.index');
 
-Route::get('/administrador/usuariosAdministrador', function () {
-    return view('/administrador/usuariosAdministrador'); 
-});
+Route::get('/admin/usuarios/{id}', [UsuariosController::class, 'show'])->name('usuarios.show');
+Route::get('/admin/usuarios/{id}/edit', [UsuariosController::class, 'edit'])->name('usuarios.edit');
+Route::put('/admin/usuarios/{id}', [UsuariosController::class, 'update'])->name('usuarios.update');
+Route::delete('/admin/usuarios/{id}', [UsuariosController::class, 'destroy'])->name('usuarios.destroy');
+
+
+//
 
 Route::get('/administrador/horariosAdministrador', function () {
     return view('/administrador/horariosAdministrador'); 

@@ -182,8 +182,10 @@ return new class extends Migration
 
         Schema::create('horarios', function (Blueprint $table) {
             $table->id('Id_horarios');
-            $table->time('Hora_clase')->nullable();
-            $table->string('Dia_clase')->nullable();
+            $table->time('Horario_clase_uno')->nullable();
+            $table->string('Dia_clase_uno')->nullable();
+            $table->time('Horario_clase_dos')->nullable();
+            $table->string('Dia_clase_dos')->nullable();
             $table->foreignId('Id_programas')
                   ->constrained('programas', 'Id_programas')
                   ->onDelete('cascade');
