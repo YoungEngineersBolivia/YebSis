@@ -15,9 +15,6 @@ class ProgramaController extends Controller
          return view('administrador.programasAdministrador', compact('programas'));
     }
 
-    /**
-     * Almacenar un nuevo programa
-     */
     public function store(Request $request)
     {
         // Validar los datos
