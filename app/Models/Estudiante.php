@@ -13,18 +13,20 @@ class Estudiante extends Model
     protected $primaryKey = 'Id_estudiantes';
     public $incrementing = true;
     protected $keyType = 'int';
+    public $timestamps = true; 
 
     protected $fillable = [
         'Cod_estudiante',
         'Estado',
-        'Id_Personas',
+        'Id_personas',     
         'Id_profesores',
         'Id_programas',
         'Id_sucursales',
+        'Id_tutores',
     ];
 
     public function persona()
     {
-        return $this->belongsTo(Persona::class, 'Id_Personas', 'Id_personas');
+        return $this->belongsTo(Persona::class, 'Id_personas', 'Id_personas');
     }
 }
