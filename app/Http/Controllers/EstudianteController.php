@@ -8,6 +8,7 @@ use App\Models\Persona;
 use App\Models\Programa;
 use App\Models\Sucursal;
 use App\Models\Rol;
+use App\Models\Tutores;
 
 class EstudianteController extends Controller
 {
@@ -22,7 +23,8 @@ class EstudianteController extends Controller
     {
         $programas = Programa::all();
         $sucursales = Sucursal::all();
-        return view('administrador.registrarEstudiante', compact('programas', 'sucursales'));
+        $tutores = Tutores::with('persona')->get(); 
+        return view('administrador.registrarEstudiante', compact('programas', 'sucursales', 'tutores'));
     }
 
     public function registrar(Request $request)
@@ -37,6 +39,7 @@ class EstudianteController extends Controller
             'codigo_estudiante' => 'required|string|unique:estudiantes,Cod_estudiante',
             'programa' => 'required|exists:programas,Id_programas',
             'sucursal' => 'required|exists:sucursales,Id_Sucursales',
+            'tutor_estudiante' => 'required|exists:tutores,Id_tutores',
         ]);
 
         $rolEstudiante = Rol::where('Nombre_rol', 'Estudiante')->first();
@@ -63,6 +66,7 @@ class EstudianteController extends Controller
             'Id_programas' => $request->programa,
             'Id_sucursales' => $request->sucursal,
             'Id_profesores' => 1,
+            'Id_tutores' => $request->tutor_estudiante,
         ]);
 
         return redirect()->back()->with('success', 'Estudiante registrado correctamente.');
