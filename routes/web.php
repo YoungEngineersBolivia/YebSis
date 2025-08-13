@@ -12,6 +12,7 @@ use App\Http\Controllers\SucursalController;
 use App\Http\Controllers\HorariosController;
 
 
+
 // POST ROUTES
 
 Route::post('/administradores/registrar', [AdministradorController::class, 'registrarAdmin'])->name('administrador.registrar');
