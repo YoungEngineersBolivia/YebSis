@@ -75,8 +75,13 @@ return new class extends Migration
             $table->string('Descuento')->nullable();
             $table->string('Parentesco')->nullable();
             $table->string('Nit')->nullable();
-            $table->foreignId('Id_personas');
-            $table->foreignId('Id_usuarios');
+            $table->string('Nombre_factura')->nullable();
+            $table->foreignId('Id_personas')
+                  ->constrained('personas', 'Id_personas')
+                  ->onDelete('cascade');
+            $table->foreignId('Id_usuarios')
+                  ->constrained('usuarios', 'Id_usuarios')
+                  ->onDelete('cascade');
             $table->timestamps();
       
         });
@@ -112,8 +117,6 @@ return new class extends Migration
             $table->timestamps();
         });
 
-     
-
         Schema::create('clases_de_Prueba', function (Blueprint $table) {
             $table->id('Id_clases_Prueba');
             $table->date('Fecha_prueba')->nullable();
@@ -124,7 +127,7 @@ return new class extends Migration
                   ->onDelete('cascade');
             $table->timestamps();
         });
-        //////revisar
+        //////revisarrrrr
 
         Schema::create('publicaciones', function (Blueprint $table) {
             $table->id('Id_publicaciones');
@@ -135,7 +138,7 @@ return new class extends Migration
             $table->time('Hora')->nullable();
             $table->boolean('Estado')->nullable();
             $table ->foreignId('Id_personas')
-                   ->contrained('personas','Id_personas')
+                   ->constrained('personas','Id_personas')
                    ->onDelete('cascade');
             $table->timestamps();
         });
@@ -295,7 +298,7 @@ return new class extends Migration
     {
         Schema::dropIfExists('ganancias'); 
         Schema::dropIfExists('cuotas');
-        Schema::dropIfExists('plan_de_pagos');
+        Schema::dropIfExists('planes_pagos');
         Schema::dropIfExists('egresos');
         Schema::dropIfExists('citas');
         Schema::dropIfExists('horarios');
@@ -314,5 +317,6 @@ return new class extends Migration
         Schema::dropIfExists('programas');
         Schema::dropIfExists('personas');
         Schema::dropIfExists('roles');
-    }
+        Schema::dropIfExists('notificaciones');
+          }
 };

@@ -7,7 +7,9 @@ use App\Http\Controllers\EstudianteController;
 use App\Http\Controllers\AdministradorController;
 use App\Http\Controllers\GraduadoController;
 use App\Http\Controllers\SucursalController;
+use App\Http\Controllers\EgresosController;
 
+use App\Http\Controllers\PubNot;
 // POST ROUTES
 
 Route::post('/administradores/registrar', [AdministradorController::class, 'registrarAdmin'])->name('administrador.registrar');
@@ -42,9 +44,7 @@ Route::get('/', function () {
 Route::get('/administrador/inicioAdministrador', function () {
     return view('/administrador/inicioAdministrador'); 
 });
-Route::get('/administrador/egresosAdministrador', function () {
-    return view('/administrador/egresosAdministrador');
-});
+
 
 Route::get('/administrador/registrosAdministrador', function () {
     return view('/administrador/registrosAdministradores'); 
@@ -104,8 +104,29 @@ Route::get('/administrador/pagosAdministrador',function () {
     return view('/administrador/pagosAdministrador');
 });
 
-Route::get('/administrador/sucursalesAdministrador', [SucursalController::class, 'index'])->name('sucursales.index');
+Route::get('/administrador/', [SucursalController::class, 'index'])->name('sucursales.index');
 Route::post('/administrador/sucursalesAdministrador', [SucursalController::class, 'store'])->name('sucursales.store');
+
+Route::get('/administrador/egresosAdministrador',[EgresosController::class,'index'])->name('egresos.index');
+Route::post('/administrador/egresosAdministrador',[EgresosController::class, 'store'])->name('egresos.store');
+
+Route::get('/egresos/crear', [EgresoController::class, 'create'])->name('egreso.crear'); 
+Route::post('/egresos/registrar', [EgresoController::class, 'store'])->name('egreso.registrar'); 
+
 
 
 Route::get('/estudiantes', [EstudianteController::class, 'index'])->name('estudiantes.index');
+
+
+Route::get('/administrador/pubnotAdministrador', [PubNot::class, 'index'])->name('publicaciones.index');
+Route::post('/administrador/pubnotAdministrador', [PubNot::class, 'store'])->name('publicaciones.store');
+Route::delete('/administrador/pubnotAdministrador/{id}', [PubNot::class, 'destroy'])->name('publicaciones.destroy');
+
+Route::get('/administrador/pubnotAdministrador', [PubNot::class, 'index'])->name('notificaciones.index');
+Route::post('/administrador/pubnotAdministrador', [PubNot::class, 'store'])->name('notificaciones.store');
+Route::delete('/administrador/pubnotAdministrador/{id}', [PubNot::class, 'destroy'])->name('notificaciones.destroy');
+
+//para despues//
+Route::middleware(['auth', 'role:admin'])->group(function () {
+   
+});
