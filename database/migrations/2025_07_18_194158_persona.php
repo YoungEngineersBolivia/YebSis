@@ -14,10 +14,11 @@ return new class extends Migration
             $table->timestamps();
         });
 
+         
         Schema::create('personas', function (Blueprint $table) {
             $table->id('Id_personas');
             $table->string('Nombre')->nullable();
-            $table->string('Apellido')->unique()->nullable();
+            $table->string('Apellido')->nullable();
             $table->string('Genero')->nullable();
             $table->string('Direccion_domicilio')->nullable();
             $table->date('Fecha_nacimiento')->nullable();
@@ -29,16 +30,16 @@ return new class extends Migration
             $table->timestamps();
         });
 
-        Schema::create('programas', function (Blueprint $table) {
-            $table->id('Id_programas');
-            $table->string('Nombre')->nullable();
-            $table->string('Descripcion')->nullable();
-            $table->string('Foto')->nullable();
-            $table->string('Duracion')->nullable();
-            $table->string('Rango_edad')->nullable();
-            $table->float('Costo')->nullable();
-            $table->timestamps();
-        });
+            Schema::create('programas', function (Blueprint $table) {
+                  $table->id('Id_programas');
+                  $table->string('Nombre')->nullable();
+                  $table->string('Descripcion')->nullable();
+                  $table->binary('Foto')->nullable();
+                  $table->string('Duracion')->nullable();
+                  $table->string('Rango_edad')->nullable();
+                  $table->float('Costo')->nullable();
+                  $table->timestamps();
+            });
 
         Schema::create('sucursales', function (Blueprint $table) {
             $table->id('Id_Sucursales');
@@ -48,7 +49,7 @@ return new class extends Migration
         });
 
         Schema::create('usuarios', function (Blueprint $table) {
-            $table->id('Id_Usuarios');
+            $table->id('Id_usuarios');
             $table->string('Correo')->nullable();
             $table->string('Contrasania')->nullable();
             $table->foreignId('Id_personas')
@@ -69,21 +70,35 @@ return new class extends Migration
             $table->timestamps();
         });
 
+          Schema::create('tutores', function (Blueprint $table) {
+            $table->id('Id_tutores');
+            $table->string('Descuento')->nullable();
+            $table->string('Parentesco')->nullable();
+            $table->string('Nit')->nullable();
+            $table->foreignId('Id_personas');
+            $table->foreignId('Id_usuarios');
+            $table->timestamps();
+      
+        });
         Schema::create('estudiantes', function (Blueprint $table) {
             $table->id('Id_estudiantes');
-            $table->string('Cod_estudiante') ;
+            $table->string('Cod_estudiante')->unique();
             $table->string('Estado')->nullable();
-            $table->foreignId('Id_Personas')
+            $table->foreignId('Id_personas')
                   ->constrained('personas', 'Id_personas')
                   ->onDelete('cascade');
             $table->foreignId('Id_profesores')
+                  ->nullable()
                   ->constrained('profesores', 'Id_profesores')
-                  ->onDelete('cascade');
+                  ->onDelete('set null');
             $table->foreignId('Id_programas')
                   ->constrained('programas', 'Id_programas')
                   ->onDelete('cascade');
             $table->foreignId('Id_sucursales')
                   ->constrained('sucursales', 'Id_sucursales')
+                  ->onDelete('cascade');
+            $table->foreignId('Id_tutores')
+                  ->constrained('tutores', 'Id_tutores')
                   ->onDelete('cascade');
             $table->timestamps();
         });
@@ -97,22 +112,7 @@ return new class extends Migration
             $table->timestamps();
         });
 
-        Schema::create('tutores', function (Blueprint $table) {
-            $table->id('Id_tutores');
-            $table->string('Descuento')->nullable();
-            $table->string('Parentezco')->nullable();
-            $table->string('Nit')->nullable();
-            $table->foreignId('Id_personas')
-                  ->constrained('personas', 'Id_personas')
-                  ->onDelete('cascade');
-            $table->foreignId('Id_usuarios')
-                  ->constrained('usuarios', 'Id_usuarios')
-                  ->onDelete('cascade');
-            $table->foreignId('Id_pagos')
-                  ->constrained('pagos', 'Id_pagos')
-                  ->onDelete('cascade');
-            $table->timestamps();
-        });
+     
 
         Schema::create('clases_de_Prueba', function (Blueprint $table) {
             $table->id('Id_clases_Prueba');
@@ -124,10 +124,24 @@ return new class extends Migration
                   ->onDelete('cascade');
             $table->timestamps();
         });
+        //////revisar
 
         Schema::create('publicaciones', function (Blueprint $table) {
             $table->id('Id_publicaciones');
-            $table->string('Imagen')->nullable();
+            $table->binary('Imagen')->nullable();
+            $table->string('Nombre')->nullable();
+            $table->string('Descripcion')->nullable();
+            $table->date('Fecha')->nullable();
+            $table->time('Hora')->nullable();
+            $table->boolean('Estado')->nullable();
+            $table ->foreignId('Id_personas')
+                   ->contrained('personas','Id_personas')
+                   ->onDelete('cascade');
+            $table->timestamps();
+        });
+        Schema::create('notificaciones', function (Blueprint $table) {
+            $table->id('Id_notificaciones');
+            $table->binary('Imagen')->nullable();
             $table->string('Nombre')->nullable();
             $table->string('Descripcion')->nullable();
             $table->date('Fecha')->nullable();
@@ -138,10 +152,9 @@ return new class extends Migration
                   ->onDelete('cascade');
             $table->timestamps();
         });
-
+/////////revisar 
         Schema::create('modelos', function (Blueprint $table) {
             $table->id('Id_modelos');
-
             $table->string('Nombre_modelo')->nullable();
             $table->foreignId('Id_programa')
                   ->constrained('programas', 'Id_programas')
@@ -188,13 +201,18 @@ return new class extends Migration
 
         Schema::create('horarios', function (Blueprint $table) {
             $table->id('Id_horarios');
-            $table->time('Hora_clase')->nullable();
-            $table->string('Dia_clase')->nullable();
+            $table->string('Horario_clase_uno')->nullable();
+            $table->string('Dia_clase_uno')->nullable();
+            $table->string('Horario_clase_dos')->nullable();
+            $table->string('Dia_clase_dos')->nullable();
             $table->foreignId('Id_programas')
                   ->constrained('programas', 'Id_programas')
                   ->onDelete('cascade');
             $table->foreignId('Id_profesores')
                   ->constrained('profesores', 'Id_profesores')
+                  ->onDelete('cascade');
+            $table->foreignId('Id_estudiantes')
+                  ->constrained('estudiantes', 'Id_estudiantes')
                   ->onDelete('cascade');
             $table->timestamps();
         });
@@ -203,7 +221,6 @@ return new class extends Migration
             $table->id('Id_citas');
             $table->date('Fecha')->nullable();
             $table->time('Hora')->nullable();
-            $table->boolean('Nombre')->nullable();
             $table->foreignId('Id_tutores')
                   ->constrained('tutores', 'Id_tutores')
                   ->onDelete('cascade');
@@ -219,7 +236,7 @@ return new class extends Migration
             $table->string('Descripcion_egreso')->nullable();
             $table->date('Fecha_egreso')->nullable();
             $table->float('Monto_egreso')->nullable();
-            $table->timestamps();
+      
         });
 
         Schema::create('planes_pagos', function (Blueprint $table) {
@@ -234,8 +251,8 @@ return new class extends Migration
             $table->foreignId('Id_pagos')
                   ->constrained('pagos', 'Id_pagos')
                   ->onDelete('cascade');
-            $table->foreignId('Id_tutores')
-                  ->constrained('tutores', 'Id_tutores')
+             $table->foreignId('Id_estudiantes')
+                  ->constrained('estudiantes', 'Id_estudiantes')
                   ->onDelete('cascade');
             $table->timestamps();
         });
@@ -276,7 +293,6 @@ return new class extends Migration
                   ->onDelete('cascade');
             $table->timestamps();
         });
-
 
     }
 

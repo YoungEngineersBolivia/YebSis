@@ -3,11 +3,16 @@
 @section('title', 'Registrar')
 
 @section('content')
+
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
 <div class="d-flex align-items-center gap-3">
-    <h1 class="me-2">Registrar administrador</h1>
+    <h1 class="me-2">Registrar estudiante</h1>
 </div>
 
-<form action="/administradores/registrar" method="POST">
+<form action="/estudiantes/registrar" method="POST">
     @csrf
 
     <div class="d-flex align-items-end gap-3 mb-3">
@@ -67,16 +72,62 @@
     </div>
 
     <div class="d-flex align-items-end gap-3">
+
+        <div style="width: 150px;">
+            <label for="codigo_estudiante" class="form-label">Código</label>
+            <input type="text" id="codigo_estudiante" name="codigo_estudiante" class="form-control" 
+                value="{{ old('codigo_estudiante') }}" required>
+        </div>
+
         <div style="width: 220px;">
-            <label for="correo" class="form-label">Correo</label>
-            <input type="email" id="correo" name="correo" class="form-control" 
-                   value="{{ old('correo') }}" required>
+            <label for="programa" class="form-label">Programa</label>
+            <select id="programa" name="programa" class="form-select" required>
+                <option value="" selected disabled>Seleccione un programa...</option>
+                @foreach($programas as $programa)
+                    <option value="{{ $programa->Id_programas }}">{{ $programa->Nombre }}</option>
+                @endforeach
+            </select>
+        </div>
+
+        <div style="width: 220px;">
+            <label for="sucursal" class="form-label">Sucursal</label>
+            <select id="sucursal" name="sucursal" class="form-select" required>
+                <option value="" selected disabled>Seleccione una sucursal...</option>
+                @foreach($sucursales as $sucursal)
+                    <option value="{{ $sucursal->Id_Sucursales }}">{{ $sucursal->Nombre }}</option>
+                @endforeach
+            </select>
+        </div>
+
+        <div style="width: 280px;">
+            <label for="tutor_estudiante" class="form-label">Tutor</label>
+            <select id="tutor_estudiante" name="tutor_estudiante" class="form-select select2" required>
+                <option value="" disabled selected>Seleccione un tutor...</option>
+                @foreach($tutores as $tutor)
+                    <option value="{{ $tutor->Id_tutores }}">
+                        {{ $tutor->persona->Nombre }} {{ $tutor->persona->Apellido }} - {{ $tutor->Parentesco }}
+                    </option>
+                @endforeach
+            </select>
+        </div>
+
         </div>
 
         <div>
             <button type="submit" class="btn btn-primary">Registrar</button>
         </div>
+
     </div>
+
 </form>
+
+<script>
+    $(document).ready(function() {
+        $('.select2').select2({
+            placeholder: "Seleccione un tutor",
+            allowClear: true
+        });
+    });
+</script>
 
 @endsection

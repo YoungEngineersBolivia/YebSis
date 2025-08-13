@@ -4,10 +4,20 @@
 
 @section('content')
 <div class="d-flex align-items-center gap-3">
-    <h1 class="me-2">Registrar administrador</h1>
+    <h1 class="me-2">Registrar Profesor</h1>
 </div>
 
-<form action="/administradores/registrar" method="POST">
+@if (session('success'))
+    <div class="alert alert-success d-flex align-items-center justify-content-center gap-2" role="alert">
+        <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" fill="currentColor" class="bi bi-check-circle-fill" viewBox="0 0 16 16">
+            <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM6.97 11.03a.75.75 0 0 0 1.08 0l3.992-3.992a.75.75 0 1 0-1.06-1.06L7.5 9.439 5.53 7.47a.75.75 0 0 0-1.06 1.06l2.5 2.5z"/>
+        </svg>
+        <strong>¡Registro exitoso!</strong> {{ session('success') }}
+    </div>
+@endif
+
+
+<form action="/administradores/registrarP" method="POST">
     @csrf
 
     <div class="d-flex align-items-end gap-3 mb-3">
@@ -71,6 +81,12 @@
             <label for="correo" class="form-label">Correo</label>
             <input type="email" id="correo" name="correo" class="form-control" 
                    value="{{ old('correo') }}" required>
+        </div>
+
+        <div style="width: 220px;">
+            <label for="profesion" class="form-label">Profesion</label>
+            <input type="string" id="profesion" name="profesion" class="form-control" 
+                   value="{{ old('profesion') }}" required>
         </div>
 
         <div>

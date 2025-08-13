@@ -7,6 +7,15 @@
     <link rel="stylesheet" href="{{ asset('css/app.css') }}">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- jQuery (necesario para el AJAX que estás usando) -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
 </head>
 <body class="font-sans ">
 
@@ -14,7 +23,7 @@
     
     <div class="d-flex flex-column flex-shrink-0 p-3 bg-light position-fixed" style="width: 280px; min-height: 100vh;">
         <a href="/" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto link-dark text-decoration-none">
-            <img src="{{ Vite::asset('resources/img/ES_logo-02.png') }}" alt="Logo YE Bolivia" width="250px" class="me-2">
+            <img src="{{ Vite::asset('resources/img/ES_logo-02.webp') }}" alt="Logo YE Bolivia" width="250px" class="me-2">
         </a>
         <hr>
         <ul class="nav nav-pills flex-column mb-auto">
@@ -25,10 +34,20 @@
                 </a>
             </li>
             <li>
-                <a href="/administrador/registrosAdministrador" class="nav-link link-dark d-flex align-items-center gap-2">
+                <a class="nav-link link-dark d-flex align-items-center gap-2" data-bs-toggle="collapse" href="#submenuRegistrar" role="button" aria-expanded="false" aria-controls="submenuRegistrar">
                     <i class="bi bi-journal-text"></i>
-                    Registros
+                    Registrar
+                    <i class="bi bi-caret-down-fill ms-auto"></i>
                 </a>
+                <div class="collapse ps-4" id="submenuRegistrar">
+                    <ul class="nav flex-column">
+                        <li><a class="nav-link" href="/administrador/registrosAdministrador">Administrador</a></li>
+                        <li><a class="nav-link" href="/administrador/registrarComercial">Comercial</a></li>
+                        <li><a class="nav-link" href="/administrador/registrarTutor">Tutor</a></li>
+                        <li><a class="nav-link" href="/estudiantes/registrar">Estudiante</a></li>
+                        <li><a class="nav-link" href="/administrador/registrarProfesor">Profesor</a></li>
+                    </ul>
+                </div>
             </li>
             <li>
                 <a href="/administrador/tutoresAdministrador" class="nav-link link-dark d-flex align-items-center gap-2">
@@ -98,7 +117,6 @@
                 <button type="button" class="btn btn-danger w-75">Cerrar sesión</button>
                 <img src="https://github.com/mdo.png" alt="perfil" width="32" height="32" class="rounded-circle">
             </a>
-        <hr>
           
         
     </div>
@@ -108,6 +126,7 @@
                 @yield('content')
             </div>
     </div>
+    @yield('scripts')
 
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
