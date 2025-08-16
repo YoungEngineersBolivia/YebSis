@@ -16,5 +16,11 @@ class Usuario extends Model
         'Contrasania',
         'Id_personas'
     ];
+
+    public function persona()
+    {
+        return $this->belongsTo(\App\Models\Persona::class, 'Id_personas', 'Id_personas');
+    }
+
 }
 

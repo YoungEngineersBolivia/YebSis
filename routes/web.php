@@ -5,9 +5,13 @@ use App\Http\Controllers\ProgramaController;
 use App\Http\Controllers\RegistroAdministradorController;
 use App\Http\Controllers\EstudianteController;
 use App\Http\Controllers\AdministradorController;
+use App\Http\Controllers\TutoresController;
+use App\Http\Controllers\UsuariosController;
 use App\Http\Controllers\GraduadoController;
 use App\Http\Controllers\SucursalController;
 use App\Http\Controllers\EgresosController;
+use App\Http\Controllers\HorariosController;
+
 
 use App\Http\Controllers\PubNot;
 // POST ROUTES
@@ -50,17 +54,43 @@ Route::get('/administrador/registrosAdministrador', function () {
     return view('/administrador/registrosAdministradores'); 
 });
 
-Route::get('/administrador/tutoresAdministrador', function () {
-    return view('/administrador/tutoresAdministrador'); 
-});
+//TUTORES
 
-Route::get('/administrador/usuariosAdministrador', function () {
-    return view('/administrador/usuariosAdministrador'); 
-});
+Route::get('/administrador/tutoresAdministrador', [TutoresController::class, 'index'])->name('tutores.index');
 
-Route::get('/administrador/horariosAdministrador', function () {
-    return view('/administrador/horariosAdministrador'); 
-});
+Route::get('/admin/tutores/{id}', [TutoresController::class, 'show'])->name('tutores.show');
+Route::get('/admin/tutores/{id}/edit', [TutoresController::class, 'edit'])->name('tutores.edit');
+Route::put('/admin/tutores/{id}', [TutoresController::class, 'update'])->name('tutores.update');
+Route::delete('/admin/tutores/{id}', [TutoresController::class, 'destroy'])->name('tutores.destroy');
+
+//USUARIOS
+Route::get('/administrador/usuariosAdministrador', [UsuariosController::class, 'index'])->name('usuarios.index');
+
+Route::get('/admin/usuarios/{id}', [UsuariosController::class, 'show'])->name('usuarios.show');
+Route::get('/admin/usuarios/{id}/edit', [UsuariosController::class, 'edit'])->name('usuarios.edit');
+Route::put('/admin/usuarios/{id}', [UsuariosController::class, 'update'])->name('usuarios.update');
+Route::delete('/admin/usuarios/{id}', [UsuariosController::class, 'destroy'])->name('usuarios.destroy');
+
+
+//
+
+Route::get('/administrador/horariosAdministrador', [HorariosController::class, 'index'])->name('horarios.index');
+
+Route::get('/administrador/horarios/create', [HorariosController::class, 'create'])->name('horarios.create');
+
+Route::post('/administrador/horarios', [HorariosController::class, 'store'])->name('horarios.store');
+
+Route::get('/administrador/horarios/{id}', [HorariosController::class, 'show'])->name('horarios.show');
+
+Route::get('/administrador/horarios/{id}/edit', [HorariosController::class, 'edit'])->name('horarios.edit');
+
+Route::put('/administrador/horarios/{id}', [HorariosController::class, 'update'])->name('horarios.update');
+
+Route::delete('/administrador/horarios/{id}', [HorariosController::class, 'destroy'])->name('horarios.destroy');
+
+Route::post('/administrador/horarios/asignar', [HorariosController::class, 'asignar'])->name('horarios.asignar');
+
+//
 
 
 Route::get('administrador/estudiantesAdministrador', function () {

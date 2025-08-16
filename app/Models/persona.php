@@ -20,4 +20,9 @@ class Persona extends Model
         'Celular',
         'Id_roles'
     ];
+
+    public function rol()
+    {
+        return $this->belongsTo(\App\Models\Rol::class, 'Id_roles', 'Id_roles');
+    }
 }
