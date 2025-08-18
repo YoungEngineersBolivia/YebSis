@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class Usuario extends Model
 {
     protected $table = 'usuarios';
-    protected $primaryKey = 'Id_Usuarios';
+    protected $primaryKey = 'Id_usuarios';
     public $timestamps = true;
     public $incrementing = true;
 

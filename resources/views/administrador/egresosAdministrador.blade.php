@@ -10,14 +10,14 @@
     <div class="container-fluid mt-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h1 class="mb-0">Egresos</h1>
-        <a href="{{ route('egreso.registrar') }}" class="btn btn-primary">
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalRegistrarEgreso">
             <i class="fas fa-plus me-2"></i>Egresos
-        </a>
-
+        </button>
     </div>
 
     @if(session('success'))
         <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="fas fa-check-circle me-2"></i>
             {{ session('success') }}
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
@@ -45,7 +45,8 @@
         <div class="col-md-6">
             <div class="input-group">
                 <span class="input-group-text"><i class="fas fa-search"></i></span>
-                <input type="text" class="form-control" placeholder="Buscar Programa" id="searchInput">
+                <input type="text" class="form-control" placeholder="Buscar Egreso" id="searchInput">
+                
             </div>
         </div>
     </div>
@@ -91,4 +92,40 @@
                 </div>
             @endif
 
+    <!-- Modal Registrar Egreso -->
+    <div class="modal fade" id="modalRegistrarEgreso" tabindex="-1" aria-labelledby="modalRegistrarEgresoLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form method="POST" action="{{ route('egresos.store') }}">
+                    @csrf
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="modalRegistrarEgresoLabel">Registrar Nuevo Egreso</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="tipo" class="form-label">Tipo de Egreso</label>
+                            <input type="text" class="form-control" id="tipo" name="Tipo" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="descripcion" class="form-label">Descripción</label>
+                            <textarea class="form-control" id="descripcion" name="Descripcion_egreso" required></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label for="fecha" class="form-label">Fecha</label>
+                            <input type="date" class="form-control" id="fecha" name="Fecha_egreso" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="monto" class="form-label">Monto</label>
+                            <input type="number" step="0.01" class="form-control" id="monto" name="Monto_egreso" required>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-primary">Guardar Egreso</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 @endsection

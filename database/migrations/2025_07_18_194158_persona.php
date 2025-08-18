@@ -108,12 +108,32 @@ return new class extends Migration
             $table->timestamps();
         });
 
+        // CREA PRIMERO PLANES_PAGOS
+        Schema::create('planes_pagos', function (Blueprint $table) {
+            $table->id('Id_planes_pagos');
+            $table->float('Monto_total')->nullable();
+            $table->integer('Nro_cuotas')->nullable();
+            $table->date('fecha_plan_pagos')->nullable();
+            $table->string('Estado_plan')->nullable();
+            $table->foreignId('Id_programas')
+                  ->constrained('programas', 'Id_programas')
+                  ->onDelete('cascade');
+            $table->foreignId('Id_estudiantes')
+                  ->constrained('estudiantes', 'Id_estudiantes')
+                  ->onDelete('cascade');
+            $table->timestamps();
+        });
+
+        // LUEGO CREA PAGOS
         Schema::create('pagos', function (Blueprint $table) {
             $table->id('Id_pagos');
             $table->string('Descripcion')->nullable();
             $table->string('Comprobante')->nullable();
             $table->float('Monto_pago')->nullable();
             $table->date('Fecha_pago')->nullable();
+            $table->foreignId('Id_planes_pagos')
+                  ->constrained('planes_pagos', 'Id_planes_pagos')
+                  ->onDelete('cascade');
             $table->timestamps();
         });
 
@@ -242,23 +262,7 @@ return new class extends Migration
       
         });
 
-        Schema::create('planes_pagos', function (Blueprint $table) {
-            $table->id('Id_planes_pagos');
-            $table->float('Monto_total')->nullable();
-            $table->integer('Nro_cuotas')->nullable();
-            $table->date('fecha_plan_pagos')->nullable();
-            $table->string('Estado_plan')->nullable();
-            $table->foreignId('Id_programas')
-                  ->constrained('programas', 'Id_programas')
-                  ->onDelete('cascade');
-            $table->foreignId('Id_pagos')
-                  ->constrained('pagos', 'Id_pagos')
-                  ->onDelete('cascade');
-             $table->foreignId('Id_estudiantes')
-                  ->constrained('estudiantes', 'Id_estudiantes')
-                  ->onDelete('cascade');
-            $table->timestamps();
-        });
+      
 
         Schema::create('cuotas', function (Blueprint $table) {
             $table->id('Id_cuotas');
@@ -325,3 +329,4 @@ return new class extends Migration
         Schema::dropIfExists('notificaciones');
           }
 };
+

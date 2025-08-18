@@ -17,6 +17,7 @@ class Tutores extends Model
         'Descuento',
         'Parentesco', 
         'Nit',
+        'Nombre_factura',
         'Id_personas',
         'Id_usuarios',
     ];
