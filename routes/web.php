@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\PlanesPagoController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProgramaController;
 use App\Http\Controllers\RegistroAdministradorController;
@@ -9,10 +10,13 @@ use App\Http\Controllers\TutoresController;
 use App\Http\Controllers\UsuariosController;
 use App\Http\Controllers\GraduadoController;
 use App\Http\Controllers\SucursalController;
+use App\Http\Controllers\EgresosController;
 use App\Http\Controllers\HorariosController;
+use App\Http\Controllers\RegistroCombinadoController;
 
 
-
+use App\Http\Controllers\PubNot;
+use App\Http\Controllers\PagosController;
 // POST ROUTES
 
 Route::post('/administradores/registrar', [AdministradorController::class, 'registrarAdmin'])->name('administrador.registrar');
@@ -47,9 +51,7 @@ Route::get('/', function () {
 Route::get('/administrador/inicioAdministrador', function () {
     return view('/administrador/inicioAdministrador'); 
 });
-Route::get('/administrador/egresosAdministrador', function () {
-    return view('/administrador/egresosAdministrador');
-});
+
 
 Route::get('/administrador/registrosAdministrador', function () {
     return view('/administrador/registrosAdministradores'); 
@@ -58,19 +60,18 @@ Route::get('/administrador/registrosAdministrador', function () {
 //TUTORES
 
 Route::get('/administrador/tutoresAdministrador', [TutoresController::class, 'index'])->name('tutores.index');
-
-Route::get('/admin/tutores/{id}', [TutoresController::class, 'show'])->name('tutores.show');
-Route::get('/admin/tutores/{id}/edit', [TutoresController::class, 'edit'])->name('tutores.edit');
-Route::put('/admin/tutores/{id}', [TutoresController::class, 'update'])->name('tutores.update');
-Route::delete('/admin/tutores/{id}', [TutoresController::class, 'destroy'])->name('tutores.destroy');
+Route::get('/administrador/tutores/{id}', [TutoresController::class, 'show'])->name('tutores.show');
+Route::get('/administrador/tutores/{id}/edit', [TutoresController::class, 'edit'])->name('tutores.edit');
+Route::put('/administrador/tutores/{id}', [TutoresController::class, 'update'])->name('tutores.update');
+Route::delete('/administrador/tutores/{id}', [TutoresController::class, 'destroy'])->name('tutores.destroy');
 
 //USUARIOS
 Route::get('/administrador/usuariosAdministrador', [UsuariosController::class, 'index'])->name('usuarios.index');
 
-Route::get('/admin/usuarios/{id}', [UsuariosController::class, 'show'])->name('usuarios.show');
-Route::get('/admin/usuarios/{id}/edit', [UsuariosController::class, 'edit'])->name('usuarios.edit');
-Route::put('/admin/usuarios/{id}', [UsuariosController::class, 'update'])->name('usuarios.update');
-Route::delete('/admin/usuarios/{id}', [UsuariosController::class, 'destroy'])->name('usuarios.destroy');
+Route::get('/administrador/usuarios/{id}', [UsuariosController::class, 'show'])->name('usuarios.show');
+Route::get('/administrador/usuarios/{id}/edit', [UsuariosController::class, 'edit'])->name('usuarios.edit');
+Route::put('/administrador/usuarios/{id}', [UsuariosController::class, 'update'])->name('usuarios.update');
+Route::delete('/administrador/usuarios/{id}', [UsuariosController::class, 'destroy'])->name('usuarios.destroy');
 
 
 //
@@ -131,12 +132,40 @@ Route::get('administrador/nuevosProgramasAdministrador', function(){
 
 Route::get('/administrador/graduadosAdministrador', [GraduadoController::class, 'index'])->name('graduados.index');
 
-Route::get('/administrador/pagosAdministrador',function () {
-    return view('/administrador/pagosAdministrador');
-});
+Route::get('/administrador/pagosAdministrador', [PagosController::class, 'form'])->name('pagosAdministrador');
+Route::post('/administrador/pagosAdministrador', [PagosController::class, 'registrarPago'])->name('pagos.registrar');
+Route::get('/administrador/pagos', [PagosController::class, 'index'])->name('pagos.index');
 
 Route::get('/administrador/sucursalesAdministrador', [SucursalController::class, 'index'])->name('sucursales.index');
 Route::post('/administrador/sucursalesAdministrador', [SucursalController::class, 'store'])->name('sucursales.store');
 
+Route::get('/administrador/egresosAdministrador',[EgresosController::class,'index'])->name('egresos.index');
+Route::post('/administrador/egresosAdministrador',[EgresosController::class, 'store'])->name('egresos.store');
+
+Route::get('/egresos/crear', [EgresoController::class, 'create'])->name('egreso.crear'); 
+Route::post('/egresos/registrar', [EgresoController::class, 'store'])->name('egreso.registrar'); 
+
+
 
 Route::get('/estudiantes', [EstudianteController::class, 'index'])->name('estudiantes.index');
+
+
+Route::get('/administrador/pubnotAdministrador', [PubNot::class, 'index'])->name('publicaciones.index');
+Route::post('/administrador/pubnotAdministrador', [PubNot::class, 'store'])->name('publicaciones.store');
+Route::delete('/administrador/pubnotAdministrador/{id}', [PubNot::class, 'destroy'])->name('publicaciones.destroy');
+
+//para despues//
+Route::middleware(['auth', 'role:admin'])->group(function () {
+   
+});
+Route::get('/administrador/tutorEstudianteAdministrador', [RegistroCombinadoController::class, 'mostrarFormulario'])->name('registroCombinado.form');
+Route::post('/administrador/tutorEstudianteAdministrador', [RegistroCombinadoController::class, 'registrar'])->name('registroCombinado.registrar');
+Route::post('/planes-pago/registrar', [PlanesPagoController::class, 'registrar'])->name('planes-pago.registrar');
+// Notificaciones a tutores
+Route::post('/administrador/notificaciones', [PubNot::class, 'store'])->name('notificaciones.store');
+
+
+// DASHBOARD
+use App\Http\Controllers\DashboardController;
+Route::get('/administrador/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+Route::get('/administrador/dashboard', [DashboardController::class, 'index'])->name('dashboard');

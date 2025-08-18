@@ -75,8 +75,13 @@ return new class extends Migration
             $table->string('Descuento')->nullable();
             $table->string('Parentesco')->nullable();
             $table->string('Nit')->nullable();
-            $table->foreignId('Id_personas');
-            $table->foreignId('Id_usuarios');
+            $table->string('Nombre_factura')->nullable();
+            $table->foreignId('Id_personas')
+                  ->constrained('personas', 'Id_personas')
+                  ->onDelete('cascade');
+            $table->foreignId('Id_usuarios')
+                  ->constrained('usuarios', 'Id_usuarios')
+                  ->onDelete('cascade');
             $table->timestamps();
       
         });
@@ -103,16 +108,34 @@ return new class extends Migration
             $table->timestamps();
         });
 
+        // CREA PRIMERO PLANES_PAGOS
+        Schema::create('planes_pagos', function (Blueprint $table) {
+            $table->id('Id_planes_pagos');
+            $table->float('Monto_total')->nullable();
+            $table->integer('Nro_cuotas')->nullable();
+            $table->date('fecha_plan_pagos')->nullable();
+            $table->string('Estado_plan')->nullable();
+            $table->foreignId('Id_programas')
+                  ->constrained('programas', 'Id_programas')
+                  ->onDelete('cascade');
+            $table->foreignId('Id_estudiantes')
+                  ->constrained('estudiantes', 'Id_estudiantes')
+                  ->onDelete('cascade');
+            $table->timestamps();
+        });
+
+        // LUEGO CREA PAGOS
         Schema::create('pagos', function (Blueprint $table) {
             $table->id('Id_pagos');
             $table->string('Descripcion')->nullable();
             $table->string('Comprobante')->nullable();
             $table->float('Monto_pago')->nullable();
             $table->date('Fecha_pago')->nullable();
+            $table->foreignId('Id_planes_pagos')
+                  ->constrained('planes_pagos', 'Id_planes_pagos')
+                  ->onDelete('cascade');
             $table->timestamps();
         });
-
-     
 
         Schema::create('clases_de_Prueba', function (Blueprint $table) {
             $table->id('Id_clases_Prueba');
@@ -124,7 +147,7 @@ return new class extends Migration
                   ->onDelete('cascade');
             $table->timestamps();
         });
-        //////revisar
+        //////revisarrrrr
 
         Schema::create('publicaciones', function (Blueprint $table) {
             $table->id('Id_publicaciones');
@@ -135,7 +158,7 @@ return new class extends Migration
             $table->time('Hora')->nullable();
             $table->boolean('Estado')->nullable();
             $table ->foreignId('Id_personas')
-                   ->contrained('personas','Id_personas')
+                   ->constrained('personas','Id_personas')
                    ->onDelete('cascade');
             $table->timestamps();
         });
@@ -239,23 +262,7 @@ return new class extends Migration
       
         });
 
-        Schema::create('planes_pagos', function (Blueprint $table) {
-            $table->id('Id_planes_pagos');
-            $table->float('Monto_total')->nullable();
-            $table->integer('Nro_cuotas')->nullable();
-            $table->date('fecha_plan_pagos')->nullable();
-            $table->string('Estado_plan')->nullable();
-            $table->foreignId('Id_programas')
-                  ->constrained('programas', 'Id_programas')
-                  ->onDelete('cascade');
-            $table->foreignId('Id_pagos')
-                  ->constrained('pagos', 'Id_pagos')
-                  ->onDelete('cascade');
-             $table->foreignId('Id_estudiantes')
-                  ->constrained('estudiantes', 'Id_estudiantes')
-                  ->onDelete('cascade');
-            $table->timestamps();
-        });
+      
 
         Schema::create('cuotas', function (Blueprint $table) {
             $table->id('Id_cuotas');
@@ -300,7 +307,7 @@ return new class extends Migration
     {
         Schema::dropIfExists('ganancias'); 
         Schema::dropIfExists('cuotas');
-        Schema::dropIfExists('plan_de_pagos');
+        Schema::dropIfExists('planes_pagos');
         Schema::dropIfExists('egresos');
         Schema::dropIfExists('citas');
         Schema::dropIfExists('horarios');
@@ -319,5 +326,7 @@ return new class extends Migration
         Schema::dropIfExists('programas');
         Schema::dropIfExists('personas');
         Schema::dropIfExists('roles');
-    }
+        Schema::dropIfExists('notificaciones');
+          }
 };
+
