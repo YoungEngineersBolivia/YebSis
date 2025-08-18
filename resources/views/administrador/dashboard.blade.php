@@ -54,7 +54,7 @@
             <div class="card shadow-sm text-center">
                 <div class="card-body">
                     <h6><i class="fas fa-arrow-up text-success"></i> Ingresos Totales</h6>
-                    <h3>Bs {{ isset($ingresosTotales) ? number_format($ingresosTotales, 2, '.', ',') : '0.00' }}</h3>
+                    <h3>Bs {{ number_format($ingresosTotales ?? 0, 2, '.', ',') }}</h3>
                 </div>
             </div>
         </div>
