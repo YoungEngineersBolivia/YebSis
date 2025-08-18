@@ -10,7 +10,7 @@ use App\Http\Controllers\UsuariosController;
 use App\Http\Controllers\GraduadoController;
 use App\Http\Controllers\SucursalController;
 use App\Http\Controllers\HorariosController;
-
+use App\Http\Controllers\DashboardController;
 
 
 // POST ROUTES
@@ -27,6 +27,9 @@ Route::get('/estudiantes/registrar', [EstudianteController::class, 'mostrarFormu
 Route::post('/estudiantes/registrar', [EstudianteController::class, 'registrar'])->name('estudiantes.registrar');
 
 //GET ROUTES
+
+Route::get('/administrador/dashboardAdministrador', [DashboardController::class, 'index'])
+    ->name('admin.dashboard');
 
 Route::get('/administrador/registrarProfesor', function(){
     return view('/administrador/registrarProfesor');

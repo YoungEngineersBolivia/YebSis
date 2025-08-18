@@ -28,7 +28,7 @@
         <hr>
         <ul class="nav nav-pills flex-column mb-auto">
             <li class="#">
-                <a href="/administrador/estudiantesAdministrador" class="nav-link link-dark d-flex align-items-center gap-2 ">
+                <a href="/administrador/dashboardAdministrador" class="nav-link link-dark d-flex align-items-center gap-2 ">
                     <i class="bi bi-clipboard-data"></i>
                     Dashboard
                 </a>
