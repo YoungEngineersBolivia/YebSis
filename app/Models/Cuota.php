@@ -7,7 +7,7 @@ class Cuota extends Model
 {
     protected $table = 'cuotas';
     protected $primaryKey = 'Id_cuotas';
-    public $timestamps = true;
+    public $timestamps = false;
 
     protected $fillable = [
         'Nro_de_cuota',
@@ -15,7 +15,7 @@ class Cuota extends Model
         'Monto_cuota',
         'Monto_pagado',
         'Estado_cuota',
-        'Id_planes_pagos',
+        'Id_planes_pagos'
     ];
 
     public function planPago()

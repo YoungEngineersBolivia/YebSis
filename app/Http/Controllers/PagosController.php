@@ -41,65 +41,35 @@ class PagosController extends Controller
 
     public function registrarPago(Request $request)
     {
-        $cuota = Cuota::find($request->cuota_id);
-        if ($cuota) {
-            $cuota->pagado = true;
-            $cuota->fecha_pago = $request->fecha_pago ?? now();
-            $cuota->Descripcion = $request->descripcion;
-            $cuota->Comprobante = $request->comprobante;
-            $cuota->Monto_pagado = $request->monto_pago;
-            $cuota->Id_planes_pagos = $request->id_planes_pagos;
-            $cuota->save();
-
-            return back()->with('success', 'Pago registrado correctamente');
-        }
-
-        return back()->with('error', 'Cuota no encontrada');
-    }
-
-    public function registrar(Request $request)
-    {
         try {
-            $request->validate([
-                'cuota_id' => 'required',
-                'descripcion' => 'required|string',
-                'comprobante' => 'required|string',
-                'monto_pago' => 'required|numeric',
-                'fecha_pago' => 'required|date',
-                'id_planes_pagos' => 'required'
-            ]);
-
-            $cuota = Cuota::where('Id_cuotas', $request->cuota_id)
-                          ->orWhere('id', $request->cuota_id)
-                          ->first();
-
-            if (!$cuota) {
-                return redirect()->back()->with('error', 'Cuota no encontrada (ID: ' . $request->cuota_id . ')');
-            }
-
             \DB::beginTransaction();
 
+            $cuota = Cuota::where('Id_cuotas', $request->cuota_id)->first();
+            if (!$cuota) {
+                return back()->with('error', 'Cuota no encontrada');
+            }
+
+            // Actualizar cuota
             $cuota->Monto_pagado = $request->monto_pago;
             $cuota->Estado_cuota = 'Pagado';
-            $cuota->fecha_pago = $request->fecha_pago;
-            $cuota->pagado = true;
             $cuota->save();
 
+            // Registrar pago
             Pago::create([
                 'Descripcion' => $request->descripcion,
                 'Comprobante' => $request->comprobante,
                 'Monto_pago' => $request->monto_pago,
-                'Fecha_pago' => $request->fecha_pago,
+                'Fecha_pago' => $request->fecha_pago ?? now(),
                 'Id_planes_pagos' => $request->id_planes_pagos,
                 'Id_cuotas' => $request->cuota_id
             ]);
 
             \DB::commit();
-            return redirect()->back()->with('success', "¡Pago registrado exitosamente! Monto: {$request->monto_pago} Bs.");
+            return back()->with('success', 'Pago registrado correctamente');
 
         } catch (\Exception $e) {
             \DB::rollBack();
-            return redirect()->back()->with('error', 'Error al registrar el pago: ' . $e->getMessage())->withInput();
+            return back()->with('error', 'Error al registrar pago: ' . $e->getMessage());
         }
     }
 }
