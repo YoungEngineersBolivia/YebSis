@@ -2,7 +2,8 @@
 
 @section('title', 'Estudiantes')
 @section('styles')
-<link href="{{ asset('css/style.css') }}" rel="stylesheet">
+@vite('resources/css/dashboard.css')
+
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 @endsection
 

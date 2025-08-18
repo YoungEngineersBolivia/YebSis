@@ -1,13 +1,8 @@
 <?php
 
 return [
-    'previous' => '&laquo; Anterior',
-    'next' => 'Siguiente &raquo;',
-    'showing' => 'Mostrando',
-    'to' => 'a',
-    'of' => 'de',
-    'results' => 'resultados',
     'required' => 'El campo :attribute es obligatorio.',
     'email' => 'El campo :attribute debe ser un correo válido.',
     'unique' => 'El valor del campo :attribute ya está en uso.',
+
 ];

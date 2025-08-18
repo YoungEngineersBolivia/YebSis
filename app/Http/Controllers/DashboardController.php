@@ -2,46 +2,61 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Sucursal;
 use Illuminate\Support\Facades\DB;
 
 class DashboardController extends Controller
 {
-    public function index()
-    {
-        $porProgramaSucursal = DB::table('estudiantes as e')
-            ->join('programas as p', 'p.Id_programas', '=', 'e.Id_programas')
-            ->join('sucursales as s', 's.Id_Sucursales', '=', 'e.Id_sucursales')
-            ->select('p.Nombre as programa', 's.Nombre as sucursal', DB::raw('COUNT(*) as total'))
-            ->groupBy('p.Nombre', 's.Nombre')
-            ->orderBy('p.Nombre')
-            ->get()
-            ->groupBy('sucursal');
+public function index()
+{
+    // Tomamos la primera sucursal como ejemplo
+   $sucursales = Sucursal::all(); // colección de todas las sucursales
 
-        $conteoEstados = DB::table('estudiantes')
-            ->select('Estado', DB::raw('COUNT(*) as total'))
-            ->groupBy('Estado')
-            ->pluck('total', 'Estado');
+    $alumnosPorSucursal = [];
 
-        $activos   = $conteoEstados['ACTIVO']   ?? $conteoEstados['Activo']   ?? 0;
-        $inactivos = $conteoEstados['INACTIVO'] ?? $conteoEstados['Inactivo'] ?? 0;
-
-        $porSucursal = DB::table('estudiantes as e')
-            ->join('sucursales as s', 's.Id_Sucursales', '=', 'e.Id_sucursales')
-            ->select('s.Nombre as sucursal', DB::raw('COUNT(*) as total'))
-            ->groupBy('s.Nombre')
-            ->orderBy('s.Nombre')
+    foreach ($sucursales as $sucursal) {
+        $alumnosPorSucursal[$sucursal->Id_Sucursales] = DB::table('estudiantes')
+            ->join('programas', 'estudiantes.Id_programas', '=', 'programas.Id_programas')
+            ->select('programas.Nombre as programa', DB::raw('count(*) as total'))
+            ->where('estudiantes.Id_sucursales', $sucursal->Id_Sucursales)
+            ->groupBy('programas.Nombre')
             ->get();
-
-        $ingresosTotales = (float) DB::table('pagos')->sum('Monto_pago');
-        $egresosTotales  = (float) DB::table('egresos')->sum('Monto_egreso');
-
-        return view('administrador.dashboardAdministrador', compact(
-            'porProgramaSucursal',
-            'activos',
-            'inactivos',
-            'porSucursal',
-            'ingresosTotales',
-            'egresosTotales'
-        ));
     }
+
+    return view('administrador.dashboard', compact('sucursales', 'alumnosPorSucursal'));
+
+
+    // Total de alumnos por todas las sucursales
+    $sucursales = DB::table('estudiantes')
+        ->join('sucursales', 'estudiantes.Id_sucursales', '=', 'sucursales.Id_Sucursales')
+        ->select('sucursales.Nombre', DB::raw('count(*) as total'))
+        ->groupBy('sucursales.Nombre')
+        ->get();
+
+    return view('administrador.dashboard', compact('sucursal', 'alumnos', 'sucursales'));
+}
+
+public function dashboard($sucursalId)
+{
+    // sucursal seleccionada
+    $sucursal = Sucursal::findOrFail($sucursalId);
+
+    // alumnos por programa en esa sucursal
+    $alumnos = DB::table('estudiantes')
+        ->join('programas', 'estudiantes.Id_programas', '=', 'programas.Id_programas')
+        ->select('programas.Nombre as programa', DB::raw('count(*) as total'))
+        ->where('estudiantes.Id_sucursales', $sucursalId)
+        ->groupBy('programas.Nombre')
+        ->get();
+
+    // todas las sucursales con total de alumnos
+    $sucursales = DB::table('estudiantes')
+        ->join('sucursales', 'estudiantes.Id_sucursales', '=', 'sucursales.Id_Sucursales')
+        ->select('sucursales.Nombre', DB::raw('count(*) as total'))
+        ->groupBy('sucursales.Nombre')
+        ->get();
+
+    return view('administrador.dashboard', compact('sucursal', 'alumnos', 'sucursales'));
+}
+
 }

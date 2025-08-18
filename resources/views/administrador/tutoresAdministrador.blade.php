@@ -103,6 +103,31 @@
         </div>
     @endif
 
+    <!-- Modal para ver información -->
+    <div class="modal fade" id="modalVerTutor" tabindex="-1" aria-labelledby="modalVerTutorLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Información del Tutor</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body">
+                    <p><strong>Nombre:</strong> <span id="verNombre"></span></p>
+                    <p><strong>Apellido:</strong> <span id="verApellido"></span></p>
+                    <p><strong>Celular:</strong> <span id="verCelular"></span></p>
+                    <p><strong>Dirección:</strong> <span id="verDireccion"></span></p>
+                    <p><strong>Correo:</strong> <span id="verCorreo"></span></p>
+                    <p><strong>Parentesco:</strong> <span id="verParentesco"></span></p>
+                    <p><strong>Descuento:</strong> <span id="verDescuento"></span>%</p>
+                    <p><strong>NIT:</strong> <span id="verNit"></span></p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Modal para edición -->
     <div class="modal fade" id="modalEditarTutor" tabindex="-1" aria-labelledby="modalEditarLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg">
@@ -179,34 +204,38 @@
     });
 
     function verTutor(id) {
-        fetch(`/admin/tutores/${id}`)
+        fetch(`/administrador/tutores/${id}`)
             .then(res => res.json())
             .then(data => {
-                alert(`Nombre: ${data.Nombre} ${data.Apellido}
-        Celular: ${data.Celular}
-        Dirección: ${data.Direccion_domicilio}
-        Correo: ${data.Correo}
-        Parentesco: ${data.Parentesco}
-        Descuento: ${data.Descuento}%
-        NIT: ${data.Nit}`);
-                    });
+                document.getElementById('verNombre').textContent = data.persona.Nombre;
+                document.getElementById('verApellido').textContent = data.persona.Apellido;
+                document.getElementById('verCelular').textContent = data.persona.Celular;
+                document.getElementById('verDireccion').textContent = data.persona.Direccion_domicilio;
+                document.getElementById('verCorreo').textContent = data.usuario.Correo;
+                document.getElementById('verParentesco').textContent = data.Parentesco;
+                document.getElementById('verDescuento').textContent = data.Descuento;
+                document.getElementById('verNit').textContent = data.Nit;
+
+                const modal = new bootstrap.Modal(document.getElementById('modalVerTutor'));
+                modal.show();
+            });
     }
 
     function editarTutor(id) {
-        fetch(`/admin/tutores/${id}/edit`)
+        fetch(`/administrador/tutores/${id}/edit`)
             .then(res => res.json())
             .then(data => {
-                document.getElementById('editarNombre').value = data.Nombre;
-                document.getElementById('editarApellido').value = data.Apellido;
-                document.getElementById('editarCelular').value = data.Celular;
-                document.getElementById('editarDireccion').value = data.Direccion_domicilio;
-                document.getElementById('editarCorreo').value = data.Correo;
+                document.getElementById('editarNombre').value = data.persona.Nombre;
+                document.getElementById('editarApellido').value = data.persona.Apellido;
+                document.getElementById('editarCelular').value = data.persona.Celular;
+                document.getElementById('editarDireccion').value = data.persona.Direccion_domicilio;
+                document.getElementById('editarCorreo').value = data.usuario.Correo;
                 document.getElementById('editarParentesco').value = data.Parentesco;
                 document.getElementById('editarDescuento').value = data.Descuento;
                 document.getElementById('editarNit').value = data.Nit;
 
                 const form = document.getElementById('formEditarTutor');
-                form.action = `/admin/tutores/${id}`;
+                form.action = `/administrador/tutores/${id}`;
                 const modal = new bootstrap.Modal(document.getElementById('modalEditarTutor'));
                 modal.show();
             });
@@ -214,7 +243,7 @@
 
     function eliminarTutor(id) {
         if (confirm("¿Estás seguro de eliminar este tutor?")) {
-            fetch(`/admin/tutores/${id}`, {
+            fetch(`/administrador/tutores/${id}`, {
                 method: 'DELETE',
                 headers: {
                     'X-CSRF-TOKEN': '{{ csrf_token() }}',
@@ -226,7 +255,7 @@
                 if (data.success) {
                     location.reload();
                 } else {
-                    alert("Error al eliminar tutor: " + data.message);
+                    alert("Error al eliminar tutor: " + (data.message || 'No se pudo eliminar.'));
                 }
             });
         }

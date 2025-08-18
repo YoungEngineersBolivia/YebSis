@@ -29,4 +29,15 @@ class Estudiante extends Model
     {
         return $this->belongsTo(Persona::class, 'Id_personas', 'Id_personas');
     }
+
+    public function tutor()
+    {
+        return $this->belongsTo(Tutores::class, 'Id_tutores', 'Id_tutores');
+    }
+
+    public function planPago()
+    {
+        return $this->hasOne(PlanesPago::class, 'Id_estudiantes', 'Id_estudiantes');
+    }
+   
 }

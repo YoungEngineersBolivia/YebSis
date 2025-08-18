@@ -59,13 +59,17 @@ class EstudianteController extends Controller
             'Id_roles' => $rolEstudiante->Id_roles,
         ]);
 
+        // Verifica que el profesor con Id_profesores = 1 exista
+        $profesorId = 1;
+        $profesorExiste = \App\Models\Profesor::where('Id_profesores', $profesorId)->exists();
+
         Estudiante::create([
             'Cod_estudiante' => $request->codigo_estudiante,
             'Estado' => 'Activo',
-            'Id_Personas' => $persona->Id_personas,
+            'Id_personas' => $persona->Id_personas,
             'Id_programas' => $request->programa,
             'Id_sucursales' => $request->sucursal,
-            'Id_profesores' => 1,
+            'Id_profesores' => $profesorExiste ? $profesorId : null, // Usa null si no existe
             'Id_tutores' => $request->tutor_estudiante,
         ]);
 
