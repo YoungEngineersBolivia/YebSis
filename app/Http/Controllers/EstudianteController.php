@@ -14,8 +14,17 @@ class EstudianteController extends Controller
 {
     // Listar estudiantes
     public function index()
-    {
-        $estudiantes = Estudiante::with('persona')->get();
+        {
+            $query = Estudiante::with([
+            'persona',
+            'programa',
+            'sucursal',
+            'profesor.persona', 
+        ]);
+
+
+        $estudiantes = $query->get();
+
         return view('administrador.estudiantesAdministrador', compact('estudiantes'));
     }
 

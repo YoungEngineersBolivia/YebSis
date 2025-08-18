@@ -172,3 +172,11 @@ Route::post('/administrador/notificaciones', [PubNot::class, 'store'])->name('no
 // DASHBOARD
 Route::get('/administrador/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 Route::get('/administrador/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+
+
+//ESTUDIANTES
+Route::get('/estudiantes/{id}/editar', [EstudianteController::class, 'editar'])->name('estudiantes.editar');
+Route::put('/estudiantes/{id}', [EstudianteController::class, 'actualizar'])->name('estudiantes.actualizar');
+Route::delete('/estudiantes/{id}', [EstudianteController::class, 'eliminar'])->name('estudiantes.eliminar');
+Route::get('/estudiantes/{id}', [EstudianteController::class, 'ver'])->name('estudiantes.ver');
+
