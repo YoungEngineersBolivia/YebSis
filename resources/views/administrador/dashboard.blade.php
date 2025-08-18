@@ -88,6 +88,7 @@
     $alIna = $alumnosInactivos ?? null;  // pásalo desde el controlador si lo tienes
   @endphp
 
+<<<<<<< HEAD
   {{-- Franja inferior: KPIs y tarjetas de totales (como la 2da imagen) --}}
   <div class="row g-3 mt-1 align-items-stretch">
     {{-- KPI Ingresos/Egresos con botones --}}
@@ -97,6 +98,17 @@
         <div class="d-flex align-items-center justify-content-between">
           <h2>Bs {{ $ingresos }}</h2>
           <i class="fa-solid fa-rotate text-muted"></i>
+=======
+    {{-- Métricas --}}
+    <div class="row mb-4">
+        <div class="col-md-4 mb-3">
+            <div class="card shadow-sm text-center">
+                <div class="card-body">
+                    <h6><i class="fas fa-arrow-up text-success"></i> Ingresos Totales</h6>
+                    <h3>Bs {{ number_format($ingresosTotales ?? 0, 2, '.', ',') }}</h3>
+                </div>
+            </div>
+>>>>>>> 16f888cbb9339c9b68084012e1379ce5293c8212
         </div>
         <div class="mt-3">
           <a href="{{ route('pagos.create') }}" class="btn btn-soft-success btn-sm px-3">

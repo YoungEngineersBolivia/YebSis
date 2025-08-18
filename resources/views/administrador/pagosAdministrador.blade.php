@@ -76,7 +76,7 @@
                                                     <button type="button" class="btn btn-success btn-sm" 
                                                         data-bs-toggle="modal" 
                                                         data-bs-target="#modalRegistrarPago"
-                                                        data-cuota-id="{{ $cuota->id }}"
+                                                        data-cuota-id="{{ $cuota->Id_cuotas }}"
                                                         data-monto="{{ $cuota->Monto_cuota }}"
                                                         data-plan-id="{{ $cuota->Id_planes_pagos }}">
                                                         Registrar Pago
@@ -239,7 +239,7 @@ function mostrarEstudiante(est) {
                                     class="btn btn-success btn-sm" 
                                     data-bs-toggle="modal" 
                                     data-bs-target="#modalRegistrarPago"
-                                    data-cuota-id="${cuota.id}"
+                                    data-cuota-id="${cuota.Id_cuotas}"
                                     data-monto="${cuota.Monto_cuota}"
                                     data-plan-id="${cuota.Id_planes_pagos}">
                                     Registrar Pago
@@ -282,9 +282,16 @@ modalRegistrarPago.addEventListener('show.bs.modal', function (event) {
     const monto = button.getAttribute('data-monto');
     const planId = button.getAttribute('data-plan-id');
     
+    console.log('Datos de cuota:', { cuotaId, monto, planId }); // Debug
+    
+    if (!cuotaId) {
+        console.error('No se encontró el ID de la cuota');
+        return;
+    }
+
     // Asignar valores al formulario
     document.getElementById('modal-cuota-id').value = cuotaId;
-    document.getElementById('modal-monto-pago').value = monto || '';
+    document.getElementById('modal-monto-pago').value = monto || 0;
     document.getElementById('modal-id-planes-pagos').value = planId || '';
     document.getElementById('modal-fecha-pago').value = new Date().toISOString().split('T')[0];
     
