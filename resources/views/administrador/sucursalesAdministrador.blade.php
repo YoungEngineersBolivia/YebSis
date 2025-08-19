@@ -15,7 +15,7 @@
     <table class="table table-bordered">
         <thead>
             <tr>
-                <th>ID</th>
+            
                 <th>Nombre</th>
                 <th>Dirección</th>
                 <th>Acciones</th>
@@ -24,13 +24,16 @@
         <tbody>
             @foreach($sucursales as $sucursal)
             <tr>
-                <td>{{ $sucursal->Id_Sucursales }}</td>
+              
                 <td>{{ $sucursal->Nombre }}</td>
                 <td>{{ $sucursal->Direccion }}</td>
                 <td>
-                    <!-- Aquí podrías agregar botones de editar o eliminar -->
-                    <a href="#" class="btn btn-sm btn-warning">Editar</a>
-                    <a href="#" class="btn btn-sm btn-danger">Eliminar</a>
+                    <button class="btn btn-sm btn-warning" title="Editar">
+                        <i class="bi bi-pencil-square"></i>
+                    </button>
+                    <button class="btn btn-sm btn-danger" title="Eliminar">
+                        <i class="bi bi-trash3-fill"></i>
+                    </button>
                 </td>
             </tr>
             @endforeach
