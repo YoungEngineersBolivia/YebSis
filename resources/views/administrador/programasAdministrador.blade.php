@@ -94,18 +94,18 @@
                                     <button class="btn btn-sm btn-outline-danger" 
                                             onclick="eliminarPrograma({{ $programa->id }})"
                                             title="Eliminar">
-                                        <i class="fas fa-trash"></i>
+                                        <i class="bi bi-trash3-fill"></i>
                                     </button>
                                    
-                                    <button class="btn btn-sm btn-outline-primary" 
+                                    <button class="btn btn-sm btn-outline-warning" 
                                             onclick="editarPrograma({{ $programa->Id_programas }})"
                                             title="Editar">
-                                        <i class="fas fa-edit"></i>
+                                        <i class="bi bi-pencil-square"></i>
                                     </button>
-                                    <button class="btn btn-sm btn-outline-secondary" 
+                                    <button class="btn btn-sm btn-outline-dark" 
                                             onclick="verPrograma({{ $programa->id }})"
                                             title="Ver detalles">
-                                        <i class="fas fa-user"></i>
+                                        <i class="bi bi-person-fill"></i>
                                     </button>
                                 </div>
                             </td>

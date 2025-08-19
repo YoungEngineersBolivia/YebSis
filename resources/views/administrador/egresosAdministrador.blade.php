@@ -63,6 +63,7 @@
                                 <th>Descripción</th>
                                 <th>Fecha</th>
                                 <th>Monto</th>
+                                <th>Acciones</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -75,14 +76,13 @@
                                     <td>
                                         <div class="d-flex gap-2">
                                             <button class="btn btn-sm btn-outline-primary" title="Editar">
-                                                <i class="fas fa-edit"></i>
+                                                <i class="bi bi-pencil-square"></i>
                                             </button>
-                                            <button class="btn btn-sm btn-outline-danger" title="Eliminar">
-                                                <i class="fas fa-trash"></i>
+                                            
+                                         
+                                    <button class="btn btn-sm btn-outline-danger" title="Eliminar">
+                                                <i class="bi bi-trash3-fill"></i>
                                             </button>
-                                            <button class="btn btn-sm btn-outline-secondary" >
-                                        <i class="fas fa-user"></i>
-                                    </button>
                                         </div>
                                     </td>
                                 </tr>
