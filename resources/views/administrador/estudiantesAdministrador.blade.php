@@ -1,36 +1,52 @@
 @extends('administrador.baseAdministrador')
 
 @section('title', 'Estudiantes')
+
 @section('styles')
-<link href="{{ asset('css/style.css') }}" rel="stylesheet">
-<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    @vite('resources/css/dashboard.css')
+    {{-- Font Awesome (ya lo usabas) --}}
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    {{-- Bootstrap Icons (necesario para bi bi-*) --}}
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <style>
+        .table thead th {
+            white-space: nowrap;
+        }
+        .badge-status {
+            font-size: .85rem;
+        }
+        .search-hint {
+            font-size: .9rem; color:#666;
+        }
+    </style>
 @endsection
 
 @section('content')
-    <div class="container-fluid mt-4">
+<div class="container-fluid mt-4">
+
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h1 class="mb-0">Lista de Estudiantes</h1>
-        <a href="{{ route('estudiantes.registrar') }}" class="btn btn-primary">
+        <a href="{{ route('registroCombinado.registrar') }}" class="btn btn-primary">
             <i class="fas fa-plus me-2"></i>Registrar Estudiante
         </a>
-
     </div>
 
+    {{-- Mensajes de sesión --}}
     @if(session('success'))
         <div class="alert alert-success alert-dismissible fade show" role="alert">
             {{ session('success') }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
         </div>
     @endif
 
     @if(session('error'))
         <div class="alert alert-danger alert-dismissible fade show" role="alert">
             {{ session('error') }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
         </div>
     @endif
 
-    
+    {{-- Errores de validación --}}
     @if($errors->any())
         <div class="alert alert-danger alert-dismissible fade show" role="alert">
             <ul class="mb-0">
@@ -38,62 +54,128 @@
                     <li>{{ $error }}</li>
                 @endforeach
             </ul>
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
         </div>
     @endif
+
+    {{-- Buscador --}}
     <div class="row mb-3">
         <div class="col-md-6">
+            <label for="searchInput" class="form-label mb-1">Buscar</label>
             <div class="input-group">
                 <span class="input-group-text"><i class="fas fa-search"></i></span>
-                <input type="text" class="form-control" placeholder="Buscar Programa" id="searchInput">
+                <input type="text" class="form-control" placeholder="Filtrar por código, nombre, programa, profesor o sucursal" id="searchInput">
             </div>
+            <div class="search-hint mt-1">Escribe para filtrar filas en tiempo real.</div>
         </div>
     </div>
 
+    @if ($estudiantes->isEmpty())
+        <div class="card">
+            <div class="card-body text-center py-5">
+                <p class="mb-2">No hay estudiantes registrados.</p>
+                <a href="{{ route('registroCombinado.registrar') }}" class="btn btn-outline-primary">
+                    <i class="fas fa-user-plus me-2"></i>Registrar el primero
+                </a>
+            </div>
+        </div>
+    @else
+        <div class="table-responsive">
+            <table class="table table-hover align-middle" id="studentsTable">
+                <thead class="table-light">
+                    <tr>
+                        <th style="min-width:120px;">Código</th>
+                        <th style="min-width:220px;">Nombre</th>
+                        <th style="min-width:180px;">Programa</th>
+                        <th style="min-width:220px;">Profesor</th>
+                        <th style="min-width:160px;">Sucursal</th>
+                        <th style="min-width:120px;">Estado</th>
+                        <th style="min-width:160px;">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach ($estudiantes as $estudiante)
+                        @php
+                            $personaEst = $estudiante->persona ?? null;
+                            $nombreCompletoEst = $personaEst ? trim(($personaEst->Nombre ?? '').' '.($personaEst->Apellido ?? '')) : null;
 
-   @if ($estudiantes->isEmpty())
-                <p>No hay estudiantes registrados.</p>
-            @else
-                <div class="table-responsive">
-                    <table class="table table-hover">
-                        <thead class="table-light">
-                            <tr>
-                                <th>Código</th>
-                                <th>Nombre</th>
-                                <th>Programa</th>
-                                <th>Profesor</th>
-                                <th>Sucursal</th>
-                                <th>Estado</th>
-                                <th>Acciones</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach ($estudiantes as $estudiante)
-                                <tr>
-                                    <td>{{ $estudiante->Cod_estudiante }}</td>
-                                    <td>{{ $estudiante->persona->Nombre ?? 'Sin datos' }}</td>
-                                    <td>{{ $estudiante->programa->Nombre ?? 'Sin programa' }}</td>
-                                    <td>{{ $estudiante->profesor->Nombre ?? 'Sin profesor' }}</td>
-                                    <td>{{ $estudiante->sucursal->Nombre ?? 'Sin sucursal' }}</td>
-                                    <td>{{ $estudiante->Estado }}</td>
-                                    <td>
-                                        <div class="d-flex gap-2">
-                                            <button class="btn btn-sm btn-outline-primary" title="Editar">
-                                                <i class="fas fa-edit"></i>
-                                            </button>
-                                            <button class="btn btn-sm btn-outline-danger" title="Eliminar">
-                                                <i class="fas fa-trash"></i>
-                                            </button>
-                                            <button class="btn btn-sm btn-outline-secondary" >
-                                        <i class="fas fa-user"></i>
-                                    </button>
-                                        </div>
-                                    </td>
-                                </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
-                </div>
-            @endif
+                            $programa = $estudiante->programa->Nombre ?? 'Sin programa';
+                            $sucursal = $estudiante->sucursal->Nombre ?? 'Sin sucursal';
 
+                            // Si el nombre del profesor está en PERSONA:
+                            $prof = $estudiante->profesor ?? null;
+                            $profPersona = $prof?->persona ?? null;
+                            $profesorNombre = $profPersona
+                                ? trim(($profPersona->Nombre ?? '').' '.($profPersona->Apellido ?? ''))
+                                : ($prof->Nombre ?? null); // fallback si profesores.Nombre existe
+                            $profesorNombre = $profesorNombre ?: 'Sin profesor';
+                        @endphp
+                        <tr>
+                            <td class="fw-semibold">{{ $estudiante->Cod_estudiante }}</td>
+                            <td>{{ $nombreCompletoEst ?: 'Sin datos' }}</td>
+                            <td>{{ $programa }}</td>
+                            <td>{{ $profesorNombre }}</td>
+                            <td>{{ $sucursal }}</td>
+                            <td>
+                                @if(Str::lower($estudiante->Estado) === 'activo')
+                                    <span class="badge text-bg-success badge-status">Activo</span>
+                                @elseif(Str::lower($estudiante->Estado) === 'inactivo')
+                                    <span class="badge text-bg-secondary badge-status">Inactivo</span>
+                                @else
+                                    <span class="badge text-bg-light text-dark badge-status">{{ $estudiante->Estado }}</span>
+                                @endif
+                            </td>
+                            <td>
+                                <div class="d-flex gap-2">
+                                    {{-- Botón Editar (ajusta la ruta si la tienes) --}}
+                                    <a href="{{ route('estudiantes.editar', $estudiante->Id_estudiantes ?? 0) }}"
+                                       class="btn btn-sm btn-outline-primary" title="Editar">
+                                        <i class="bi bi-pencil-square"></i>
+                                    </a>
+
+                                    {{-- Botón Eliminar (ajusta la ruta si la tienes) --}}
+                                    <form action="{{ route('estudiantes.eliminar', $estudiante->Id_estudiantes ?? 0) }}"
+                                          method="POST" onsubmit="return confirm('¿Eliminar este estudiante?');">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="btn btn-sm btn-outline-danger" title="Eliminar">
+                                            <i class="bi bi-trash3-fill"></i>
+                                        </button>
+                                    </form>
+
+                                    {{-- Ver/Perfil (ajusta la ruta si la tienes) --}}
+                                    <a href="{{ route('estudiantes.ver', $estudiante->Id_estudiantes ?? 0) }}"
+                                       class="btn btn-sm btn-outline-secondary" title="Ver perfil">
+                                        <i class="bi bi-person-fill"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
+    @endif
+</div>
+@endsection
+
+@section('scripts')
+<script>
+    // Filtro de tabla en vivo
+    (function () {
+        const input = document.getElementById('searchInput');
+        const table = document.getElementById('studentsTable');
+        if (!input || !table) return;
+
+        input.addEventListener('input', function () {
+            const q = this.value.trim().toLowerCase();
+            const rows = table.querySelectorAll('tbody tr');
+
+            rows.forEach(row => {
+                const text = row.innerText.toLowerCase();
+                row.style.display = text.includes(q) ? '' : 'none';
+            });
+        });
+    })();
+</script>
 @endsection
