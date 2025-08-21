@@ -1,26 +1,25 @@
 <?php
-
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    public function up()
+    public function up(): void
     {
-        Schema::table('cuotas', function (Blueprint $table) {
-            $table->boolean('pagado')->default(false);
-            $table->text('Descripcion')->nullable();
-            $table->string('Comprobante')->nullable();
-            $table->timestamps();
-        });
+        if (Schema::hasTable('cuotas') && !Schema::hasColumn('cuotas', 'pagado')) {
+            Schema::table('cuotas', function (Blueprint $table) {
+                $table->boolean('pagado')->default(false);
+            });
+        }
     }
 
-    public function down()
+    public function down(): void
     {
-        Schema::table('cuotas', function (Blueprint $table) {
-            $table->dropColumn(['pagado', 'Descripcion', 'Comprobante']);
-            $table->dropTimestamps();
-        });
+        if (Schema::hasTable('cuotas') && Schema::hasColumn('cuotas', 'pagado')) {
+            Schema::table('cuotas', function (Blueprint $table) {
+                $table->dropColumn('pagado');
+            });
+        }
     }
 };
