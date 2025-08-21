@@ -26,7 +26,7 @@
 
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h1 class="mb-0">Lista de Estudiantes</h1>
-        <a href="{{ route('estudiantes.registrar') }}" class="btn btn-primary">
+        <a href="{{ route('registroCombinado.registrar') }}" class="btn btn-primary">
             <i class="fas fa-plus me-2"></i>Registrar Estudiante
         </a>
     </div>
@@ -74,7 +74,7 @@
         <div class="card">
             <div class="card-body text-center py-5">
                 <p class="mb-2">No hay estudiantes registrados.</p>
-                <a href="{{ route('estudiantes.registrar') }}" class="btn btn-outline-primary">
+                <a href="{{ route('registroCombinado.registrar') }}" class="btn btn-outline-primary">
                     <i class="fas fa-user-plus me-2"></i>Registrar el primero
                 </a>
             </div>

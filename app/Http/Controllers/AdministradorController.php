@@ -224,7 +224,7 @@ class AdministradorController extends Controller
         Profesor::create([
             'Profesion' => $request->profesion,
             'Id_personas' => $persona->Id_personas,
-            'Id_usuarios' => $usuario->Id_Usuarios,
+            'Id_usuarios' => $usuario->Id_usuarios,
         ]);
 
         Mail::to($request->correo)->send(new ClaveGeneradaAdmin(
