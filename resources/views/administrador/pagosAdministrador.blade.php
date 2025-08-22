@@ -73,7 +73,7 @@
                                          
                                             <td>
                                                 @if(!$cuota->pagado)
-                                                    <button type="button" class="btn btn-success btn-sm" 
+                                                    <button type="button" class="btn btn-primary" 
                                                         data-bs-toggle="modal" 
                                                         data-bs-target="#modalRegistrarPago"
                                                         data-cuota-id="{{ $cuota->Id_cuotas }}"
@@ -140,7 +140,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                <button type="submit" class="btn btn-success">Registrar Pago</button>
+                <button type="submit" class="btn btn-primary">Registrar Pago</button>
             </div>
         </div>
     </form>
