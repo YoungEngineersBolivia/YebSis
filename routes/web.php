@@ -17,6 +17,7 @@ use App\Http\Controllers\RegistroCombinadoController;
 use App\Http\Controllers\PagosController;
 use App\Http\Controllers\PubNot;
 use App\Http\Controllers\EstudiantesInactivosController;
+use App\Http\Controllers\EstudiantesActivosController;
 
 
 /* -------------------Home pagina <web-------------------------*/
@@ -128,4 +129,6 @@ Route::post('/planes-pago/registrar', [App\Http\Controllers\PlanesPagoController
 Route::get('/comercial/estudiantesNoActivos', [EstudiantesInactivosController::class, 'index'])->name('estudiantesNoActivos');
 Route::put('/estudiantes/activar/{id}', [EstudiantesInactivosController::class, 'reactivar'])->name('estudiantes.reactivar');
 
-
+/*-------------------ESTUDIANTES ACTIVOS--------------------*/ 
+Route::get('/comercial/estudiantesActivos', [EstudiantesActivosController::class, 'index'])->name('estudiantesActivos');
+Route::put('/estudiantes/desactivar/{id}', [EstudiantesActivosController::class, 'desactivar'])->name('estudiantes.desactivar');
