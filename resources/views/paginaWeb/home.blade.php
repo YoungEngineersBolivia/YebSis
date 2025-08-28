@@ -4,24 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Young Engineers La Paz - STEM para Niños</title>
-  
     <link href="{{ asset('css/home.css') }}" rel="stylesheet">
 
 </head>
 <body>
-    <!-- Floating Background Elements -->
-    <div class="floating-elements">
-        <div class="floating-element" style="left: 10%; animation-delay: 0s;"></div>
-        <div class="floating-element" style="left: 20%; animation-delay: 2s;"></div>
-        <div class="floating-element" style="left: 30%; animation-delay: 4s;"></div>
-        <div class="floating-element" style="left: 40%; animation-delay: 6s;"></div>
-        <div class="floating-element" style="left: 50%; animation-delay: 8s;"></div>
-        <div class="floating-element" style="left: 60%; animation-delay: 10s;"></div>
-        <div class="floating-element" style="left: 70%; animation-delay: 12s;"></div>
-        <div class="floating-element" style="left: 80%; animation-delay: 14s;"></div>
-        <div class="floating-element" style="left: 90%; animation-delay: 16s;"></div>
-    </div>
-
     <!-- Header -->
     <header>
         <div class="container">
@@ -42,8 +28,8 @@
     <div class="container">
         <!-- Hero Section -->
         <section class="hero">
-            <div class="hero-content">
-                <div class="hero-text">
+           
+               
                     <h1>SOBRE NOSOTROS</h1>
                     <p>
                         Hola amigos, bienvenidos a la página de Young Engineers para la zona sur de La Paz. Gracias por visitarnos en este sitio web. Young Engineers, Zona Sur, La Paz, es un Centro de Estudios que da a los niños de nuestra comunidad la posibilidad de aprender y disfrutar del <span class="highlight">STEM</span> (siglas en inglés para Ciencias, Tecnología, Ingeniería y Matemáticas) a través del modelo que une el aprender con la diversión: <span class="highlight">EDUTAINMENT</span>.
@@ -51,11 +37,11 @@
                     <p>
                         Las carreras de tecnología, ingeniería y ciencia son el futuro y nosotros queremos que los niños de nuestra comunidad puedan acercarse a estas disciplinas de una manera práctica y divertida. ¡Únete a nuestra comunidad y empecemos juntos el cambio hacia el futuro!
                     </p>
-                </div>
+               
                 <div class="hero-visual">
                     <img src="{{ Vite::asset('resources/img/Logo_sign.png') }}"alt="Logo YE Bolivia" width="250px" class="me-2">
                 </div>
-            </div>
+            
             
             <div class="contact-section">
                 <h3 style="color: white; margin-bottom: 10px;">¡CONTÁCTANOS!</h3>
@@ -194,58 +180,6 @@
      <script src="https://cdnjs.cloudflare.com/ajax/libs/bodymovin/5.7.6/lottie.min.js"></script>
 
     <script>
-        // Smooth scrolling animation
-        document.addEventListener('DOMContentLoaded', function() {
-            // Add smooth scroll behavior
-            const links = document.querySelectorAll('a[href^="#"]');
-            links.forEach(link => {
-                link.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    const target = document.querySelector(this.getAttribute('href'));
-                    if (target) {
-                        target.scrollIntoView({
-                            behavior: 'smooth'
-                        });
-                    }
-                });
-            });
-
-            // Add entrance animations
-            const observerOptions = {
-                threshold: 0.1,
-                rootMargin: '0px 0px -50px 0px'
-            };
-
-            const observer = new IntersectionObserver(function(entries) {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        entry.target.style.animation = 'fadeInUp 0.6s ease forwards';
-                    }
-                });
-            }, observerOptions);
-
-            // Observe program cards and news cards
-            document.querySelectorAll('.program-card, .news-card').forEach(card => {
-                card.style.opacity = '0';
-                card.style.transform = 'translateY(30px)';
-                observer.observe(card);
-            });
-
-            // Add click handlers for buttons
-            document.querySelectorAll('.btn-contact, .btn-iniciar').forEach(btn => {
-                btn.addEventListener('click', function(e) {
-                    if (!this.href || this.href === '#') {
-                        e.preventDefault();
-                        this.style.transform = 'scale(0.95)';
-                        setTimeout(() => {
-                            this.style.transform = '';
-                        }, 150);
-                    }
-                });
-            });
-        });
-
-        // CSS for fade in animation
         const style = document.createElement('style');
         style.textContent = `
             @keyframes fadeInUp {
