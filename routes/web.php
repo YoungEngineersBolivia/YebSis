@@ -18,8 +18,17 @@ use App\Http\Controllers\PagosController;
 use App\Http\Controllers\PubNot;
 use App\Http\Controllers\EstudiantesInactivosController;
 
-/* ----------------- HOME / BASE ----------------- */
-Route::get('/', fn () => view('/administrador/baseAdministrador'));
+
+/* -------------------Home pagina <web-------------------------*/
+
+Route::get('/', function () {
+    return view('/paginaWeb/home'); // Retorna la vista welcome.blade.php
+});
+
+
+
+/* ----------------- HOME / BASE Administrador  ----------------- */
+//Route::get('/', fn () => view('/administrador/baseAdministrador'));
 
 /* ----------------- DASHBOARD ----------------- */
 Route::get('/administrador/dashboard', [DashboardController::class, 'index'])
@@ -118,4 +127,5 @@ Route::post('/planes-pago/registrar', [App\Http\Controllers\PlanesPagoController
 /*-------------------ESTUDIANTES NO ACTIVOS-----------------*/
 Route::get('/comercial/estudiantesNoActivos', [EstudiantesInactivosController::class, 'index'])->name('estudiantesNoActivos');
 Route::put('/estudiantes/activar/{id}', [EstudiantesInactivosController::class, 'reactivar'])->name('estudiantes.reactivar');
+
 
