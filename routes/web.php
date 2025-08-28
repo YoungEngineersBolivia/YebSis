@@ -17,8 +17,17 @@ use App\Http\Controllers\RegistroCombinadoController;
 use App\Http\Controllers\PagosController;
 use App\Http\Controllers\PubNot;
 
-/* ----------------- HOME / BASE ----------------- */
-Route::get('/', fn () => view('/administrador/baseAdministrador'));
+
+/* -------------------Home pagina <web-------------------------*/
+
+Route::get('/', function () {
+    return view('/paginaWeb/home'); // Retorna la vista welcome.blade.php
+});
+
+
+
+/* ----------------- HOME / BASE Administrador  ----------------- */
+//Route::get('/', fn () => view('/administrador/baseAdministrador'));
 
 /* ----------------- DASHBOARD ----------------- */
 Route::get('/administrador/dashboard', [DashboardController::class, 'index'])
@@ -112,3 +121,5 @@ Route::post('/planes-pago/registrar', [App\Http\Controllers\PlanesPagoController
 
 /* ----------------- MIDDLEWARE (reserva para después) ----------------- */
 // Route::middleware(['auth', 'role:admin'])->group(function () { /* ... */ });
+
+

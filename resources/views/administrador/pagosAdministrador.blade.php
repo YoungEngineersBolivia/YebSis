@@ -42,7 +42,7 @@
                         {{ $estudiante->persona->Nombre ?? '' }} {{ $estudiante->persona->Apellido ?? '' }}
                     </h5>
                     <p>
-                        Padre: 
+                        Tutor:
                         {{ $estudiante->tutor && $estudiante->tutor->persona ? $estudiante->tutor->persona->Nombre . ' ' . $estudiante->tutor->persona->Apellido : 'Sin padre asignado' }}
                     </p>
                     <h6>Cuotas:</h6>
@@ -79,10 +79,10 @@
                                                         data-cuota-id="{{ $cuota->Id_cuotas }}"
                                                         data-monto="{{ $cuota->Monto_cuota }}"
                                                         data-plan-id="{{ $cuota->Id_planes_pagos }}">
-                                                        Registrar Pago
+                                                        <i class="fas fa-money-bill"></i> Registrar
                                                     </button>
                                                 @else
-                                                    Pagado
+                                                    <span class="badge bg-success">Pagado</span>
                                                 @endif
                                             </td>
                                         </tr>
@@ -277,30 +277,32 @@ const modalRegistrarPago = document.getElementById('modalRegistrarPago');
 modalRegistrarPago.addEventListener('show.bs.modal', function (event) {
     const button = event.relatedTarget;
     
+    // Debug: Mostrar el botón completo
+    console.log('Botón:', button);
+    console.log('Atributos:', {
+        cuotaId: button.getAttribute('data-cuota-id'),
+        monto: button.getAttribute('data-monto'),
+        planId: button.getAttribute('data-plan-id')
+    });
+    
     // Obtener datos del botón
     const cuotaId = button.getAttribute('data-cuota-id');
     const monto = button.getAttribute('data-monto');
     const planId = button.getAttribute('data-plan-id');
     
-    console.log('Datos de cuota:', { cuotaId, monto, planId }); // Debug
-    
-    if (!cuotaId) {
-        console.error('No se encontró el ID de la cuota');
+    // Verificar que tenemos los datos
+    if (!cuotaId || !monto || !planId) {
+        console.error('Faltan datos de la cuota:', { cuotaId, monto, planId });
         return;
     }
 
-    // Asignar valores al formulario
+    // Llenar el formulario
     document.getElementById('modal-cuota-id').value = cuotaId;
-    document.getElementById('modal-monto-pago').value = monto || 0;
-    document.getElementById('modal-id-planes-pagos').value = planId || '';
+    document.getElementById('modal-monto-pago').value = monto;
+    document.getElementById('modal-id-planes-pagos').value = planId;
     document.getElementById('modal-fecha-pago').value = new Date().toISOString().split('T')[0];
-    
-    // Descripción predeterminada
     document.getElementById('modal-descripcion').value = `Pago de cuota #${cuotaId}`;
-    
-    // Generar número de comprobante
-    const comprobante = `COMP-${new Date().getTime()}-${cuotaId}`;
-    document.getElementById('modal-comprobante').value = comprobante;
+    document.getElementById('modal-comprobante').value = `COMP-${new Date().getTime()}-${cuotaId}`;
 });
 </script>
 @endsection
