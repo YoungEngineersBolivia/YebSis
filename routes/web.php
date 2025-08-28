@@ -16,6 +16,7 @@ use App\Http\Controllers\HorariosController;
 use App\Http\Controllers\RegistroCombinadoController;
 use App\Http\Controllers\PagosController;
 use App\Http\Controllers\PubNot;
+use App\Http\Controllers\EstudiantesInactivosController;
 
 /* ----------------- HOME / BASE ----------------- */
 Route::get('/', fn () => view('/administrador/baseAdministrador'));
@@ -61,14 +62,15 @@ Route::delete('/administrador/horarios/{id}', [HorariosController::class, 'destr
 Route::post('/administrador/horarios/asignar', [HorariosController::class, 'asignar'])->name('horarios.asignar');
 
 /* ----------------- ESTUDIANTES ----------------- */
-// quita el closure duplicado de la misma ruta
+
 Route::get('/administrador/estudiantesAdministrador', [EstudianteController::class, 'index'])->name('admin.estudiantes');
 
 Route::get('/estudiantes', [EstudianteController::class, 'index'])->name('estudiantes.index');
-Route::get('/estudiantes/{id}/editar', [EstudianteController::class, 'editar'])->name('estudiantes.editar');
-Route::put('/estudiantes/{id}', [EstudianteController::class, 'actualizar'])->name('estudiantes.actualizar');
+Route::put('/estudiantes/editar/{id}', [EstudianteController::class, 'editar'])->name('estudiantes.editar');
 Route::delete('/estudiantes/{id}', [EstudianteController::class, 'eliminar'])->name('estudiantes.eliminar');
 Route::get('/estudiantes/{id}', [EstudianteController::class, 'ver'])->name('estudiantes.ver');
+Route::put('/estudiantes/{id}/cambiar-estado', [EstudianteController::class, 'cambiarEstado'])->name('estudiantes.cambiarEstado');
+
 
 /* ----------------- PROGRAMAS ----------------- */
 Route::get('/administrador/programasAdministrador', [ProgramaController::class, 'index']);
@@ -112,3 +114,8 @@ Route::post('/planes-pago/registrar', [App\Http\Controllers\PlanesPagoController
 
 /* ----------------- MIDDLEWARE (reserva para después) ----------------- */
 // Route::middleware(['auth', 'role:admin'])->group(function () { /* ... */ });
+
+/*-------------------ESTUDIANTES NO ACTIVOS-----------------*/
+Route::get('/comercial/estudiantesNoActivos', [EstudiantesInactivosController::class, 'index'])->name('estudiantesNoActivos');
+Route::put('/estudiantes/activar/{id}', [EstudiantesInactivosController::class, 'reactivar'])->name('estudiantes.reactivar');
+

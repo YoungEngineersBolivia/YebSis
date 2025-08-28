@@ -105,6 +105,7 @@ class RegistroCombinadoController extends Controller
             $estudiante = Estudiante::create([
                 'Cod_estudiante' => $request->codigo_estudiante,
                 'Estado' => 'Activo',
+                'Fecha_estado' => now()->format('Y-m-d'),
                 'Id_personas' => $personaEstudiante->Id_personas,
                 'Id_programas' => $request->programa,
                 'Id_sucursales' => $request->sucursal,
