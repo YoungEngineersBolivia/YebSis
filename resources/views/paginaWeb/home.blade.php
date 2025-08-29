@@ -19,7 +19,8 @@
                     <span>RECONOCIDO POR:</span>
                     <img src="{{Vite::asset('resources/img/recognized_by.png')}}" alt="Reconocimiento" width="200px" class="me-2">
                     <span>REDES SOCIALES</span>
-                    <button class="btn-iniciar">Iniciar Sesión</button>
+                    <a href="{{ route('login') }}" class="btn-iniciar">Iniciar Sesión</a>
+
                 </nav>
             </div>
         </div>

@@ -1,7 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-
+use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ProgramaController;
 use App\Http\Controllers\RegistroAdministradorController;
@@ -25,7 +25,9 @@ use App\Http\Controllers\EstudiantesActivosController;
 Route::get('/', function () {
     return view('/paginaWeb/home'); // Retorna la vista welcome.blade.php
 });
-
+Route::get('/login', function () {
+    return view('paginaWeb.login'); // Retorna la vista login.blade.php
+})->name('login');
 
 
 /* ----------------- HOME / BASE Administrador  ----------------- */
@@ -132,3 +134,10 @@ Route::put('/estudiantes/activar/{id}', [EstudiantesInactivosController::class, 
 /*-------------------ESTUDIANTES ACTIVOS--------------------*/ 
 Route::get('/comercial/estudiantesActivos', [EstudiantesActivosController::class, 'index'])->name('estudiantesActivos');
 Route::put('/estudiantes/desactivar/{id}', [EstudiantesActivosController::class, 'desactivar'])->name('estudiantes.desactivar');
+
+
+/*------------------------------------LOGIN--------------------------------*/
+
+Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
+Route::post('/login', [AuthController::class, 'login'])->name('login.submit');
+Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
