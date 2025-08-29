@@ -85,6 +85,7 @@ return new class extends Migration
             $table->timestamps();
       
         });
+        
         Schema::create('estudiantes', function (Blueprint $table) {
             $table->id('Id_estudiantes');
             $table->string('Cod_estudiante')->unique();
@@ -109,7 +110,6 @@ return new class extends Migration
             $table->timestamps();
         });
 
-        // CREA PRIMERO PLANES_PAGOS
         Schema::create('planes_pagos', function (Blueprint $table) {
             $table->id('Id_planes_pagos');
             $table->float('Monto_total')->nullable();
@@ -125,7 +125,6 @@ return new class extends Migration
             $table->timestamps();
         });
 
-        // LUEGO CREA PAGOS
         Schema::create('pagos', function (Blueprint $table) {
             $table->id('Id_pagos');
             $table->string('Descripcion')->nullable();
@@ -148,7 +147,6 @@ return new class extends Migration
                   ->onDelete('cascade');
             $table->timestamps();
         });
-        //////revisarrrrr
 
         Schema::create('publicaciones', function (Blueprint $table) {
             $table->id('Id_publicaciones');
@@ -328,6 +326,6 @@ return new class extends Migration
         Schema::dropIfExists('personas');
         Schema::dropIfExists('roles');
         Schema::dropIfExists('notificaciones');
-          }
+      }
 };
 
