@@ -51,7 +51,7 @@ return new class extends Migration
         Schema::create('usuarios', function (Blueprint $table) {
             $table->id('Id_usuarios');
             $table->string('Correo')->nullable();
-            $table->string('Contrasania')->nullable();
+            $table->string('Contrasenia')->nullable();
             $table->foreignId('Id_personas')
                   ->constrained('personas', 'Id_personas')
                   ->onDelete('cascade');
