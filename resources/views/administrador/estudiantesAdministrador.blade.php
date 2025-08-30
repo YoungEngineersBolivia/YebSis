@@ -127,15 +127,14 @@
                             </td>
                             <td>
                                 <div class="d-flex gap-2">
-                                    {{-- Botón Editar (ajusta la ruta si la tienes) --}}
-                                    <a href="{{ route('estudiantes.editar', $estudiante->Id_estudiantes ?? 0) }}"
-                                       class="btn btn-sm btn-outline-primary" title="Editar">
+                                    {{-- Botón Editar --}}
+                                    <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#editarModal{{ $estudiante->Id_estudiantes }}">
                                         <i class="bi bi-pencil-square"></i>
-                                    </a>
+                                    </button>
 
-                                    {{-- Botón Eliminar (ajusta la ruta si la tienes) --}}
+                                    {{-- Botón Eliminar --}}
                                     <form action="{{ route('estudiantes.eliminar', $estudiante->Id_estudiantes ?? 0) }}"
-                                          method="POST" onsubmit="return confirm('¿Eliminar este estudiante?');">
+                                        method="POST" onsubmit="return confirm('¿Eliminar este estudiante?');">
                                         @csrf
                                         @method('DELETE')
                                         <button type="submit" class="btn btn-sm btn-outline-danger" title="Eliminar">
@@ -143,14 +142,83 @@
                                         </button>
                                     </form>
 
-                                    {{-- Ver/Perfil (ajusta la ruta si la tienes) --}}
+                                    {{-- Ver/Perfil --}}
                                     <a href="{{ route('estudiantes.ver', $estudiante->Id_estudiantes ?? 0) }}"
-                                       class="btn btn-sm btn-outline-secondary" title="Ver perfil">
+                                    class="btn btn-sm btn-outline-secondary" title="Ver perfil">
                                         <i class="bi bi-person-fill"></i>
                                     </a>
+
+                                    {{-- Botón Cambiar Estado --}}
+                                    <form action="{{ route('estudiantes.cambiarEstado', $estudiante->Id_estudiantes) }}"
+                                        method="POST" onsubmit="return confirm('¿Cambiar el estado del estudiante?');">
+                                        @csrf
+                                        @method('PUT')
+                                        <button type="submit" class="btn btn-sm btn-outline-info">
+                                            {{ $estudiante->Estado === 'Activo' ? 'Desactivar' : 'Activar' }}
+                                        </button>
+                                    </form>
                                 </div>
                             </td>
                         </tr>
+
+                        <!-- Modal para editar estudiante -->
+                        <div class="modal fade" id="editarModal{{ $estudiante->Id_estudiantes }}" tabindex="-1" aria-labelledby="editarModalLabel{{ $estudiante->Id_estudiantes }}" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="editarModalLabel{{ $estudiante->Id_estudiantes }}">Editar Estudiante</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <form action="{{ route('estudiantes.editar', $estudiante->Id_estudiantes) }}" method="POST">
+                                            @csrf
+                                            @method('PUT')
+                                            <div class="mb-3">
+                                                <label for="nombre" class="form-label">Nombre</label>
+                                                <input type="text" class="form-control" id="nombre" name="nombre" value="{{ $estudiante->persona->Nombre }}" required>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label for="apellido" class="form-label">Apellido</label>
+                                                <input type="text" class="form-control" id="apellido" name="apellido" value="{{ $estudiante->persona->Apellido }}" required>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label for="programa" class="form-label">Programa</label>
+                                                <select class="form-select" id="programa" name="programa" required>
+                                                    @foreach($programas as $programa)
+                                                        <option value="{{ $programa->Id_programas }}" {{ $estudiante->Id_programas == $programa->Id_programas ? 'selected' : '' }}>
+                                                            {{ $programa->Nombre }}
+                                                        </option>
+                                                    @endforeach
+                                                </select>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label for="sucursal" class="form-label">Sucursal</label>
+                                                <select class="form-select" id="sucursal" name="sucursal" required>
+                                                    @foreach($sucursales as $sucursal)
+                                                        <option value="{{ $sucursal->Id_Sucursales }}" {{ $estudiante->Id_sucursales == $sucursal->Id_Sucursales ? 'selected' : '' }}>
+                                                            {{ $sucursal->Nombre }}
+                                                        </option>
+                                                    @endforeach
+                                                </select>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label for="tutor_estudiante" class="form-label">Tutor</label>
+                                                <select class="form-select" id="tutor_estudiante" name="tutor_estudiante" required>
+                                                    @foreach($tutores as $tutor)
+                                                        <option value="{{ $tutor->Id_tutores }}" {{ $estudiante->Id_tutores == $tutor->Id_tutores ? 'selected' : '' }}>
+                                                            {{ $tutor->persona->Nombre }} {{ $tutor->persona->Apellido }}
+                                                        </option>
+                                                    @endforeach
+                                                </select>
+                                            </div>
+
+                                            <button type="submit" class="btn btn-primary">Guardar cambios</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
                     @endforeach
                 </tbody>
             </table>

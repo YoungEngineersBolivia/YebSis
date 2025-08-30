@@ -1,7 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-
+use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ProgramaController;
 use App\Http\Controllers\RegistroAdministradorController;
@@ -16,9 +16,19 @@ use App\Http\Controllers\HorariosController;
 use App\Http\Controllers\RegistroCombinadoController;
 use App\Http\Controllers\PagosController;
 use App\Http\Controllers\PubNot;
+use App\Http\Controllers\EstudiantesInactivosController;
+use App\Http\Controllers\EstudiantesActivosController;
+use App\Http\Controllers\Auth\CustomLoginController; // <-- añadido
 
-/* ----------------- HOME / BASE ----------------- */
-Route::get('/', fn () => view('/administrador/baseAdministrador'));
+
+/* -------------------Home pagina <web-------------------------*/
+
+Route::get('/', function () {
+    return view('/paginaWeb/home'); // Retorna la vista welcome.blade.php
+});
+
+/* ----------------- HOME / BASE Administrador  ----------------- */
+//Route::get('/', fn () => view('/administrador/baseAdministrador'));
 
 /* ----------------- DASHBOARD ----------------- */
 Route::get('/administrador/dashboard', [DashboardController::class, 'index'])
@@ -61,14 +71,15 @@ Route::delete('/administrador/horarios/{id}', [HorariosController::class, 'destr
 Route::post('/administrador/horarios/asignar', [HorariosController::class, 'asignar'])->name('horarios.asignar');
 
 /* ----------------- ESTUDIANTES ----------------- */
-// quita el closure duplicado de la misma ruta
+
 Route::get('/administrador/estudiantesAdministrador', [EstudianteController::class, 'index'])->name('admin.estudiantes');
 
 Route::get('/estudiantes', [EstudianteController::class, 'index'])->name('estudiantes.index');
-Route::get('/estudiantes/{id}/editar', [EstudianteController::class, 'editar'])->name('estudiantes.editar');
-Route::put('/estudiantes/{id}', [EstudianteController::class, 'actualizar'])->name('estudiantes.actualizar');
+Route::put('/estudiantes/editar/{id}', [EstudianteController::class, 'editar'])->name('estudiantes.editar');
 Route::delete('/estudiantes/{id}', [EstudianteController::class, 'eliminar'])->name('estudiantes.eliminar');
 Route::get('/estudiantes/{id}', [EstudianteController::class, 'ver'])->name('estudiantes.ver');
+Route::put('/estudiantes/{id}/cambiar-estado', [EstudianteController::class, 'cambiarEstado'])->name('estudiantes.cambiarEstado');
+
 
 /* ----------------- PROGRAMAS ----------------- */
 Route::get('/administrador/programasAdministrador', [ProgramaController::class, 'index']);
@@ -112,3 +123,39 @@ Route::post('/planes-pago/registrar', [App\Http\Controllers\PlanesPagoController
 
 /* ----------------- MIDDLEWARE (reserva para después) ----------------- */
 // Route::middleware(['auth', 'role:admin'])->group(function () { /* ... */ });
+
+/*-------------------ESTUDIANTES NO ACTIVOS-----------------*/
+Route::get('/comercial/estudiantesNoActivos', [EstudiantesInactivosController::class, 'index'])->name('estudiantesNoActivos');
+Route::put('/estudiantes/activar/{id}', [EstudiantesInactivosController::class, 'reactivar'])->name('estudiantes.reactivar');
+
+/*-------------------ESTUDIANTES ACTIVOS--------------------*/ 
+Route::get('/comercial/estudiantesActivos', [EstudiantesActivosController::class, 'index'])->name('estudiantesActivos');
+Route::put('/estudiantes/desactivar/{id}', [EstudiantesActivosController::class, 'desactivar'])->name('estudiantes.desactivar');
+
+
+/*------------------------------------LOGIN--------------------------------*/
+
+// Mostrar formulario de login (GET)
+Route::get('/login', function () {
+    return view('paginaWeb.login');
+})->name('login');
+
+// Procesar login (POST) --> CustomLoginController@login
+Route::post('/login', [CustomLoginController::class, 'login'])->name('login.submit');
+
+// Logout
+Route::post('/logout', [CustomLoginController::class, 'logout'])->name('logout');
+
+/*-------------------RUTAS COMERCIALES-------------------*/
+Route::get('/comercial/estudianteActivoComercial', function () {
+    return view('comercial.estudianteActivoComercial');
+})->name('comercial.estudianteActivoComercial');
+
+/*-------------------RUTAS PARA PROFESOR Y TUTOR-------------------*/
+Route::get('profesor/homeProfesor', function () {
+    return view('profesor.homeProfesor');
+})->name('home.profesor');
+
+Route::get('tutor/homeTutor', function () {
+    return view('tutor.homeTutor');
+})->name('home.tutor');

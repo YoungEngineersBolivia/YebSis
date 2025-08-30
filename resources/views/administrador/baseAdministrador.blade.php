@@ -115,10 +115,10 @@
                         </a>
                         <div class="collapse ps-4" id="submenuComercial">
                             <ul class="nav flex-column">
-                                <li><a class="nav-link" href="/administrador/registrosAdministrador">Prospectos</a></li>
-                                <li><a class="nav-link" href="/administrador/tutorEstudianteAdministrador">Estudiantes activos</a></li>
-                                <li><a class="nav-link" href="/administrador/registrarProfesor">Estudiantes no activos</a></li>
-                                <li><a class="nav-link" href="/administrador/registrarProfesor">Talleres</a></li>
+                                <li><a class="nav-link" href="/comercial/prospectosComercial">Prospectos</a></li>
+                                <li><a class="nav-link" href="/comercial/estudiantesActivos">Estudiantes activos</a></li>
+                                <li><a class="nav-link" href="/comercial/estudiantesNoActivos">Estudiantes no activos</a></li>
+                                <li><a class="nav-link" href="/comercial/talleresComercial">Talleres</a></li>
                             </ul>
                         </div>
                     </li>

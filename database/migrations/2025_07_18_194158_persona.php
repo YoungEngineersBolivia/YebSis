@@ -51,7 +51,7 @@ return new class extends Migration
         Schema::create('usuarios', function (Blueprint $table) {
             $table->id('Id_usuarios');
             $table->string('Correo')->nullable();
-            $table->string('Contrasania')->nullable();
+            $table->string('Contrasenia')->nullable();
             $table->foreignId('Id_personas')
                   ->constrained('personas', 'Id_personas')
                   ->onDelete('cascade');
@@ -89,6 +89,7 @@ return new class extends Migration
             $table->id('Id_estudiantes');
             $table->string('Cod_estudiante')->unique();
             $table->string('Estado')->nullable();
+            $table->date('Fecha_estado');
             $table->foreignId('Id_personas')
                   ->constrained('personas', 'Id_personas')
                   ->onDelete('cascade');
@@ -175,7 +176,7 @@ return new class extends Migration
                   ->onDelete('cascade');
             $table->timestamps();
         });
-/////////revisar 
+
         Schema::create('modelos', function (Blueprint $table) {
             $table->id('Id_modelos');
             $table->string('Nombre_modelo')->nullable();
