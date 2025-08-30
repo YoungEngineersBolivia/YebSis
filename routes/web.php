@@ -18,6 +18,7 @@ use App\Http\Controllers\PagosController;
 use App\Http\Controllers\PubNot;
 use App\Http\Controllers\EstudiantesInactivosController;
 use App\Http\Controllers\EstudiantesActivosController;
+use App\Http\Controllers\Auth\CustomLoginController; // <-- añadido
 
 
 /* -------------------Home pagina <web-------------------------*/
@@ -25,10 +26,6 @@ use App\Http\Controllers\EstudiantesActivosController;
 Route::get('/', function () {
     return view('/paginaWeb/home'); // Retorna la vista welcome.blade.php
 });
-Route::get('/login', function () {
-    return view('paginaWeb.login'); // Retorna la vista login.blade.php
-})->name('login');
-
 
 /* ----------------- HOME / BASE Administrador  ----------------- */
 //Route::get('/', fn () => view('/administrador/baseAdministrador'));
@@ -138,6 +135,27 @@ Route::put('/estudiantes/desactivar/{id}', [EstudiantesActivosController::class,
 
 /*------------------------------------LOGIN--------------------------------*/
 
-Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
-Route::post('/login', [AuthController::class, 'login'])->name('login.submit');
-Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+// Mostrar formulario de login (GET)
+Route::get('/login', function () {
+    return view('paginaWeb.login');
+})->name('login');
+
+// Procesar login (POST) --> CustomLoginController@login
+Route::post('/login', [CustomLoginController::class, 'login'])->name('login.submit');
+
+// Logout
+Route::post('/logout', [CustomLoginController::class, 'logout'])->name('logout');
+
+/*-------------------RUTAS COMERCIALES-------------------*/
+Route::get('/comercial/estudianteActivoComercial', function () {
+    return view('comercial.estudianteActivoComercial');
+})->name('comercial.estudianteActivoComercial');
+
+/*-------------------RUTAS PARA PROFESOR Y TUTOR-------------------*/
+Route::get('profesor/homeProfesor', function () {
+    return view('profesor.homeProfesor');
+})->name('home.profesor');
+
+Route::get('tutor/homeTutor', function () {
+    return view('tutor.homeTutor');
+})->name('home.tutor');
