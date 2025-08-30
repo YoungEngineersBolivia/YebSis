@@ -2,48 +2,47 @@
 
 namespace App\Models;
 
-use Illuminate\Contracts\Auth\MustVerifyEmail;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Support\Facades\Hash;
 
 class User extends Authenticatable
 {
     use HasFactory, Notifiable;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array
-     */
+    protected $table = 'usuarios';
+    protected $primaryKey = 'Id_usuarios';
+    public $timestamps = true;
+
     protected $fillable = [
-        'name',
-        'email',
-        'password',
+        'Correo',
+        'contrasenia',
+        'Id_personas',
     ];
 
-    /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var array
-     */
     protected $hidden = [
-        'password',
-        'remember_token',
+        'contrasenia',
     ];
 
-    /**
-     * The attributes that should be cast to native types.
-     *
-     * @var array
-     */
-    protected $casts = [
-        'email_verified_at' => 'datetime',
-    ];
-
-    public function getAuthIdentifierName()
+    // Indica a Laravel cuál es la columna de la contraseña para Auth
+    public function getAuthPassword()
     {
-        return 'Correo';
+        return $this->contrasenia;
+    }
+
+    // Mutator: guarda hasheada al asignar contrasenia
+    public function setContraseniaAttribute($value)
+    {
+        if ($value === null) {
+            $this->attributes['contrasenia'] = null;
+            return;
+        }
+
+        if (preg_match('/^\$2y\$/', $value) || preg_match('/^\$2b\$/', $value)) {
+            $this->attributes['contrasenia'] = $value;
+        } else {
+            $this->attributes['contrasenia'] = Hash::make($value);
+        }
     }
 }

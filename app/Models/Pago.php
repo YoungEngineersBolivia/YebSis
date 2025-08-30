@@ -15,5 +15,7 @@ class Pago extends Model
         'Comprobante',
         'Monto_pago',
         'Fecha_pago',
+        'Id_planes_pagos'
+        // 'Id_cuotas' // No incluir si la columna no existe en la tabla pagos
     ];
 }
