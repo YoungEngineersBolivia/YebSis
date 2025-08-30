@@ -10,6 +10,10 @@ use App\Models\Usuario;
 
 class CustomLoginController extends Controller
 {
+    /**
+     * Maneja el inicio de sesión validando credenciales
+     * y redirigiendo según el rol del usuario.
+     */
     public function login(Request $request)
     {
         $request->validate([
@@ -20,52 +24,51 @@ class CustomLoginController extends Controller
         $email = $request->input('Correo');
         $password = $request->input('Contrasenia');
 
-        // Busca el usuario en la tabla 'usuarios' por el campo 'Correo'
+        // Obtiene el usuario asociado al correo
         $usuario = Usuario::where('Correo', $email)->first();
 
-        // Si no existe, muestra error
         if (! $usuario) {
             return back()
                 ->withInput($request->only('Correo'))
                 ->withErrors(['Credenciales' => 'Credenciales incorrectas']);
         }
 
-        // Compara la contraseña ingresada con la almacenada en la BD
         $stored = (string) $usuario->Contrasenia;
         $ok = false;
 
-        // Si la contraseña está hasheada (bcrypt/argon2), usa Hash::check
+        // Verifica la contraseña según si está hasheada o en texto plano
         if (strpos($stored, '$2y$') === 0 || strpos($stored, '$2a$') === 0 || strpos($stored, '$argon2') === 0) {
             if (Hash::check($password, $stored)) $ok = true;
         } else {
-            // Si está en texto plano, compara directamente
             if (hash_equals($stored, (string)$password)) $ok = true;
         }
 
-        // Si no coincide, muestra error
         if (! $ok) {
             return back()
                 ->withInput($request->only('Correo'))
                 ->withErrors(['Credenciales' => 'Credenciales incorrectas']);
         }
 
-        // Si coincide, inicia sesión y redirige según el rol
+        // Autentica al usuario en el sistema
         Auth::login($usuario);
 
-        // Obtener el rol desde la relación persona
+        // Obtiene el rol de la persona asociada y redirige
         $rol = $usuario->persona ? $usuario->persona->Id_roles : null;
 
-        if ($rol == 1) { // 1 = Administrador
+        if ($rol == 1) { 
             return redirect()->route('admin.dashboard');
-        } elseif ($rol == 2) { // 2 = Tutor
+        } elseif ($rol == 2) { 
             return redirect()->route('home.profesor');
-        } elseif ($rol == 3) { // 3 = Profesor
+        } elseif ($rol == 3) { 
             return redirect()->route('home.tutor');
         } else {
-            return redirect('/'); // Redirección por defecto si el rol no es reconocido
+            return redirect('/');
         }
     }
 
+    /**
+     * Cierra la sesión activa y redirige al login.
+     */
     public function logout(Request $request)
     {
         Auth::logout();
