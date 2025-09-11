@@ -19,16 +19,14 @@ use App\Http\Controllers\PubNot;
 use App\Http\Controllers\EstudiantesInactivosController;
 use App\Http\Controllers\EstudiantesActivosController;
 use App\Http\Controllers\ReporteTalleresController;
+use App\Http\Controllers\Auth\CustomLoginController; 
+
 
 /* -------------------Home pagina <web-------------------------*/
 
 Route::get('/', function () {
     return view('/paginaWeb/home'); // Retorna la vista welcome.blade.php
 });
-Route::get('/login', function () {
-    return view('paginaWeb.login'); // Retorna la vista login.blade.php
-})->name('login');
-
 
 /* ----------------- HOME / BASE Administrador  ----------------- */
 //Route::get('/', fn () => view('/administrador/baseAdministrador'));
@@ -155,3 +153,27 @@ Route::get('/comercial/talleresComercial', [ReporteTalleresController::class, 'i
     // Ruta API para obtener datos dinámicos (opcional)
     Route::get('/api/reportes/talleres/datos', [ReporteTalleresController::class, 'obtenerDatos'])
          ->name('api.reportes.talleres.datos'); 
+// Mostrar formulario de login (GET)
+Route::get('/login', function () {
+    return view('paginaWeb.login');
+})->name('login');
+
+// Procesar login (POST) --> CustomLoginController@login
+Route::post('/login', [CustomLoginController::class, 'login'])->name('login.submit');
+
+// Logout
+Route::post('/logout', [CustomLoginController::class, 'logout'])->name('logout');
+
+/*-------------------RUTAS COMERCIALES-------------------*/
+Route::get('/comercial/estudianteActivoComercial', function () {
+    return view('comercial.estudianteActivoComercial');
+})->name('comercial.estudianteActivoComercial');
+
+/*-------------------RUTAS PARA PROFESOR Y TUTOR-------------------*/
+Route::get('profesor/homeProfesor', function () {
+    return view('profesor.homeProfesor');
+})->name('home.profesor');
+
+Route::get('tutor/homeTutor', function () {
+    return view('tutor.homeTutor');
+})->name('home.tutor');
