@@ -11,14 +11,14 @@ use App\Http\Controllers\TutoresController;
 use App\Http\Controllers\UsuariosController;
 use App\Http\Controllers\GraduadoController;
 use App\Http\Controllers\SucursalController;
-use App\Http\Controllers\EgresosController;   // <- asegurarse que este controlador existe
+use App\Http\Controllers\EgresosController;   
 use App\Http\Controllers\HorariosController;
 use App\Http\Controllers\RegistroCombinadoController;
 use App\Http\Controllers\PagosController;
 use App\Http\Controllers\PubNot;
 use App\Http\Controllers\EstudiantesInactivosController;
 use App\Http\Controllers\EstudiantesActivosController;
-
+use App\Http\Controllers\ReporteTalleresController;
 
 /* -------------------Home pagina <web-------------------------*/
 
@@ -141,3 +141,17 @@ Route::put('/estudiantes/desactivar/{id}', [EstudiantesActivosController::class,
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
 Route::post('/login', [AuthController::class, 'login'])->name('login.submit');
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+
+
+/*-----------------------------TALLERES-------------------------------*/
+
+Route::get('/comercial/talleresComercial', [ReporteTalleresController::class, 'index'])
+         ->name('reportes.talleres');
+    
+    // Ruta para exportar datos (opcional)
+    Route::get('/reportes/talleres/exportar', [ReporteTalleresController::class, 'exportar'])
+         ->name('reportes.talleres.exportar');
+    
+    // Ruta API para obtener datos dinámicos (opcional)
+    Route::get('/api/reportes/talleres/datos', [ReporteTalleresController::class, 'obtenerDatos'])
+         ->name('api.reportes.talleres.datos'); 
