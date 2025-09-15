@@ -20,7 +20,7 @@ use App\Http\Controllers\EstudiantesInactivosController;
 use App\Http\Controllers\EstudiantesActivosController;
 use App\Http\Controllers\ReporteTalleresController;
 use App\Http\Controllers\Auth\CustomLoginController; 
-
+use App\Http\Controllers\InscripcionEstudianteController;
 
 /* -------------------Home pagina <web-------------------------*/
 
@@ -177,3 +177,45 @@ Route::get('profesor/homeProfesor', function () {
 Route::get('tutor/homeTutor', function () {
     return view('tutor.homeTutor');
 })->name('home.tutor');
+
+/* ------------------- ADMINISTRADOR: Inscripción Estudiante y Gestión Talleres ------------------- */
+Route::get('/administrador/registrarEstudianteAntiguo', [InscripcionEstudianteController::class, 'mostrarFormulario'])
+    ->name('inscripcionEstudiante.mostrar');
+
+// Ruta para procesar la inscripción
+Route::post('/administrador/registrarEstudianteAntiguo/registrar', [InscripcionEstudianteController::class, 'inscribir'])
+    ->name('inscripcionEstudiante.registrar');
+
+// Rutas AJAX
+Route::post('/administrador/registrarEstudianteAntiguo/buscar-codigo', [InscripcionEstudianteController::class, 'buscarPorCodigo'])
+    ->name('inscripcionEstudiante.buscarCodigo');
+
+Route::post('/administrador/registrarEstudianteAntiguo/buscar-nombre', [InscripcionEstudianteController::class, 'buscarPorNombre'])
+    ->name('inscripcionEstudiante.buscarNombre');
+
+Route::post('/administrador/registrarEstudianteAntiguo/obtener-por-tipo', [InscripcionEstudianteController::class, 'obtenerPorTipo'])
+    ->name('inscripcionEstudiante.obtenerPorTipo');
+
+
+//Route::get('administrador/admin', fn () => view('administrador.inscripcionEstudiante'));
+
+/* ------------------- ADMINISTRADOR: Gestión de Talleres ------------------- */
+Route::prefix('administrador/talleres')->middleware(['auth', 'role:admin'])->group(function () {
+    
+    // Ver todos los talleres
+    Route::get('/', [TallerController::class, 'index'])
+         ->name('talleres.index');
+    
+    // Ver inscripciones de un taller específico
+    Route::get('/{id}/inscripciones', [TallerController::class, 'verInscripciones'])
+         ->name('talleres.inscripciones');
+    
+    // Ver pagos de talleres
+    Route::get('/pagos', [TallerController::class, 'verPagos'])
+         ->name('talleres.pagos');
+    
+    // Reportes de talleres
+    Route::get('/reportes', [TallerController::class, 'reportes'])
+         ->name('talleres.reportes');
+    
+});

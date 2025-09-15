@@ -44,6 +44,7 @@
                                 <li><a class="nav-link" href="/administrador/registrosAdministrador">Administrador</a></li>
                                 <li><a class="nav-link" href="/administrador/tutorEstudianteAdministrador">Registrar nuevo estudiante</a></li>
                                 <li><a class="nav-link" href="/administrador/registrarProfesor">Profesor</a></li>
+                                <li><a class="nav-link" href="/administrador/registrarEstudianteAntiguo">Registrar graduado</a></li>
                             </ul>
                         </div>
                     </li>
