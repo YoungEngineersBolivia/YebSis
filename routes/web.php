@@ -178,6 +178,8 @@ Route::get('tutor/homeTutor', function () {
     return view('tutor.homeTutor');
 })->name('home.tutor');
 
+
+Route::get('/', [PaginaWebController::class, 'home'])->name('home');
 /* ------------------- ADMINISTRADOR: Inscripción Estudiante y Gestión Talleres ------------------- */
 Route::get('/administrador/registrarEstudianteAntiguo', [InscripcionEstudianteController::class, 'mostrarFormulario'])
     ->name('inscripcionEstudiante.mostrar');
