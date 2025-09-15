@@ -31,17 +31,19 @@ return new class extends Migration
             $table->timestamps();
         });
 
-            Schema::create('programas', function (Blueprint $table) {
-                  $table->id('Id_programas');
-                  $table->string('Nombre')->nullable();
-                  $table->string('Descripcion')->nullable();
-                  $table->binary('Foto')->nullable();
-                  $table->string('Duracion')->nullable();
-                  $table->string('Rango_edad')->nullable();
-                  $table->float('Costo')->nullable();
-                  $table->timestamps();
-            });
-
+      Schema::create('programas', function (Blueprint $table) {
+            $table->id('Id_programas');
+            $table->string('Nombre')->nullable();
+            $table->string('Descripcion')->nullable();
+            $table->binary('Foto')->nullable();
+            $table->string('Duracion')->nullable();
+            $table->string('Rango_edad')->nullable();
+            $table->float('Costo')->nullable();
+            $table->string('Tipo')->nullable();
+            $table->string('Estado');
+            $table->timestamps();
+      });
+  
         Schema::create('sucursales', function (Blueprint $table) {
             $table->id('Id_Sucursales');
             $table->string('Nombre')->nullable();
@@ -86,6 +88,7 @@ return new class extends Migration
             $table->timestamps();
       
         });
+        
         Schema::create('estudiantes', function (Blueprint $table) {
             $table->id('Id_estudiantes');
             $table->string('Cod_estudiante')->unique();
@@ -110,7 +113,19 @@ return new class extends Migration
             $table->timestamps();
         });
 
-        // CREA PRIMERO PLANES_PAGOS
+        Schema::create('estudiantes_talleres', function (Blueprint $table) {
+            $table->id('Id_estudiantes_talleres');
+            $table->date('Fecha_inscripcion')->nullable();
+            $table->foreignId('Id_estudiantes')
+                  ->constrained('estudiantes', 'Id_estudiantes')
+                  ->cascadeOnDelete();
+            $table->foreignId('Id_programas')
+                  ->constrained('programas', 'Id_programas')
+                  ->cascadeOnDelete();
+            $table->timestamps();
+            $table->unique(['Id_estudiantes', 'Id_programas'], 'unique_estudiante_taller');
+            });
+
         Schema::create('planes_pagos', function (Blueprint $table) {
             $table->id('Id_planes_pagos');
             $table->float('Monto_total')->nullable();
@@ -126,7 +141,6 @@ return new class extends Migration
             $table->timestamps();
         });
 
-        // LUEGO CREA PAGOS
         Schema::create('pagos', function (Blueprint $table) {
             $table->id('Id_pagos');
             $table->string('Descripcion')->nullable();
@@ -135,6 +149,19 @@ return new class extends Migration
             $table->date('Fecha_pago')->nullable();
             $table->foreignId('Id_planes_pagos')
                   ->constrained('planes_pagos', 'Id_planes_pagos')
+                  ->onDelete('cascade');
+            $table->timestamps();
+        });
+
+        Schema::create('pagos_talleres', function (Blueprint $table) {
+            $table->id('Id_pagos_talleres');
+            $table->string('Descripcion')->nullable();
+            $table->string('Comprobante')->nullable();
+            $table->float('Monto_pago')->nullable();
+            $table->date('Fecha_pago')->nullable();
+            $table->string('Metodo_pago')->nullable();
+            $table->foreignId('Id_estudiantes_talleres')
+                  ->constrained('estudiantes_talleres', 'Id_estudiantes_talleres')
                   ->onDelete('cascade');
             $table->timestamps();
         });
@@ -149,7 +176,6 @@ return new class extends Migration
                   ->onDelete('cascade');
             $table->timestamps();
         });
-        //////revisarrrrr
 
         Schema::create('publicaciones', function (Blueprint $table) {
             $table->id('Id_publicaciones');
@@ -261,7 +287,7 @@ return new class extends Migration
             $table->string('Descripcion_egreso')->nullable();
             $table->date('Fecha_egreso')->nullable();
             $table->float('Monto_egreso')->nullable();
-      
+            $table->timestamps();
         });
 
       
@@ -329,6 +355,6 @@ return new class extends Migration
         Schema::dropIfExists('personas');
         Schema::dropIfExists('roles');
         Schema::dropIfExists('notificaciones');
-          }
+      }
 };
 

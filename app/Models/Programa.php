@@ -50,5 +50,27 @@ class Programa extends Model
         }
         return $query;
     }
+    
+    public function inscripcionesTalleres()
+    {
+        return $this->hasMany(EstudianteTaller::class, 'Id_programas', 'Id_programas');
+    }
 
+    // Scope para obtener solo talleres
+    public function scopeTalleres($query)
+    {
+        return $query->whereIn('Tipo', ['taller_invierno', 'taller_verano']);
+    }
+
+    // Scope para obtener solo programas regulares
+    public function scopeProgramasRegulares($query)
+    {
+        return $query->where('Tipo', 'programa');
+    }
+
+    // Scope para talleres activos
+    public function scopeActivos($query)
+    {
+        return $query->where('Estado', true);
+    }
 }
