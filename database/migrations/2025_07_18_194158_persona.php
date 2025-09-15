@@ -14,7 +14,8 @@ return new class extends Migration
             $table->timestamps();
         });
 
-         
+       
+      
         Schema::create('personas', function (Blueprint $table) {
             $table->id('Id_personas');
             $table->string('Nombre')->nullable();
@@ -157,7 +158,7 @@ return new class extends Migration
             $table->string('Descripcion')->nullable();
             $table->date('Fecha')->nullable();
             $table->time('Hora')->nullable();
-            $table->boolean('Estado')->nullable();
+            $table->String('Estado')->nullable();
             $table ->foreignId('Id_personas')
                    ->constrained('personas','Id_personas')
                    ->onDelete('cascade');

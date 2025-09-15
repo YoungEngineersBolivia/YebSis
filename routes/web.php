@@ -159,3 +159,8 @@ Route::get('profesor/homeProfesor', function () {
 Route::get('tutor/homeTutor', function () {
     return view('tutor.homeTutor');
 })->name('home.tutor');
+
+
+use App\Http\Controllers\PaginaWebController;
+
+Route::get('/', [PaginaWebController::class, 'home'])->name('home');
