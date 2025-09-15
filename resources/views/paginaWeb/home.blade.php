@@ -130,7 +130,7 @@
                                 </div>
 
                                 <div class="form-group">
-                                    <label class="form-label">Numero de celular para que podamos contactarte</label>
+                                    <label class="form-label">Numero de celular para que podamos contactarte.</label>
                                     <input type="tel" class="form-input" name="telefono" placeholder="Ingrese su número de teléfono" required>
                                 </div>
 
