@@ -9,20 +9,6 @@
     {{-- AGREGAR META TAG PARA CSRF --}}
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    {{-- DEBUG INFO TEMPORAL - REMOVER DESPUÉS --}}
-    <div style="background: #f0f0f0; padding: 10px; margin: 20px 0; border: 1px solid #ccc;">
-        <h5>DEBUG INFO:</h5>
-        <p><strong>Programas:</strong> {{ isset($programas) ? count($programas) : 'No definido' }}</p>
-        <p><strong>Talleres:</strong> {{ isset($talleres) ? count($talleres) : 'No definido' }}</p>
-        
-        @if(isset($programas) && count($programas) > 0)
-            <p><strong>Primer programa:</strong> {{ $programas->first()->Nombre ?? 'Sin nombre' }}</p>
-        @endif
-        
-        @if(isset($talleres) && count($talleres) > 0)
-            <p><strong>Primer taller:</strong> {{ $talleres->first()->Nombre ?? 'Sin nombre' }}</p>
-        @endif
-    </div>
 
     {{-- Mostrar errores de validación --}}
     @if ($errors->any())
@@ -48,11 +34,6 @@
         {{-- ================= BUSCAR ESTUDIANTE ================= --}}
         <h4>Buscar Estudiante</h4>
         <div class="row">
-            <div class="col-md-6">
-                <label>Código de Estudiante</label>
-                <input type="text" id="codigo_estudiante_buscar" class="form-control" placeholder="Ingrese código de estudiante">
-                <button type="button" id="btn_buscar" class="btn btn-info mt-2">Buscar</button>
-            </div>
             <div class="col-md-6">
                 <label>Buscar por Nombre</label>
                 <input type="text" id="nombre_buscar" class="form-control" placeholder="Ingrese nombre del estudiante">
