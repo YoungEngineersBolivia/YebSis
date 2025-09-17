@@ -201,18 +201,19 @@
                     <input type="number" step="0.01" id="descuento_taller" class="form-control" value="20" readonly>
                 </div>
                 <div class="col-md-4">
-                    <label>Monto con Descuento (Bs)</label>
-                    <input type="number" step="0.01" id="monto_taller_descuento" name="monto_taller_descuento" class="form-control" readonly>
+                    <label>Monto con Descuento (Bs) *</label>
+                    <input type="number" step="0.01" id="monto_taller_descuento" name="monto_taller_descuento" class="form-control">
                 </div>
                 <div class="col-md-4">
-                    <label>Fecha de Pago</label>
+                    <label>Fecha de Pago *</label>
                     <input type="date" name="fecha_pago_taller" class="form-control" value="{{ now()->format('Y-m-d') }}">
                 </div>
             </div>
             <div class="row mt-3">
                 <div class="col-md-6">
-                    <label>Método de Pago</label>
+                    <label>Método de Pago *</label>
                     <select name="metodo_pago_taller" class="form-control">
+                        <option value="">Seleccione método de pago...</option>
                         <option value="efectivo">Efectivo</option>
                         <option value="transferencia">Transferencia</option>
                         <option value="tarjeta">Tarjeta</option>
@@ -220,8 +221,9 @@
                     </select>
                 </div>
                 <div class="col-md-6">
-                    <label>Estado del Pago</label>
+                    <label>Estado del Pago *</label>
                     <select name="estado_pago_taller" class="form-control">
+                        <option value="">Seleccione estado...</option>
                         <option value="pagado">Pagado</option>
                         <option value="pendiente">Pendiente</option>
                     </select>
@@ -377,10 +379,21 @@ $(document).ready(function() {
         $('#programa_taller').html('<option value="">Seleccione...</option>');
         $('#costo_programa').val('');
         
+        // IMPORTANTE: Limpiar atributos required según el tipo
         if (tipo === 'programa') {
-            console.log('Cargando programas...');
-            console.log('Programas disponibles:', programas);
+            // Para programas: requeridos los campos del plan de pagos
+            $('#nro_cuotas').attr('required', true);
+            $('#Monto_total').attr('required', true);
+            $('#Total_con_descuento').attr('required', true);
+            $('#fecha_plan_pagos').attr('required', true);
             
+            // Para programas: NO requeridos los campos de taller
+            $('#monto_taller_descuento').removeAttr('required');
+            $('#fecha_pago_taller').removeAttr('required');
+            $('#metodo_pago_taller').removeAttr('required');
+            $('#estado_pago_taller').removeAttr('required');
+            
+            console.log('Cargando programas...');
             if (programas && programas.length > 0) {
                 let options = '<option value="">Seleccione un programa...</option>';
                 programas.forEach(function(programa) {
@@ -392,9 +405,19 @@ $(document).ready(function() {
             }
             
         } else if (tipo === 'taller') {
-            console.log('Cargando talleres...');
-            console.log('Talleres disponibles:', talleres);
+            // Para talleres: requeridos los campos de pago directo
+            $('#monto_taller_descuento').attr('required', true);
+            $('#fecha_pago_taller').attr('required', true);
+            $('#metodo_pago_taller').attr('required', true);
+            $('#estado_pago_taller').attr('required', true);
             
+            // Para talleres: NO requeridos los campos de programa
+            $('#nro_cuotas').removeAttr('required');
+            $('#Monto_total').removeAttr('required');
+            $('#Total_con_descuento').removeAttr('required');
+            $('#fecha_plan_pagos').removeAttr('required');
+            
+            console.log('Cargando talleres...');
             if (talleres && talleres.length > 0) {
                 let options = '<option value="">Seleccione un taller...</option>';
                 talleres.forEach(function(taller) {
@@ -513,31 +536,73 @@ $(document).ready(function() {
         $('#plan_pagos_programa').hide();
         $('#pago_taller').hide();
         $('#btn_inscribir').hide();
+        
+        // Limpiar valores cuando se ocultan las secciones
+        $('#plan_pagos_programa input').val('');
+        $('#pago_taller input').val('');
+        $('#tabla-cuotas-programa tbody').html('');
+        $('#cuotas-programa-hidden-inputs').html('');
     }
 
     // ===== VALIDACIÓN DEL FORMULARIO ANTES DEL ENVÍO =====
     $('#formInscripcion').submit(function(e) {
         const tipo = $('#tipo_seleccion').val();
         
+        // Validación específica según tipo
         if (tipo === 'programa') {
             const nroCuotas = $('#nro_cuotas').val();
+            const totalConDescuento = $('#Total_con_descuento').val();
+            
             if (!nroCuotas || nroCuotas < 1) {
                 e.preventDefault();
                 alert('El número de cuotas debe ser mayor a 0');
+                $('#nro_cuotas').focus();
                 return false;
             }
+            
+            if (!totalConDescuento || totalConDescuento <= 0) {
+                e.preventDefault();
+                alert('El total con descuento debe ser mayor a 0');
+                return false;
+            }
+            
         } else if (tipo === 'taller') {
-            const montoTaller = $('#monto_taller').val();
-            if (!montoTaller || montoTaller <= 0) {
+            const montoTallerDescuento = $('#monto_taller_descuento').val();
+            const fechaPago = $('input[name="fecha_pago_taller"]').val();
+            const metodoPago = $('select[name="metodo_pago_taller"]').val();
+            const estadoPago = $('select[name="estado_pago_taller"]').val();
+            
+            if (!montoTallerDescuento || montoTallerDescuento <= 0) {
                 e.preventDefault();
                 alert('El monto del taller debe ser mayor a 0');
+                $('#monto_taller_descuento').focus();
+                return false;
+            }
+            
+            if (!fechaPago) {
+                e.preventDefault();
+                alert('Debe seleccionar una fecha de pago');
+                $('input[name="fecha_pago_taller"]').focus();
+                return false;
+            }
+            
+            if (!metodoPago) {
+                e.preventDefault();
+                alert('Debe seleccionar un método de pago');
+                $('select[name="metodo_pago_taller"]').focus();
+                return false;
+            }
+            
+            if (!estadoPago) {
+                e.preventDefault();
+                alert('Debe seleccionar un estado de pago');
+                $('select[name="estado_pago_taller"]').focus();
                 return false;
             }
         }
         
         return true;
     });
-
     // ===== EVENTO ENTER EN CAMPOS DE BÚSQUEDA =====
     $('#codigo_estudiante_buscar').keypress(function(e) {
         if (e.which === 13) { // Enter

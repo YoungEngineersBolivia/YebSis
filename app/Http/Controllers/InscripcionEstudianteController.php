@@ -20,29 +20,24 @@ class InscripcionEstudianteController extends Controller
     public function mostrarFormulario()
     {
         try {
-            // CORREGIDO: Estado es string, no boolean
-            // Buscar programas que sean tipo 'Programa' y estado 'activo'
             $programas = Programa::where('Tipo', 'LIKE', '%programa%')
                                ->whereIn('Estado', ['activo', 'Activo', '1', 'true'])
                                ->select('Id_programas', 'Nombre', 'Costo', 'Tipo')
                                ->get();
             
-            // Buscar talleres que sean tipo 'Taller' y estado 'activo'
             $talleres = Programa::where('Tipo', 'LIKE', '%taller%')
                               ->whereIn('Estado', ['activo', 'Activo', '1', 'true'])
                               ->select('Id_programas', 'Nombre', 'Costo', 'Tipo')
                               ->get();
             
-            // Si no encuentra por tipo, obtener todos los programas activos
             if ($programas->isEmpty() && $talleres->isEmpty()) {
                 Log::info('No se encontraron programas por tipo, obteniendo todos los activos');
                 $todosLosProgramas = Programa::whereIn('Estado', ['activo', 'Activo', '1', 'true'])
                                    ->select('Id_programas', 'Nombre', 'Costo', 'Tipo')
                                    ->get();
                 
-                // Dividir manualmente si no hay campo Tipo específico
                 $programas = $todosLosProgramas;
-                $talleres = collect(); // Colección vacía
+                $talleres = collect(); 
             }
             
             $sucursales = Sucursal::select('Id_Sucursales', 'Nombre')->get();
@@ -50,7 +45,6 @@ class InscripcionEstudianteController extends Controller
                 $query->select('Id_personas', 'Nombre', 'Apellido');
             }])->select('Id_profesores', 'Id_personas')->get();
 
-            // Debug logs
             Log::info('Programas encontrados: ' . $programas->count());
             Log::info('Talleres encontrados: ' . $talleres->count());
             Log::info('Sucursales encontradas: ' . $sucursales->count());
@@ -164,13 +158,12 @@ class InscripcionEstudianteController extends Controller
             $tipo = $request->input('tipo');
             Log::info("Buscando tipo: $tipo");
             
-            // CORREGIDO: Buscar con diferentes variaciones y Estado como string
             if ($tipo === 'programa') {
                 $items = Programa::where(function($query) {
                         $query->where('Tipo', 'LIKE', '%programa%')
                               ->orWhere('Tipo', 'LIKE', '%Programa%')
                               ->orWhere('Tipo', 'LIKE', '%PROGRAMA%')
-                              ->orWhereNull('Tipo'); // En caso de que Tipo sea null, considerar como programa
+                              ->orWhereNull('Tipo'); 
                     })
                     ->whereIn('Estado', ['activo', 'Activo', '1', 'true', 'habilitado', 'disponible'])
                     ->select('Id_programas', 'Nombre', 'Costo', 'Tipo')
@@ -313,6 +306,7 @@ class InscripcionEstudianteController extends Controller
 
     private function inscribirTaller($request, $estudiante, $programa)
     {
+        // CORREGIDO: Validación específica para talleres (sin Nro_cuotas)
         $request->validate([
             'monto_taller_descuento' => 'required|numeric|min:0',
             'fecha_pago_taller' => 'required|date',
@@ -323,8 +317,8 @@ class InscripcionEstudianteController extends Controller
 
         // Verificar si ya está inscrito en este taller
         $yaInscrito = EstudianteTaller::where('Id_estudiantes', $estudiante->Id_estudiantes)
-                                   ->where('Id_programas', $programa->Id_programas)
-                                   ->exists();
+                                ->where('Id_programas', $programa->Id_programas)
+                                ->exists();
 
         if ($yaInscrito) {
             return back()->withErrors(['error' => 'El estudiante ya está inscrito en este taller.']);
@@ -337,7 +331,7 @@ class InscripcionEstudianteController extends Controller
             'Fecha_inscripcion' => now()->format('Y-m-d'),
         ]);
 
-        // Crear pago del taller (usando la tabla correcta según tu migración)
+        // Crear pago del taller
         PagoTaller::create([
             'Descripcion' => $request->descripcion_taller ?: ('Pago ' . $programa->Nombre),
             'Monto_pago' => $request->monto_taller_descuento,
