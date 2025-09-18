@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Http\Controllers;
 
 use App\Models\Usuario;
@@ -10,11 +9,21 @@ use Illuminate\Support\Facades\DB;
 class UsuariosController extends Controller
 {
     // Mostrar todos los usuarios
-    public function index()
+    public function index(Request $request)
     {
+        $search = $request->input('search');  // Obtener el término de búsqueda
+
+        // Realiza la consulta para obtener los usuarios filtrados
         $usuarios = Usuario::with(['persona.rol'])
+            ->when($search, function($query, $search) {
+                return $query->whereHas('persona', function($q) use ($search) {
+                    $q->where('Nombre', 'like', "%$search%")
+                      ->orWhere('Apellido', 'like', "%$search%")
+                      ->orWhere('Correo', 'like', "%$search%");
+                });
+            })
             ->orderBy('Id_usuarios', 'desc')
-            ->paginate(10);
+            ->paginate(10);  // Pagina los resultados para no cargar demasiados registros
 
         return view('administrador.usuariosAdministrador', compact('usuarios'));
     }

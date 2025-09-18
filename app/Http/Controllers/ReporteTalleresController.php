@@ -11,43 +11,42 @@ class ReporteTalleresController extends Controller
     {
         // Obtener el período seleccionado (por defecto 6 meses)
         $periodo = $request->get('periodo', 6);
-        
-        // Fechas para comparación
-        $fechaActual = Carbon::now();
-        $fechaInicioActual = $fechaActual->copy()->subMonths($periodo);
-        $fechaInicioAnterior = $fechaActual->copy()->subYears(1)->subMonths($periodo);
-        $fechaFinAnterior = $fechaActual->copy()->subYears(1);
 
-        // Datos del período actual
-        $datosActuales = $this->obtenerDatosEstudiantes($fechaInicioActual, $fechaActual);
-        
-        // Datos del período anterior (mismo período del año pasado)
-        $datosAnteriores = $this->obtenerDatosEstudiantes($fechaInicioAnterior, $fechaFinAnterior);
+        // Fechas para obtener talleres de 2024 y 2025
+        $fechaInicio2024 = Carbon::createFromDate(2024, 1, 1);
+        $fechaFin2024 = Carbon::createFromDate(2024, 12, 31);
+
+        $fechaInicio2025 = Carbon::createFromDate(2025, 1, 1);
+        $fechaFin2025 = Carbon::createFromDate(2025, 12, 31);
+
+        // Obtener datos de los estudiantes inscritos en los talleres de cada año
+        $talleres2024 = $this->obtenerDatosTalleres($fechaInicio2024, $fechaFin2024);
+        $talleres2025 = $this->obtenerDatosTalleres($fechaInicio2025, $fechaFin2025);
 
         // Preparar datos para la gráfica
-        $datosGrafica = $this->prepararDatosGrafica($datosActuales, $datosAnteriores, $periodo);
+        $datosGrafica = $this->prepararDatosGrafica($talleres2024, $talleres2025, $periodo);
 
-        // Obtener datos detallados para la tabla
-        $detalleTabla = $this->obtenerDetalleTabla($fechaInicioActual, $fechaActual);
-
-        return view('comercial.talleresComercial', compact('datosGrafica', 'detalleTabla', 'periodo'));
+        // Pasar los datos a la vista
+        return view('comercial.talleresComercial', compact('datosGrafica', 'talleres2024', 'talleres2025', 'periodo'));
     }
 
-    private function obtenerDatosEstudiantes($fechaInicio, $fechaFin)
+    public function obtenerDatosTalleres($fechaInicio, $fechaFin)
     {
-        return DB::table('estudiantes')
-            ->join('programas', 'estudiantes.Id_programas', '=', 'programas.Id_programas')
-            ->whereBetween('estudiantes.created_at', [$fechaInicio, $fechaFin])
+        return DB::table('estudiantes_talleres')
+            ->join('estudiantes', 'estudiantes_talleres.Id_estudiantes', '=', 'estudiantes.Id_estudiantes')
+            ->join('programas', 'estudiantes_talleres.Id_programas', '=', 'programas.Id_programas')
+            ->join('personas', 'estudiantes.Id_personas', '=', 'personas.Id_personas') // JOIN con la tabla personas
+            ->whereBetween('estudiantes_talleres.Fecha_inscripcion', [$fechaInicio, $fechaFin])
             ->select(
-                'programas.Nombre as programa',
-                DB::raw('COUNT(*) as total_estudiantes'),
-                DB::raw('MONTH(estudiantes.created_at) as mes'),
-                DB::raw('YEAR(estudiantes.created_at) as año')
+                'programas.Nombre as taller',
+                'personas.Nombre as nombre_estudiante', // Aquí accedes al nombre desde la tabla personas
+                'estudiantes_talleres.Fecha_inscripcion'
             )
-            ->groupBy('programas.Id_programas', 'programas.Nombre', 'mes', 'año')
-            ->orderBy('mes')
+            ->orderBy('estudiantes_talleres.Fecha_inscripcion')
             ->get();
     }
+
+
 
     private function prepararDatosGrafica($datosActuales, $datosAnteriores, $periodo)
     {
@@ -105,6 +104,7 @@ class ReporteTalleresController extends Controller
             'datos' => $datosOrganizados
         ];
     }
+
 
     private function obtenerDetalleTabla($fechaInicio, $fechaFin)
     {
