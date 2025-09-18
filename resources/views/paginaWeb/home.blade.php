@@ -6,177 +6,398 @@
     <title>Young Engineers La Paz - STEM para Niños</title>
     <link href="{{ asset('css/home.css') }}" rel="stylesheet">
 
+    <style>
+    /* --- NUEVO DISEÑO COLORIDO Y AMIGABLE --- */
+    body {
+        background: linear-gradient(135deg, #f5f6fa 60%, #e0f7fa 100%);
+        font-family: 'Arial', sans-serif;
+        color: #222;
+    }
+    /* NAVBAR RESPONSIVO */
+    .header-content {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        position: relative;
+    }
+    .nav-links {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        font-weight: 600;
+        font-size: 1rem;
+    }
+    .navbar-toggle {
+        display: none;
+        background: none;
+        border: none;
+        font-size: 2rem;
+        color: #0984e3;
+        cursor: pointer;
+        margin-left: 10px;
+    }
+    @media (max-width: 800px) {
+        .nav-links {
+            display: none;
+            position: absolute;
+            top: 60px;
+            right: 0;
+            background: #fff;
+            flex-direction: column;
+            gap: 0;
+            width: 220px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.12);
+            border-radius: 0 0 12px 12px;
+            z-index: 1000;
+        }
+        .nav-links.show {
+            display: flex;
+        }
+        .navbar-toggle {
+            display: block;
+        }
+    }
+    /* FORMULARIO DE CONTACTO SIN GRADIENTE */
+    .modal-container {
+        background: #fff;
+        padding: 32px 24px;
+        border-radius: 18px;
+        box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+        max-width: 420px;
+        margin: 0 auto;
+        border-top: 5px solid #00b894;
+        border-bottom: 5px solid #f9ca24;
+        position: relative;
+    }
+    .modal-header h2 {
+        color: #0984e3;
+        font-weight: bold;
+        margin-bottom: 8px;
+        letter-spacing: 1px;
+    }
+    .modal-header .modal-subtitle {
+        color: #636e72;
+        font-size: 1rem;
+        margin-bottom: 10px;
+    }
+    .form-group {
+        margin-bottom: 18px;
+        position: relative;
+    }
+    .form-group label {
+        font-weight: bold;
+        color: #e74c3c;
+        margin-bottom: 6px;
+        display: block;
+        letter-spacing: 0.5px;
+    }
+    .form-group input[type="text"],
+    .form-group input[type="tel"] {
+        width: 100%;
+        padding: 12px 16px 12px 40px;
+        border-radius: 12px;
+        border: 1.5px solid #00b894;
+        background: #f9f9f9;
+        font-size: 1rem;
+        color: #222;
+        outline: none;
+        transition: border 0.2s;
+        box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+    }
+    .form-group input[type="text"]:focus,
+    .form-group input[type="tel"]:focus {
+        border: 1.5px solid #f9ca24;
+        background: #fff;
+    }
+    .form-group input[type="text"]::placeholder,
+    .form-group input[type="tel"]::placeholder {
+        color: #b2bec3;
+    }
+    .form-group .input-icon {
+        position: absolute;
+        left: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        font-size: 1.2rem;
+        color: #00b894;
+    }
+    .modal-body button[type="submit"] {
+        width: 100%;
+        background: #0984e3;
+        color: #fff;
+        font-weight: bold;
+        border: none;
+        border-radius: 25px;
+        padding: 14px 0;
+        font-size: 1.1rem;
+        margin-top: 10px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        letter-spacing: 1px;
+        transition: background 0.2s, box-shadow 0.2s;
+    }
+    .modal-body button[type="submit"]:hover {
+        background: #00b894;
+        box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+    }
+    .close-btn {
+        color: #e74c3c;
+        font-size: 2rem;
+        top: 10px;
+        right: 10px;
+    }
+    .close-btn:hover {
+        color: #00b894;
+    }
+    /* --- FIN FORMULARIO --- */
+    /* --- COLORES EN SECCIONES Y BOTONES --- */
+    .btn-whatsapp {
+        background: linear-gradient(45deg, #25d366, #00b894);
+        color: #fff;
+        font-weight: bold;
+        font-size: 1.1rem;
+    }
+    .btn-register {
+        background: linear-gradient(45deg, #e74c3c, #f9ca24);
+        color: #fff;
+        font-weight: bold;
+        font-size: 1.1rem;
+    }
+    .winter-workshop {
+        background: linear-gradient(135deg, #f9ca24, #00b894);
+        color: #222;
+    }
+    .winter-workshop .btn-contact {
+        background: linear-gradient(45deg, #e74c3c, #0984e3);
+        color: #fff;
+    }
+    .footer-logo img {
+        filter: drop-shadow(0 2px 8px #f9ca24);
+    }
+    .footer-section h3, .contact-info h3 {
+        color: #0984e3;
+    }
+    .social-icon {
+        background: linear-gradient(45deg, #e74c3c, #00b894);
+    }
+    /* --- FIN NUEVO DISEÑO COLORIDO --- */
+    .modal-overlay {
+        display: none;
+        position: fixed;
+        top: 0; left: 0;
+        width: 100%; height: 100%;
+        background: rgba(0,0,0,0.6);
+        justify-content: center;
+        align-items: center;
+        z-index: 999;
+    }
+    .modal-overlay.show { 
+        display: flex; 
+    }
+    .modal-container {
+        background: #fff;
+        padding: 20px;
+        border-radius: 12px;
+        width: 90%;
+        max-width: 600px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        max-height: 80vh;
+        overflow-y: auto;
+    }
+    .modal-header { 
+        text-align:center; 
+        margin-bottom:20px; 
+        position: relative;
+    }
+    .close-btn { 
+        position: absolute;
+        right: 0;
+        top: 0;
+        font-size: 24px; 
+        cursor: pointer; 
+        border: none; 
+        background: none;
+        color: #666;
+        padding: 5px;
+    }
+    .close-btn:hover {
+        color: #000;
+    }
+
+    .btn-iniciar {
+        background: #0984e3;
+        color: #fff;
+        border: none;
+        border-radius: 25px;
+        padding: 12px 36px;
+        font-weight: bold;
+        font-size: 1.1rem;
+        letter-spacing: 1px;
+        box-shadow: 0 4px 16px rgba(9,132,227,0.18);
+        transition: background 0.2s, box-shadow 0.2s, transform 0.2s;
+        position: relative;
+        overflow: hidden;
+        display: inline-block;
+        text-decoration: none;
+    }
+    .btn-iniciar:hover {
+        background: #00b894;
+        color: #fff;
+        box-shadow: 0 8px 32px 0 #00b89444, 0 0 0 4px #00b89433;
+        transform: translateY(-2px) scale(1.05);
+        text-decoration: none;
+    }
+    .btn-iniciar:active {
+        background: #0984e3;
+        box-shadow: 0 2px 8px rgba(9,132,227,0.18);
+        transform: scale(0.98);
+    }
+    .btn-iniciar:visited {
+        color: #fff;
+        text-decoration: none;
+    }
+    .btn-register:hover {
+        background: #ff9800;
+        color: #fff;
+    }
+    .btn-register {
+        text-decoration: none;
+    }
+    </style>
 </head>
 
-<style>
-.modal-overlay {
-  display: none; /* oculto por defecto */
-  position: fixed;
-  top: 0; left: 0;
-  width: 100%; height: 100%;
-  background: rgba(0,0,0,0.6);
-  justify-content: center;
-  align-items: center;
-  z-index: 999;
-}
-
-.modal-overlay.show {
-  display: flex; /* se muestra cuando agregas la clase show */
-}
-
-.modal-container {
-  background: #fff;
-  padding: 20px;
-  border-radius: 12px;
-  width: 400px;
-  max-width: 90%;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-}
-
-.modal-header {
-  text-align: center;
-  margin-bottom: 20px;
-}
-
-.close-btn {
-  float: right;
-  background: none;
-  border: none;
-  font-size: 24px;
-  cursor: pointer;
-}
-</style>
 <body>
+   
     <!-- Header -->
     <header>
-        <div class="container">
-            <div class="header-content">
-                <div class="logo">
-                    <img src="{{ Vite::asset('resources/img/ES_logo-02.webp') }}"alt="Logo YE Bolivia" width="250px" class="me-2">
-                </div>
-                <nav class="nav-links">
-                    <span>RECONOCIDO POR:</span>
-                    <img src="{{Vite::asset('resources/img/recognized_by.png')}}" alt="Reconocimiento" width="200px" class="me-2">
-                    <span>REDES SOCIALES</span>
-                    <a href="{{ route('login') }}" class="btn-iniciar">Iniciar Sesión</a>
-
-                </nav>
+    <div class="container">
+        <div class="header-content">
+            <div class="logo">
+                <img src="{{ Vite::asset('resources/img/ES_logo-02.webp') }}"alt="Logo YE Bolivia" width="250px" class="me-2">
             </div>
+            <button class="navbar-toggle" onclick="toggleNavbar()">&#9776;</button>
+            <nav class="nav-links" id="mainNavLinks">
+                <span>RECONOCIDO POR:</span>
+                <img src="{{Vite::asset('resources/img/recognized_by.png')}}" alt="Reconocimiento" width="200px" class="me-2">
+                <span>REDES SOCIALES</span>
+                <a href="{{ route('login') }}" class="btn-iniciar">Iniciar Sesión</a>
+            </nav>
         </div>
-    </header>
+    </div>
+</header>
+<script>
+function toggleNavbar() {
+    var nav = document.getElementById('mainNavLinks');
+    nav.classList.toggle('show');
+}
+</script>
 
     <div class="container">
         <!-- Hero Section -->
-      <section class="hero">
-    <h1 class="hero-title">SOBRE NOSOTROS</h1> <!-- centrado -->
+        <section class="hero">
+            <h1 class="hero-title">SOBRE NOSOTROS</h1>
+            <div class="hero-container">
+                <!-- Columna 1: Texto -->
+                <div class="contenedor-texto">
+                    <p>
+                        Hola amigos, bienvenidos a la página de Young Engineers para la zona sur de La Paz. Gracias por visitarnos en este sitio web. Young Engineers, Zona Sur, La Paz, es un Centro de Estudios que da a los niños de nuestra comunidad la posibilidad de aprender y disfrutar del <span class="highlight">STEM</span> (siglas en inglés para Ciencias, Tecnología, Ingeniería y Matemáticas) a través del modelo que une el aprender con la diversión: <span class="highlight">EDUTAINMENT</span>.
+                    </p>
+                    <p>
+                        Las carreras de tecnología, ingeniería y ciencia son el futuro y nosotros queremos que los niños de nuestra comunidad puedan acercarse a estas disciplinas de una manera práctica y divertida. ¡Únete a nuestra comunidad y empecemos juntos el cambio hacia el futuro!
+                    </p>
+                </div>
 
-    <div class="hero-container">
-        <!-- Columna 1: Texto -->
-        <div class="contenedor-texto">
-            <p >
-                Hola amigos, bienvenidos a la página de Young Engineers para la zona sur de La Paz. Gracias por visitarnos en este sitio web. Young Engineers, Zona Sur, La Paz, es un Centro de Estudios que da a los niños de nuestra comunidad la posibilidad de aprender y disfrutar del <span class="highlight">STEM</span> (siglas en inglés para Ciencias, Tecnología, Ingeniería y Matemáticas) a través del modelo que une el aprender con la diversión: <span class="highlight">EDUTAINMENT</span>.
-            </p>
-            <p>
-                Las carreras de tecnología, ingeniería y ciencia son el futuro y nosotros queremos que los niños de nuestra comunidad puedan acercarse a estas disciplinas de una manera práctica y divertida. ¡Únete a nuestra comunidad y empecemos juntos el cambio hacia el futuro!
-            </p>
-        </div>
+                <!-- Columna 2: Imagen -->
+                <div class="hero-visual">
+                    <img src="{{ Vite::asset('resources/img/Logo_sign.png') }}" alt="Logo YE Bolivia" width="250px" class="me-2">
+                </div>
 
-        <!-- Columna 2: Imagen -->
-        <div class="hero-visual">
-            <img src="{{ Vite::asset('resources/img/Logo_sign.png') }}" alt="Logo YE Bolivia" width="250px" class="me-2">
-        </div>
+                <!-- Columna 3: Contáctanos -->
+                <div class="contact-section">
+                    <h3 style="color: black; margin-bottom: 10px;">¡CONTÁCTANOS!</h3>
+                    <div class="contact-buttons">
+                        <a href="https://wa.me/59177788398" target="_blank" class="btn-contact btn-whatsapp">
+                            <div id="whatsapp-animation" style="width:40px; height:40px; display:inline-block; vertical-align:middle;"></div>
+                            <span style="vertical-align:middle; margin-left:8px;">WHATSAPP</span>
+                        </a>
+                        <p><b>O</b></p>
+                        <a href="#" class="btn-contact btn-register" onclick="openContactModal()">
+                            <img src="{{ Vite::asset('resources/img/registro.png') }}" alt="Registro">
+                            <span>Estoy interesado</span>
+                        </a>
 
-        <!-- Columna 3: Contáctanos -->
-        <div class="contact-section">
-            <h3 style="color: black; margin-bottom: 10px;">¡CONTÁCTANOS!</h3>
-            <div class="contact-buttons">
-                <!-- Botón con animación JSON -->
-                <a href="#" class="btn-contact btn-whatsapp">
-                    <div id="whatsapp-animation" style="width:40px; height:40px; display:inline-block; vertical-align:middle;"></div>
-                    <span style="vertical-align:middle; margin-left:8px;">WHATSAPP</span>
-                </a>
-
-                <p><b>O</b></p>
-
-                <!-- Botón normal -->
-                <!-- Botón normal -->
-                `<a href="#" class="btn-contact btn-register" onclick="openModal()">
-                    <img src="{{ Vite::asset('resources/img/registro.png') }}" alt="Registro">
-                    <span>Estoy interesado</span>
-                </a>`
-
-                <div class="modal-overlay" id="contactModal" onclick="closeModalOnOverlay(event)">
-                    <div class="modal-container">
-                        <!-- Header -->
-                        <div class="modal-header">
-                            <button class="close-btn" onclick="closeModal()">&times;</button>
-                            <h2 class="modal-title">CONTÁCTANOS</h2>
-                            <p class="modal-subtitle">
-                                Por favor llene sus datos y nosotros nos contactaremos con usted a la brevedad posible
-                            </p>
-                        </div>
-
-                        <!-- Body -->
-                        <div class="modal-body">
-                            <form id="contactForm">
-                                <div class="form-group">
-                                    <label class="form-label">Nombres</label>
-                                    <input type="text" class="form-input" name="nombres" placeholder="Ingrese sus nombres" required>
+                        <!-- MODAL DE CONTACTO -->
+                        <div class="modal-overlay" id="contactModal" onclick="closeContactModalOnOverlay(event)">
+                            <div class="modal-container">
+                                <div class="modal-header">
+                                    <button class="close-btn" onclick="closeContactModal()">&times;</button>
+                                    <h2 class="modal-title">CONTÁCTANOS</h2>
+                                    <p class="modal-subtitle">
+                                        Por favor llene sus datos y nosotros nos contactaremos con usted a la brevedad posible
+                                    </p>
                                 </div>
 
-                                <div class="form-group">
-                                    <label class="form-label">Apellidos</label>
-                                    <input type="text" class="form-input" name="apellidos" placeholder="Ingrese sus apellidos" required>
+                                @if(session('success'))
+                                <div style="color:green; font-weight:bold; margin-bottom:10px;">
+                                    {{ session('success') }}
                                 </div>
+                                @endif
 
-                                <div class="form-group">
-                                    <label class="form-label">Numero de celular para que podamos contactarte.</label>
-                                    <input type="tel" class="form-input" name="telefono" placeholder="Ingrese su número de teléfono" required>
+                                <div class="modal-body">
+                                    <form id="contactForm" action="{{ route('prospectos.store') }}" method="POST">
+                                        @csrf
+                                        <div class="form-group">
+                                            <label>Nombres</label>
+                                            <span class="input-icon">👤</span>
+                                            <input type="text" name="nombres" placeholder="Ingrese sus nombres" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Apellidos</label>
+                                            <span class="input-icon">👥</span>
+                                            <input type="text" name="apellidos" placeholder="Ingrese sus apellidos" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Teléfono</label>
+                                            <span class="input-icon">📱</span>
+                                            <input type="tel" name="telefono" placeholder="Ingrese su número de teléfono" required>
+                                        </div>
+                                        <button type="submit">ENVIAR INFORMACIÓN</button>
+                                    </form>
                                 </div>
-
-                                <button type="submit" class="submit-btn">ENVIAR INFORMACIÓN</button>
-                            </form>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
-    </div>
-</section>
-
-
-
+        </section>
 
         <!-- Programs Section -->
         <section class="programs">
             <h2>PROGRAMAS</h2>
             <div class="programs-grid">
-    @foreach($programas as $programa)
-        <div class="program-card">
-            <div class="program-icon">
-                @if($programa->Foto)
-                    <img src="data:image/jpeg;base64,{{ base64_encode($programa->Foto) }}" 
-                         alt="{{ $programa->Nombre }}" style="width:150px; height:150px;">
-                @else
-                    🏫
-                @endif
-            </div>
-            <h3 class="program-title">{{ $programa->Nombre }}</h3>
-            <div class="program-details">
-                <div class="age-badge">Edad: {{ $programa->Rango_edad }}</div><br>
-                <div class="duration-badge">Duración: {{ $programa->Duracion }}</div>
-                <div class="cost-badge">Costo: ${{ $programa->Costo }}</div>
-            </div>
-        </div>
-    @endforeach
-</div>
+                @foreach($programas as $programa)
+                    <div class="program-card">
+                        <div class="program-icon" style="text-align:center; margin-bottom:10px;">
+                            @if($programa->Imagen)
+                                <img src="{{ asset('storage/' . $programa->Imagen) }}" 
+                                    alt="{{ $programa->Nombre }}" 
+                                    style="max-width:150px; height:auto;">
 
-
-               
-
-                
+                            @else
+                                🏫
+                            @endif
+                        </div>
+                        <h3 class="program-title">{{ $programa->Nombre }}</h3>
+                        <div class="program-details">
+                            <div class="age-badge">Edad: {{ $programa->Rango_edad }}</div>
+                            <div class="duration-badge">Duración: {{ $programa->Duracion }}</div>
+                            <div class="cost-badge">Costo: ${{ $programa->Costo }}</div>
+                        </div>
+                    </div>
+                @endforeach
             </div>
         </section>
+
+  
 
         <!-- News Section -->
         <section class="news">
@@ -193,7 +414,6 @@
                         </p>
                     </div>
                 </div>
-
                 <div class="news-card">
                     <div class="news-image">
                         <div style="font-size: 60px;">🏗️</div>
@@ -210,9 +430,44 @@
             <div class="winter-workshop">
                 <h3>INSCRÍBETE AL TALLER DE INVIERNO</h3>
                 <p>¡No te pierdas nuestro taller especial de vacaciones de invierno!</p>
-                <button class="btn-contact" style="margin-top: 20px; background: linear-gradient(45deg, #00b894, #00a085);">Más Información</button>
+                <button class="btn-contact" style="margin-top: 20px; background: linear-gradient(45deg, #00b894, #00a085);" onclick="openPublicacionesModal()">Ver Publicaciones</button>
             </div>
-        
+        </section>
+    </div>
+
+    <!-- MODAL PUBLICACIONES -->
+    <div class="modal-overlay" id="publicacionesModal" onclick="closePublicacionesModalOnOverlay(event)">
+        <div class="modal-container">
+            <div class="modal-header">
+                <button class="close-btn" onclick="closePublicacionesModal()">&times;</button>
+                <h2 class="modal-title"></h2>
+            </div>
+            <div class="modal-body" style="max-height:80%; overflow-y:auto;">
+                @if(isset($publicaciones) && $publicaciones->count() > 0)
+                    @foreach($publicaciones as $publicacion)
+                        <div class="card" style="margin-bottom:15px; border:1px solid #ddd; border-radius:8px; padding:15px; background: #f9f9f9;">
+                            @if($publicacion->Imagen)
+                                <img src="{{ asset('storage/' . $publicacion->Imagen) }}" 
+                                    alt="Imagen de {{ $publicacion->Nombre }}" 
+                                    style="width:100%; max-height:500px; object-fit:cover; border-radius:8px;">
+                            @else
+                                <p>No hay imagen disponible</p>
+                            @endif
+                        </div>
+                    @endforeach
+                @else
+                    <div style="text-align: center; padding: 40px;">
+                        <h3>📭 No hay publicaciones disponibles</h3>
+                        <p>Por el momento no tenemos novedades que mostrar.</p>
+                        <p style="font-size: 12px; color: #666; margin-top: 20px;">
+                            <strong>Info para desarrollador:</strong><br>
+                            Variable $publicaciones: {{ isset($publicaciones) ? 'Existe' : 'No existe' }}<br>
+                            Cantidad: {{ $publicaciones->count() ?? 0 }}
+                        </p>
+                    </div>
+                @endif
+            </div>
+        </div>
     </div>
 
     <!-- Footer -->
@@ -222,10 +477,9 @@
                 <div class="footer-logo">
                     <div>
                         <img src="{{ Vite::asset('resources/img/logo_blanco.png') }}" alt="Logo YE Bolivia" width="250px" class="me-2">
-                          <p>© Copyright 2020 e Square Young Engineers Franchising Ltd. Todos los derechos reservados.</p>
-                           <p>LEGO® es una marca registrada de empresas que no patrocinan, autorizan ni respaldan estos programas o este sitio web.</p>
+                        <p>© Copyright 2020 e Square Young Engineers Franchising Ltd. Todos los derechos reservados.</p>
+                        <p>LEGO® es una marca registrada de empresas que no patrocinan, autorizan ni respaldan estos programas o este sitio web.</p>
                     </div>
-                    
                     <div class="footer-text">
                         <div class="social-icons">
                             <a href="#" class="social-icon">f</a>
@@ -233,12 +487,10 @@
                         </div>
                     </div>
                 </div>
-
                 <div class="footer-section">
                     <h3>Young Engineers</h3>
                     <p style="margin-top: 20px; color: #bdc3c7;">Programa educativo líder en STEM para niños y jóvenes.</p>
                 </div>
-
                 <div class="contact-info">
                     <h3>Contact Info</h3>
                     <div class="contact-item">
@@ -255,31 +507,26 @@
                     </div>
                 </div>
             </div>
-            
             <div class="copyright">
                 <p>Young Engineers La Paz - Zona Sur | Educación STEM para el futuro</p>
             </div>
         </div>
+        <div class="floating-elements"></div>
     </footer>
-     <script src="https://cdnjs.cloudflare.com/ajax/libs/bodymovin/5.7.6/lottie.min.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bodymovin/5.7.6/lottie.min.js"></script>
 
     <script>
+        // ========== ANIMACIONES Y ELEMENTOS FLOTANTES ==========
         const style = document.createElement('style');
         style.textContent = `
             @keyframes fadeInUp {
-                from {
-                    opacity: 0;
-                    transform: translateY(30px);
-                }
-                to {
-                    opacity: 1;
-                    transform: translateY(0);
-                }
+                from { opacity: 0; transform: translateY(30px); }
+                to { opacity: 1; transform: translateY(0); }
             }
         `;
         document.head.appendChild(style);
 
-        // Dynamic floating elements
         function createFloatingElement() {
             const element = document.createElement('div');
             element.className = 'floating-element';
@@ -292,60 +539,142 @@
             
             document.querySelector('.floating-elements').appendChild(element);
             
-            setTimeout(() => {
-                element.remove();
-            }, 25000);
+            setTimeout(() => element.remove(), 25000);
         }
 
-        // Create floating elements periodically
         setInterval(createFloatingElement, 3000);
 
-
+        // Animación WhatsApp
         lottie.loadAnimation({
-        container: document.getElementById('whatsapp-animation'),
-        renderer: 'svg',
-        loop: true,
-        autoplay: true,
-        path: "{{ asset('animaciones/whatsapp.json') }}" // tu JSON
-    });
+            container: document.getElementById('whatsapp-animation'),
+            renderer: 'svg',
+            loop: true,
+            autoplay: true,
+            path: "{{ asset('animaciones/whatsapp.json') }}"
+        });
+
+        // ========== MODAL DE CONTACTO ==========
+        function openContactModal() {
+            const modal = document.getElementById('contactModal');
+            modal.classList.add('show');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeContactModal() {
+            const modal = document.getElementById('contactModal');
+            modal.classList.remove('show');
+            document.body.style.overflow = 'auto';
+        }
+
+        function closeContactModalOnOverlay(event) {
+            if (event.target === event.currentTarget) {
+                closeContactModal();
+            }
+        }
+
+        // ========== MODAL DE PUBLICACIONES ==========
+        function openPublicacionesModal() {
+            var modal = document.getElementById('publicacionesModal');
+            if(modal) {
+                modal.classList.add('show');
+                document.body.style.overflow = 'hidden';
+            }
+        }
+
+        function closePublicacionesModal() {
+            var modal = document.getElementById('publicacionesModal');
+            if(modal) {
+                modal.classList.remove('show');
+                document.body.style.overflow = 'auto';
+            }
+        }
+
+        function closePublicacionesModalOnOverlay(event) {
+            if (event.target === event.currentTarget) {
+                closePublicacionesModal();
+            }
+        }
+
+        // ========== FORMULARIO DE CONTACTO ========== 
+        // Eliminado el JS personalizado para que el formulario se envíe normalmente
+        // document.getElementById('contactForm').addEventListener('submit', function(e) {
+        //     e.preventDefault();
+        //     const formData = new FormData(this);
+        //     fetch("{{ route('prospectos.store') }}", {
+        //         method: "POST",
+        //         headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
+        //         body: formData
+        //     })
+        //     .then(response => response.json())
+        //     .then(data => {
+        //         alert(data.message);
+        //         this.reset();
+        //         closeContactModal();
+        //     })
+        //     .catch(error => {
+        //         console.error('Error:', error);
+        //         alert('Ocurrió un error al enviar tus datos.');
+        //     });
+        // });
+
+        // ========== DEBUG Y AUTO-ABRIR MODAL ==========
+        function updateDebugInfo(message) {
+            const debugElement = document.getElementById('debugText');
+            const publicacionesCount = {{ $publicaciones->count() ?? 0 }};
+            const timestamp = new Date().toLocaleTimeString();
+            
+            if(debugElement) {
+                debugElement.innerHTML = `
+                    Publicaciones en BD: ${publicacionesCount}<br>
+                    Variable existe: {{ isset($publicaciones) ? 'SÍ' : 'NO' }}<br>
+                    Última acción: ${message}<br>
+                    Hora: ${timestamp}
+                `;
+            }
+        }
+
+        // ========== EVENTOS Y AUTO-ABRIR ==========
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log("🚀 DOM cargado - Iniciando verificaciones...");
+            
+            const publicacionesCount = {{ $publicaciones->count() ?? 0 }};
+            const hayPublicaciones = publicacionesCount > 0;
+            
+            updateDebugInfo("DOM cargado");
+            
+            console.log("📊 Datos de publicaciones:");
+            console.log("- Count:", publicacionesCount);
+            console.log("- Hay publicaciones:", hayPublicaciones);
+            console.log("- Datos:", @json($publicaciones ?? []));
+            
+            // AUTO-ABRIR SI HAY PUBLICACIONES
+            if(hayPublicaciones) {
+                console.log("✨ Hay publicaciones, abriendo modal automáticamente...");
+                setTimeout(() => {
+                    openPublicacionesModal();
+                    updateDebugInfo("Modal abierto automáticamente");
+                }, 1000); // Esperar 1 segundo
+            } else {
+                console.log("📭 No hay publicaciones para mostrar");
+                updateDebugInfo("Sin publicaciones para mostrar");
+            }
+        });
+
+        // Cerrar modales con ESC
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                closeContactModal();
+                closePublicacionesModal();
+            }
+        });
+
+        // OCULTAR DEBUG DESPUÉS DE 10 SEGUNDOS (opcional)
+        setTimeout(() => {
+            const debugElement = document.getElementById('debugInfo');
+            if(debugElement) {
+                debugElement.style.display = 'none';
+            }
+        }, 10000);
     </script>
-    <script>
-function openModal() {
-    const modal = document.getElementById('contactModal');
-    modal.classList.add('show');
-    document.body.style.overflow = 'hidden';
-}
-
-function closeModal() {
-    const modal = document.getElementById('contactModal');
-    modal.classList.remove('show');
-    document.body.style.overflow = 'auto';
-}
-
-function closeModalOnOverlay(event) {
-    if (event.target === event.currentTarget) {
-        closeModal();
-    }
-}
-
-// cerrar con Escape
-document.addEventListener('keydown', function(event) {
-    if (event.key === 'Escape') {
-        closeModal();
-    }
-});
-
-// manejar envío del formulario
-document.getElementById('contactForm').addEventListener('submit', function(e) {
-    e.preventDefault();
-    const formData = new FormData(this);
-    alert(`¡Gracias ${formData.get('nombres')} ${formData.get('apellidos')}! Nos contactaremos contigo al ${formData.get('telefono')} pronto.`);
-    this.reset();
-    closeModal();
-});
-</script>
-
 </body>
-
-
 </html>
