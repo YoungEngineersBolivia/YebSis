@@ -198,7 +198,7 @@
             <div class="row mt-3">
                 <div class="col-md-4">
                     <label>Descuento Estudiante Activo (%)</label>
-                    <input type="number" step="0.01" id="descuento_taller" class="form-control" value="20" readonly>
+                    <input type="number" step="0.01" id="descuento_taller" class="form-control" value="20">
                 </div>
                 <div class="col-md-4">
                     <label>Monto con Descuento (Bs) *</label>

@@ -40,7 +40,6 @@ return new class extends Migration
             $table->string('Rango_edad')->nullable();
             $table->float('Costo')->nullable();
             $table->string('Tipo')->nullable();
-            $table->string('Estado');
             $table->timestamps();
       });
   
