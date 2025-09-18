@@ -18,7 +18,7 @@ class Programa extends Model
         'Rango_edad',
         'Duracion',
         'Descripcion',
-        'foto',
+        'Imagen',
         'Tipo'
     ];
 
@@ -26,11 +26,11 @@ class Programa extends Model
         'Costo' => 'decimal:2',
     ];
 
-    // Accessor para la URL completa de la foto
+    // Accessor para la URL completa de la imagen
     public function getFotoUrlAttribute()
     {
-        if ($this->Foto) {
-            return asset('storage/' . $this->Foto);
+        if ($this->Imagen) {
+            return asset('storage/' . $this->Imagen);
         }
         return asset('images/default-program.png'); // Imagen por defecto
     }

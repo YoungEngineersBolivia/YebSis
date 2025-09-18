@@ -57,14 +57,13 @@ return new class extends Migration
 
       Schema::create('programas', function (Blueprint $table) {
             $table->id('Id_programas');
+            $table->string('Imagen')->nullable();
             $table->string('Nombre')->nullable();
             $table->string('Descripcion')->nullable();
-            $table->string('foto')->nullable();
             $table->string('Duracion')->nullable();
             $table->string('Rango_edad')->nullable();
             $table->float('Costo')->nullable();
             $table->string('Tipo')->nullable();
-            $table->enum('Estado', ['activo', 'inactivo'])->default('activo');
             $table->timestamps();
       });
   

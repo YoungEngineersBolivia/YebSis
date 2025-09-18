@@ -24,8 +24,9 @@ class ProgramaController extends Controller
             'rango_edad' => 'required|string|max:100',
             'duracion' => 'required|string|max:100',
             'descripcion' => 'required|string',
-            'foto' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048'
+            'imagen' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048'
         ]);
+        
 
         try {
             $programa = new Programa();
@@ -35,12 +36,12 @@ class ProgramaController extends Controller
             $programa->Duracion = $request->duracion;
             $programa->Descripcion = $request->descripcion;
 
-            // Manejar subida de foto (guardar ruta)
-            if ($request->hasFile('foto')) {
-                $foto = $request->file('foto');
-                $nombreFoto = time() . '_' . Str::random(10) . '.' . $foto->getClientOriginalExtension();
-                $rutaFoto = $foto->storeAs('programas', $nombreFoto, 'public');
-                $programa->foto = $rutaFoto;
+            // Manejar subida de imagen (guardar ruta)
+            if ($request->hasFile('imagen')) {
+                $imagen = $request->file('imagen');
+                $nombreImagen = time() . '_' . Str::random(10) . '.' . $imagen->getClientOriginalExtension();
+                $rutaImagen = $imagen->storeAs('programas', $nombreImagen, 'public');
+                $programa->imagen = $rutaImagen;
             }
 
             $programa->save();
@@ -73,7 +74,7 @@ class ProgramaController extends Controller
             'rango_edad' => 'required|string|max:100',
             'duracion' => 'required|string|max:100',
             'descripcion' => 'required|string',
-            'foto' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048'
+            'imagen' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048'
         ]);
 
         try {
@@ -83,16 +84,17 @@ class ProgramaController extends Controller
             $programa->Rango_edad = $request->rango_edad;
             $programa->Duracion = $request->duracion;
             $programa->Descripcion = $request->descripcion;
+            
 
-            if ($request->hasFile('foto')) {
-                // Eliminar foto anterior si existe
-                if ($programa->foto && Storage::disk('public')->exists($programa->foto)) {
-                    Storage::disk('public')->delete($programa->foto);
+            if ($request->hasFile('imagen')) {
+                // Eliminar imagen anterior si existe
+                if ($programa->imagen && Storage::disk('public')->exists($programa->imagen)) {
+                    Storage::disk('public')->delete($programa->imagen);
                 }
-                $foto = $request->file('foto');
-                $nombreFoto = time() . '_' . Str::random(10) . '.' . $foto->getClientOriginalExtension();
-                $rutaFoto = $foto->storeAs('programas', $nombreFoto, 'public');
-                $programa->foto = $rutaFoto;
+                $imagen = $request->file('imagen');
+                $nombreImagen = time() . '_' . Str::random(10) . '.' . $imagen->getClientOriginalExtension();
+                $rutaImagen = $imagen->storeAs('programas', $nombreImagen, 'public');
+                $programa->imagen = $rutaImagen;
             }
 
             $programa->save();
@@ -109,8 +111,8 @@ class ProgramaController extends Controller
         try {
             $programa = Programa::findOrFail($id);
 
-            if ($programa->foto && Storage::disk('public')->exists($programa->foto)) {
-                Storage::disk('public')->delete($programa->foto);
+            if ($programa->imagen && Storage::disk('public')->exists($programa->isAutomaticallyEagerLoadingRelationships)) {
+                Storage::disk('public')->delete($programa->imagen);
             }
 
             $programa->delete();

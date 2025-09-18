@@ -377,8 +377,8 @@ function toggleNavbar() {
                 @foreach($programas as $programa)
                     <div class="program-card">
                         <div class="program-icon" style="text-align:center; margin-bottom:10px;">
-                            @if($programa->Foto)
-                                <img src="{{ asset('storage/' . $programa->foto) }}" 
+                            @if($programa->Imagen)
+                                <img src="{{ asset('storage/' . $programa->Imagen) }}" 
                                     alt="{{ $programa->Nombre }}" 
                                     style="max-width:150px; height:auto;">
 
