@@ -10,14 +10,16 @@ class Programa extends Model
     use HasFactory;
 
     protected $table = 'programas'; 
-
+    protected $primaryKey = 'Id_programas';
+    
     protected $fillable = [
         'Nombre',
         'Costo',
         'Rango_edad',
         'Duracion',
         'Descripcion',
-        'Foto'
+        'Foto',
+        'Tipo'
     ];
 
     protected $casts = [
@@ -72,5 +74,15 @@ class Programa extends Model
     public function scopeActivos($query)
     {
         return $query->where('Estado', true);
+    }
+
+    public function planesPago()
+    {
+        return $this->hasMany(PlanesPago::class, 'Id_programas', 'Id_programas');
+    }
+
+    public function estudiantesTalleres()
+    {
+        return $this->hasMany(EstudianteTaller::class, 'Id_programas', 'Id_programas');
     }
 }

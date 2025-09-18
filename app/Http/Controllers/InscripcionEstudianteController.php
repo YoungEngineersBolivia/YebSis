@@ -20,40 +20,24 @@ class InscripcionEstudianteController extends Controller
     public function mostrarFormulario()
     {
         try {
-            // Debug: Veamos qué tipos de programas existen en la BD
-            Log::info('Tipos de programas en BD:', Programa::distinct()->pluck('Tipo')->toArray());
-            
-            // Obtener TODOS los programas primero para debug
-            $todosLosProgramas = Programa::where('Estado', true)
+            $programas = Programa::where('Tipo', 'LIKE', '%programa%')
+                               ->whereIn('Estado', ['activo', 'Activo', '1', 'true'])
                                ->select('Id_programas', 'Nombre', 'Costo', 'Tipo')
                                ->get();
             
-            Log::info('Todos los programas:', $todosLosProgramas->toArray());
+            $talleres = Programa::where('Tipo', 'LIKE', '%taller%')
+                              ->whereIn('Estado', ['activo', 'Activo', '1', 'true'])
+                              ->select('Id_programas', 'Nombre', 'Costo', 'Tipo')
+                              ->get();
             
-            // Intentar diferentes variaciones del campo Tipo
-            $programas = Programa::where(function($query) {
-                    $query->where('Tipo', 'Programa')
-                          ->orWhere('Tipo', 'programa')
-                          ->orWhere('Tipo', 'PROGRAMA');
-                })
-                ->where('Estado', true)
-                ->select('Id_programas', 'Nombre', 'Costo', 'Tipo')
-                ->get();
-            
-            $talleres = Programa::where(function($query) {
-                    $query->where('Tipo', 'Taller')
-                          ->orWhere('Tipo', 'taller')
-                          ->orWhere('Tipo', 'TALLER');
-                })
-                ->where('Estado', true)
-                ->select('Id_programas', 'Nombre', 'Costo', 'Tipo')
-                ->get();
-
-            // Si no encuentra nada con el campo Tipo, usar todos los programas
             if ($programas->isEmpty() && $talleres->isEmpty()) {
-                Log::warning('No se encontraron programas con campo Tipo, usando todos los programas');
-                $programas = $todosLosProgramas; // Usar todos como programas
-                $talleres = collect(); // Colección vacía para talleres
+                Log::info('No se encontraron programas por tipo, obteniendo todos los activos');
+                $todosLosProgramas = Programa::whereIn('Estado', ['activo', 'Activo', '1', 'true'])
+                                   ->select('Id_programas', 'Nombre', 'Costo', 'Tipo')
+                                   ->get();
+                
+                $programas = $todosLosProgramas;
+                $talleres = collect(); 
             }
             
             $sucursales = Sucursal::select('Id_Sucursales', 'Nombre')->get();
@@ -61,14 +45,19 @@ class InscripcionEstudianteController extends Controller
                 $query->select('Id_personas', 'Nombre', 'Apellido');
             }])->select('Id_profesores', 'Id_personas')->get();
 
+            Log::info('Programas encontrados: ' . $programas->count());
+            Log::info('Talleres encontrados: ' . $talleres->count());
+            Log::info('Sucursales encontradas: ' . $sucursales->count());
+            Log::info('Profesores encontrados: ' . $profesores->count());
+
             return view('administrador.inscripcionEstudiante', compact('programas', 'talleres', 'sucursales', 'profesores'));
+            
         } catch (\Exception $e) {
             Log::error('Error al cargar formulario de inscripción: ' . $e->getMessage());
             return back()->withErrors(['error' => 'Error al cargar el formulario: ' . $e->getMessage()]);
         }
     }
 
-    // Buscar estudiante por código
     public function buscarPorCodigo(Request $request)
     {
         try {
@@ -112,7 +101,6 @@ class InscripcionEstudianteController extends Controller
         }
     }
 
-    // Buscar estudiante por nombre
     public function buscarPorNombre(Request $request)
     {
         try {
@@ -164,7 +152,6 @@ class InscripcionEstudianteController extends Controller
         }
     }
 
-    // CORREGIDO: Obtener programas o talleres según el tipo
     public function obtenerPorTipo(Request $request)
     {
         try {
@@ -172,45 +159,48 @@ class InscripcionEstudianteController extends Controller
             Log::info("Buscando tipo: $tipo");
             
             if ($tipo === 'programa') {
-                // Buscar con diferentes variaciones
                 $items = Programa::where(function($query) {
-                        $query->where('Tipo', 'Programa')
-                              ->orWhere('Tipo', 'programa')
-                              ->orWhere('Tipo', 'PROGRAMA');
+                        $query->where('Tipo', 'LIKE', '%programa%')
+                              ->orWhere('Tipo', 'LIKE', '%Programa%')
+                              ->orWhere('Tipo', 'LIKE', '%PROGRAMA%')
+                              ->orWhereNull('Tipo'); 
                     })
-                    ->where('Estado', true)
+                    ->whereIn('Estado', ['activo', 'Activo', '1', 'true', 'habilitado', 'disponible'])
                     ->select('Id_programas', 'Nombre', 'Costo', 'Tipo')
                     ->get();
                 
-                // Si no encuentra nada, intentar sin filtro de tipo
-                if ($items->isEmpty()) {
-                    Log::warning('No se encontraron programas con campo Tipo, buscando todos activos');
-                    $items = Programa::where('Estado', true)
-                           ->select('Id_programas', 'Nombre', 'Costo', 'Tipo')
-                           ->get();
-                }
-                
             } elseif ($tipo === 'taller') {
                 $items = Programa::where(function($query) {
-                        $query->where('Tipo', 'Taller')
-                              ->orWhere('Tipo', 'taller')
-                              ->orWhere('Tipo', 'TALLER');
+                        $query->where('Tipo', 'LIKE', '%taller%')
+                              ->orWhere('Tipo', 'LIKE', '%Taller%')
+                              ->orWhere('Tipo', 'LIKE', '%TALLER%');
                     })
-                    ->where('Estado', true)
+                    ->whereIn('Estado', ['activo', 'Activo', '1', 'true', 'habilitado', 'disponible'])
                     ->select('Id_programas', 'Nombre', 'Costo', 'Tipo')
                     ->get();
             } else {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Tipo no válido'
+                    'message' => 'Tipo no válido. Debe ser "programa" o "taller"'
                 ]);
+            }
+
+            if ($items->isEmpty()) {
+                Log::warning("No se encontraron items para tipo: $tipo. Buscando todos los programas activos...");
+                
+                $items = Programa::whereIn('Estado', ['activo', 'Activo', '1', 'true', 'habilitado', 'disponible'])
+                       ->select('Id_programas', 'Nombre', 'Costo', 'Tipo')
+                       ->get();
+                       
+                Log::info("Programas activos encontrados: " . $items->count());
             }
 
             Log::info("Items encontrados para $tipo:", $items->toArray());
 
             return response()->json([
                 'success' => true,
-                'items' => $items
+                'items' => $items,
+                'message' => $items->isEmpty() ? 'No se encontraron elementos disponibles' : null
             ]);
             
         } catch (\Exception $e) {
@@ -222,36 +212,6 @@ class InscripcionEstudianteController extends Controller
         }
     }
 
-    // Método para debug - eliminar después de solucionar
-    public function debugProgramas()
-    {
-        try {
-            $programas = Programa::all();
-            
-            Log::info('=== DEBUG PROGRAMAS ===');
-            Log::info('Total programas: ' . $programas->count());
-            
-            foreach ($programas as $programa) {
-                Log::info("ID: {$programa->Id_programas}, Nombre: {$programa->Nombre}, Tipo: '{$programa->Tipo}', Estado: {$programa->Estado}");
-            }
-            
-            // Verificar estructura de la tabla
-            $columns = DB::getSchemaBuilder()->getColumnListing('programas');
-            Log::info('Columnas de la tabla programas:', $columns);
-            
-            return response()->json([
-                'total' => $programas->count(),
-                'programas' => $programas,
-                'columnas' => $columns
-            ]);
-            
-        } catch (\Exception $e) {
-            Log::error('Error en debug: ' . $e->getMessage());
-            return response()->json(['error' => $e->getMessage()]);
-        }
-    }
-
-    // Inscribir estudiante
     public function inscribir(Request $request)
     {
         // Validación básica
@@ -268,12 +228,11 @@ class InscripcionEstudianteController extends Controller
             $estudiante = Estudiante::findOrFail($request->Id_estudiantes);
             $programa = Programa::findOrFail($request->programa_taller);
 
+            Log::info("Inscribiendo estudiante {$estudiante->Id_estudiantes} en {$request->tipo_seleccion}: {$programa->Nombre}");
+
             if ($request->tipo_seleccion === 'programa') {
-                // INSCRIPCIÓN A PROGRAMA REGULAR
                 $result = $this->inscribirPrograma($request, $estudiante, $programa);
-                
             } else {
-                // INSCRIPCIÓN A TALLER
                 $result = $this->inscribirTaller($request, $estudiante, $programa);
             }
 
@@ -282,6 +241,7 @@ class InscripcionEstudianteController extends Controller
 
         } catch (\Illuminate\Validation\ValidationException $e) {
             DB::rollBack();
+            Log::error('Error de validación al inscribir:', $e->errors());
             return back()->withErrors($e->validator)->withInput();
         } catch (\Exception $e) {
             DB::rollBack();
@@ -299,11 +259,11 @@ class InscripcionEstudianteController extends Controller
             'Total_con_descuento' => 'required|numeric|min:0'
         ]);
 
-        // Verificar si ya tiene un programa activo del mismo tipo
-        if ($estudiante->Estado === 'Activo' && $estudiante->Id_programas) {
+        // Verificar si ya tiene un programa activo
+        if (in_array($estudiante->Estado, ['Activo', 'activo']) && $estudiante->Id_programas) {
             $programaActual = Programa::find($estudiante->Id_programas);
-            if ($programaActual && in_array($programaActual->Tipo, ['Programa', 'programa', 'PROGRAMA'])) {
-                return back()->withErrors(['error' => 'El estudiante ya tiene un programa regular activo. Complete o cancele el programa actual antes de inscribir a uno nuevo.']);
+            if ($programaActual && stripos($programaActual->Tipo, 'programa') !== false) {
+                return back()->withErrors(['error' => 'El estudiante ya tiene un programa regular activo.']);
             }
         }
 
@@ -341,11 +301,12 @@ class InscripcionEstudianteController extends Controller
             }
         }
 
-        return redirect()->back()->with('success', 'Estudiante inscrito exitosamente al programa: ' . $programa->Nombre . '. Se aplicó un descuento del 15% por ser estudiante activo.');
+        return redirect()->back()->with('success', 'Estudiante inscrito exitosamente al programa: ' . $programa->Nombre);
     }
 
     private function inscribirTaller($request, $estudiante, $programa)
     {
+        // CORREGIDO: Validación específica para talleres (sin Nro_cuotas)
         $request->validate([
             'monto_taller_descuento' => 'required|numeric|min:0',
             'fecha_pago_taller' => 'required|date',
@@ -354,9 +315,10 @@ class InscripcionEstudianteController extends Controller
             'descripcion_taller' => 'nullable|string'
         ]);
 
+        // Verificar si ya está inscrito en este taller
         $yaInscrito = EstudianteTaller::where('Id_estudiantes', $estudiante->Id_estudiantes)
-                                   ->where('Id_programas', $programa->Id_programas)
-                                   ->exists();
+                                ->where('Id_programas', $programa->Id_programas)
+                                ->exists();
 
         if ($yaInscrito) {
             return back()->withErrors(['error' => 'El estudiante ya está inscrito en este taller.']);
@@ -367,8 +329,6 @@ class InscripcionEstudianteController extends Controller
             'Id_estudiantes' => $estudiante->Id_estudiantes,
             'Id_programas' => $programa->Id_programas,
             'Fecha_inscripcion' => now()->format('Y-m-d'),
-            'Estado_inscripcion' => 'inscrito',
-            'Observaciones' => 'Inscrito por estudiante activo con descuento del 20% aplicado'
         ]);
 
         // Crear pago del taller
@@ -376,11 +336,48 @@ class InscripcionEstudianteController extends Controller
             'Descripcion' => $request->descripcion_taller ?: ('Pago ' . $programa->Nombre),
             'Monto_pago' => $request->monto_taller_descuento,
             'Fecha_pago' => $request->fecha_pago_taller,
-            'Estado_pago' => $request->estado_pago_taller,
             'Metodo_pago' => $request->metodo_pago_taller,
             'Id_estudiantes_talleres' => $inscripcionTaller->Id_estudiantes_talleres
         ]);
 
-        return redirect()->back()->with('success', 'Estudiante inscrito exitosamente al taller: ' . $programa->Nombre . '. Se aplicó un descuento del 20% por ser estudiante activo.');
+        return redirect()->back()->with('success', 'Estudiante inscrito exitosamente al taller: ' . $programa->Nombre);
+    }
+
+    // MÉTODO TEMPORAL PARA DEBUG - ELIMINAR DESPUÉS
+    public function debugProgramas()
+    {
+        try {
+            $programas = Programa::all();
+            $estados = Programa::distinct()->pluck('Estado');
+            $tipos = Programa::distinct()->pluck('Tipo');
+            
+            Log::info('=== DEBUG PROGRAMAS COMPLETO ===');
+            Log::info('Total programas en BD: ' . $programas->count());
+            Log::info('Estados encontrados: ' . $estados->toJson());
+            Log::info('Tipos encontrados: ' . $tipos->toJson());
+            
+            foreach ($programas as $programa) {
+                Log::info("ID: {$programa->Id_programas}, Nombre: {$programa->Nombre}, Tipo: '{$programa->Tipo}', Estado: '{$programa->Estado}'");
+            }
+            
+            return response()->json([
+                'total' => $programas->count(),
+                'estados' => $estados,
+                'tipos' => $tipos,
+                'programas' => $programas->map(function($p) {
+                    return [
+                        'id' => $p->Id_programas,
+                        'nombre' => $p->Nombre,
+                        'tipo' => $p->Tipo,
+                        'estado' => $p->Estado,
+                        'costo' => $p->Costo
+                    ];
+                })
+            ]);
+            
+        } catch (\Exception $e) {
+            Log::error('Error en debug: ' . $e->getMessage());
+            return response()->json(['error' => $e->getMessage()]);
+        }
     }
 }
