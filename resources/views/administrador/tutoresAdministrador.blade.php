@@ -2,17 +2,15 @@
 
 @section('title', 'Tutores')
 @section('styles')
-<link href="{{ asset('css/style.css') }}" rel="stylesheet">
-<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="{{ asset('css/style.css') }}" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 @endsection
 
 @section('content')
 <div class="container-fluid mt-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h1 class="mb-0">Tutores</h1>
-        <a href="{{ url('/administrador/registrarTutor') }}" class="btn btn-primary">
-            <i class="fas fa-plus me-2"></i> Añadir Tutor
-        </a>
+        
     </div>
 
     <!-- Mostrar mensajes -->
@@ -45,7 +43,9 @@
         <div class="col-md-6">
             <div class="input-group">
                 <span class="input-group-text"><i class="fas fa-search"></i></span>
-                <input type="text" class="form-control" placeholder="Buscar Tutor" id="searchInput">
+                <form action="{{ route('tutores.index') }}" method="GET">
+                    <input type="text" class="form-control" name="search" placeholder="Buscar Tutor" value="{{ request()->search }}">
+                </form>
             </div>
         </div>
     </div>
@@ -194,15 +194,7 @@
 
 @section('scripts')
 <script>
-    document.getElementById('searchInput').addEventListener('keyup', function () {
-        const filtro = this.value.toUpperCase();
-        const filas = document.querySelectorAll('tbody tr');
-        filas.forEach(fila => {
-            const nombre = fila.cells[0].textContent.toUpperCase();
-            fila.style.display = nombre.includes(filtro) ? '' : 'none';
-        });
-    });
-
+    // Lógica de ver detalles, editar y eliminar tutor
     function verTutor(id) {
         fetch(`/administrador/tutores/${id}`)
             .then(res => res.json())

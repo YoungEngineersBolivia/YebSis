@@ -30,4 +30,10 @@ class Usuario extends Authenticatable
     {
         return $this->belongsTo(\App\Models\Persona::class, 'Id_personas', 'Id_personas');
     }
+
+    public function tutor()
+    {
+        return $this->hasOne(Tutores::class, 'Id_usuarios');
+    }
+
 }
