@@ -131,6 +131,8 @@ Route::put('/estudiantes/activar/{id}', [EstudiantesInactivosController::class, 
 
 /*-------------------ESTUDIANTES ACTIVOS--------------------*/ 
 Route::get('/comercial/estudiantesActivos', [EstudiantesActivosController::class, 'index'])->name('estudiantesActivos');
+Route::get('/estudiantes-activos/exportar', [EstudiantesActivosController::class, 'exportar'])
+        ->name('estudiantesActivos.exportar');
 Route::put('/estudiantes/desactivar/{id}', [EstudiantesActivosController::class, 'desactivar'])->name('estudiantes.desactivar');
 
 
