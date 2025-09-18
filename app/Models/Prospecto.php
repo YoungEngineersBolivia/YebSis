@@ -25,7 +25,5 @@ class Prospecto extends Model
     ];
 
     public $incrementing = True;
-
-    // Si quieres, puedes desactivar timestamps si no los usas
     // public $timestamps = false;
 }

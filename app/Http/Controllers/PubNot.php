@@ -51,7 +51,7 @@ class PubNot extends Controller
             $request->validate([
                 'nombre' => 'required|string|max:255',
                 'descripcion' => 'required|string',
-                'imagen' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:2048',
+                'imagen' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:5120',
             ]);
             $imagenPath = null;
             if ($request->hasFile('imagen')) {

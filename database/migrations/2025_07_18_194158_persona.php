@@ -19,7 +19,7 @@ return new class extends Migration
             $table->string('Nombre')->nullable();
             $table->string('Apellido')->nullable();
             $table->string('Celular')->nullable();
-            $table->enum('Estado_prospecto', ['nuevo', 'contactado'])->default('nuevo');
+            $table->string('Estado_prospecto', 100)->default('nuevo');
             $table->foreignId('Id_roles')
                   ->constrained('roles','Id_roles')
                   ->onDelete('cascade');
@@ -31,7 +31,7 @@ return new class extends Migration
                   $table->string('Nombre_Estudiante');
                   $table->date('Fecha_clase');   
                   $table->time('Hora_clase');   
-                  $table->string('Comentarios');
+                  $table->string('Comentarios')->nullable();
                   $table->foreignId('Id_prospectos')
                         ->constrained('prospectos','Id_prospectos')
                         ->onDelete('cascade');
@@ -59,12 +59,12 @@ return new class extends Migration
             $table->id('Id_programas');
             $table->string('Nombre')->nullable();
             $table->string('Descripcion')->nullable();
-            $table->binary('Foto')->nullable();
+            $table->string('foto')->nullable();
             $table->string('Duracion')->nullable();
             $table->string('Rango_edad')->nullable();
             $table->float('Costo')->nullable();
             $table->string('Tipo')->nullable();
-            $table->string('Estado');
+            $table->enum('Estado', ['activo', 'inactivo'])->default('activo');
             $table->timestamps();
       });
   
@@ -190,17 +190,7 @@ return new class extends Migration
             $table->timestamps();
         });
 
-        Schema::create('clases_de_Prueba', function (Blueprint $table) {
-            $table->id('Id_clases_Prueba');
-            $table->date('Fecha_prueba')->nullable();
-            $table->time('Hora_prueba')->nullable();
-            $table->string('Nombre_estudiante')->nullable();
-            $table->foreignId('Id_personas')
-                  ->constrained('personas', 'Id_personas')
-                  ->onDelete('cascade');
-            $table->timestamps();
-        });
-
+     
         Schema::create('publicaciones', function (Blueprint $table) {
             $table->id('Id_publicaciones');
             $table->string('Imagen')->nullable();

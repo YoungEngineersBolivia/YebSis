@@ -23,6 +23,7 @@ use App\Http\Controllers\Auth\CustomLoginController;
 use App\Http\Controllers\InscripcionEstudianteController;
 use App\Http\Controllers\PaginaWebController;
 use App\Http\Controllers\ProspectoController;
+use App\Http\Controllers\ClasePruebaController;
 
 
 /* -------------------Home pagina <web-------------------------*/
@@ -209,3 +210,7 @@ Route::post('prospectos', [ProspectoController::class, 'store'])->name('prospect
 
 Route::get('/comercial/prospectosComercial', [ProspectoController::class, 'index'])
      ->name('prospectos.comercial');
+Route::put('/prospectos/{id}/estado', [ProspectoController::class, 'updateEstado'])->name('prospectos.updateEstado');
+
+// Ruta para guardar clase de prueba
+Route::post('/claseprueba/store', [ClasePruebaController::class, 'store'])->name('claseprueba.store');

@@ -18,7 +18,7 @@ class Programa extends Model
         'Rango_edad',
         'Duracion',
         'Descripcion',
-        'Foto',
+        'foto',
         'Tipo'
     ];
 
