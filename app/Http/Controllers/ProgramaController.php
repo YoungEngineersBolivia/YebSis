@@ -26,6 +26,7 @@ class ProgramaController extends Controller
             'descripcion' => 'required|string',
             'foto' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048'
         ]);
+        
 
         try {
             // Crear nuevo programa
@@ -85,6 +86,7 @@ class ProgramaController extends Controller
             $programa->Rango_edad = $request->rango_edad;
             $programa->Duracion = $request->duracion;
             $programa->Descripcion = $request->descripcion;
+            
 
             
             if ($request->hasFile('foto')) {

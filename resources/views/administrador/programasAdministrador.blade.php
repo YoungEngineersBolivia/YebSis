@@ -147,6 +147,10 @@
                                     <input type="text" class="form-control" id="rango_edad" name="rango_edad" required>
                                 </div>
                             </div>
+                            <div class="mb-3">
+                            <label for="duracion" class="form-label">Duracion</label>
+                            <input type="text" class="form-control" id="duracion" name="duracion" required>
+                        </div>
                         </div>
                         <div class="mb-3">
                             <label for="descripcion" class="form-label">Descripción</label>

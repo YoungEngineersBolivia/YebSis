@@ -82,7 +82,6 @@
                     <span class="input-group-text"><i class="fas fa-search"></i></span>
                     <input type="text" class="form-control" placeholder="Filtrar por código, nombre o apellido" name="search" value="{{ request()->search }}">
                 </div>
-                <div class="search-hint mt-1">Escribe para filtrar filas en tiempo real.</div>
             </form>
         </div>
     </div>
