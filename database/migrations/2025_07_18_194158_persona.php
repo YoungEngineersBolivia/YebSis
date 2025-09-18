@@ -14,7 +14,29 @@ return new class extends Migration
             $table->timestamps();
         });
 
-       
+       Schema::create('prospectos',function (Blueprint $table){
+            $table->id('Id_prospectos');
+            $table->string('Nombre')->nullable();
+            $table->string('Apellido')->nullable();
+            $table->string('Celular')->nullable();
+            $table->enum('Estado_prospecto', ['nuevo', 'contactado'])->default('nuevo');
+            $table->foreignId('Id_roles')
+                  ->constrained('roles','Id_roles')
+                  ->onDelete('cascade');
+            $table->timestamps();
+
+       });
+        Schema::create('clasePrueba', function (Blueprint $table) {
+                  $table->id('Id_clasePrueba');
+                  $table->string('Nombre_Estudiante');
+                  $table->date('Fecha_clase');   
+                  $table->time('Hora_clase');   
+                  $table->string('Comentarios');
+                  $table->foreignId('Id_prospectos')
+                        ->constrained('prospectos','Id_prospectos')
+                        ->onDelete('cascade');
+                  
+      });
       
         Schema::create('personas', function (Blueprint $table) {
             $table->id('Id_personas');
@@ -30,6 +52,8 @@ return new class extends Migration
                   ->onDelete('cascade');
             $table->timestamps();
         });
+       
+
 
       Schema::create('programas', function (Blueprint $table) {
             $table->id('Id_programas');
@@ -179,7 +203,7 @@ return new class extends Migration
 
         Schema::create('publicaciones', function (Blueprint $table) {
             $table->id('Id_publicaciones');
-            $table->binary('Imagen')->nullable();
+            $table->string('Imagen')->nullable();
             $table->string('Nombre')->nullable();
             $table->string('Descripcion')->nullable();
             $table->date('Fecha')->nullable();
@@ -355,6 +379,7 @@ return new class extends Migration
         Schema::dropIfExists('personas');
         Schema::dropIfExists('roles');
         Schema::dropIfExists('notificaciones');
+        Schema::dropIfExists('prospectos');
       }
 };
 

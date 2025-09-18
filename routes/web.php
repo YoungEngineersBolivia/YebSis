@@ -11,7 +11,7 @@ use App\Http\Controllers\TutoresController;
 use App\Http\Controllers\UsuariosController;
 use App\Http\Controllers\GraduadoController;
 use App\Http\Controllers\SucursalController;
-use App\Http\Controllers\EgresosController;   
+use App\Http\Controllers\EgresosController;
 use App\Http\Controllers\HorariosController;
 use App\Http\Controllers\RegistroCombinadoController;
 use App\Http\Controllers\PagosController;
@@ -19,14 +19,18 @@ use App\Http\Controllers\PubNot;
 use App\Http\Controllers\EstudiantesInactivosController;
 use App\Http\Controllers\EstudiantesActivosController;
 use App\Http\Controllers\ReporteTalleresController;
-use App\Http\Controllers\Auth\CustomLoginController; 
+use App\Http\Controllers\Auth\CustomLoginController;
 use App\Http\Controllers\InscripcionEstudianteController;
+use App\Http\Controllers\PaginaWebController;
+use App\Http\Controllers\ProspectoController;
+
 
 /* -------------------Home pagina <web-------------------------*/
 
 Route::get('/', function () {
     return view('/paginaWeb/home'); // Retorna la vista welcome.blade.php
 });
+
 
 /* ----------------- HOME / BASE Administrador  ----------------- */
 //Route::get('/', fn () => view('/administrador/baseAdministrador'));
@@ -41,11 +45,11 @@ Route::post('/administradores/registrarC', [AdministradorController::class, 'reg
 Route::post('/administradores/registrarT', [AdministradorController::class, 'registrarTutor'])->name('administrador.registrarT');
 Route::post('/administradores/registrarP', [AdministradorController::class, 'registrarProfesor'])->name('administrador.registrarP');
 
-Route::get('/administrador/registrarProfesor', fn () => view('/administrador/registrarProfesor'));
-Route::get('/administrador/registrarTutor', fn () => view('/administrador/registrarTutor'));
-Route::get('/administrador/registrarComercial', fn () => view('/administrador/registrarComercial'));
-Route::get('/administrador/inicioAdministrador', fn () => view('/administrador/inicioAdministrador'));
-Route::get('/administrador/registrosAdministrador', fn () => view('/administrador/registrosAdministradores'));
+Route::get('/administrador/registrarProfesor', fn() => view('/administrador/registrarProfesor'));
+Route::get('/administrador/registrarTutor', fn() => view('/administrador/registrarTutor'));
+Route::get('/administrador/registrarComercial', fn() => view('/administrador/registrarComercial'));
+Route::get('/administrador/inicioAdministrador', fn() => view('/administrador/inicioAdministrador'));
+Route::get('/administrador/registrosAdministrador', fn() => view('/administrador/registrosAdministradores'));
 
 /* ----------------- TUTORES ----------------- */
 Route::get('/administrador/tutoresAdministrador', [TutoresController::class, 'index'])->name('tutores.index');
@@ -90,13 +94,13 @@ Route::get('/programas/{id}', [ProgramaController::class, 'show'])->name('progra
 Route::get('/admin/programas/{id}/edit', [ProgramaController::class, 'edit'])->name('programas.edit');
 Route::put('/programas/{id}', [ProgramaController::class, 'update'])->name('programas.update');
 Route::delete('/programas/{id}', [ProgramaController::class, 'destroy'])->name('programas.destroy');
-Route::get('administrador/nuevosProgramasAdministrador', fn () => view('administrador.nuevoProgramaAdministrador'));
+Route::get('administrador/nuevosProgramasAdministrador', fn() => view('administrador.nuevoProgramaAdministrador'));
 
 /* ----------------- GRADUADOS ----------------- */
 Route::get('/administrador/graduadosAdministrador', [GraduadoController::class, 'index'])->name('graduados.index');
 
 /* ----------------- PAGOS ----------------- */
-Route::get('/administrador/pagosAdministrador', [PagosController::class, 'form'])->name('pagos.form');  
+Route::get('/administrador/pagosAdministrador', [PagosController::class, 'form'])->name('pagos.form');
 Route::get('/administrador/pagos', [PagosController::class, 'index'])->name('pagos.index'); // filtro por nombre
 Route::post('/administrador/pagosAdministrador', [PagosController::class, 'registrarPago'])->name('pagos.registrar');
 
@@ -112,10 +116,12 @@ Route::get('/administrador/egresos/crear', [EgresosController::class, 'create'])
 Route::post('/administrador/egresos/registrar', [EgresosController::class, 'store'])->name('egresos.registrar');
 
 /* ----------------- PUBLICACIONES / NOTIFICACIONES ----------------- */
-Route::get('/administrador/pubnotAdministrador', [PubNot::class, 'index'])->name('publicaciones.index');
-Route::post('/administrador/pubnotAdministrador', [PubNot::class, 'store'])->name('publicaciones.store');
-Route::delete('/administrador/pubnotAdministrador/{id}', [PubNot::class, 'destroy'])->name('publicaciones.destroy');
-Route::post('/administrador/notificaciones', [PubNot::class, 'store'])->name('notificaciones.store');
+Route::middleware('auth')->group(function () {
+    Route::get('/administrador/pubnotAdministrador', [PubNot::class, 'index'])->name('publicaciones.index');
+    Route::post('/administrador/pubnotAdministrador', [PubNot::class, 'store'])->name('publicaciones.store');
+    Route::delete('/administrador/pubnotAdministrador/{id}', [PubNot::class, 'destroy'])->name('publicaciones.destroy');
+    Route::post('/administrador/notificaciones', [PubNot::class, 'storeNotificacion'])->name('notificaciones.store');
+});
 
 /* ----------------- REGISTRO COMBINADO / PLANES ----------------- */
 Route::get('/administrador/tutorEstudianteAdministrador', [RegistroCombinadoController::class, 'mostrarFormulario'])->name('registroCombinado.form');
@@ -129,7 +135,7 @@ Route::post('/planes-pago/registrar', [App\Http\Controllers\PlanesPagoController
 Route::get('/comercial/estudiantesNoActivos', [EstudiantesInactivosController::class, 'index'])->name('estudiantesNoActivos');
 Route::put('/estudiantes/activar/{id}', [EstudiantesInactivosController::class, 'reactivar'])->name('estudiantes.reactivar');
 
-/*-------------------ESTUDIANTES ACTIVOS--------------------*/ 
+/*-------------------ESTUDIANTES ACTIVOS--------------------*/
 Route::get('/comercial/estudiantesActivos', [EstudiantesActivosController::class, 'index'])->name('estudiantesActivos');
 Route::put('/estudiantes/desactivar/{id}', [EstudiantesActivosController::class, 'desactivar'])->name('estudiantes.desactivar');
 
@@ -144,15 +150,15 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 /*-----------------------------TALLERES-------------------------------*/
 
 Route::get('/comercial/talleresComercial', [ReporteTalleresController::class, 'index'])
-         ->name('reportes.talleres');
-    
-    // Ruta para exportar datos (opcional)
-    Route::get('/reportes/talleres/exportar', [ReporteTalleresController::class, 'exportar'])
-         ->name('reportes.talleres.exportar');
-    
-    // Ruta API para obtener datos dinámicos (opcional)
-    Route::get('/api/reportes/talleres/datos', [ReporteTalleresController::class, 'obtenerDatos'])
-         ->name('api.reportes.talleres.datos'); 
+    ->name('reportes.talleres');
+
+// Ruta para exportar datos (opcional)
+Route::get('/reportes/talleres/exportar', [ReporteTalleresController::class, 'exportar'])
+    ->name('reportes.talleres.exportar');
+
+// Ruta API para obtener datos dinámicos (opcional)
+Route::get('/api/reportes/talleres/datos', [ReporteTalleresController::class, 'obtenerDatos'])
+    ->name('api.reportes.talleres.datos');
 // Mostrar formulario de login (GET)
 Route::get('/login', function () {
     return view('paginaWeb.login');
@@ -198,26 +204,8 @@ Route::post('/administrador/registrarEstudianteAntiguo/buscar-nombre', [Inscripc
 Route::post('/administrador/registrarEstudianteAntiguo/obtener-por-tipo', [InscripcionEstudianteController::class, 'obtenerPorTipo'])
     ->name('inscripcionEstudiante.obtenerPorTipo');
 
+Route::post('prospectos', [ProspectoController::class, 'store'])->name('prospectos.store');
 
-//Route::get('administrador/admin', fn () => view('administrador.inscripcionEstudiante'));
 
-/* ------------------- ADMINISTRADOR: Gestión de Talleres ------------------- */
-Route::prefix('administrador/talleres')->middleware(['auth', 'role:admin'])->group(function () {
-    
-    // Ver todos los talleres
-    Route::get('/', [TallerController::class, 'index'])
-         ->name('talleres.index');
-    
-    // Ver inscripciones de un taller específico
-    Route::get('/{id}/inscripciones', [TallerController::class, 'verInscripciones'])
-         ->name('talleres.inscripciones');
-    
-    // Ver pagos de talleres
-    Route::get('/pagos', [TallerController::class, 'verPagos'])
-         ->name('talleres.pagos');
-    
-    // Reportes de talleres
-    Route::get('/reportes', [TallerController::class, 'reportes'])
-         ->name('talleres.reportes');
-    
-});
+Route::get('/comercial/prospectosComercial', [ProspectoController::class, 'index'])
+     ->name('prospectos.comercial');
