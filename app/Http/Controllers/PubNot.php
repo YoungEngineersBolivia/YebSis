@@ -12,8 +12,6 @@ class PubNot extends Controller
     {
         $publicaciones = Publicacion::orderBy('created_at', 'desc')->get();
         $notificaciones = Notificacion::orderBy('Fecha', 'desc')->limit(10)->get();
-
-        // Traer tutores con datos de persona
         $tutores = \App\Models\Tutores::with('persona')->orderBy('Id_tutores', 'desc')->get();
 
         return view('administrador.pubnotAdministrador', compact('publicaciones', 'notificaciones', 'tutores'));
@@ -37,7 +35,7 @@ class PubNot extends Controller
             }
             $tutores = $request->input('tutores');
             foreach ($tutores as $idTutor) {
-                \App\Models\Notificacion::create([
+              Notificacion::create([
                     'Nombre' => $request->nombre,
                     'Descripcion' => $request->descripcion,
                     'Imagen' => $imagenPath ? str_replace('public/', '', $imagenPath) : null,
@@ -53,13 +51,22 @@ class PubNot extends Controller
             $request->validate([
                 'nombre' => 'required|string|max:255',
                 'descripcion' => 'required|string',
-                'imagen' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:2048',
+                'imagen' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:5120',
             ]);
             $imagenPath = null;
             if ($request->hasFile('imagen')) {
-                $imagenPath = $request->file('imagen')->store('publicaciones', 'public');
-            }
-            \App\Models\Publicacion::create([
+                    $file = $request->file('imagen'); // <-- asigna la variable aquí
+
+                    $nombreOriginal = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
+                    $extension = $file->getClientOriginalExtension();
+                    $nombreArchivo = $nombreOriginal . '_' . time() . '.' . $extension;
+
+                    $imagenPath = $file->storeAs('publicaciones', $nombreArchivo, 'public');
+                } else {
+                    $imagenPath = null;
+                }
+            
+            Publicacion::create([
                 'Nombre' => $request->nombre,
                 'Descripcion' => $request->descripcion,
                 'Imagen' => $imagenPath ? str_replace('public/', '', $imagenPath) : null,
@@ -80,4 +87,5 @@ class PubNot extends Controller
 
         return redirect()->route('publicaciones.index')->with('success', 'Publicación eliminada correctamente.');
     }
+
 }

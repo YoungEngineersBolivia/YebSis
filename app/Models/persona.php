@@ -25,4 +25,8 @@ class Persona extends Model
     {
         return $this->belongsTo(\App\Models\Rol::class, 'Id_roles', 'Id_roles');
     }
+    public function tutor()
+    {
+        return $this->hasOne(Tutores::class, 'Id_personas');
+    }
 }

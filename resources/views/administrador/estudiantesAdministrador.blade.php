@@ -4,9 +4,7 @@
 
 @section('styles')
     @vite('resources/css/dashboard.css')
-    {{-- Font Awesome (ya lo usabas) --}}
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    {{-- Bootstrap Icons (necesario para bi bi-*) --}}
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
     <style>
         .table thead th {
@@ -17,6 +15,23 @@
         }
         .search-hint {
             font-size: .9rem; color:#666;
+        }
+
+        /* Estilo del botón de desactivar/activar */
+        .btn-toggle-status {
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+        .btn-toggle-status.active {
+            background-color: #28a745;
+            color: white;
+        }
+        .btn-toggle-status.inactive {
+            background-color: #dc3545;
+            color: white;
+        }
+
+        .pagination {
+            justify-content: center;
         }
     </style>
 @endsection
@@ -61,12 +76,13 @@
     {{-- Buscador --}}
     <div class="row mb-3">
         <div class="col-md-6">
-            <label for="searchInput" class="form-label mb-1">Buscar</label>
-            <div class="input-group">
-                <span class="input-group-text"><i class="fas fa-search"></i></span>
-                <input type="text" class="form-control" placeholder="Filtrar por código, nombre, programa, profesor o sucursal" id="searchInput">
-            </div>
-            <div class="search-hint mt-1">Escribe para filtrar filas en tiempo real.</div>
+            <form action="{{ route('estudiantes.index') }}" method="GET">
+                <label for="searchInput" class="form-label mb-1">Buscar</label>
+                <div class="input-group">
+                    <span class="input-group-text"><i class="fas fa-search"></i></span>
+                    <input type="text" class="form-control" placeholder="Filtrar por código, nombre o apellido" name="search" value="{{ request()->search }}">
+                </div>
+            </form>
         </div>
     </div>
 
@@ -102,12 +118,11 @@
                             $programa = $estudiante->programa->Nombre ?? 'Sin programa';
                             $sucursal = $estudiante->sucursal->Nombre ?? 'Sin sucursal';
 
-                            // Si el nombre del profesor está en PERSONA:
                             $prof = $estudiante->profesor ?? null;
                             $profPersona = $prof?->persona ?? null;
                             $profesorNombre = $profPersona
                                 ? trim(($profPersona->Nombre ?? '').' '.($profPersona->Apellido ?? ''))
-                                : ($prof->Nombre ?? null); // fallback si profesores.Nombre existe
+                                : ($prof->Nombre ?? null);
                             $profesorNombre = $profesorNombre ?: 'Sin profesor';
                         @endphp
                         <tr>
@@ -127,14 +142,11 @@
                             </td>
                             <td>
                                 <div class="d-flex gap-2">
-                                    {{-- Botón Editar --}}
                                     <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#editarModal{{ $estudiante->Id_estudiantes }}">
                                         <i class="bi bi-pencil-square"></i>
                                     </button>
 
-                                    {{-- Botón Eliminar --}}
-                                    <form action="{{ route('estudiantes.eliminar', $estudiante->Id_estudiantes ?? 0) }}"
-                                        method="POST" onsubmit="return confirm('¿Eliminar este estudiante?');">
+                                    <form action="{{ route('estudiantes.eliminar', $estudiante->Id_estudiantes ?? 0) }}" method="POST" onsubmit="return confirm('¿Eliminar este estudiante?');">
                                         @csrf
                                         @method('DELETE')
                                         <button type="submit" class="btn btn-sm btn-outline-danger" title="Eliminar">
@@ -142,88 +154,30 @@
                                         </button>
                                     </form>
 
-                                    {{-- Ver/Perfil --}}
-                                    <a href="{{ route('estudiantes.ver', $estudiante->Id_estudiantes ?? 0) }}"
-                                    class="btn btn-sm btn-outline-secondary" title="Ver perfil">
+                                    <a href="{{ route('estudiantes.ver', $estudiante->Id_estudiantes ?? 0) }}" class="btn btn-sm btn-outline-secondary" title="Ver perfil">
                                         <i class="bi bi-person-fill"></i>
                                     </a>
 
-                                    {{-- Botón Cambiar Estado --}}
-                                    <form action="{{ route('estudiantes.cambiarEstado', $estudiante->Id_estudiantes) }}"
-                                        method="POST" onsubmit="return confirm('¿Cambiar el estado del estudiante?');">
+                                    <form action="{{ route('estudiantes.cambiarEstado', $estudiante->Id_estudiantes) }}" method="POST" onsubmit="return confirm('¿Cambiar el estado del estudiante?');">
                                         @csrf
                                         @method('PUT')
-                                        <button type="submit" class="btn btn-sm btn-outline-info">
-                                            {{ $estudiante->Estado === 'Activo' ? 'Desactivar' : 'Activar' }}
+                                        <button type="submit" class="btn btn-sm btn-toggle-status {{ $estudiante->Estado === 'Activo' ? 'inactive' : 'active' }}">
+                                            <i class="bi {{ $estudiante->Estado === 'Activo' ? 'bi-toggle-off' : 'bi-toggle-on' }}"></i>
                                         </button>
                                     </form>
                                 </div>
                             </td>
                         </tr>
-
-                        <!-- Modal para editar estudiante -->
-                        <div class="modal fade" id="editarModal{{ $estudiante->Id_estudiantes }}" tabindex="-1" aria-labelledby="editarModalLabel{{ $estudiante->Id_estudiantes }}" aria-hidden="true">
-                            <div class="modal-dialog">
-                                <div class="modal-content">
-                                    <div class="modal-header">
-                                        <h5 class="modal-title" id="editarModalLabel{{ $estudiante->Id_estudiantes }}">Editar Estudiante</h5>
-                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                    </div>
-                                    <div class="modal-body">
-                                        <form action="{{ route('estudiantes.editar', $estudiante->Id_estudiantes) }}" method="POST">
-                                            @csrf
-                                            @method('PUT')
-                                            <div class="mb-3">
-                                                <label for="nombre" class="form-label">Nombre</label>
-                                                <input type="text" class="form-control" id="nombre" name="nombre" value="{{ $estudiante->persona->Nombre }}" required>
-                                            </div>
-                                            <div class="mb-3">
-                                                <label for="apellido" class="form-label">Apellido</label>
-                                                <input type="text" class="form-control" id="apellido" name="apellido" value="{{ $estudiante->persona->Apellido }}" required>
-                                            </div>
-                                            <div class="mb-3">
-                                                <label for="programa" class="form-label">Programa</label>
-                                                <select class="form-select" id="programa" name="programa" required>
-                                                    @foreach($programas as $programa)
-                                                        <option value="{{ $programa->Id_programas }}" {{ $estudiante->Id_programas == $programa->Id_programas ? 'selected' : '' }}>
-                                                            {{ $programa->Nombre }}
-                                                        </option>
-                                                    @endforeach
-                                                </select>
-                                            </div>
-                                            <div class="mb-3">
-                                                <label for="sucursal" class="form-label">Sucursal</label>
-                                                <select class="form-select" id="sucursal" name="sucursal" required>
-                                                    @foreach($sucursales as $sucursal)
-                                                        <option value="{{ $sucursal->Id_Sucursales }}" {{ $estudiante->Id_sucursales == $sucursal->Id_Sucursales ? 'selected' : '' }}>
-                                                            {{ $sucursal->Nombre }}
-                                                        </option>
-                                                    @endforeach
-                                                </select>
-                                            </div>
-                                            <div class="mb-3">
-                                                <label for="tutor_estudiante" class="form-label">Tutor</label>
-                                                <select class="form-select" id="tutor_estudiante" name="tutor_estudiante" required>
-                                                    @foreach($tutores as $tutor)
-                                                        <option value="{{ $tutor->Id_tutores }}" {{ $estudiante->Id_tutores == $tutor->Id_tutores ? 'selected' : '' }}>
-                                                            {{ $tutor->persona->Nombre }} {{ $tutor->persona->Apellido }}
-                                                        </option>
-                                                    @endforeach
-                                                </select>
-                                            </div>
-
-                                            <button type="submit" class="btn btn-primary">Guardar cambios</button>
-                                        </form>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
                     @endforeach
                 </tbody>
             </table>
         </div>
     @endif
+
+    <!-- Paginación -->
+    <div class="d-flex justify-content-center mt-4">
+        {{ $estudiantes->links('pagination::bootstrap-5') }}
+    </div>
 </div>
 @endsection
 
@@ -231,7 +185,7 @@
 <script>
     // Filtro de tabla en vivo
     (function () {
-        const input = document.getElementById('searchInput');
+        const input = document.querySelector('input[name="search"]');
         const table = document.getElementById('studentsTable');
         if (!input || !table) return;
 

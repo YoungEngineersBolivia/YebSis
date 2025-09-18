@@ -1,9 +1,10 @@
 @extends('/administrador/baseAdministrador')
 
 @section('title', 'Programas')
+
 @section('styles')
-<link href="{{ asset('css/style.css') }}" rel="stylesheet">
-<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="{{ asset('css/style.css') }}" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 @endsection
 
 @section('content')
@@ -14,6 +15,7 @@
             <i class="fas fa-plus me-2"></i>Añadir Programa
         </button>
     </div>
+
     @if(session('success'))
         <div class="alert alert-success alert-dismissible fade show" role="alert">
             {{ session('success') }}
@@ -55,36 +57,20 @@
             <table class="table table-hover">
                 <thead class="table-light">
                     <tr>
-                        <th class="fw-bold text-dark">
-                            Nombre 
-                            <i class="fbi bi-arrow-down"></i>
-                        </th>
-                        <th class="fw-bold bi-arrow-down">
-                            Costo 
-                            <i class="fbi bi-arrow-down"></i>
-                        </th>
-                        <th class="fw-bold text-dark ">
-                            Rango de Edad 
-                            <i class="fbi bi-arrow-down"></i>
-                        </th>
-                        <th class="fw-bold text-dark ">
-                            Duración 
-                            <i class="fbi bi-arrow-down"></i>
-                        </th>
-                        <th class="fw-bold text-dark ">
-                            Descripción 
-                            <i class="fbi bi-arrow-down"></i>
-                        </th>
-                        <th class="fw-bold text-dark ">
-                            Acciones 
-                            <i class="fbi bi-arrow-down"></i>
-                        </th>
+                        <th class="fw-bold text-dark">Nombre</th>
+                        <th class="fw-bold text-dark">Tipo</th> <!-- Nuevo campo de tipo -->
+                        <th class="fw-bold text-dark">Costo</th>
+                        <th class="fw-bold text-dark">Rango de Edad</th>
+                        <th class="fw-bold text-dark">Duración</th>
+                        <th class="fw-bold text-dark">Descripción</th>
+                        <th class="fw-bold text-dark">Acciones</th>
                     </tr>
                 </thead>
                 <tbody>
                     @foreach ($programas as $programa)
                         <tr>
                             <td class="fw-normal">{{ $programa->Nombre }}</td>
+                            <td class="text-muted">{{ $programa->Tipo ?? 'No especificado' }}</td> <!-- Mostrar tipo -->
                             <td class="text-muted">{{ number_format($programa->Costo, 0) }} Bs</td>
                             <td class="text-muted">{{ $programa->Rango_edad }}</td>
                             <td class="text-muted">{{ $programa->Duracion }}</td>
@@ -96,7 +82,6 @@
                                             title="Eliminar">
                                         <i class="bi bi-trash3-fill"></i>
                                     </button>
-                                   
                                     <button class="btn btn-sm btn-outline-warning" 
                                             onclick="editarPrograma({{ $programa->Id_programas }})"
                                             title="Editar">
@@ -121,6 +106,7 @@
         </div>
     @endif
 
+    <!-- Modal para añadir programa -->
     <div class="modal fade" id="nuevoProgramaModal" tabindex="-1" aria-labelledby="nuevoProgramaLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg">
             <div class="modal-content" id="modalContent">
@@ -129,7 +115,7 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
                 </div>
                 <div class="modal-body">
-                   <form id="formNuevoPrograma" action="{{ route('programas.store') }}" method="POST" enctype="multipart/form-data">-->
+                    <form id="formNuevoPrograma" action="{{ route('programas.store') }}" method="POST" enctype="multipart/form-data">
                         @csrf
                         <div class="row">
                             <div class="col-md-6">
@@ -140,24 +126,31 @@
                             </div>
                             <div class="col-md-6">
                                 <div class="mb-3">
-                                    <label for="costo" class="form-label">Costo (Bs)</label>
-                                    <input type="number" class="form-control" id="costo" name="costo" step="0.01" required>
+                                    <label for="tipo" class="form-label">Tipo de Programa</label>
+                                    <select class="form-control" id="tipo" name="tipo" required>
+                                        <option value="programa">Programa</option>
+                                        <option value="taller">Taller</option>
+                                    </select>
                                 </div>
                             </div>
                         </div>
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="mb-3">
-                                    <label for="rango_edad" class="form-label">Rango de Edad</label>
-                                    <input type="text" class="form-control" id="rango_edad" name="rango_edad" required>
+                                    <label for="costo" class="form-label">Costo (Bs)</label>
+                                    <input type="number" class="form-control" id="costo" name="costo" step="0.01" required>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="mb-3">
-                                    <label for="duracion" class="form-label">Duración</label>
-                                    <input type="text" class="form-control" id="duracion" name="duracion" required>
+                                    <label for="rango_edad" class="form-label">Rango de Edad</label>
+                                    <input type="text" class="form-control" id="rango_edad" name="rango_edad" required>
                                 </div>
                             </div>
+                            <div class="mb-3">
+                            <label for="duracion" class="form-label">Duracion</label>
+                            <input type="text" class="form-control" id="duracion" name="duracion" required>
+                        </div>
                         </div>
                         <div class="mb-3">
                             <label for="descripcion" class="form-label">Descripción</label>
@@ -176,134 +169,32 @@
             </div>
         </div>
     </div>
-    <!-- Modal para editar -->
-        <div class="modal fade" id="modalPrograma" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Editar Programa</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body" id="modalProgramaBody">
-               
-            </div>
-            </div>
-        </div>
-        </div>
 
 </div>
-
 
 @endsection
 
 @section('scripts')
-<script src="{{asset('js/programasAdministrador.js')}}"></script>
 <script>
-// Función de búsqueda
-document.getElementById('searchInput').addEventListener('keyup', function() {
-    var input, filter, table, tr, td, i, txtValue;
-    input = document.getElementById('searchInput');
-    filter = input.value.toUpperCase();
-    table = document.querySelector('.table tbody');
-    tr = table.getElementsByTagName('tr');
+    // Función de búsqueda
+    document.getElementById('searchInput').addEventListener('keyup', function() {
+        var input, filter, table, tr, td, i, txtValue;
+        input = document.getElementById('searchInput');
+        filter = input.value.toUpperCase();
+        table = document.querySelector('.table tbody');
+        tr = table.getElementsByTagName('tr');
 
-    for (i = 0; i < tr.length; i++) {
-        td = tr[i].getElementsByTagName('td')[0]; // Buscar en la columna nombre
-        if (td) {
-            txtValue = td.textContent || td.innerText;
-            if (txtValue.toUpperCase().indexOf(filter) > -1) {
-                tr[i].style.display = '';
-            } else {
-                tr[i].style.display = 'none';
+        for (i = 0; i < tr.length; i++) {
+            td = tr[i].getElementsByTagName('td')[0]; // Buscar en la columna nombre
+            if (td) {
+                txtValue = td.textContent || td.innerText;
+                if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                    tr[i].style.display = '';
+                } else {
+                    tr[i].style.display = 'none';
+                }
             }
         }
-    }
-});
-
-// Funciones para los botones de acción
-function eliminarPrograma(id) {
-    if (confirm('¿Estás seguro de que quieres eliminar este programa?')) {
-        fetch(`/admin/programas/${id}`, {
-            method: 'DELETE',
-            headers: {
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-                'Content-Type': 'application/json',
-            },
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                location.reload();
-            } else {
-                alert('Error al eliminar: ' + data.message);
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('Error al eliminar el programa');
-        });
-    }
-}
-
-function editarPrograma(id) {
-   
-    fetch(`/admin/programas/${id}/edit`)
-        .then(response => response.json())
-        .then(data => {
-           
-            document.getElementById('nombre').value = data.Nombre;
-            document.getElementById('costo').value = data.Costo;
-            document.getElementById('rango_edad').value = data.Rango_edad;
-            document.getElementById('duracion').value = data.Duracion;
-            document.getElementById('descripcion').value = data.Descripcion;
-            
-            
-            const form = document.getElementById('formNuevoPrograma');
-            form.action = `/admin/programas/${id}`;
-            
-            
-            const methodField = document.createElement('input');
-            methodField.type = 'hidden';
-            methodField.name = '_method';
-            methodField.value = 'PUT';
-            form.appendChild(methodField);
-            
-            
-            document.querySelector('.modal-title').textContent = 'Editar Programa';
-         
-            const modal = new bootstrap.Modal(document.getElementById('nuevoProgramaModal'));
-            modal.show();
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('Error al cargar los datos del programa');
-        });
-}
-
-function verPrograma(id) {
-
-    fetch(`/admin/programas/${id}`)
-        .then(response => response.json())
-        .then(data => {
-            alert(`Programa: ${data.Nombre}\nCosto: ${data.Costo} Bs\nRango de Edad: ${data.Rango_edad}\nDuración: ${data.Duracion}\nDescripción: ${data.Descripcion}`);
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('Error al cargar los detalles del programa');
-        });
-}
-
-
-document.getElementById('nuevoProgramaModal').addEventListener('hidden.bs.modal', function () {
-    const form = document.getElementById('formNuevoPrograma');
-    form.reset();
-    form.action = "{{ route('programas.store') }}";
-    const methodField = form.querySelector('input[name="_method"]');
-    if (methodField) {
-        methodField.remove();
-    }
-
-    document.querySelector('.modal-title').textContent = 'Nuevo Programa';
-});
+    });
 </script>
 @endsection

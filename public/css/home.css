@@ -445,6 +445,17 @@ header {
     font-size: 2rem;
     margin-bottom: 10px;
 }
+.modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(0,0,0,0.6);
+    justify-content: center;
+    align-items: center;
+    z-index: 10000; /* Más alto que todo */
+}
+
 
 /* Footer */
 footer {
@@ -475,6 +486,21 @@ footer {
     line-height: 1.6;
     margin-bottom: 15px;
 }
+footer {
+    position: relative;
+    z-index: 1; /* Debajo del modal */
+}
+
+.floating-elements {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 0; /* Siempre detrás del modal */
+}
+
 
 .social-icons {
     display: flex;
@@ -628,3 +654,47 @@ footer {
     display: inline-block;
     margin: 5px 0;
 }
+
+
+ .modal-overlay {
+        display: none;
+        position: fixed;
+        top: 0; left: 0;
+        width: 100%; height: 100%;
+        background: rgba(0,0,0,0.6);
+        justify-content: center;
+        align-items: center;
+        z-index: 10000000;
+    }
+    .modal-overlay.show { 
+        display: flex; 
+    }
+    .modal-container {
+        background: #fff;
+        padding: 20px;
+        border-radius: 12px;
+        width: 90%;
+        max-width: 600px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        max-height: 80vh;
+        overflow-y: auto;
+    }
+    .modal-header { 
+        text-align:center; 
+        margin-bottom:20px; 
+        position: relative;
+    }
+    .close-btn { 
+        position: absolute;
+        right: 0;
+        top: 0;
+        font-size: 24px; 
+        cursor: pointer; 
+        border: none; 
+        background: none;
+        color: #666;
+        padding: 5px;
+    }
+    .close-btn:hover {
+        color: #000;
+    }

@@ -18,13 +18,6 @@
             <form action="{{ route('publicaciones.store') }}" method="POST" enctype="multipart/form-data">
                 @csrf
                 <div class="mb-3">
-                <div class="mb-3">
-                    <label for="imagen_notif" class="form-label">Archivo / Imagen (opcional)</label>
-                    <input type="file" name="imagen" id="imagen_notif" class="form-control" accept="image/*,application/pdf">
-                    @error('imagen')
-                        <small class="text-danger">{{ $message }}</small>
-                    @enderror
-                </div>
                     <label for="nombre" class="form-label">Título</label>
                     <input type="text" name="nombre" id="nombre" class="form-control" required>
                     @error('nombre')

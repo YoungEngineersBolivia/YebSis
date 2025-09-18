@@ -10,21 +10,27 @@ use App\Models\Tutores;
 
 class EstudianteController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        // Cargar las relaciones necesarias de los estudiantes
-        $estudiantes = Estudiante::with(['persona', 'programa', 'sucursal', 'profesor', 'profesor.persona'])->get();
-        
-        // Obtener todos los programas, sucursales y tutores disponibles
-        $programas = Programa::all();
-        $sucursales = Sucursal::all();
-        $tutores = Tutores::with('persona')->get();  // Obtener todos los tutores con la relación persona
+        // Obtener el término de búsqueda desde el request
+        $search = $request->input('search');  
 
-        // Retornar la vista con estudiantes, programas, sucursales y tutores
-        return view('administrador.estudiantesAdministrador', compact('estudiantes', 'programas', 'sucursales', 'tutores'));
+        // Realizar la consulta para obtener los estudiantes filtrados
+        $estudiantes = Estudiante::with(['persona', 'programa', 'sucursal', 'profesor', 'profesor.persona'])
+            ->when($search, function($query, $search) {
+                return $query->whereHas('persona', function($q) use ($search) {
+                    // Filtrar solo por Nombre y Apellido
+                    $q->where('Nombre', 'like', "%$search%")
+                    ->orWhere('Apellido', 'like', "%$search%")
+                    ->orWhere('Cod_estudiante', 'like', "%$search%");
+                });
+            })
+            ->orderBy('Id_estudiantes', 'desc')
+            ->paginate(10);  // Paginación de resultados
+
+        // Retornar la vista con estudiantes y otras relaciones necesarias
+        return view('administrador.estudiantesAdministrador', compact('estudiantes'));
     }
-
-
 
 
     public function mostrarFormulario()

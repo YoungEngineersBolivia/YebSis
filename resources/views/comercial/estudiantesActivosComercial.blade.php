@@ -60,14 +60,7 @@
     <div class="card-soft p-3">
         <div class="d-flex justify-content-between align-items-center mb-3">
             <div class="toolbar">
-                <div class="dropdown">
-                    <button class="btn btn-ghost dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        Filtrar
-                    </button>
-                    <ul class="dropdown-menu">
-                        <li><a class="dropdown-item disabled" href="#">Semanas (demo)</a></li>
-                    </ul>
-                </div>
+                
 
                 <!-- Formulario de filtros -->
                 <form class="d-flex gap-2" method="GET" action="{{ route('estudiantesActivos') }}">
@@ -88,10 +81,7 @@
                 </form>
             </div>
 
-            <div class="d-flex align-items-center gap-2">
-                <i class="bi bi-funnel"></i>
-                <span class="text-muted">Filtrar por fecha</span>
-            </div>
+            
         </div>
 
         <!-- Tabla -->
@@ -101,7 +91,7 @@
                     <tr>
                         <th>Nombre</th>
                         <th>Apellido</th>
-                        <th>Fecha de inactivación</th>
+                        <th>Fecha de activación</th>
                         <th class="text-center">Acciones</th>
                     </tr>
                 </thead>

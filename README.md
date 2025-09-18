@@ -9,3 +9,7 @@ php artisan migrate:fresh
 ```bash
 php artisan migrate:fresh --seed
 ```
+
+```bash
+php artisan storage:link
+```

@@ -4,6 +4,7 @@
 
 @section('content')
 <div class="container-fluid px-4">
+    <!-- Gráfico de Talleres -->
     <div class="row">
         <div class="col-12">
             <div class="card shadow-sm">
@@ -12,12 +13,12 @@
                     <div class="dropdown">
                         <button class="btn btn-outline-secondary dropdown-toggle" type="button" 
                                 id="periodoDropdown" data-bs-toggle="dropdown">
-                            {{ $periodo }} months
+                            {{ $periodo }} meses
                         </button>
                         <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="?periodo=3">3 months</a></li>
-                            <li><a class="dropdown-item" href="?periodo=6">6 months</a></li>
-                            <li><a class="dropdown-item" href="?periodo=12">12 months</a></li>
+                            <li><a class="dropdown-item" href="?periodo=3">3 meses</a></li>
+                            <li><a class="dropdown-item" href="?periodo=6">6 meses</a></li>
+                            <li><a class="dropdown-item" href="?periodo=12">12 meses</a></li>
                         </ul>
                     </div>
                 </div>
@@ -29,96 +30,66 @@
                             <canvas id="talleresChart"></canvas>
                         </div>
                     </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
-                    <!-- Filtros -->
-                    <div class="row mb-4">
-                        <div class="col-md-3">
-                            <h6 class="fw-bold mb-3">Filtrar</h6>
-                            <select class="form-select" id="filtroSemana">
-                                <option>Semanas</option>
-                                <option>Última semana</option>
-                                <option>Últimas 2 semanas</option>
-                                <option>Último mes</option>
-                            </select>
-                        </div>
-                        <div class="col-md-9 text-end">
-                            <button class="btn btn-outline-secondary" id="filtroFecha">
-                                <i class="fas fa-filter me-1"></i>
-                                Filtrar por fecha
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Tabla de datos -->
+    <!-- Tablas de Talleres -->
+    <div class="row">
+        <div class="col-6">
+            <!-- Tabla Talleres 2024 -->
+            <div class="card shadow-sm">
+                <div class="card-header bg-white">
+                    <h4 class="mb-0 fw-bold">Talleres 2024</h4>
+                </div>
+                <div class="card-body">
                     <div class="table-responsive">
-                        <table class="table table-hover" id="tablaEstudiantes">
+                        <table class="table table-hover">
                             <thead class="table-light">
                                 <tr>
-                                    <th>
-                                        <div class="d-flex align-items-center">
-                                            <span class="me-2">Programa/Taller</span>
-                                            <i class="fas fa-sort text-muted"></i>
-                                        </div>
-                                    </th>
-                                    <th>
-                                        <div class="d-flex align-items-center">
-                                            <span class="me-2">Teléfono</span>
-                                            <i class="fas fa-sort text-muted"></i>
-                                        </div>
-                                    </th>
-                                    <th>
-                                        <div class="d-flex align-items-center">
-                                            <span class="me-2">Fecha de Registro</span>
-                                            <i class="fas fa-sort text-muted"></i>
-                                        </div>
-                                    </th>
-                                    <th>
-                                        <div class="d-flex align-items-center">
-                                            <span class="me-2">Contactado</span>
-                                            <i class="fas fa-sort text-muted"></i>
-                                        </div>
-                                    </th>
-                                    <th>
-                                        <div class="d-flex align-items-center">
-                                            <span class="me-2">Acciones</span>
-                                            <i class="fas fa-sort text-muted"></i>
-                                        </div>
-                                    </th>
+                                    <th>Taller</th>
+                                    <th>Estudiante</th>
+                                    <th>Fecha Inscripción</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                @foreach($detalleTabla as $estudiante)
+                                @foreach($talleres2024 as $estudiante)
                                 <tr>
-                                    <td>
-                                        <div class="d-flex align-items-center">
-                                            <div class="bg-primary rounded-circle me-2" 
-                                                 style="width: 8px; height: 8px;"></div>
-                                            <span class="fw-medium">{{ $estudiante->taller }}</span>
-                                        </div>
-                                    </td>
-                                    <td class="text-muted">{{ $estudiante->telefono ?? 'Sin teléfono' }}</td>
-                                    <td class="text-muted">
-                                        {{ \Carbon\Carbon::parse($estudiante->fecha_registro)->format('d/m/Y') }}
-                                    </td>
-                                    <td>
-                                        @if($estudiante->contactado == 'Contactado')
-                                            <span class="badge bg-success-subtle text-success rounded-pill">
-                                                <i class="fas fa-circle me-1" style="font-size: 6px;"></i>
-                                                Contactado
-                                            </span>
-                                        @else
-                                            <span class="badge bg-danger-subtle text-danger rounded-pill">
-                                                <i class="fas fa-circle me-1" style="font-size: 6px;"></i>
-                                                No Contactado
-                                            </span>
-                                        @endif
-                                    </td>
-                                    <td>
-                                        <button class="btn btn-sm btn-outline-danger" 
-                                                onclick="eliminar({{ $estudiante->Id_estudiantes }})">
-                                            <i class="fas fa-trash"></i>
-                                        </button>
-                                    </td>
+                                    <td>{{ $estudiante->taller }}</td>
+                                    <td>{{ $estudiante->nombre_estudiante }}</td>
+                                    <td>{{ \Carbon\Carbon::parse($estudiante->Fecha_inscripcion)->format('d/m/Y') }}</td>
+                                </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-6">
+            <!-- Tabla Talleres 2025 -->
+            <div class="card shadow-sm">
+                <div class="card-header bg-white">
+                    <h4 class="mb-0 fw-bold">Talleres 2025</h4>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Taller</th>
+                                    <th>Estudiante</th>
+                                    <th>Fecha Inscripción</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach($talleres2025 as $estudiante)
+                                <tr>
+                                    <td>{{ $estudiante->taller }}</td>
+                                    <td>{{ $estudiante->nombre_estudiante }}</td>
+                                    <td>{{ \Carbon\Carbon::parse($estudiante->Fecha_inscripcion)->format('d/m/Y') }}</td>
                                 </tr>
                                 @endforeach
                             </tbody>
@@ -236,26 +207,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 });
-
-function eliminar(idEstudiante) {
-    if (confirm('¿Está seguro de eliminar este estudiante?')) {
-        // Implementar lógica de eliminación
-        fetch(`/estudiantes/${idEstudiante}`, {
-            method: 'DELETE',
-            headers: {
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-            }
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                location.reload();
-            } else {
-                alert('Error al eliminar el estudiante');
-            }
-        });
-    }
-}
 </script>
 
 <style>

@@ -45,8 +45,9 @@
                                 <li><a class="nav-link" href="/administrador/tutorEstudianteAdministrador">Registrar nuevo estudiante</a></li>
                                 <li><a class="nav-link" href="/administrador/registrarProfesor">Profesor</a></li>
                                 <li><a class="nav-link" href="/administrador/registrarEstudianteAntiguo">Registrar graduado</a></li>
-                            </ul>
-                        </div>
+                                
+                                </ul>
+                         </div>
                     </li>
                     <li>
                         <a href="/administrador/tutoresAdministrador" class="nav-link link-dark d-flex align-items-center gap-2">
@@ -116,7 +117,8 @@
                         </a>
                         <div class="collapse ps-4" id="submenuComercial">
                             <ul class="nav flex-column">
-                                <li><a class="nav-link" href="/comercial/prospectosComercial">Prospectos</a></li>
+                                <li><a class="nav-link" href="{{ route('prospectos.comercial') }}">Prospectos</a></li>
+
                                 <li><a class="nav-link" href="/comercial/estudiantesActivos">Estudiantes activos</a></li>
                                 <li><a class="nav-link" href="/comercial/estudiantesNoActivos">Estudiantes no activos</a></li>
                                 <li><a class="nav-link" href="/comercial/talleresComercial">Talleres</a></li>
