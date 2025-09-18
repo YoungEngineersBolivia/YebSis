@@ -9,9 +9,26 @@ use Illuminate\Support\Str;
 
 class TutoresController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $tutores = Tutores::with(['persona', 'usuario'])->orderBy('Id_tutores', 'desc')->paginate(10);
+        // Obtén el término de búsqueda de la solicitud
+        $search = $request->input('search');
+        
+        // Realiza la consulta para obtener los tutores filtrados
+        $tutores = Tutores::query()
+            ->whereHas('persona', function ($query) use ($search) {
+                // Búsqueda en la tabla 'personas'
+                $query->where('Nombre', 'like', "%$search%")
+                    ->orWhere('Apellido', 'like', "%$search%")
+                    ->orWhere('Celular', 'like', "%$search%")
+                    ->orWhere('Direccion_domicilio', 'like', "%$search%");
+            })
+            ->orWhereHas('usuario', function ($query) use ($search) {
+                // Búsqueda en la tabla 'usuarios'
+                $query->where('Correo', 'like', "%$search%");
+            })
+            ->paginate(10); // Pagina los resultados para no cargar demasiados registros
+
         return view('administrador.tutoresAdministrador', compact('tutores'));
     }
 
@@ -43,7 +60,6 @@ class TutoresController extends Controller
     {
         $tutor = Tutores::with(['persona', 'usuario'])->findOrFail($id);
 
-        // Actualiza los datos relacionados
         $tutor->persona->Nombre = $request->nombre;
         $tutor->persona->Apellido = $request->apellido;
         $tutor->persona->Celular = $request->celular;
