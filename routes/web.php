@@ -199,25 +199,4 @@ Route::post('/administrador/registrarEstudianteAntiguo/obtener-por-tipo', [Inscr
     ->name('inscripcionEstudiante.obtenerPorTipo');
 
 
-//Route::get('administrador/admin', fn () => view('administrador.inscripcionEstudiante'));
 
-/* ------------------- ADMINISTRADOR: Gestión de Talleres ------------------- */
-Route::prefix('administrador/talleres')->middleware(['auth', 'role:admin'])->group(function () {
-    
-    // Ver todos los talleres
-    Route::get('/', [TallerController::class, 'index'])
-         ->name('talleres.index');
-    
-    // Ver inscripciones de un taller específico
-    Route::get('/{id}/inscripciones', [TallerController::class, 'verInscripciones'])
-         ->name('talleres.inscripciones');
-    
-    // Ver pagos de talleres
-    Route::get('/pagos', [TallerController::class, 'verPagos'])
-         ->name('talleres.pagos');
-    
-    // Reportes de talleres
-    Route::get('/reportes', [TallerController::class, 'reportes'])
-         ->name('talleres.reportes');
-    
-});
