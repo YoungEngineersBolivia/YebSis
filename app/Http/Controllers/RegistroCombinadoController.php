@@ -76,7 +76,7 @@ class RegistroCombinadoController extends Controller
             $contraseñaTemporal = Str::random(8);
             $usuarioTutor = Usuario::create([
                 'Correo' => $request->tutor_email,
-                'Contrasania' => bcrypt($contraseñaTemporal),
+                'Contrasenia' => bcrypt($contraseñaTemporal),
                 'Id_personas' => $personaTutor->Id_personas, 
             ]);
 

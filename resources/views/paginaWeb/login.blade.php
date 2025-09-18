@@ -38,6 +38,7 @@
             @endif
             <form method="POST" action="{{ route('login.submit') }}">
                 @csrf
+                
                 <div class="form-group">
                     <label class="form-label" for="Correo">Correo electrónico</label>
                     <input type="email" name="Correo" id="Correo" class="form-input" placeholder="Ejemplo@gmail.com" required autofocus value="{{ old('Correo') }}">

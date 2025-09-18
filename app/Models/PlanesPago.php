@@ -24,4 +24,14 @@ class PlanesPago extends Model
     {
         return $this->hasMany(Cuota::class, 'Id_planes_pagos', 'Id_planes_pagos');
     }
+
+    public function programa()
+    {
+        return $this->belongsTo(Programa::class, 'Id_programas', 'Id_programas');
+    }
+
+    public function estudiante()
+    {
+        return $this->belongsTo(Estudiante::class, 'Id_estudiantes', 'Id_estudiantes');
+    }
 }

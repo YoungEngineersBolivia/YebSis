@@ -100,4 +100,26 @@ class Estudiante extends Model
         });
     }
 
+    public function talleresInscritos()
+    {
+        return $this->hasMany(EstudianteTaller::class, 'Id_estudiantes', 'Id_estudiantes');
+    }
+
+    // Método para verificar si está inscrito en un taller específico
+    public function estaInscritoEnTaller($idTaller)
+    {
+        return $this->talleresInscritos()
+                    ->where('Id_programas', $idTaller)
+                    ->where('Estado_inscripcion', 'inscrito')
+                    ->exists();
+    }
+
+    // Obtener talleres activos del estudiante
+    public function talleresActivos()
+    {
+        return $this->talleresInscritos()
+                    ->where('Estado_inscripcion', 'inscrito')
+                    ->with('taller');
+    }
+
 }

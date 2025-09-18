@@ -11,15 +11,16 @@ use App\Http\Controllers\TutoresController;
 use App\Http\Controllers\UsuariosController;
 use App\Http\Controllers\GraduadoController;
 use App\Http\Controllers\SucursalController;
-use App\Http\Controllers\EgresosController;   // <- asegurarse que este controlador existe
+use App\Http\Controllers\EgresosController;   
 use App\Http\Controllers\HorariosController;
 use App\Http\Controllers\RegistroCombinadoController;
 use App\Http\Controllers\PagosController;
 use App\Http\Controllers\PubNot;
 use App\Http\Controllers\EstudiantesInactivosController;
 use App\Http\Controllers\EstudiantesActivosController;
-use App\Http\Controllers\Auth\CustomLoginController; // <-- añadido
-
+use App\Http\Controllers\ReporteTalleresController;
+use App\Http\Controllers\Auth\CustomLoginController; 
+use App\Http\Controllers\InscripcionEstudianteController;
 
 /* -------------------Home pagina <web-------------------------*/
 
@@ -135,6 +136,23 @@ Route::put('/estudiantes/desactivar/{id}', [EstudiantesActivosController::class,
 
 /*------------------------------------LOGIN--------------------------------*/
 
+Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
+Route::post('/login', [AuthController::class, 'login'])->name('login.submit');
+Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+
+
+/*-----------------------------TALLERES-------------------------------*/
+
+Route::get('/comercial/talleresComercial', [ReporteTalleresController::class, 'index'])
+         ->name('reportes.talleres');
+    
+    // Ruta para exportar datos (opcional)
+    Route::get('/reportes/talleres/exportar', [ReporteTalleresController::class, 'exportar'])
+         ->name('reportes.talleres.exportar');
+    
+    // Ruta API para obtener datos dinámicos (opcional)
+    Route::get('/api/reportes/talleres/datos', [ReporteTalleresController::class, 'obtenerDatos'])
+         ->name('api.reportes.talleres.datos'); 
 // Mostrar formulario de login (GET)
 Route::get('/login', function () {
     return view('paginaWeb.login');
@@ -159,3 +177,26 @@ Route::get('profesor/homeProfesor', function () {
 Route::get('tutor/homeTutor', function () {
     return view('tutor.homeTutor');
 })->name('home.tutor');
+
+
+Route::get('/', [PaginaWebController::class, 'home'])->name('home');
+/* ------------------- ADMINISTRADOR: Inscripción Estudiante y Gestión Talleres ------------------- */
+Route::get('/administrador/registrarEstudianteAntiguo', [InscripcionEstudianteController::class, 'mostrarFormulario'])
+    ->name('inscripcionEstudiante.mostrar');
+
+// Ruta para procesar la inscripción
+Route::post('/administrador/registrarEstudianteAntiguo/registrar', [InscripcionEstudianteController::class, 'inscribir'])
+    ->name('inscripcionEstudiante.registrar');
+
+// Rutas AJAX
+Route::post('/administrador/registrarEstudianteAntiguo/buscar-codigo', [InscripcionEstudianteController::class, 'buscarPorCodigo'])
+    ->name('inscripcionEstudiante.buscarCodigo');
+
+Route::post('/administrador/registrarEstudianteAntiguo/buscar-nombre', [InscripcionEstudianteController::class, 'buscarPorNombre'])
+    ->name('inscripcionEstudiante.buscarNombre');
+
+Route::post('/administrador/registrarEstudianteAntiguo/obtener-por-tipo', [InscripcionEstudianteController::class, 'obtenerPorTipo'])
+    ->name('inscripcionEstudiante.obtenerPorTipo');
+
+
+
