@@ -24,7 +24,8 @@ class ProgramaController extends Controller
             'rango_edad' => 'required|string|max:100',
             'duracion' => 'required|string|max:100',
             'descripcion' => 'required|string',
-            'imagen' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048'
+            'imagen' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'tipo' => 'required|string|max:255'
         ]);
         
 
@@ -35,6 +36,7 @@ class ProgramaController extends Controller
             $programa->Rango_edad = $request->rango_edad;
             $programa->Duracion = $request->duracion;
             $programa->Descripcion = $request->descripcion;
+            $programa->tipo = $request->tipo;
 
             // Manejar subida de imagen (guardar ruta)
             if ($request->hasFile('imagen')) {
