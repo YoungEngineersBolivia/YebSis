@@ -30,8 +30,6 @@ class Estudiante extends Model
         'Id_tutores',
     ];
 
-    // --- RELACIONES QUE NECESITA LA VISTA ---
-    // Relación con la persona asociada al estudiante
     public function persona()
     {
         return $this->belongsTo(Persona::class, 'Id_personas', 'Id_personas');

@@ -28,10 +28,12 @@
 
     <div class="row mb-3">
         <div class="col-md-6">
-            <div class="input-group">
-                <span class="input-group-text"><i class="fas fa-search"></i></span>
-                <input type="text" class="form-control" placeholder="Buscar por nombre" id="searchInput">
-            </div>
+            <form action="{{ route('usuarios.index') }}" method="GET">
+                <div class="input-group">
+                    <span class="input-group-text"><i class="fas fa-search"></i></span>
+                    <input type="text" class="form-control" name="search" placeholder="Buscar por nombre" value="{{ request()->search }}">
+                </div>
+            </form>
         </div>
     </div>
 
@@ -119,27 +121,6 @@
 
 @section('scripts')
 <script>
-    // Buscar usuarios por nombre
-    document.getElementById('searchInput').addEventListener('keyup', function () {
-        const filtro = this.value.toUpperCase();
-        const filas = document.querySelectorAll('tbody tr');
-
-        filas.forEach(fila => {
-            const nombre = fila.cells[0].textContent.toUpperCase();
-            fila.style.display = nombre.includes(filtro) ? '' : 'none';
-        });
-    });
-
-    function verUsuario(id) {
-        fetch(`/admin/usuarios/${id}`)
-            .then(res => res.json())
-            .then(data => {
-                alert(`Nombre: ${data.Nombre} ${data.Apellido}
-Correo: ${data.Correo}
-Rol: ${data.Rol}`);
-            });
-    }
-
     function editarUsuario(id) {
         fetch(`/admin/usuarios/${id}/edit`)
             .then(res => res.json())
