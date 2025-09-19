@@ -7,7 +7,6 @@
     <link href="{{ asset('css/home.css') }}" rel="stylesheet">
 
     <style>
-    /* --- NUEVO DISEÑO COLORIDO Y AMIGABLE --- */
     body {
         background: linear-gradient(135deg, #f5f6fa 60%, #e0f7fa 100%);
         font-family: 'Arial', sans-serif;
@@ -262,6 +261,47 @@
     .btn-register {
         text-decoration: none;
     }
+    .programs-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 24px;
+        margin-bottom: 32px;
+    }
+    .section-title {
+        font-size: 2.3rem;
+        font-weight: bold;
+        text-align: center;
+        margin-bottom: 32px;
+        letter-spacing: 2px;
+        border-radius: 18px;
+        padding: 16px 0;
+        box-shadow: 0 2px 12px #00b89433;
+        color: #fff;
+        opacity: 0;
+        transform: translateY(40px);
+        transition: opacity 0.7s cubic-bezier(.4,0,.2,1), transform 0.7s cubic-bezier(.4,0,.2,1);
+    }
+    .section-title.visible {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    .section-title.programas {
+        background: #e74c3c;
+        text-shadow: 0 2px 12px #c0392b, 0 1px 0 #fff;
+    }
+    .section-title.talleres {
+        background: #8e44ad;
+        text-shadow: 0 2px 12px #6c3483, 0 1px 0 #fff;
+    }
+    .program-card {
+        opacity: 0;
+        transform: translateY(40px);
+        transition: opacity 0.7s cubic-bezier(.4,0,.2,1), transform 0.7s cubic-bezier(.4,0,.2,1);
+    }
+    .program-card.visible {
+        opacity: 1;
+        transform: translateY(0);
+    }
     </style>
 </head>
 
@@ -372,32 +412,72 @@ function toggleNavbar() {
 
         <!-- Programs Section -->
         <section class="programs">
-            <h2>PROGRAMAS</h2>
+            <h2 class="section-title programas">PROGRAMAS</h2>
             <div class="programs-grid">
+                @php $colors = ['#e74c3c', '#f9ca24', '#0984e3', '#00b894']; $i = 0; @endphp
                 @foreach($programas as $programa)
-                    <div class="program-card">
-                        <div class="program-icon" style="text-align:center; margin-bottom:10px;">
-                            @if($programa->Imagen)
-                                <img src="{{ asset('storage/' . $programa->Imagen) }}" 
-                                    alt="{{ $programa->Nombre }}" 
-                                    style="max-width:150px; height:auto;">
-
-                            @else
-                                🏫
-                            @endif
+                    @if($programa->Tipo === 'programa')
+                        @php $bgColor = $colors[$i % 4]; $i++; @endphp
+                        <div class="program-card" style="background: {{ $bgColor }}20; border-radius: 18px; box-shadow: 0 2px 12px rgba(0,0,0,0.08); border-top: 6px solid {{ $bgColor }};">
+                            <div class="program-icon" style="text-align:center; margin-bottom:10px;">
+                                @if($programa->Imagen)
+                                    <img src="{{ asset('storage/' . $programa->Imagen) }}" 
+                                        alt="{{ $programa->Nombre }}" 
+                                        style="max-width:150px; height:auto;">
+                                @else
+                                    <img src="{{ Vite::asset('resources/img/Logo_sign.png') }}" 
+    alt="Imagen por defecto" 
+    style="max-width:80px; height:auto; margin:12px 0;">
+                                @endif
+                            </div>
+                            <h3 class="program-title" style="color: {{ $bgColor }};">{{ $programa->Nombre }}</h3>
+                            <div class="program-details">
+                                <div class="age-badge">Edad: {{ $programa->Rango_edad }}</div>
+                                <div class="duration-badge">Duración: {{ $programa->Duracion }}</div>
+                                <div class="cost-badge">Costo: Bs{{ $programa->Costo }}</div>
+                            </div>
                         </div>
-                        <h3 class="program-title">{{ $programa->Nombre }}</h3>
-                        <div class="program-details">
-                            <div class="age-badge">Edad: {{ $programa->Rango_edad }}</div>
-                            <div class="duration-badge">Duración: {{ $programa->Duracion }}</div>
-                            <div class="cost-badge">Costo: ${{ $programa->Costo }}</div>
-                        </div>
-                    </div>
+                    @endif
                 @endforeach
             </div>
         </section>
 
   
+            <!-- Talleres Section -->
+            <section class="programs" style="margin-top: 32px;">
+                <h2 class="section-title talleres">TALLERES</h2>
+                <div class="programs-grid">
+                    @php $colors = ['#e74c3c', '#f9ca24', '#0984e3', '#00b894', '#8e44ad', '#fd79a8', '#00bfff']; $j = 0; @endphp
+                    @foreach($programas as $programa)
+                        @if($programa->Tipo === 'taller')
+                            @php $bgColor = $colors[$j % count($colors)]; $j++; @endphp
+                            <div class="program-card" style="background: {{ $bgColor }}20; border-radius: 18px; box-shadow: 0 2px 12px rgba(0,0,0,0.08); border-top: 6px solid {{ $bgColor }};">
+                                <div class="program-icon" style="text-align:center; margin-bottom:10px;">
+                                    @if($programa->Imagen)
+                                        <img src="{{ asset('storage/' . $programa->Imagen) }}" 
+                                            alt="{{ $programa->Nombre }}" 
+                                            style="max-width:150px; height:auto;">
+                                    @else
+                                        <img src="{{ Vite::asset('resources/img/Logo_sign.png') }}" 
+    alt="Imagen por defecto" 
+    style="max-width:80px; height:auto; margin:12px 0;">
+                                    @endif
+                                </div>
+                                <h3 class="program-title" style="color: {{ $bgColor }};">{{ $programa->Nombre }}</h3>
+                                <div class="program-details">
+                                    <div class="age-badge">Edad: {{ $programa->Rango_edad }}</div>
+                                    <div class="duration-badge">Duración: {{ $programa->Duracion }}</div>
+                                    <div class="cost-badge">Costo: Bs{{ $programa->Costo }}</div>
+                                </div>
+                            </div>
+                        @endif
+                    @endforeach
+                </div>
+            </section>
+        </section>
+    </div>
+
+    
 
         <!-- News Section -->
         <section class="news">
@@ -426,14 +506,6 @@ function toggleNavbar() {
                     </div>
                 </div>
             </div>
-
-            <div class="winter-workshop">
-                <h3>INSCRÍBETE AL TALLER DE INVIERNO</h3>
-                <p>¡No te pierdas nuestro taller especial de vacaciones de invierno!</p>
-                <button class="btn-contact" style="margin-top: 20px; background: linear-gradient(45deg, #00b894, #00a085);" onclick="openPublicacionesModal()">Ver Publicaciones</button>
-            </div>
-        </section>
-    </div>
 
     <!-- MODAL PUBLICACIONES -->
     <div class="modal-overlay" id="publicacionesModal" onclick="closePublicacionesModalOnOverlay(event)">
@@ -675,6 +747,18 @@ function toggleNavbar() {
                 debugElement.style.display = 'none';
             }
         }, 10000);
+
+        // Animación de aparición de títulos al hacer scroll
+        function revealTitlesOnScroll() {
+            document.querySelectorAll('.section-title, .program-card').forEach(function(el) {
+                var rect = el.getBoundingClientRect();
+                if (rect.top < window.innerHeight - 60) {
+                    el.classList.add('visible');
+                }
+            });
+        }
+        window.addEventListener('scroll', revealTitlesOnScroll);
+        document.addEventListener('DOMContentLoaded', revealTitlesOnScroll);
     </script>
 </body>
 </html>

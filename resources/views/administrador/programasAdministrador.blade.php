@@ -157,8 +157,8 @@
                             <textarea class="form-control" id="descripcion" name="descripcion" rows="3" required></textarea>
                         </div>
                         <div class="mb-3">
-                            <label for="foto" class="form-label">Foto del Programa</label>
-                            <input type="file" class="form-control" id="foto" name="foto" accept="image/*">
+                            <label for="imagen" class="form-label">Foto del Programa</label>
+                            <input type="file" class="form-control" id="imagen" name="imagen" accept="image/*">
                         </div>
                     </form>
                 </div>
