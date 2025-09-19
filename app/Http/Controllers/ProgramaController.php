@@ -43,7 +43,7 @@ class ProgramaController extends Controller
                 $imagen = $request->file('imagen');
                 $nombreImagen = time() . '_' . Str::random(10) . '.' . $imagen->getClientOriginalExtension();
                 $rutaImagen = $imagen->storeAs('programas', $nombreImagen, 'public');
-                $programa->imagen = $rutaImagen;
+                $programa->Imagen = $rutaImagen;
             }
 
             $programa->save();
@@ -90,13 +90,13 @@ class ProgramaController extends Controller
 
             if ($request->hasFile('imagen')) {
                 // Eliminar imagen anterior si existe
-                if ($programa->imagen && Storage::disk('public')->exists($programa->imagen)) {
-                    Storage::disk('public')->delete($programa->imagen);
+                if ($programa->Imagen && Storage::disk('public')->exists($programa->Imagen)) {
+                    Storage::disk('public')->delete($programa->Imagen);
                 }
                 $imagen = $request->file('imagen');
                 $nombreImagen = time() . '_' . Str::random(10) . '.' . $imagen->getClientOriginalExtension();
                 $rutaImagen = $imagen->storeAs('programas', $nombreImagen, 'public');
-                $programa->imagen = $rutaImagen;
+                $programa->Imagen = $rutaImagen;
             }
 
             $programa->save();
@@ -113,8 +113,8 @@ class ProgramaController extends Controller
         try {
             $programa = Programa::findOrFail($id);
 
-            if ($programa->imagen && Storage::disk('public')->exists($programa->isAutomaticallyEagerLoadingRelationships)) {
-                Storage::disk('public')->delete($programa->imagen);
+            if ($programa->Imagen && Storage::disk('public')->exists($programa->Imagen)) {
+                Storage::disk('public')->delete($programa->Imagen);
             }
 
             $programa->delete();
