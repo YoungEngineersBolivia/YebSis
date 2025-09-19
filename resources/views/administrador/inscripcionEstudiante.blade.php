@@ -151,7 +151,7 @@
             <div class="row mt-3">
                 <div class="col-md-4">
                     <label>Descuento (%) - Estudiante Activo</label>
-                    <input type="number" step="0.01" id="descuento_estudiante" class="form-control" value="15" readonly>
+                    <input type="number" step="0.01" id="descuento_estudiante" class="form-control" value="15" min="0" max="100">
                 </div>
                 <div class="col-md-4">
                     <label>Total con descuento (Bs)</label>
@@ -198,7 +198,7 @@
             <div class="row mt-3">
                 <div class="col-md-4">
                     <label>Descuento Estudiante Activo (%)</label>
-                    <input type="number" step="0.01" id="descuento_taller" class="form-control" value="20">
+                    <input type="number" step="0.01" id="descuento_taller" class="form-control" value="20" min="0" max="100">
                 </div>
                 <div class="col-md-4">
                     <label>Monto con Descuento (Bs) *</label>
@@ -458,6 +458,21 @@ $(document).ready(function() {
         }
     });
 
+    // ===== EVENTOS PARA RECALCULAR DESCUENTOS CUANDO CAMBIEN =====
+    $('#descuento_estudiante').on('input change', function() {
+        const tipo = $('#tipo_seleccion').val();
+        if (tipo === 'programa') {
+            calcularDescuentoPrograma();
+        }
+    });
+
+    $('#descuento_taller').on('input change', function() {
+        const tipo = $('#tipo_seleccion').val();
+        if (tipo === 'taller') {
+            calcularDescuentoTaller();
+        }
+    });
+
     // ===== CALCULAR CUOTAS CUANDO CAMBIE EL NÚMERO O LA FECHA =====
     $('#nro_cuotas, #fecha_plan_pagos').on('input change', function() {
         generarCuotas();
@@ -467,6 +482,17 @@ $(document).ready(function() {
     function calcularDescuentoPrograma() {
         const montoTotal = parseFloat($('#Monto_total').val()) || 0;
         const descuento = parseFloat($('#descuento_estudiante').val()) || 0;
+        
+        // Validar que el descuento esté en rango válido
+        if (descuento < 0) {
+            $('#descuento_estudiante').val(0);
+            return;
+        }
+        if (descuento > 100) {
+            $('#descuento_estudiante').val(100);
+            return;
+        }
+        
         const totalConDescuento = montoTotal - (montoTotal * descuento / 100);
         
         $('#Total_con_descuento').val(totalConDescuento.toFixed(2));
@@ -477,13 +503,26 @@ $(document).ready(function() {
     function calcularDescuentoTaller() {
         const montoTaller = parseFloat($('#monto_taller').val()) || 0;
         const descuento = parseFloat($('#descuento_taller').val()) || 0;
+        
+        // Validar que el descuento esté en rango válido
+        if (descuento < 0) {
+            $('#descuento_taller').val(0);
+            return;
+        }
+        if (descuento > 100) {
+            $('#descuento_taller').val(100);
+            return;
+        }
+        
         const montoConDescuento = montoTaller - (montoTaller * descuento / 100);
         
         $('#monto_taller_descuento').val(montoConDescuento.toFixed(2));
         
         // Actualizar descripción automáticamente
         const nombrePrograma = $('#programa_taller option:selected').text();
-        $('#descripcion_taller').val(`Pago ${nombrePrograma.split(' - ')[0]}`);
+        if (nombrePrograma && nombrePrograma !== 'Seleccione...') {
+            $('#descripcion_taller').val(`Pago ${nombrePrograma.split(' - ')[0]}`);
+        }
     }
 
     // ===== GENERAR CUOTAS AUTOMÁTICAMENTE =====
@@ -603,6 +642,7 @@ $(document).ready(function() {
         
         return true;
     });
+    
     // ===== EVENTO ENTER EN CAMPOS DE BÚSQUEDA =====
     $('#codigo_estudiante_buscar').keypress(function(e) {
         if (e.which === 13) { // Enter

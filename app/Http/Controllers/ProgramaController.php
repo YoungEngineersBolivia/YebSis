@@ -24,7 +24,8 @@ class ProgramaController extends Controller
             'rango_edad' => 'required|string|max:100',
             'duracion' => 'required|string|max:100',
             'descripcion' => 'required|string',
-            'imagen' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048'
+            'imagen' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'tipo' => 'required|string|max:255'
         ]);
         
 
@@ -35,13 +36,14 @@ class ProgramaController extends Controller
             $programa->Rango_edad = $request->rango_edad;
             $programa->Duracion = $request->duracion;
             $programa->Descripcion = $request->descripcion;
+            $programa->tipo = $request->tipo;
 
             // Manejar subida de imagen (guardar ruta)
             if ($request->hasFile('imagen')) {
                 $imagen = $request->file('imagen');
                 $nombreImagen = time() . '_' . Str::random(10) . '.' . $imagen->getClientOriginalExtension();
                 $rutaImagen = $imagen->storeAs('programas', $nombreImagen, 'public');
-                $programa->imagen = $rutaImagen;
+                $programa->Imagen = $rutaImagen;
             }
 
             $programa->save();
@@ -88,13 +90,13 @@ class ProgramaController extends Controller
 
             if ($request->hasFile('imagen')) {
                 // Eliminar imagen anterior si existe
-                if ($programa->imagen && Storage::disk('public')->exists($programa->imagen)) {
-                    Storage::disk('public')->delete($programa->imagen);
+                if ($programa->Imagen && Storage::disk('public')->exists($programa->Imagen)) {
+                    Storage::disk('public')->delete($programa->Imagen);
                 }
                 $imagen = $request->file('imagen');
                 $nombreImagen = time() . '_' . Str::random(10) . '.' . $imagen->getClientOriginalExtension();
                 $rutaImagen = $imagen->storeAs('programas', $nombreImagen, 'public');
-                $programa->imagen = $rutaImagen;
+                $programa->Imagen = $rutaImagen;
             }
 
             $programa->save();
@@ -111,8 +113,8 @@ class ProgramaController extends Controller
         try {
             $programa = Programa::findOrFail($id);
 
-            if ($programa->imagen && Storage::disk('public')->exists($programa->isAutomaticallyEagerLoadingRelationships)) {
-                Storage::disk('public')->delete($programa->imagen);
+            if ($programa->Imagen && Storage::disk('public')->exists($programa->Imagen)) {
+                Storage::disk('public')->delete($programa->Imagen);
             }
 
             $programa->delete();
