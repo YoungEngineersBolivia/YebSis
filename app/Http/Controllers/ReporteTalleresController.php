@@ -35,26 +35,24 @@ class ReporteTalleresController extends Controller
         return DB::table('estudiantes_talleres')
             ->join('estudiantes', 'estudiantes_talleres.Id_estudiantes', '=', 'estudiantes.Id_estudiantes')
             ->join('programas', 'estudiantes_talleres.Id_programas', '=', 'programas.Id_programas')
-            ->join('personas', 'estudiantes.Id_personas', '=', 'personas.Id_personas') // JOIN con la tabla personas
+            ->join('personas', 'estudiantes.Id_personas', '=', 'personas.Id_personas')
             ->whereBetween('estudiantes_talleres.Fecha_inscripcion', [$fechaInicio, $fechaFin])
             ->select(
                 'programas.Nombre as taller',
-                'personas.Nombre as nombre_estudiante', // Aquí accedes al nombre desde la tabla personas
+                'personas.Nombre as nombre_estudiante',
                 'estudiantes_talleres.Fecha_inscripcion'
             )
             ->orderBy('estudiantes_talleres.Fecha_inscripcion')
             ->get();
     }
 
-
-
-    private function prepararDatosGrafica($datosActuales, $datosAnteriores, $periodo)
+    private function prepararDatosGrafica($talleres2024, $talleres2025, $periodo)
     {
-        // Obtener todos los programas únicos
-        $programas = collect($datosActuales)->merge($datosAnteriores)
-            ->pluck('programa')->unique()->sort()->values();
+        // Obtener todos los talleres únicos de ambos años
+        $programas = collect($talleres2024)->merge($talleres2025)
+            ->pluck('taller')->unique()->sort()->values();
 
-        // Preparar meses
+        // Preparar meses basados en el período seleccionado
         $meses = [];
         $fechaActual = Carbon::now();
         
@@ -68,7 +66,21 @@ class ReporteTalleresController extends Controller
             ];
         }
 
-        // Organizar datos por mes y programa
+        // Procesar datos de 2024 por mes y taller
+        $datosAgrupados2024 = collect($talleres2024)->groupBy(function($item) {
+            return Carbon::parse($item->Fecha_inscripcion)->format('n'); // mes como número
+        })->map(function($grupo) {
+            return $grupo->groupBy('taller')->map->count();
+        });
+
+        // Procesar datos de 2025 por mes y taller
+        $datosAgrupados2025 = collect($talleres2025)->groupBy(function($item) {
+            return Carbon::parse($item->Fecha_inscripcion)->format('n'); // mes como número
+        })->map(function($grupo) {
+            return $grupo->groupBy('taller')->map->count();
+        });
+
+        // Organizar datos por mes y programa para la gráfica
         $datosOrganizados = [];
         
         foreach ($meses as $mes) {
@@ -77,34 +89,31 @@ class ReporteTalleresController extends Controller
                 'anterior' => []
             ];
 
-            // Datos actuales
             foreach ($programas as $programa) {
-                $cantidad = $datosActuales->where('programa', $programa)
-                    ->where('mes', $mes['numero'])
-                    ->where('año', $mes['año_actual'])
-                    ->sum('total_estudiantes');
-                
+                // Datos actuales (2025 si estamos en 2025, sino 2024)
+                if ($mes['año_actual'] == 2025) {
+                    $cantidad = $datosAgrupados2025->get($mes['numero'], collect())->get($programa, 0);
+                } else {
+                    $cantidad = $datosAgrupados2024->get($mes['numero'], collect())->get($programa, 0);
+                }
                 $datosOrganizados[$mes['nombre']]['actual'][$programa] = $cantidad;
-            }
 
-            // Datos anteriores
-            foreach ($programas as $programa) {
-                $cantidad = $datosAnteriores->where('programa', $programa)
-                    ->where('mes', $mes['numero'])
-                    ->where('año', $mes['año_anterior'])
-                    ->sum('total_estudiantes');
-                
+                // Datos anteriores (año anterior)
+                if ($mes['año_anterior'] == 2024) {
+                    $cantidad = $datosAgrupados2024->get($mes['numero'], collect())->get($programa, 0);
+                } else {
+                    $cantidad = 0; // Si no hay datos del año anterior
+                }
                 $datosOrganizados[$mes['nombre']]['anterior'][$programa] = $cantidad;
             }
         }
 
         return [
             'meses' => $meses,
-            'programas' => $programas,
+            'programas' => $programas->toArray(),
             'datos' => $datosOrganizados
         ];
     }
-
 
     private function obtenerDetalleTabla($fechaInicio, $fechaFin)
     {
@@ -118,14 +127,14 @@ class ReporteTalleresController extends Controller
                 'programas.Nombre as taller',
                 'persona_tutor.Celular as telefono',
                 'estudiantes.created_at as fecha_registro',
-                'persona_tutor.Celular as contactado', // Puedes ajustar esta lógica
+                'persona_tutor.Celular as contactado',
                 'estudiantes.Id_estudiantes'
             )
             ->orderBy('programas.Nombre')
             ->orderBy('estudiantes.created_at', 'desc')
             ->get()
             ->map(function ($item) {
-                $item->contactado = rand(0, 1) ? 'Contactado' : 'No Contactado'; // Ejemplo
+                $item->contactado = rand(0, 1) ? 'Contactado' : 'No Contactado';
                 return $item;
             });
     }
