@@ -21,25 +21,22 @@ class InscripcionEstudianteController extends Controller
     {
         try {
             $programas = Programa::where('Tipo', 'LIKE', '%programa%')
-                               ->whereIn('Estado', ['activo', 'Activo', '1', 'true'])
+                                ->select('Id_programas', 'Nombre', 'Costo', 'Tipo')
+                                ->get();
+
+            $talleres = Programa::where('Tipo', 'LIKE', '%taller%')
                                ->select('Id_programas', 'Nombre', 'Costo', 'Tipo')
                                ->get();
-            
-            $talleres = Programa::where('Tipo', 'LIKE', '%taller%')
-                              ->whereIn('Estado', ['activo', 'Activo', '1', 'true'])
-                              ->select('Id_programas', 'Nombre', 'Costo', 'Tipo')
-                              ->get();
-            
+
             if ($programas->isEmpty() && $talleres->isEmpty()) {
                 Log::info('No se encontraron programas por tipo, obteniendo todos los activos');
-                $todosLosProgramas = Programa::whereIn('Estado', ['activo', 'Activo', '1', 'true'])
-                                   ->select('Id_programas', 'Nombre', 'Costo', 'Tipo')
-                                   ->get();
-                
+                $todosLosProgramas = Programa::select('Id_programas', 'Nombre', 'Costo', 'Tipo')
+                                            ->get();
+
                 $programas = $todosLosProgramas;
                 $talleres = collect(); 
             }
-            
+
             $sucursales = Sucursal::select('Id_Sucursales', 'Nombre')->get();
             $profesores = Profesor::with(['persona' => function($query) {
                 $query->select('Id_personas', 'Nombre', 'Apellido');
@@ -81,8 +78,7 @@ class InscripcionEstudianteController extends Controller
                         'Id_estudiantes' => $estudiante->Id_estudiantes,
                         'codigo' => $estudiante->Cod_estudiante,
                         'nombre_completo' => ($estudiante->persona->Nombre ?? '') . ' ' . ($estudiante->persona->Apellido ?? ''),
-                        'programa_actual' => $estudiante->programa->Nombre ?? 'Sin programa',
-                        'estado' => $estudiante->Estado ?? 'Sin estado'
+                        'programa_actual' => $estudiante->programa->Nombre ?? 'Sin programa'
                     ]
                 ]);
             }
@@ -127,8 +123,7 @@ class InscripcionEstudianteController extends Controller
                         'Id_estudiantes' => $estudiante->Id_estudiantes,
                         'codigo' => $estudiante->Cod_estudiante,
                         'nombre_completo' => ($estudiante->persona->Nombre ?? '') . ' ' . ($estudiante->persona->Apellido ?? ''),
-                        'programa_actual' => $estudiante->programa->Nombre ?? 'Sin programa',
-                        'estado' => $estudiante->Estado ?? 'Sin estado'
+                        'programa_actual' => $estudiante->programa->Nombre ?? 'Sin programa'
                     ];
                 });
 
@@ -165,7 +160,6 @@ class InscripcionEstudianteController extends Controller
                               ->orWhere('Tipo', 'LIKE', '%PROGRAMA%')
                               ->orWhereNull('Tipo'); 
                     })
-                    ->whereIn('Estado', ['activo', 'Activo', '1', 'true', 'habilitado', 'disponible'])
                     ->select('Id_programas', 'Nombre', 'Costo', 'Tipo')
                     ->get();
                 
@@ -175,7 +169,6 @@ class InscripcionEstudianteController extends Controller
                               ->orWhere('Tipo', 'LIKE', '%Taller%')
                               ->orWhere('Tipo', 'LIKE', '%TALLER%');
                     })
-                    ->whereIn('Estado', ['activo', 'Activo', '1', 'true', 'habilitado', 'disponible'])
                     ->select('Id_programas', 'Nombre', 'Costo', 'Tipo')
                     ->get();
             } else {
@@ -188,11 +181,10 @@ class InscripcionEstudianteController extends Controller
             if ($items->isEmpty()) {
                 Log::warning("No se encontraron items para tipo: $tipo. Buscando todos los programas activos...");
                 
-                $items = Programa::whereIn('Estado', ['activo', 'Activo', '1', 'true', 'habilitado', 'disponible'])
-                       ->select('Id_programas', 'Nombre', 'Costo', 'Tipo')
+                $items = Programa::select('Id_programas', 'Nombre', 'Costo', 'Tipo')
                        ->get();
                        
-                Log::info("Programas activos encontrados: " . $items->count());
+                Log::info("Programas encontrados: " . $items->count());
             }
 
             Log::info("Items encontrados para $tipo:", $items->toArray());
@@ -260,7 +252,7 @@ class InscripcionEstudianteController extends Controller
         ]);
 
         // Verificar si ya tiene un programa activo
-        if (in_array($estudiante->Estado, ['Activo', 'activo']) && $estudiante->Id_programas) {
+        if ($estudiante->Id_programas) {
             $programaActual = Programa::find($estudiante->Id_programas);
             if ($programaActual && stripos($programaActual->Tipo, 'programa') !== false) {
                 return back()->withErrors(['error' => 'El estudiante ya tiene un programa regular activo.']);
@@ -272,7 +264,6 @@ class InscripcionEstudianteController extends Controller
             'Id_programas' => $programa->Id_programas,
             'Id_sucursales' => $request->sucursal,
             'Id_profesores' => $request->profesor ?: null,
-            'Estado' => 'Activo',
             'Fecha_estado' => now()->format('Y-m-d')
         ]);
 
@@ -348,28 +339,24 @@ class InscripcionEstudianteController extends Controller
     {
         try {
             $programas = Programa::all();
-            $estados = Programa::distinct()->pluck('Estado');
             $tipos = Programa::distinct()->pluck('Tipo');
             
             Log::info('=== DEBUG PROGRAMAS COMPLETO ===');
             Log::info('Total programas en BD: ' . $programas->count());
-            Log::info('Estados encontrados: ' . $estados->toJson());
             Log::info('Tipos encontrados: ' . $tipos->toJson());
             
             foreach ($programas as $programa) {
-                Log::info("ID: {$programa->Id_programas}, Nombre: {$programa->Nombre}, Tipo: '{$programa->Tipo}', Estado: '{$programa->Estado}'");
+                Log::info("ID: {$programa->Id_programas}, Nombre: {$programa->Nombre}, Tipo: '{$programa->Tipo}'");
             }
             
             return response()->json([
                 'total' => $programas->count(),
-                'estados' => $estados,
                 'tipos' => $tipos,
                 'programas' => $programas->map(function($p) {
                     return [
                         'id' => $p->Id_programas,
                         'nombre' => $p->Nombre,
                         'tipo' => $p->Tipo,
-                        'estado' => $p->Estado,
                         'costo' => $p->Costo
                     ];
                 })

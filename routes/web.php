@@ -24,7 +24,7 @@ use App\Http\Controllers\InscripcionEstudianteController;
 use App\Http\Controllers\PaginaWebController;
 use App\Http\Controllers\ProspectoController;
 use App\Http\Controllers\ClasePruebaController;
-
+use App\Http\Controllers\TutorHomeController;
 
 /* -------------------Home pagina <web-------------------------*/
 
@@ -216,3 +216,13 @@ Route::put('/prospectos/{id}/estado', [ProspectoController::class, 'updateEstado
 
 // Ruta para guardar clase de prueba
 Route::post('/claseprueba/store', [ClasePruebaController::class, 'store'])->name('claseprueba.store');
+
+//RUTA PORTAL TUTOR
+Route::get('/tutor/home', [App\Http\Controllers\TutorHomeController::class, 'index'])->name('tutor.home');
+Route::get('/tutor/estudiante/{id}', [App\Http\Controllers\TutorHomeController::class, 'getEstudianteDetails']);
+Route::get('/tutor/evaluaciones/{id}', [App\Http\Controllers\TutorHomeController::class, 'getEvaluaciones']);
+Route::post('/tutor/agendar-cita', [App\Http\Controllers\TutorHomeController::class, 'agendarCita']);
+
+Route::middleware(['auth'])->group(function () {
+    Route::get('/tutor/home', [TutorHomeController::class, 'index'])->name('tutor.home');
+});
