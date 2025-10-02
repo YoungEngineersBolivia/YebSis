@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aplicación Educativa</title>
+    <title>Aplicación Educativaaaaaaaaaaaaaaaaaaa</title>
     <style>
         * {
             margin: 0;
