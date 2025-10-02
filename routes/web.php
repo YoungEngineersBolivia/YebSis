@@ -28,13 +28,13 @@ use App\Http\Controllers\TutorHomeController;
 
 /* -------------------Home pagina <web-------------------------*/
 
-Route::get('/', function () {
-    return view('/paginaWeb/home'); // Retorna la vista welcome.blade.php
-});
+//Route::get('/', function () {
+//    return view('/paginaWeb/home'); // Retorna la vista welcome.blade.php
+//});
 
 
 /* ----------------- HOME / BASE Administrador  ----------------- */
-//Route::get('/', fn () => view('/administrador/baseAdministrador'));
+Route::get('/', fn () => view('/administrador/baseAdministrador'));
 
 /* ----------------- DASHBOARD ----------------- */
 Route::get('/administrador/dashboard', [DashboardController::class, 'index'])
