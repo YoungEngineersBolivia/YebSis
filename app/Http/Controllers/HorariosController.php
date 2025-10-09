@@ -12,10 +12,10 @@ class HorariosController extends Controller
 {
     public function index()
     {
-        $horarios    = \App\Models\Horario::with(['estudiante.persona', 'profesor.persona', 'programa'])->paginate(10);
-        $estudiantes = \App\Models\Estudiante::with('persona')->orderBy('Id_estudiantes')->get();
-        $profesores  = \App\Models\Profesor::with('persona')->orderBy('Id_profesores')->get();
-        $programas   = \App\Models\Programa::orderBy('Id_programas')->get(); // <-- nuevo
+        $horarios    = Horario::with(['estudiante.persona', 'profesor.persona', 'programa'])->paginate(10);
+        $estudiantes = Estudiante::with('persona')->orderBy('Id_estudiantes')->get();
+        $profesores  = Profesor::with('persona')->orderBy('Id_profesores')->get();
+        $programas   = Programa::orderBy('Id_programas')->get(); // <-- nuevo
 
         return view('administrador.horariosAdministrador', compact('horarios','estudiantes','profesores','programas'));
     }
@@ -93,11 +93,11 @@ class HorariosController extends Controller
     ]);
 
     $horario = $request->filled('horario_id')
-        ? \App\Models\Horario::findOrFail($request->horario_id)
-        : \App\Models\Horario::where('Id_estudiantes', $request->Id_estudiantes)->first();
+        ? Horario::findOrFail($request->horario_id)
+        : Horario::where('Id_estudiantes', $request->Id_estudiantes)->first();
 
     if (!$horario) {
-        $horario = new \App\Models\Horario();
+        $horario = new Horario();
         $horario->Id_estudiantes = $request->Id_estudiantes;
     }
 

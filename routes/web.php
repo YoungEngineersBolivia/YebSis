@@ -24,17 +24,21 @@ use App\Http\Controllers\InscripcionEstudianteController;
 use App\Http\Controllers\PaginaWebController;
 use App\Http\Controllers\ProspectoController;
 use App\Http\Controllers\ClasePruebaController;
+use Illuminate\Support\Facades\Auth;
 
+
+use App\Http\Controllers\TutorHomeController;
+use App\Http\Controllers\ComponentesController;
 
 /* -------------------Home pagina <web-------------------------*/
 
-Route::get('/', function () {
-    return view('/paginaWeb/home'); // Retorna la vista welcome.blade.php
-});
+//Route::get('/', function () {
+//    return view('/paginaWeb/home'); // Retorna la vista welcome.blade.php
+//});
 
 
 /* ----------------- HOME / BASE Administrador  ----------------- */
-//Route::get('/', fn () => view('/administrador/baseAdministrador'));
+Route::get('/', fn () => view('/administrador/baseAdministrador'));
 
 /* ----------------- DASHBOARD ----------------- */
 Route::get('/administrador/dashboard', [DashboardController::class, 'index'])
@@ -179,8 +183,10 @@ Route::get('/comercial/estudianteActivoComercial', function () {
 })->name('comercial.estudianteActivoComercial');
 
 /*-------------------RUTAS PARA PROFESOR Y TUTOR-------------------*/
+
 Route::get('profesor/homeProfesor', function () {
-    return view('profesor.homeProfesor');
+    $usuario = Auth::user();
+    return view('profesor.homeProfesor', compact('usuario'));
 })->name('home.profesor');
 
 Route::get('tutor/homeTutor', function () {
@@ -216,3 +222,32 @@ Route::put('/prospectos/{id}/estado', [ProspectoController::class, 'updateEstado
 
 // Ruta para guardar clase de prueba
 Route::post('/claseprueba/store', [ClasePruebaController::class, 'store'])->name('claseprueba.store');
+
+//RUTA PORTAL TUTOR
+Route::get('/tutor/home', [App\Http\Controllers\TutorHomeController::class, 'index'])->name('tutor.home');
+Route::get('/tutor/estudiante/{id}', [App\Http\Controllers\TutorHomeController::class, 'getEstudianteDetails']);
+Route::get('/tutor/evaluaciones/{id}', [App\Http\Controllers\TutorHomeController::class, 'getEvaluaciones']);
+Route::post('/tutor/agendar-cita', [App\Http\Controllers\TutorHomeController::class, 'agendarCita']);
+
+Route::middleware(['auth'])->group(function () {
+    Route::get('/tutor/home', [TutorHomeController::class, 'index'])->name('tutor.home');
+});
+
+// COMPONENTES
+// Rutas para Componentes/Motores
+Route::get('/componentes', [ComponentesController::class, 'index'])->name('componentes.index');
+    
+    // Crear nuevo componente
+    Route::post('/componentes/nuevo', [ComponentesController::class, 'store'])->name('componentes.store');
+    
+    // Registrar entrada de componente
+    Route::post('/componentes/entrada', [ComponentesController::class, 'registrarEntrada'])->name('componentes.registrarEntrada');
+    
+    // Registrar salida de componente
+    Route::post('/componentes/salida', [ComponentesController::class, 'registrarSalida'])->name('componentes.registrarSalida');
+    
+    // Eliminar componente
+    Route::delete('/componentes/{id}', [ComponentesController::class, 'destroy'])->name('componentes.destroy');
+    
+    // Ver historial de componente
+    Route::get('/componentes/{id}/historial', [ComponentesController::class, 'historial'])->name('componentes.historial');

@@ -267,6 +267,16 @@
         gap: 24px;
         margin-bottom: 32px;
     }
+    @media (max-width: 900px) {
+        .programs-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+    @media (max-width: 600px) {
+        .programs-grid {
+            grid-template-columns: 1fr;
+        }
+    }
     .section-title {
         font-size: 2.3rem;
         font-weight: bold;

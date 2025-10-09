@@ -1,5 +1,39 @@
 {
   "version": 2,
+<<<<<<< HEAD
+  "builds": [
+    {
+      "src": "api/index.php",
+      "use": "vercel-php@0.7.1"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/(css|js|images)/(.*)",
+      "dest": "public/$1/$2"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/api/index.php"
+    }
+  ],
+  "env": {
+    "APP_ENV": "production",
+    "APP_DEBUG": "false",
+    "LOG_CHANNEL": "stderr",
+    "VIEW_COMPILED_PATH": "/tmp/storage/framework/views",
+    "CACHE_DRIVER": "array",
+    "SESSION_DRIVER": "cookie",
+    "QUEUE_CONNECTION": "sync"
+  },
+  "functions": {
+    "api/index.php": {
+      "memory": 1024,
+      "maxDuration": 10
+    }
+  }
+}
+=======
   "functions": {
     "api/index.php": { "runtime": "vercel-php@0.7.1" }
   },
@@ -10,3 +44,4 @@
   "outputDirectory": "public",
   "buildCommand": "npm ci && npm run build"
 }
+>>>>>>> a2f4380b0d029aabe9ab0c93e499e29cd209b22c

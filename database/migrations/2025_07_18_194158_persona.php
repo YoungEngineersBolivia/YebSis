@@ -248,10 +248,10 @@ return new class extends Migration
                   ->constrained('estudiantes', 'Id_estudiantes')
                   ->onDelete('cascade');
             $table->foreignId('Id_preguntas')
-                  ->constrained('Preguntas', 'Id_preguntas')
+                  ->constrained('preguntas', 'Id_preguntas')
                   ->onDelete('cascade');
             $table->foreignId('Id_respuestas')
-                  ->constrained('Respuestas', 'Id_respuestas')
+                  ->constrained('respuestas', 'Id_respuestas')
                   ->onDelete('cascade');
             $table->foreignId('Id_modelos')->constrained('modelos', 'Id_modelos')->onDelete('cascade');
             $table->foreignId('Id_profesores')
