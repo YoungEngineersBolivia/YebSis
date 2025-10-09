@@ -1,0 +1,203 @@
+@extends('administrador.baseAdministrador')
+
+@section('title', 'Profesores')
+
+@section('styles')
+    @vite('resources/css/dashboard.css')
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <style>
+        .table thead th {
+            white-space: nowrap;
+        }
+        .badge-status {
+            font-size: .85rem;
+        }
+        .search-hint {
+            font-size: .9rem; color:#666;
+        }
+
+        /* Estilo del botón de desactivar/activar */
+        .btn-toggle-status {
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+        .btn-toggle-status.active {
+            background-color: #28a745;
+            color: white;
+        }
+        .btn-toggle-status.inactive {
+            background-color: #dc3545;
+            color: white;
+        }
+
+        .pagination {
+            justify-content: center;
+        }
+    </style>
+@endsection
+
+@section('content')
+<div class="container-fluid mt-4">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="mb-0">Lista de Profesores</h1>
+        <a href="{{ route('registroCombinado.registrar') }}" class="btn btn-primary">
+            <i class="fas fa-plus me-2"></i>Registrar Profesor
+        </a>
+    </div>
+
+    {{-- Mensajes de sesión --}}
+    @if(session('success'))
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            {{ session('success') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+        </div>
+    @endif
+
+    @if(session('error'))
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            {{ session('error') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+        </div>
+    @endif
+
+    {{-- Errores de validación --}}
+    @if($errors->any())
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <ul class="mb-0">
+                @foreach($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+        </div>
+    @endif
+
+    {{-- Buscador --}}
+    <div class="row mb-3">
+        <div class="col-md-6">
+            <form action="{{ route('estudiantes.index') }}" method="GET">
+                <label for="searchInput" class="form-label mb-1">Buscar</label>
+                <div class="input-group">
+                    <span class="input-group-text"><i class="fas fa-search"></i></span>
+                    <input type="text" class="form-control" placeholder="Filtrar por nombre o apellido" name="search" value="{{ request()->search }}">
+                </div>
+            </form>
+        </div>
+    </div>
+
+    @if ($estudiantes->isEmpty())
+        <div class="card">
+            <div class="card-body text-center py-5">
+                <p class="mb-2">No hay profesores registrados.</p>
+                <a href="{{ route('registroCombinado.registrar') }}" class="btn btn-outline-primary">
+                    <i class="fas fa-user-plus me-2"></i>Registrar el primero
+                </a>
+            </div>
+        </div>
+    @else
+        <div class="table-responsive">
+            <table class="table table-hover align-middle" id="studentsTable">
+                <thead class="table-light">
+                    <tr>
+                        <th style="min-width:120px;">Código</th>
+                        <th style="min-width:220px;">Nombre</th>
+                        <th style="min-width:180px;">Programa</th>
+                        <th style="min-width:220px;">Profesor</th>
+                        <th style="min-width:160px;">Sucursal</th>
+                        <th style="min-width:120px;">Estado</th>
+                        <th style="min-width:160px;">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach ($estudiantes as $estudiante)
+                        @php
+                            $personaEst = $estudiante->persona ?? null;
+                            $nombreCompletoEst = $personaEst ? trim(($personaEst->Nombre ?? '').' '.($personaEst->Apellido ?? '')) : null;
+
+                            $programa = $estudiante->programa->Nombre ?? 'Sin programa';
+                            $sucursal = $estudiante->sucursal->Nombre ?? 'Sin sucursal';
+
+                            $prof = $estudiante->profesor ?? null;
+                            $profPersona = $prof?->persona ?? null;
+                            $profesorNombre = $profPersona
+                                ? trim(($profPersona->Nombre ?? '').' '.($profPersona->Apellido ?? ''))
+                                : ($prof->Nombre ?? null);
+                            $profesorNombre = $profesorNombre ?: 'Sin profesor';
+                        @endphp
+                        <tr>
+                            <td class="fw-semibold">{{ $estudiante->Cod_estudiante }}</td>
+                            <td>{{ $nombreCompletoEst ?: 'Sin datos' }}</td>
+                            <td>{{ $programa }}</td>
+                            <td>{{ $profesorNombre }}</td>
+                            <td>{{ $sucursal }}</td>
+                            <td>
+                                @if(Str::lower($estudiante->Estado) === 'activo')
+                                    <span class="badge text-bg-success badge-status">Activo</span>
+                                @elseif(Str::lower($estudiante->Estado) === 'inactivo')
+                                    <span class="badge text-bg-secondary badge-status">Inactivo</span>
+                                @else
+                                    <span class="badge text-bg-light text-dark badge-status">{{ $estudiante->Estado }}</span>
+                                @endif
+                            </td>
+                            <td>
+                                <div class="d-flex gap-2">
+                                    <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#editarModal{{ $estudiante->Id_estudiantes }}">
+                                        <i class="bi bi-pencil-square"></i>
+                                    </button>
+
+                                    <form action="{{ route('estudiantes.eliminar', $estudiante->Id_estudiantes ?? 0) }}" method="POST" onsubmit="return confirm('¿Eliminar este estudiante?');">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="btn btn-sm btn-outline-danger" title="Eliminar">
+                                            <i class="bi bi-trash3-fill"></i>
+                                        </button>
+                                    </form>
+
+                                    <a href="{{ route('estudiantes.ver', $estudiante->Id_estudiantes ?? 0) }}" class="btn btn-sm btn-outline-secondary" title="Ver perfil">
+                                        <i class="bi bi-person-fill"></i>
+                                    </a>
+
+                                    <form action="{{ route('estudiantes.cambiarEstado', $estudiante->Id_estudiantes) }}" method="POST" onsubmit="return confirm('¿Cambiar el estado del estudiante?');">
+                                        @csrf
+                                        @method('PUT')
+                                        <button type="submit" class="btn btn-sm btn-toggle-status {{ $estudiante->Estado === 'Activo' ? 'inactive' : 'active' }}">
+                                            <i class="bi {{ $estudiante->Estado === 'Activo' ? 'bi-toggle-off' : 'bi-toggle-on' }}"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
+    @endif
+
+    <!-- Paginación -->
+    <div class="d-flex justify-content-center mt-4">
+        {{ $estudiantes->links('pagination::bootstrap-5') }}
+    </div>
+</div>
+@endsection
+
+@section('scripts')
+<script>
+    // Filtro de tabla en vivo
+    (function () {
+        const input = document.querySelector('input[name="search"]');
+        const table = document.getElementById('studentsTable');
+        if (!input || !table) return;
+
+        input.addEventListener('input', function () {
+            const q = this.value.trim().toLowerCase();
+            const rows = table.querySelectorAll('tbody tr');
+
+            rows.forEach(row => {
+                const text = row.innerText.toLowerCase();
+                row.style.display = text.includes(q) ? '' : 'none';
+            });
+        });
+    })();
+</script>
+@endsection

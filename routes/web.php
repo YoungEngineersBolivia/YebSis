@@ -25,6 +25,7 @@ use App\Http\Controllers\PaginaWebController;
 use App\Http\Controllers\ProspectoController;
 use App\Http\Controllers\ClasePruebaController;
 use App\Http\Controllers\TutorHomeController;
+use App\Http\Controllers\ComponentesController;
 
 /* -------------------Home pagina <web-------------------------*/
 
@@ -226,3 +227,22 @@ Route::post('/tutor/agendar-cita', [App\Http\Controllers\TutorHomeController::cl
 Route::middleware(['auth'])->group(function () {
     Route::get('/tutor/home', [TutorHomeController::class, 'index'])->name('tutor.home');
 });
+
+// COMPONENTES
+// Rutas para Componentes/Motores
+Route::get('/componentes', [ComponentesController::class, 'index'])->name('componentes.index');
+    
+    // Crear nuevo componente
+    Route::post('/componentes/nuevo', [ComponentesController::class, 'store'])->name('componentes.store');
+    
+    // Registrar entrada de componente
+    Route::post('/componentes/entrada', [ComponentesController::class, 'registrarEntrada'])->name('componentes.registrarEntrada');
+    
+    // Registrar salida de componente
+    Route::post('/componentes/salida', [ComponentesController::class, 'registrarSalida'])->name('componentes.registrarSalida');
+    
+    // Eliminar componente
+    Route::delete('/componentes/{id}', [ComponentesController::class, 'destroy'])->name('componentes.destroy');
+    
+    // Ver historial de componente
+    Route::get('/componentes/{id}/historial', [ComponentesController::class, 'historial'])->name('componentes.historial');
