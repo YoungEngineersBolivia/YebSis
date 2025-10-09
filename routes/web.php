@@ -24,6 +24,8 @@ use App\Http\Controllers\InscripcionEstudianteController;
 use App\Http\Controllers\PaginaWebController;
 use App\Http\Controllers\ProspectoController;
 use App\Http\Controllers\ClasePruebaController;
+use Illuminate\Support\Facades\Auth;
+
 
 
 /* -------------------Home pagina <web-------------------------*/
@@ -179,8 +181,10 @@ Route::get('/comercial/estudianteActivoComercial', function () {
 })->name('comercial.estudianteActivoComercial');
 
 /*-------------------RUTAS PARA PROFESOR Y TUTOR-------------------*/
+
 Route::get('profesor/homeProfesor', function () {
-    return view('profesor.homeProfesor');
+    $usuario = Auth::user();
+    return view('profesor.homeProfesor', compact('usuario'));
 })->name('home.profesor');
 
 Route::get('tutor/homeTutor', function () {

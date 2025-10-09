@@ -28,7 +28,7 @@ class Usuario extends Authenticatable
     // Relación con persona
     public function persona()
     {
-        return $this->belongsTo(\App\Models\Persona::class, 'Id_personas', 'Id_personas');
+        return $this->belongsTo(Persona::class, 'Id_personas', 'Id_personas');
     }
 
     public function tutor()

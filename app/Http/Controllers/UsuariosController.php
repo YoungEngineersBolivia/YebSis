@@ -5,6 +5,7 @@ use App\Models\Usuario;
 use App\Models\Persona;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 
 class UsuariosController extends Controller
 {
@@ -104,4 +105,5 @@ class UsuariosController extends Controller
             return response()->json(['success' => false, 'message' => $e->getMessage()]);
         }
     }
+   
 }

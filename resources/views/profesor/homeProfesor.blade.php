@@ -186,7 +186,7 @@
         <header class="header">
             <div class="logo">
                 <div class="logo-icon">e</div>
-                <span class="username">Nombre de Usuario</span>
+                <span class="username">{{ $Usuario->Correo }}</span>
             </div>
             <div class="menu-icon" onclick="toggleMenu()">
                 <div class="menu-line"></div>
