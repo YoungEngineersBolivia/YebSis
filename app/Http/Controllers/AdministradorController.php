@@ -217,7 +217,7 @@ class AdministradorController extends Controller
 
         $usuario = Usuario::create([
             'Correo' => $request->correo,
-            'Contrasania' => bcrypt($clave),
+            'Contrasenia' => bcrypt($clave),
             'Id_personas' => $persona->Id_personas,
         ]);
 

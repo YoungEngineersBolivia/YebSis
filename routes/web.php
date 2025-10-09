@@ -27,6 +27,8 @@ use App\Http\Controllers\ClasePruebaController;
 use Illuminate\Support\Facades\Auth;
 
 
+use App\Http\Controllers\TutorHomeController;
+use App\Http\Controllers\ComponentesController;
 
 /* -------------------Home pagina <web-------------------------*/
 
@@ -220,3 +222,32 @@ Route::put('/prospectos/{id}/estado', [ProspectoController::class, 'updateEstado
 
 // Ruta para guardar clase de prueba
 Route::post('/claseprueba/store', [ClasePruebaController::class, 'store'])->name('claseprueba.store');
+
+//RUTA PORTAL TUTOR
+Route::get('/tutor/home', [App\Http\Controllers\TutorHomeController::class, 'index'])->name('tutor.home');
+Route::get('/tutor/estudiante/{id}', [App\Http\Controllers\TutorHomeController::class, 'getEstudianteDetails']);
+Route::get('/tutor/evaluaciones/{id}', [App\Http\Controllers\TutorHomeController::class, 'getEvaluaciones']);
+Route::post('/tutor/agendar-cita', [App\Http\Controllers\TutorHomeController::class, 'agendarCita']);
+
+Route::middleware(['auth'])->group(function () {
+    Route::get('/tutor/home', [TutorHomeController::class, 'index'])->name('tutor.home');
+});
+
+// COMPONENTES
+// Rutas para Componentes/Motores
+Route::get('/componentes', [ComponentesController::class, 'index'])->name('componentes.index');
+    
+    // Crear nuevo componente
+    Route::post('/componentes/nuevo', [ComponentesController::class, 'store'])->name('componentes.store');
+    
+    // Registrar entrada de componente
+    Route::post('/componentes/entrada', [ComponentesController::class, 'registrarEntrada'])->name('componentes.registrarEntrada');
+    
+    // Registrar salida de componente
+    Route::post('/componentes/salida', [ComponentesController::class, 'registrarSalida'])->name('componentes.registrarSalida');
+    
+    // Eliminar componente
+    Route::delete('/componentes/{id}', [ComponentesController::class, 'destroy'])->name('componentes.destroy');
+    
+    // Ver historial de componente
+    Route::get('/componentes/{id}/historial', [ComponentesController::class, 'historial'])->name('componentes.historial');

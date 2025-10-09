@@ -1,5 +1,6 @@
 {
   "version": 2,
+<<<<<<< HEAD
   "builds": [
     {
       "src": "api/index.php",
@@ -32,3 +33,15 @@
     }
   }
 }
+=======
+  "functions": {
+    "api/index.php": { "runtime": "vercel-php@0.7.1" }
+  },
+  "routes": [
+    { "src": "/build/(.*)", "dest": "/build/$1" },
+    { "src": "/(.*)", "dest": "/api/index.php" }
+  ],
+  "outputDirectory": "public",
+  "buildCommand": "npm ci && npm run build"
+}
+>>>>>>> a2f4380b0d029aabe9ab0c93e499e29cd209b22c
