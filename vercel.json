@@ -3,7 +3,11 @@
   "builds": [
     {
       "src": "api/index.php",
-      "use": "vercel-php@0.7.1"
+      "use": "vercel-php@0.7.1",
+      "config": {
+        "maxLambdaSize": "50mb",
+        "runtime": "php-8.2"
+      }
     }
   ],
   "routes": [
@@ -28,11 +32,5 @@
     "APP_SERVICES_CACHE": "/tmp/bootstrap/cache/services.php",
     "APP_PACKAGES_CACHE": "/tmp/bootstrap/cache/packages.php",
     "APP_ROUTES_CACHE": "/tmp/bootstrap/cache/routes-v7.php"
-  },
-  "functions": {
-    "api/index.php": {
-      "memory": 1024,
-      "maxDuration": 10
-    }
   }
 }
