@@ -27,6 +27,7 @@ use App\Http\Controllers\ClasePruebaController;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\TutorHomeController;
 use App\Http\Controllers\ComponentesController;
+use App\Http\Controllers\ProfesorController;
 use App\Http\Controllers\ProfesoresController;
 /* -------------------Home pagina <web-------------------------*/
 
