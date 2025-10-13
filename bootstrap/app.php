@@ -4,23 +4,28 @@ use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 
-// --- Crear directorio temporal para cache ---
+// -----------------------------------------
+// Directorios temporales para Vercel
+// -----------------------------------------
 $tmpCachePath = '/tmp/bootstrap/cache';
-if (!is_dir($tmpCachePath)) {
-    mkdir($tmpCachePath, 0777, true);
-}
+$tmpStoragePath = '/tmp/storage';
 
-// Redirigir storage y cache de Laravel a /tmp
+if (!is_dir($tmpCachePath)) mkdir($tmpCachePath, 0777, true);
+if (!is_dir($tmpStoragePath)) mkdir($tmpStoragePath, 0777, true);
+
+// -----------------------------------------
+// Variables de entorno para Laravel
+// -----------------------------------------
 putenv("VIEW_COMPILED_PATH=/tmp/storage/framework/views");
 putenv("APP_CONFIG_CACHE={$tmpCachePath}/config.php");
-putenv("APP_SERVICES_CACHE={$tmpCachePath}/services.php");
 putenv("APP_PACKAGES_CACHE={$tmpCachePath}/packages.php");
 putenv("APP_ROUTES_CACHE={$tmpCachePath}/routes-v7.php");
-$appStoragePath = '/tmp/storage';
+putenv("STORAGE_PATH={$tmpStoragePath}"); // opcional
 
-// --- Crear la aplicación ---
-return Application::configure(basePath: dirname(__DIR__))
-    ->useStoragePath($appStoragePath)
+// -----------------------------------------
+// Crear la aplicación
+// -----------------------------------------
+$app = Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
         web: __DIR__.'/../routes/web.php',
         commands: __DIR__.'/../routes/console.php',
@@ -33,3 +38,19 @@ return Application::configure(basePath: dirname(__DIR__))
         //
     })
     ->create();
+
+// -----------------------------------------
+// Sobrescribir PackageManifest para /tmp
+// -----------------------------------------
+$app->singleton(
+    Illuminate\Foundation\PackageManifest::class,
+    function ($app) use ($tmpCachePath) {
+        return new Illuminate\Foundation\PackageManifest(
+            $app->basePath(),
+            $app->configPath(),
+            $tmpCachePath . '/packages.php'
+        );
+    }
+);
+
+return $app;
