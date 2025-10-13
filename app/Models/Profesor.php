@@ -23,6 +23,7 @@ class Profesor extends Model
         'Profesion',
         'Id_personas',
         'Id_usuarios',
+        'Rol_componentes',
     ];
 
     // Cargar persona por defecto (opcional, útil para la vista)
