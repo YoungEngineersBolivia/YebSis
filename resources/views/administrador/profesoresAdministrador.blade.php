@@ -248,15 +248,6 @@
                                             <input type="text" name="direccion" class="form-control" value="{{ $persona->Direccion_domicilio ?? '' }}">
                                         </div>
                                         <div class="col-12 col-sm-6">
-                                            <label class="form-label">Fecha de nacimiento</label>
-                                            <input type="date" name="fecha_nacimiento" class="form-control" value="{{ $persona->Fecha_nacimiento ?? '' }}">
-                                        </div>
-                                        <div class="col-12 col-sm-6">
-                                            <label class="form-label">Rol (Id_roles)</label>
-                                            <input type="number" name="id_roles" class="form-control" value="{{ $persona->Id_roles ?? '' }}" required>
-                                        </div>
-
-                                        <div class="col-12 col-sm-6">
                                             <label class="form-label">Correo</label>
                                             <input type="email" name="correo" class="form-control" value="{{ $usuario->Correo ?? '' }}" required>
                                         </div>
@@ -269,9 +260,20 @@
                                             <label class="form-label">Profesión</label>
                                             <input type="text" name="profesion" class="form-control" value="{{ $profesor->Profesion ?? '' }}">
                                         </div>
+                                        @php
+                                            $rolActual = $profesor->Rol_componentes ?? 'Ninguno';
+                                            $rolOptions = ['Tecnico', 'Inventario', 'Ninguno'];
+                                        @endphp
+
                                         <div class="col-12 col-sm-6">
                                             <label class="form-label">Rol componentes</label>
-                                            <input type="text" name="rol_componentes" class="form-control" value="{{ $profesor->Rol_componentes ?? '' }}">
+                                            <select name="rol_componentes" class="form-select">
+                                                @foreach($rolOptions as $opt)
+                                                    <option value="{{ $opt }}" {{ $rolActual === $opt ? 'selected' : '' }}>
+                                                        {{ $opt }}
+                                                    </option>
+                                                @endforeach
+                                            </select>
                                         </div>
                                     </div>
                                 </div>
@@ -300,7 +302,6 @@
 
 @section('scripts')
 <script>
-    // Filtro de tabla en vivo (cliente)
     (function () {
         const input = document.querySelector('input[name="search"]');
         const table = document.getElementById('teachersTable');
