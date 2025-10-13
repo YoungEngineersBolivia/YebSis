@@ -26,6 +26,7 @@ use App\Http\Controllers\ProspectoController;
 use App\Http\Controllers\ClasePruebaController;
 use App\Http\Controllers\TutorHomeController;
 use App\Http\Controllers\ComponentesController;
+use App\Http\Controllers\ProfesoresController;
 
 /* -------------------Home pagina <web-------------------------*/
 
@@ -246,3 +247,22 @@ Route::get('/componentes', [ComponentesController::class, 'index'])->name('compo
     
     // Ver historial de componente
     Route::get('/componentes/{id}/historial', [ComponentesController::class, 'historial'])->name('componentes.historial');
+
+
+// Listar profesores
+Route::get('/profesores', [ProfesoresController::class, 'index'])->name('profesores.index');
+
+// Ver detalle de un profesor
+Route::get('/profesores/{id}', [ProfesoresController::class, 'show'])->name('profesores.show');
+
+// Formulario de edición (si lo usas por separado de modal)
+Route::get('/profesores/{id}/edit', [ProfesoresController::class, 'edit'])->name('profesores.edit');
+
+// Crear nuevo profesor
+Route::post('/profesores', [ProfesoresController::class, 'store'])->name('profesores.store');
+
+// Actualizar profesor existente
+Route::put('/profesores/{id}', [ProfesoresController::class, 'update'])->name('profesores.update');
+
+// Eliminar profesor
+Route::delete('/profesores/{id}', [ProfesoresController::class, 'destroy'])->name('profesores.destroy');
