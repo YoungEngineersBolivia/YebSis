@@ -45,4 +45,8 @@ class User extends Authenticatable
             $this->attributes['contrasenia'] = Hash::make($value);
         }
     }
+    public function profesor()
+{
+    return $this->hasOne(Profesor::class, 'Id_usuarios', 'Id_usuarios');
+}
 }
