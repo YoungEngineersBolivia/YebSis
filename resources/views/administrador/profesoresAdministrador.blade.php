@@ -248,6 +248,14 @@
                                             <input type="text" name="direccion" class="form-control" value="{{ $persona->Direccion_domicilio ?? '' }}">
                                         </div>
                                         <div class="col-12 col-sm-6">
+                                            <label class="form-label">Fecha de nacimiento</label>
+                                            <input type="date" name="fecha_nacimiento" class="form-control" value="{{ $persona->Fecha_nacimiento ?? '' }}">
+                                        </div>
+                                        <div class="col-12 col-sm-6">
+                                            <label class="form-label">Rol (Id_roles)</label>
+                                            <input type="number" name="id_roles" class="form-control" value="{{ $persona->Id_roles ?? '' }}" required>
+                                        </div>
+                                        <div class="col-12 col-sm-6">
                                             <label class="form-label">Correo</label>
                                             <input type="email" name="correo" class="form-control" value="{{ $usuario->Correo ?? '' }}" required>
                                         </div>
