@@ -1,0 +1,149 @@
+* {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+            background-color: #f5f5f7;
+            color: #333;
+            min-height: 100vh;
+        }
+
+        /* ======= CONTENEDOR PRINCIPAL ======= */
+        .container {
+            width: 100%;
+            max-width: 1400px;
+            margin: 0 auto;
+            background-color: white;
+            min-height: 100vh;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* ======= CABECERA ======= */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 25px;
+            background-color: #fff;
+            border-bottom: 1px solid #e5e5e7;
+            flex-wrap: nowrap;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo-icon {
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(45deg, #4285f4, #ea4335, #fbbc05, #34a853);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 16px;
+        }
+
+        .username {
+            font-size: 18px;
+            font-weight: 500;
+            color: #1d1d1f;
+            word-break: break-word;
+        }
+
+        /* ======= ICONO DE MENÚ ======= */
+        .menu-icon {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            gap: 5px;
+            cursor: pointer;
+        }
+
+        .menu-line {
+            width: 25px;
+            height: 3px;
+            background-color: #333;
+            border-radius: 2px;
+        }
+
+        /* ======= CONTENIDO PRINCIPAL ======= */
+        main {
+            flex: 1;
+            padding: 20px;
+        }
+
+        /* ======= MEDIA QUERIES ======= */
+        @media (max-width: 1024px) {
+            .header {
+                padding: 15px 20px;
+            }
+            .username {
+                font-size: 17px;
+            }
+            main {
+                padding: 15px;
+            }
+        }
+
+        @media (max-width: 767px) {
+            .container {
+                box-shadow: none;
+                border-radius: 0;
+            }
+
+            .header {
+                flex-direction: row; /* mantener todo en la misma línea */
+                justify-content: space-between;
+                align-items: center;
+                gap: 10px;
+            }
+
+            .logo-icon {
+                width: 30px;
+                height: 30px;
+                font-size: 14px;
+            }
+
+            .username {
+                font-size: 16px;
+            }
+
+            .menu-icon {
+                align-self: auto;
+            }
+
+            main {
+                padding: 10px;
+            }
+        }
+
+        @media (min-width: 1440px) {
+            .container {
+                max-width: 1600px;
+                padding: 0 40px;
+            }
+
+            .username {
+                font-size: 20px;
+            }
+
+            .logo-icon {
+                width: 40px;
+                height: 40px;
+                font-size: 18px;
+            }
+
+            main {
+                padding: 30px;
+            }
+        }

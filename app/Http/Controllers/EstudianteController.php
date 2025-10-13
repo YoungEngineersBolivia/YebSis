@@ -7,6 +7,8 @@ use App\Models\Estudiante;
 use App\Models\Programa;
 use App\Models\Sucursal;
 use App\Models\Tutores;
+use App\Models\Rol;
+use App\Models\Persona;
 
 class EstudianteController extends Controller
 {

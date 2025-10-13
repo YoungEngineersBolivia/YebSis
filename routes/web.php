@@ -24,10 +24,10 @@ use App\Http\Controllers\InscripcionEstudianteController;
 use App\Http\Controllers\PaginaWebController;
 use App\Http\Controllers\ProspectoController;
 use App\Http\Controllers\ClasePruebaController;
+use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\TutorHomeController;
 use App\Http\Controllers\ComponentesController;
 use App\Http\Controllers\ProfesoresController;
-
 /* -------------------Home pagina <web-------------------------*/
 
 //Route::get('/', function () {
@@ -147,9 +147,9 @@ Route::put('/estudiantes/desactivar/{id}', [EstudiantesActivosController::class,
 
 /*------------------------------------LOGIN--------------------------------*/
 
-Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
-Route::post('/login', [AuthController::class, 'login'])->name('login.submit');
-Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+Route::get('/login', [Auth::class, 'showLogin'])->name('login');
+Route::post('/login', [Auth::class, 'login'])->name('login.submit');
+Route::post('/logout', [Auth::class, 'logout'])->name('logout');
 
 
 /*-----------------------------TALLERES-------------------------------*/
@@ -181,9 +181,56 @@ Route::get('/comercial/estudianteActivoComercial', function () {
 })->name('comercial.estudianteActivoComercial');
 
 /*-------------------RUTAS PARA PROFESOR Y TUTOR-------------------*/
+
 Route::get('profesor/homeProfesor', function () {
-    return view('profesor.homeProfesor');
+    $usuario = Auth::user();
+    return view('profesor.homeProfesor', compact('usuario'));
 })->name('home.profesor');
+Route::get('/profesor/menuAlumnosProfesor', [ProfesorController::class, 'menuAlumnosProfesor'])->name('profesor.alumnos');
+Route::get('/profesor/evaluarAlumno', [ProfesorController::class, 'evaluarAlumno'])->name('profesor.evaluarAlumno');
+
+
+
+Route::prefix('profesor')->name('profesor.')->middleware('auth')->group(function () {
+    
+    // Página principal con los 3 botones (menuAlumnosProfesor)
+    Route::get('/menu-alumnos', [ProfesorController::class, 'menuAlumnosProfesor'])
+        ->name('menu-alumnos');
+    
+    // Lista de estudiantes según tipo (listadoAlumnos)
+    Route::get('/listado-alumnos/{tipo}', [ProfesorController::class, 'listadoAlumnos'])
+        ->name('listado-alumnos')
+        ->where('tipo', 'evaluar|asignados|recuperatoria');
+    
+    // Detalle de un estudiante específico
+    Route::get('/estudiante/{id}', [ProfesorController::class, 'detalleEstudiante'])
+        ->name('detalle-estudiante');
+    
+    // Editar estudiante
+    Route::get('/estudiante/{id}/editar', [ProfesorController::class, 'editarEstudiante'])
+        ->name('editar-estudiante');
+    
+    // Evaluar estudiante (mostrar formulario)
+    Route::get('/estudiante/{id}/evaluar', [ProfesorController::class, 'evaluarEstudiante'])
+        ->name('evaluar-estudiante');
+    
+    // Guardar evaluación
+    Route::post('/evaluacion/guardar', [ProfesorController::class, 'guardarEvaluacion'])
+        ->name('guardar-evaluacion');
+    // Actualizar evaluación
+    Route::put('/evaluacion/{id}/actualizar', [ProfesorController::class, 'actualizarEvaluacion'])
+        ->name('actualizar-evaluacion');
+
+    
+});
+
+
+
+
+
+
+
+
 
 Route::get('tutor/homeTutor', function () {
     return view('tutor.homeTutor');
