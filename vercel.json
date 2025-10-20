@@ -3,34 +3,11 @@
   "builds": [
     {
       "src": "api/index.php",
-      "use": "vercel-php@0.7.1",
-      "config": {
-        "maxLambdaSize": "50mb",
-        "runtime": "php-8.2"
-      }
+      "use": "vercel-php@0.7.1"
     }
   ],
   "routes": [
-    {
-      "src": "/(css|js|images)/(.*)",
-      "dest": "public/$1/$2"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/api/index.php"
-    }
-  ],
-  "env": {
-    "APP_ENV": "production",
-    "APP_DEBUG": "false",
-    "LOG_CHANNEL": "stderr",
-    "VIEW_COMPILED_PATH": "/tmp/storage/framework/views",
-    "CACHE_DRIVER": "array",
-    "SESSION_DRIVER": "cookie",
-    "QUEUE_CONNECTION": "sync",
-    "APP_CONFIG_CACHE": "/tmp/bootstrap/cache/config.php",
-    "APP_SERVICES_CACHE": "/tmp/bootstrap/cache/services.php",
-    "APP_PACKAGES_CACHE": "/tmp/bootstrap/cache/packages.php",
-    "APP_ROUTES_CACHE": "/tmp/bootstrap/cache/routes-v7.php"
-  }
+    { "src": "/(css|js|images)/(.*)", "dest": "public/$1/$2" },
+    { "src": "/(.*)", "dest": "/api/index.php" }
+  ]
 }
