@@ -22,14 +22,11 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 # Establece el directorio de trabajo
 WORKDIR /var/www/html
 
-# Copia composer files primero
-COPY composer.json composer.lock ./
-
-# Instala dependencias (bcmath ya está disponible aquí)
-RUN composer install --optimize-autoloader --no-dev --no-interaction --prefer-dist
-
-# Copia el resto de archivos
+# Copia todos los archivos del proyecto
 COPY . .
+
+# Instala dependencias
+RUN composer install --optimize-autoloader --no-dev --no-interaction --prefer-dist
 
 # Genera key de Laravel
 RUN php artisan key:generate --force || true
