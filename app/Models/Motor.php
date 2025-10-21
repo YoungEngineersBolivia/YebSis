@@ -1,4 +1,5 @@
 <?php
+// App\Models\Motor.php
 
 namespace App\Models;
 
@@ -19,28 +20,23 @@ class Motor extends Model
         'Id_sucursales',
     ];
 
-    // Relación con Sucursal
     public function sucursal()
     {
         return $this->belongsTo(Sucursal::class, 'Id_sucursales', 'Id_Sucursales');
     }
 
-    // Relación con todos los movimientos
     public function movimientos()
     {
-        return $this->hasMany(MotorMovimiento::class, 'Id_motores', 'Id_motores')
-            ->orderBy('Fecha', 'desc');
+        return $this->hasMany(MotorMovimiento::class, 'Id_motores', 'Id_motores');
     }
 
-    // Relación con el último movimiento
     public function ultimoMovimiento()
     {
         return $this->hasOne(MotorMovimiento::class, 'Id_motores', 'Id_motores')
-            ->latestOfMany('Fecha');
+                    ->latest('Fecha');
     }
 
-    // Relación con motores asignados
-    public function motoresAsignados()
+    public function asignaciones()
     {
         return $this->hasMany(MotorAsignado::class, 'Id_motores', 'Id_motores');
     }

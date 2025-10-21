@@ -27,6 +27,7 @@ use App\Http\Controllers\ClasePruebaController;
 use App\Http\Controllers\TutorHomeController;
 use App\Http\Controllers\ComponentesController;
 use App\Http\Controllers\ProfesoresController;
+use App\Http\Controllers\MotoresAsignadosController;
 
 /* -------------------Home pagina <web-------------------------*/
 
@@ -243,10 +244,12 @@ Route::get('/componentes', [ComponentesController::class, 'index'])->name('compo
     Route::post('/componentes/salida', [ComponentesController::class, 'registrarSalida'])->name('componentes.registrarSalida');
     
     // Eliminar componente
-    Route::delete('/componentes/{id}', [ComponentesController::class, 'destroy'])->name('componentes.destroy');
+    Route::delete('/componentes/{motor}', [ComponentesController::class, 'destroy'])->name('componentes.destroy');
     
     // Ver historial de componente
     Route::get('/componentes/{id}/historial', [ComponentesController::class, 'historial'])->name('componentes.historial');
+
+    Route::put('/componentes/{id}', [ComponentesController::class, 'update'])->name('componentes.update');
 
 
 // Listar profesores
@@ -266,3 +269,14 @@ Route::put('/profesores/{id}', [ProfesoresController::class, 'update'])->name('p
 
 // Eliminar profesor
 Route::delete('/profesores/{id}', [ProfesoresController::class, 'destroy'])->name('profesores.destroy');
+
+//MOTORES
+
+// Rutas para gestión de motores asignados
+Route::prefix('motores')->group(function () {
+    Route::get('/asignaciones', [MotoresAsignadosController::class, 'index'])->name('motores.asignaciones.index');
+    Route::get('/asignar', [MotoresAsignadosController::class, 'create'])->name('motores.asignar.create');
+    Route::post('/asignar', [MotoresAsignadosController::class, 'store'])->name('motores.asignar.store');
+    Route::post('/entrada/{id}', [MotoresAsignadosController::class, 'registrarEntrada'])->name('motores.registrar.entrada');
+    Route::post('/reporte/{id}', [MotoresAsignadosController::class, 'storeReporte'])->name('motores.reporte.store');
+});
