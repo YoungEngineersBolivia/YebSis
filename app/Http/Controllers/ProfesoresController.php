@@ -108,9 +108,7 @@ class ProfesoresController extends Controller
             'apellido' => 'required|string|max:255',
             'genero' => 'nullable|string|max:50',
             'direccion' => 'nullable|string|max:255',
-            'fecha_nacimiento' => 'nullable|date',
             'celular' => 'nullable|string|max:50',
-            'id_roles' => 'required|integer|exists:roles,Id_roles',
             'correo' => [
                 'required', 'email', 'max:255',
                 Rule::unique('usuarios', 'Correo')->ignore($profesor->usuario->Id_usuarios, 'Id_usuarios'),
@@ -126,9 +124,7 @@ class ProfesoresController extends Controller
                 'Apellido' => $validated['apellido'],
                 'Genero' => $validated['genero'] ?? null,
                 'Direccion_domicilio' => $validated['direccion'] ?? null,
-                'Fecha_nacimiento' => $validated['fecha_nacimiento'] ?? null,
                 'Celular' => $validated['celular'] ?? null,
-                'Id_roles' => $validated['id_roles'],
             ]);
 
             $profesor->usuario->update([

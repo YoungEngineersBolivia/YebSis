@@ -1,4 +1,5 @@
 <?php
+// App\Models\MotorMovimiento.php
 
 namespace App\Models;
 
@@ -23,23 +24,16 @@ class MotorMovimiento extends Model
         'Id_usuarios',
     ];
 
-    protected $casts = [
-        'Fecha' => 'date',
-    ];
-
-    // Relación con Motor
     public function motor()
     {
         return $this->belongsTo(Motor::class, 'Id_motores', 'Id_motores');
     }
 
-    // Relación con Sucursal
     public function sucursal()
     {
         return $this->belongsTo(Sucursal::class, 'Id_sucursales', 'Id_Sucursales');
     }
 
-    // Relación con Usuario
     public function usuario()
     {
         return $this->belongsTo(Usuario::class, 'Id_usuarios', 'Id_usuarios');
