@@ -24,7 +24,7 @@ RUN php artisan config:cache || true
 RUN php artisan route:cache || true
 RUN php artisan view:cache || true
 RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
-
+RUN mkdir -p /tmp/bootstrap/cache /tmp/storage/framework/views && chmod -R 777 /tmp
 EXPOSE 8080
 
 CMD php artisan serve --host=0.0.0.0 --port=8080
