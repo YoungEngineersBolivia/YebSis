@@ -5,6 +5,7 @@
 # 1. Usamos PHP 8.2 con FPM
 FROM php:8.2-fpm
 
+
 # 2. Instala dependencias del sistema y extensiones PHP necesarias
 RUN apt-get update && apt-get install -y \
     git \
@@ -12,7 +13,9 @@ RUN apt-get update && apt-get install -y \
     libzip-dev \
     libonig-dev \
     libxml2-dev \
-    && docker-php-ext-install pdo_mysql zip bcmath
+    && docker-php-ext-install pdo_mysql zip bcmath \
+    && docker-php-ext-enable bcmath
+
 
 # 3. Instala Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
