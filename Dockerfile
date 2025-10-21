@@ -2,42 +2,54 @@
 # Dockerfile para Laravel 12
 # ===========================
 
-# 1. Usamos PHP 8.2 con FPM
 FROM php:8.2-fpm
 
-
-# 2. Instala dependencias del sistema y extensiones PHP necesarias
+# Instala dependencias del sistema y extensiones PHP
 RUN apt-get update && apt-get install -y \
     git \
     unzip \
     libzip-dev \
     libonig-dev \
     libxml2-dev \
-    && docker-php-ext-install pdo_mysql zip bcmath \
-    && docker-php-ext-enable bcmath
+    curl \
+    && docker-php-ext-install pdo_mysql zip bcmath opcache \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
 
-
-# 3. Instala Composer
+# Instala Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-# 4. Establece el directorio de trabajo
+# Establece el directorio de trabajo
 WORKDIR /var/www/html
 
-# 5. Copia archivos del proyecto
+# Copia composer files primero (mejor cache)
+COPY composer.json composer.lock ./
+
+# Instala dependencias de Laravel
+RUN composer install --optimize-autoloader --no-dev --no-interaction --no-scripts
+
+# Copia el resto de archivos
 COPY . .
 
-# 6. Instala dependencias de Laravel
-RUN composer install --optimize-autoloader --no-dev --no-interaction
+# Ejecuta scripts post-install
+RUN composer run-script post-autoload-dump
 
+# Genera key de Laravel (solo si no existe en .env)
+RUN php artisan key:generate --force || true
 
-# 8. Genera key de Laravel
-RUN php artisan key:generate
+# Storage link
+RUN php artisan storage:link || true
 
-# 9. Ajusta permisos (Linux)
+# Optimizaciones para producción
+RUN php artisan config:cache && \
+    php artisan route:cache && \
+    php artisan view:cache
+
+# Ajusta permisos
 RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
 
-# 10. Expone el puerto 8080 (Railway usa este puerto)
+# Expone el puerto
 EXPOSE 8080
 
-# 11. Comando para ejecutar Laravel
+# Comando de inicio
 CMD php artisan serve --host=0.0.0.0 --port=8080
