@@ -327,7 +327,7 @@
             <button class="navbar-toggle" onclick="toggleNavbar()">&#9776;</button>
             <nav class="nav-links" id="mainNavLinks">
                 <span>RECONOCIDO POR:</span>
-                <img src="{{asset('public/img/recognized_by.png')}}" alt="Reconocimiento" width="200px" class="me-2">
+                <img src="{{asset('img/recognized_by.png')}}" alt="Reconocimiento" width="200px" class="me-2">
                 <span>REDES SOCIALES</span>
                 <a href="{{ route('login') }}" class="btn-iniciar">Iniciar Sesión</a>
             </nav>
@@ -358,7 +358,7 @@ function toggleNavbar() {
 
                 <!-- Columna 2: Imagen -->
                 <div class="hero-visual">
-                    <img src="{{ asset('public/img/Logo_sign.png') }}" alt="Logo YE Bolivia" width="250px" class="me-2">
+                    <img src="{{ asset('img/Logo_sign.png') }}" alt="Logo YE Bolivia" width="250px" class="me-2">
                 </div>
 
                 <!-- Columna 3: Contáctanos -->
@@ -371,7 +371,7 @@ function toggleNavbar() {
                         </a>
                         <p><b>O</b></p>
                         <a href="#" class="btn-contact btn-register" onclick="openContactModal()">
-                            <img src="{{ asset('public/img/registro.png') }}" alt="Registro">
+                            <img src="{{ asset('img/registro.png') }}" alt="Registro">
                             <span>Estoy interesado</span>
                         </a>
 
@@ -435,7 +435,7 @@ function toggleNavbar() {
                                         alt="{{ $programa->Nombre }}" 
                                         style="max-width:150px; height:auto;">
                                 @else
-                                    <img src="{{ asset('public/img/Logo_sign.png') }}" 
+                                    <img src="{{ asset('img/Logo_sign.png') }}" 
     alt="Imagen por defecto" 
     style="max-width:80px; height:auto; margin:12px 0;">
                                 @endif
@@ -468,7 +468,7 @@ function toggleNavbar() {
                                             alt="{{ $programa->Nombre }}" 
                                             style="max-width:150px; height:auto;">
                                     @else
-                                        <img src="{{ asset('public/img/Logo_sign.png') }}" 
+                                        <img src="{{ asset('img/Logo_sign.png') }}" 
     alt="Imagen por defecto" 
     style="max-width:80px; height:auto; margin:12px 0;">
                                     @endif
