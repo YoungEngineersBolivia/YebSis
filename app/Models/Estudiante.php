@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
+
 class Estudiante extends Model
 {
     use HasFactory;
@@ -119,5 +120,14 @@ class Estudiante extends Model
                     ->where('Estado_inscripcion', 'inscrito')
                     ->with('taller');
     }
+    public function horario()
+{
+    return $this->hasOne(Horario::class, 'Id_estudiantes', 'Id_estudiantes');
+}
+public function modelo()
+    {
+        return $this->belongsTo(Modelo::class, 'Id_modelo', 'Id_modelo');
+    }
+
 
 }
