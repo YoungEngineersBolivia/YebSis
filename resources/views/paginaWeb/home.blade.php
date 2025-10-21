@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Young Engineers La Paz - STEM para Niños</title>
-    <link href="{{ asset('css/home.css') }}" rel="stylesheet">
+    <link href="{{ secure_asset('css/home.css') }}" rel="stylesheet">
 </head>
 
 <body>
@@ -14,12 +14,12 @@
     <div class="container">
         <div class="header-content">
             <div class="logo">
-                <img src="{{ asset('public/img/ES_logo-02.webp') }}"alt="Logo YE Bolivia" width="250px" class="me-2">
+                <img src="{{ secure_asset('public/img/ES_logo-02.webp') }}"alt="Logo YE Bolivia" width="250px" class="me-2">
             </div>
             <button class="navbar-toggle" onclick="toggleNavbar()">&#9776;</button>
             <nav class="nav-links" id="mainNavLinks">
                 <span>RECONOCIDO POR:</span>
-                <img src="{{asset('img/recognized_by.png')}}" alt="Reconocimiento" width="200px" class="me-2">
+                <img src="{{secure_asset('img/recognized_by.png')}}" alt="Reconocimiento" width="200px" class="me-2">
                 <span>REDES SOCIALES</span>
                 <a href="{{ route('login') }}" class="btn-iniciar">Iniciar Sesión</a>
             </nav>
@@ -50,7 +50,7 @@ function toggleNavbar() {
 
                 <!-- Columna 2: Imagen -->
                 <div class="hero-visual">
-                    <img src="{{ asset('img/Logo_sign.png') }}" alt="Logo YE Bolivia" width="250px" class="me-2">
+                    <img src="{{ secure_asset('img/Logo_sign.png') }}" alt="Logo YE Bolivia" width="250px" class="me-2">
                 </div>
 
                 <!-- Columna 3: Contáctanos -->
@@ -63,7 +63,7 @@ function toggleNavbar() {
                         </a>
                         <p><b>O</b></p>
                         <a href="#" class="btn-contact btn-register" onclick="openContactModal()">
-                            <img src="{{ asset('img/registro.png') }}" alt="Registro">
+                            <img src="{{ secure_asset('img/registro.png') }}" alt="Registro">
                             <span>Estoy interesado</span>
                         </a>
 
@@ -123,11 +123,11 @@ function toggleNavbar() {
                         <div class="program-card" style="background: {{ $bgColor }}20; border-radius: 18px; box-shadow: 0 2px 12px rgba(0,0,0,0.08); border-top: 6px solid {{ $bgColor }};">
                             <div class="program-icon" style="text-align:center; margin-bottom:10px;">
                                 @if($programa->Imagen)
-                                    <img src="{{ asset('storage/' . $programa->Imagen) }}" 
+                                    <img src="{{ secure_asset('storage/' . $programa->Imagen) }}" 
                                         alt="{{ $programa->Nombre }}" 
                                         style="max-width:150px; height:auto;">
                                 @else
-                                    <img src="{{ asset('img/Logo_sign.png') }}" 
+                                    <img src="{{ secure_asset('img/Logo_sign.png') }}" 
     alt="Imagen por defecto" 
     style="max-width:80px; height:auto; margin:12px 0;">
                                 @endif
@@ -156,11 +156,11 @@ function toggleNavbar() {
                             <div class="program-card" style="background: {{ $bgColor }}20; border-radius: 18px; box-shadow: 0 2px 12px rgba(0,0,0,0.08); border-top: 6px solid {{ $bgColor }};">
                                 <div class="program-icon" style="text-align:center; margin-bottom:10px;">
                                     @if($programa->Imagen)
-                                        <img src="{{ asset('storage/' . $programa->Imagen) }}" 
+                                        <img src="{{ secure_asset('storage/' . $programa->Imagen) }}" 
                                             alt="{{ $programa->Nombre }}" 
                                             style="max-width:150px; height:auto;">
                                     @else
-                                        <img src="{{ asset('img/Logo_sign.png') }}" 
+                                        <img src="{{ secure_asset('img/Logo_sign.png') }}" 
     alt="Imagen por defecto" 
     style="max-width:80px; height:auto; margin:12px 0;">
                                     @endif
@@ -221,7 +221,7 @@ function toggleNavbar() {
                     @foreach($publicaciones as $publicacion)
                         <div class="card" style="margin-bottom:15px; border:1px solid #ddd; border-radius:8px; padding:15px; background: #f9f9f9;">
                             @if($publicacion->Imagen)
-                                <img src="{{ asset('storage/' . $publicacion->Imagen) }}" 
+                                <img src="{{ secure_asset('storage/' . $publicacion->Imagen) }}" 
                                     alt="Imagen de {{ $publicacion->Nombre }}" 
                                     style="width:100%; max-height:500px; object-fit:cover; border-radius:8px;">
                             @else
@@ -250,7 +250,7 @@ function toggleNavbar() {
             <div class="footer-content">
                 <div class="footer-logo">
                     <div>
-                        <img src="{{ asset('public/img/logo_blanco.png') }}" alt="Logo YE Bolivia" width="250px" class="me-2">
+                        <img src="{{ secure_asset('public/img/logo_blanco.png') }}" alt="Logo YE Bolivia" width="250px" class="me-2">
                         <p>© Copyright 2020 e Square Young Engineers Franchising Ltd. Todos los derechos reservados.</p>
                         <p>LEGO® es una marca registrada de empresas que no patrocinan, autorizan ni respaldan estos programas o este sitio web.</p>
                     </div>
@@ -324,7 +324,7 @@ function toggleNavbar() {
             renderer: 'svg',
             loop: true,
             autoplay: true,
-            path: "{{ asset('animaciones/whatsapp.json') }}"
+            path: "{{ secure_asset('animaciones/whatsapp.json') }}"
         });
 
         // ========== MODAL DE CONTACTO ==========
