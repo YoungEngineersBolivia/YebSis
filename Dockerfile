@@ -26,8 +26,6 @@ COPY . .
 # 6. Instala dependencias de Laravel
 RUN composer install --optimize-autoloader --no-dev --no-interaction
 
-# 7. Copia archivo .env de ejemplo si no existe (opcional)
-RUN if [ ! -f ".env" ]; then cp .env.example .env; fi
 
 # 8. Genera key de Laravel
 RUN php artisan key:generate
