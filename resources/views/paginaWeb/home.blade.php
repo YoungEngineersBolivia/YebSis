@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Young Engineers La Paz - STEM para Niños</title>
-    <link href="{{ secure_asset('css/home.css') }}" rel="stylesheet">
+    <link href="{{ auto_asset('css/home.css') }}" rel="stylesheet">
 </head>
 
 <body>
@@ -14,7 +14,7 @@
     <div class="container">
         <div class="header-content">
             <div class="logo">
-                <img src="{{ secure_asset('public/img/ES_logo-02.webp') }}"alt="Logo YE Bolivia" width="250px" class="me-2">
+                <img src="{{ secure_asset('img/ES_logo-02.webp') }}"alt="Logo YE Bolivia" width="250px" class="me-2">
             </div>
             <button class="navbar-toggle" onclick="toggleNavbar()">&#9776;</button>
             <nav class="nav-links" id="mainNavLinks">
@@ -250,7 +250,7 @@ function toggleNavbar() {
             <div class="footer-content">
                 <div class="footer-logo">
                     <div>
-                        <img src="{{ secure_asset('public/img/logo_blanco.png') }}" alt="Logo YE Bolivia" width="250px" class="me-2">
+                        <img src="{{ secure_asset('img/logo_blanco.png') }}" alt="Logo YE Bolivia" width="250px" class="me-2">
                         <p>© Copyright 2020 e Square Young Engineers Franchising Ltd. Todos los derechos reservados.</p>
                         <p>LEGO® es una marca registrada de empresas que no patrocinan, autorizan ni respaldan estos programas o este sitio web.</p>
                     </div>
