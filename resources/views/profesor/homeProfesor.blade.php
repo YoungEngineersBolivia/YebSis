@@ -189,6 +189,7 @@
         </a>
 
 
+        <a href="{{ route()}}"></a>
         <button class="menu-button assigned" onclick="handleAssigned()">
             Inventario
         </button>

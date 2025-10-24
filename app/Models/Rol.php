@@ -11,4 +11,12 @@ class Rol extends Model
     public $timestamps = true;
 
     protected $fillable = ['Nombre_rol'];
+
+    /**
+     * Relación con personas
+     */
+    public function personas()
+    {
+        return $this->hasMany(Persona::class, 'Id_roles', 'Id_roles');
+    }
 }

@@ -41,4 +41,47 @@ class Usuario extends Authenticatable
         return $this->hasOne(\App\Models\Profesor::class, 'Id_usuarios', 'Id_usuarios');
     }
 
+    /**
+     * Accessor para obtener el rol del usuario
+     * Obtiene el nombre del rol desde: usuario -> persona -> role
+     */
+    public function getRolAttribute()
+    {
+        // Si no está cargada la relación, cargarla
+        if (!$this->relationLoaded('persona')) {
+            $this->load('persona.rol');
+        }
+
+        // Retornar el nombre del rol en minúsculas
+        if ($this->persona && $this->persona->rol) {
+            return strtolower($this->persona->rol->Nombre_rol);
+        }
+
+        return null;
+    }
+
+    /**
+     * Verificar si el usuario tiene un rol específico
+     */
+    public function hasRole($role)
+    {
+        return $this->rol === strtolower($role);
+    }
+
+    /**
+     * Verificar si el usuario tiene alguno de los roles dados
+     */
+    public function hasAnyRole($roles)
+    {
+        $roles = is_array($roles) ? $roles : func_get_args();
+        $userRole = $this->rol;
+        
+        foreach ($roles as $role) {
+            if ($userRole === strtolower($role)) {
+                return true;
+            }
+        }
+        
+        return false;
+    }
 }
