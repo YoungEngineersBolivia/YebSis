@@ -1,7 +1,7 @@
 @extends('profesor.baseProfesor')
 
 @section('styles')
-<link rel="stylesheet" href="{{ asset('css/profesor/listadoAlumnos.css') }}">
+<link rel="stylesheet" href="{{ auto_asset('css/profesor/listadoAlumnos.css') }}">
 @endsection
 
 @section('content')
@@ -23,7 +23,7 @@
         >
             {{-- Avatar según género --}}
             <img 
-                src="{{ asset('images/' . ($estudiante->persona?->Genero === 'M' ? 'avatar-boy.png' : 'avatar-girl.png')) }}" 
+                src="{{ auto_asset('images/' . ($estudiante->persona?->Genero === 'M' ? 'avatar-boy.png' : 'avatar-girl.png')) }}" 
                 alt="{{ $estudiante->persona?->Nombre ?? 'Estudiante' }}" 
                 class="student-avatar"
             >

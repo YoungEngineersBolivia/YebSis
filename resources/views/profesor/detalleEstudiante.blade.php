@@ -16,7 +16,7 @@
 
     <div class="student-card">
         <div class="student-left">
-            <img src="{{ asset('images/' . ($estudiante->genero ?? 'M') == 'M' ? 'avatar-boy.png' : 'avatar-girl.png') }}" alt="Estudiante" class="student-detail-avatar">
+            <img src="{{ auto_asset('images/' . ($estudiante->genero ?? 'M') == 'M' ? 'avatar-boy.png' : 'avatar-girl.png') }}" alt="Estudiante" class="student-detail-avatar">
             <div class="student-code">
                 Código del<br>estudiante
             </div>

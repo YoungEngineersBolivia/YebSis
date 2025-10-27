@@ -3,175 +3,268 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@yield('title', 'Mi Aplicación Laravel')</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <title>@yield('title', 'YE Bolivia - Administrador')</title>
+    <link rel="stylesheet" href="{{ asset('css/dashboard/app.css') }}">
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <style>
+        .sidebar-link {
+            transition: all 0.3s ease;
+            border-radius: 8px;
+            padding: 10px 12px;
+            margin: 2px 0;
+        }
+        .sidebar-link:hover {
+            background-color: #e9ecef;
+            transform: translateX(5px);
+        }
+        .sidebar-link.active {
+            background-color: #0d6efd;
+            color: white !important;
+        }
+        .submenu-item {
+            padding-left: 45px;
+            font-size: 0.9rem;
+        }
+        .nav-section-title {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            color: #6c757d;
+            font-weight: 600;
+            margin-top: 1rem;
+            margin-bottom: 0.5rem;
+            padding-left: 12px;
+        }
+    </style>
 </head>
-<body class="font-sans ">
+<body class="font-sans">
 
-    <div class="d-flex">
-        <!-- Sidebar -->
-        <div class="d-flex flex-column flex-shrink-0 p-3 bg-light position-fixed" style="width: 280px; height: 100vh;">
-            <!-- Logo -->
-            <a href="/" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto link-dark text-decoration-none">
-                <img src="{{ auto_asset('img/ES_logo-02.webp') }}" alt="Logo YE Bolivia" width="250px" class="me-2">
-            </a>
-            <hr>
+<div class="d-flex">
+    <!-- Sidebar -->
+    <div class="d-flex flex-column flex-shrink-0 p-3 bg-light position-fixed" style="width: 280px; height: 100vh;">
+        <!-- Logo -->
+        <a href="{{ route('admin.dashboard') }}" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto link-dark text-decoration-none">
+            <img src="{{ asset('img/ES_logo-02.webp') }}" alt="Logo YE Bolivia" width="250px" class="me-2">
+        </a>
+        <hr>
 
-            <!-- Menú con Scroll -->
-            <div class="overflow-auto" style="flex-grow: 1; max-height: calc(100vh - 120px);">
-                <ul class="nav nav-pills flex-column mb-auto">
-                    <li>
-                        <a href="/administrador/dashboard" class="nav-link link-dark d-flex align-items-center gap-2 ">
-                            <i class="bi bi-clipboard-data"></i>
-                            Dashboard
-                        </a>
-                    </li>
-                    <li>
-                        <a class="nav-link link-dark d-flex align-items-center gap-2" data-bs-toggle="collapse" href="#submenuRegistrar" role="button" aria-expanded="false" aria-controls="submenuRegistrar">
-                            <i class="bi bi-journal-text"></i>
-                            Registrar
-                            <i class="bi bi-caret-down-fill ms-auto"></i>
-                        </a>
-                        <div class="collapse ps-4" id="submenuRegistrar">
-                            <ul class="nav flex-column">
-                                <li><a class="nav-link" href="/administrador/registrosAdministrador">Administrador</a></li>
-                                <li><a class="nav-link" href="/administrador/tutorEstudianteAdministrador">Registrar nuevo estudiante</a></li>
-                                <li><a class="nav-link" href="/administrador/registrarProfesor">Profesor</a></li>
-                                <li><a class="nav-link" href="/administrador/registrarEstudianteAntiguo">Registrar graduado</a></li>
-                                
-                                </ul>
-                         </div>
-                    </li>
-                    <li>
-                        <a href="/administrador/tutoresAdministrador" class="nav-link link-dark d-flex align-items-center gap-2">
-                            <i class="bi bi-person-workspace"></i>
-                            Tutores
-                        </a>
-                    </li>
-                    <li>
-                        <a href="/administrador/usuariosAdministrador" class="nav-link link-dark d-flex align-items-center gap-2">
-                            <i class="bi bi-people-fill"></i>
-                            Usuarios
-                        </a>
-                    </li>
-                    <li>
-                        <a href="/administrador/horariosAdministrador" class="nav-link link-dark d-flex align-items-center gap-2">
-                            <i class="bi bi-calendar-week"></i>
-                            Horarios
-                        </a>
-                    </li>
-                    <li>
-                        <a href="/administrador/estudiantesAdministrador" class="nav-link link-dark d-flex align-items-center gap-2">
-                            <i class="bi bi-person-fill"></i>
-                            Estudiantes
-                        </a>
-                    </li>
-                    <li>
-                        <a href="/administrador/pubnotAdministrador" class="nav-link link-dark d-flex align-items-center gap-2">
-                            <i class="bi bi-send-fill"></i>
-                            Publicar y Notificar
-                        </a>
-                    </li>
-                    <li>
-                        <a href="/administrador/programasAdministrador" class="nav-link link-dark d-flex align-items-center gap-2">
-                            <i class="bi bi-folder-fill"></i>
-                            Programas
-                        </a>
-                    </li>
-                    <li>
-                        <a href="/administrador/graduadosAdministrador" class="nav-link link-dark d-flex align-items-center gap-2">
-                            <i class="bi bi-patch-check-fill"></i>
-                            Graduados
-                        </a>
-                    </li>
-                    <li>
-                        <a href="/administrador/pagosAdministrador" class="nav-link link-dark d-flex align-items-center gap-2">
-                            <i class="bi bi-cash-coin"></i>
-                            Pagos
-                        </a>
-                    </li>
-                    <li>
-                        <a href="/administrador/egresosAdministrador" class="nav-link link-dark d-flex align-items-center gap-2">
-                            <i class="bi bi-layer-backward"></i>
-                            Egresos
-                        </a>
-                    </li>
-                    <li>
-                        <a href="/administrador/sucursalesAdministrador" class="nav-link link-dark d-flex align-items-center gap-2">
-                            <i class="bi bi-building"></i>
-                            Sucursal
-                        </a>
-                    </li>
-                    <li>
-                        <a class="nav-link link-dark d-flex align-items-center gap-2" data-bs-toggle="collapse" href="#submenuComercial" role="button" aria-expanded="false" aria-controls="submenuRegistrar">
-                            <i class="bi bi-journal-text"></i>
-                            Comercial
-                            <i class="bi bi-caret-down-fill ms-auto"></i>
-                        </a>
-                        <div class="collapse ps-4" id="submenuComercial">
+        <!-- Menú con Scroll -->
+        <div class="overflow-auto" style="flex-grow: 1; max-height: calc(100vh - 150px);">
+            <ul class="nav nav-pills flex-column mb-auto">
+
+                <!-- Dashboard -->
+                <li>
+                    <a href="{{ route('admin.dashboard') }}" class="nav-link link-dark sidebar-link d-flex align-items-center gap-2">
+                        <i class="bi bi-speedometer2"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+
+                <!-- Sección: Gestión de Personas -->
+                <div class="nav-section-title">GESTIÓN DE PERSONAS</div>
+
+                <li>
+                    <a class="nav-link link-dark sidebar-link d-flex align-items-center gap-2" data-bs-toggle="collapse" href="#submenuPersonal" role="button" aria-expanded="false">
+                        <i class="bi bi-people"></i>
+                        <span>Personal</span>
+                        <i class="bi bi-chevron-down ms-auto"></i>
+                    </a>
+                    <div class="collapse" id="submenuPersonal">
                         <ul class="nav flex-column">
-                            <li><a class="nav-link" href="{{ route('prospectos.comercial') }}">Prospectos</a></li>
-                            <li><a class="nav-link" href="{{ route('estudiantesActivos') }}">Estudiantes activos</a></li>
-                            <li><a class="nav-link" href="{{ route('estudiantesNoActivos') }}">Estudiantes no activos</a></li>
-                            <li><a class="nav-link" href="{{ route('reportes.talleres') }}">Talleres</a></li>
+                            <li><a class="nav-link link-dark submenu-item" href="{{ url('administrador/registrosAdministrador') }}">Administradores</a></li>
+                            <li><a class="nav-link link-dark submenu-item" href="{{ url('administrador/profesores') }}">Profesores</a></li>
+                            <li><a class="nav-link link-dark submenu-item" href="{{ url('administrador/tutoresAdministrador') }}">Tutores</a></li>
+                            <li><a class="nav-link link-dark submenu-item" href="{{ route('usuarios.index') }}">Todos los Usuarios</a></li>
                         </ul>
                     </div>
-                    </li>
-                </ul>
-            </div>
+                </li>
 
-            <hr>
+                <!-- Estudiantes -->
+                <li>
+                    <a class="nav-link link-dark sidebar-link d-flex align-items-center gap-2" data-bs-toggle="collapse" href="#submenuEstudiantes" role="button" aria-expanded="false">
+                        <i class="bi bi-mortarboard"></i>
+                        <span>Estudiantes</span>
+                        <i class="bi bi-chevron-down ms-auto"></i>
+                    </a>
+                    <div class="collapse" id="submenuEstudiantes">
+                        <ul class="nav flex-column">
+                            <li><a class="nav-link link-dark submenu-item" href="{{ route('admin.estudiantes') }}">Ver Todos</a></li>
+                            <li><a class="nav-link link-dark submenu-item" href="{{ route('registroCombinado.form') }}">Registrar Nuevo</a></li>
+                            <li><a class="nav-link link-dark submenu-item" href="{{ route('inscripcionEstudiante.mostrar') }}">Inscribir a Taller</a></li>
+                            <li><a class="nav-link link-dark submenu-item" href="{{ route('estudiantesActivos') }}">Estudiantes Activos</a></li>
+                            <li><a class="nav-link link-dark submenu-item" href="{{ route('estudiantesNoActivos') }}">Estudiantes Inactivos</a></li>
+                            <li><a class="nav-link link-dark submenu-item" href="{{ route('graduados.index') }}">Graduados</a></li>
+                        </ul>
+                    </div>
+                </li>
+
+                <!-- Sección: Académico -->
+                <div class="nav-section-title">ACADÉMICO</div>
+
+                <li>
+                    <a class="nav-link link-dark sidebar-link d-flex align-items-center gap-2" data-bs-toggle="collapse" href="#submenuProgramas" role="button" aria-expanded="false">
+                        <i class="bi bi-book"></i>
+                        <span>Programas</span>
+                        <i class="bi bi-chevron-down ms-auto"></i>
+                    </a>
+                    <div class="collapse" id="submenuProgramas">
+                        <ul class="nav flex-column">
+                            <li><a class="nav-link link-dark submenu-item" href="{{ url('administrador/programasAdministrador') }}">Ver Programas</a></li>
+                            <li><a class="nav-link link-dark submenu-item" href="{{ url('administrador/nuevosProgramasAdministrador') }}">Crear Programa</a></li>
+                            <li><a class="nav-link link-dark submenu-item" href="{{ route('reportes.talleres') }}">Reportes de Talleres</a></li>
+                        </ul>
+                    </div>
+                </li>
+
+                <!-- Horarios -->
+                <li>
+                    <a href="{{ route('horarios.index') }}" class="nav-link link-dark sidebar-link d-flex align-items-center gap-2">
+                        <i class="bi bi-calendar-week"></i>
+                        <span>Horarios</span>
+                    </a>
+                </li>
+
+                <!-- Sección: Finanzas -->
+                <div class="nav-section-title">FINANZAS</div>
+
+                <li>
+                    <a href="{{ route('pagos.form') }}" class="nav-link link-dark sidebar-link d-flex align-items-center gap-2">
+                        <i class="bi bi-cash-coin"></i>
+                        <span>Pagos</span>
+                    </a>
+                </li>
+
+                <li>
+                    <a href="{{ route('egresos.index') }}" class="nav-link link-dark sidebar-link d-flex align-items-center gap-2">
+                        <i class="bi bi-arrow-down-circle"></i>
+                        <span>Egresos</span>
+                    </a>
+                </li>
+
+                <!-- Sección: Operaciones -->
+                <div class="nav-section-title">OPERACIONES</div>
+
+                <li>
+                    <a class="nav-link link-dark sidebar-link d-flex align-items-center gap-2" data-bs-toggle="collapse" href="#submenuInventario" role="button" aria-expanded="false">
+                        <i class="bi bi-box-seam"></i>
+                        <span>Inventario</span>
+                        <i class="bi bi-chevron-down ms-auto"></i>
+                    </a>
+                    <div class="collapse" id="submenuInventario">
+                        <ul class="nav flex-column">
+                            <li><a class="nav-link link-dark submenu-item" href="{{ route('componentes.index') }}">Componentes/Motores</a></li>
+                            <li><a class="nav-link link-dark submenu-item" href="{{ route('motores.asignaciones.index') }}">Asignaciones</a></li>
+                            <li><a class="nav-link link-dark submenu-item" href="{{ route('motores.asignar.create') }}">Asignar Motor</a></li>
+                        </ul>
+                    </div>
+                </li>
+
+                <li>
+                    <a href="{{ route('sucursales.index') }}" class="nav-link link-dark sidebar-link d-flex align-items-center gap-2">
+                        <i class="bi bi-building"></i>
+                        <span>Sucursales</span>
+                    </a>
+                </li>
+
+                <!-- Sección: Comunicación -->
+                <div class="nav-section-title">COMUNICACIÓN</div>
+
+                <li>
+                    <a href="{{ route('publicaciones.index') }}" class="nav-link link-dark sidebar-link d-flex align-items-center gap-2">
+                        <i class="bi bi-megaphone"></i>
+                        <span>Publicar y Notificar</span>
+                    </a>
+                </li>
+
+                <li>
+                    <a class="nav-link link-dark sidebar-link d-flex align-items-center gap-2" data-bs-toggle="collapse" href="#submenuComercial" role="button" aria-expanded="false">
+                        <i class="bi bi-graph-up"></i>
+                        <span>Comercial</span>
+                        <i class="bi bi-chevron-down ms-auto"></i>
+                    </a>
+                    <div class="collapse" id="submenuComercial">
+                        <ul class="nav flex-column">
+                            <li><a class="nav-link link-dark submenu-item" href="{{ route('prospectos.comercial') }}">Prospectos</a></li>
+                            <li><a class="nav-link link-dark submenu-item" href="{{ route('estudiantesActivos') }}">Estudiantes Activos</a></li>
+                            <li><a class="nav-link link-dark submenu-item" href="{{ route('estudiantesNoActivos') }}">Estudiantes Inactivos</a></li>
+                        </ul>
+                    </div>
+                </li>
+
+            </ul>
+        </div>
+
+        <hr>
 
         <!-- Usuario y Cerrar sesión -->
-            <div class="d-flex align-items-center justify-content-between">
-                <div class="d-flex align-items-center gap-2">
-                    <img src="https://ui-avatars.com/api/?name={{ auth()->user()->persona->Nombre ?? 'Usuario' }}&background=0d6efd&color=fff" alt="perfil" width="32" height="32" class="rounded-circle">
-                    <div class="d-flex flex-column" style="line-height: 1.2;">
-                        <small class="fw-bold">{{ auth()->user()->persona->Nombre ?? 'Usuario' }}</small>
-                        <small class="text-muted" style="font-size: 0.75rem;">{{ ucfirst(auth()->user()->rol ?? 'Admin') }}</small>
-                    </div>
+        <div class="d-flex align-items-center justify-content-between">
+            <div class="d-flex align-items-center gap-2">
+                <img src="https://ui-avatars.com/api/?name={{ auth()->user()->persona->Nombre ?? 'Usuario' }}&background=0d6efd&color=fff" alt="perfil" width="32" height="32" class="rounded-circle">
+                <div class="d-flex flex-column" style="line-height: 1.2;">
+                    <small class="fw-bold">{{ auth()->user()->persona->Nombre ?? 'Usuario' }}</small>
+                    <small class="text-muted" style="font-size: 0.75rem;">{{ ucfirst(auth()->user()->rol ?? 'Admin') }}</small>
                 </div>
-                <form action="{{ route('logout') }}" method="POST" class="m-0">
-                    @csrf
-                    <button type="submit" class="btn btn-sm btn-danger" title="Cerrar sesión">
-                        <i class="bi bi-box-arrow-right"></i>
-                    </button>
-                </form>
             </div>
+            <form action="{{ route('logout') }}" method="POST" class="m-0">
+                @csrf
+                <button type="submit" class="btn btn-sm btn-danger" title="Cerrar sesión">
+                    <i class="bi bi-box-arrow-right"></i>
+                </button>
+            </form>
         </div>
+    </div>
 
-        <!-- Contenido Principal -->
-        <div class="flex-grow-1" style="margin-left: 280px;">
+    <!-- Contenido Principal -->
+    <div class="flex-grow-1" style="margin-left: 280px;">
+        <div class="container-fluid p-4">
+            @if(session('success'))
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    <i class="bi bi-check-circle-fill me-2"></i>
+                    {{ session('success') }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            @endif
 
-            <!-- Contenido -->
-            <div class="container-fluid p-4">
-                <!-- Mensajes de éxito/error -->
-                @if(session('success'))
-                    <div class="alert alert-success alert-dismissible fade show" role="alert">
-                        <i class="bi bi-check-circle-fill me-2"></i>
-                        {{ session('success') }}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                    </div>
-                @endif
+            @if(session('error'))
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                    {{ session('error') }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            @endif
 
-                @if(session('error'))
-                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                        <i class="bi bi-exclamation-triangle-fill me-2"></i>
-                        {{ session('error') }}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                    </div>
-                @endif
-
-                @yield('content')
-            </div>
+            @yield('content')
         </div>
+    </div>
+</div>
 
-    @yield('scripts')
-    <script src="{{ asset('js/administrador/baseAdministrador.js') }}"></script>
-    @stack('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const currentPath = window.location.pathname;
+        const links = document.querySelectorAll('.nav-link');
+        
+        links.forEach(link => {
+            if (link.getAttribute('href') === currentPath) {
+                link.classList.add('active');
+                const collapse = link.closest('.collapse');
+                if (collapse) collapse.classList.add('show');
+            }
+        });
+    });
 
+    setTimeout(() => {
+        document.querySelectorAll('.alert').forEach(alert => {
+            const bsAlert = new bootstrap.Alert(alert);
+            bsAlert.close();
+        });
+    }, 5000);
+</script>
+@yield('scripts')
+@stack('scripts')
 </body>
 </html>
