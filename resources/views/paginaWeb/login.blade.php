@@ -4,7 +4,22 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Jóvenes Ingenieros - Login</title>
-    <link href="{{ auto_asset('css/login.css') }}" rel="stylesheet">
+    <link href="{{ asset('css/login.css') }}" rel="stylesheet">
+    <style>
+        .forgot-pwd button {
+            background-color: transparent;
+            color: #007bff;
+            border: none;
+            padding: 0;
+            font-size: 14px;
+            text-decoration: underline;
+            cursor: pointer;
+        }
+
+        .forgot-pwd button:hover {
+            color: #0056b3;
+        }
+    </style>
 </head>
 <body>
     <div class="container">
@@ -49,7 +64,13 @@
                         <input type="password" name="Contrasenia" id="password" class="form-input" placeholder="Contraseña" required>
                         <button type="button" class="password-toggle" onclick="togglePassword()">👁</button>
                     </div>
+                    <div class="forgot-pwd">
+                        <a href="{{route('password.request')}}">
+                            <button type="button">Te olvidaste tu contraseña?</button>
+                        </a>
+                    </div>
                 </div>
+
                 <button type="submit" class="login-button">Iniciar Sesión</button>
             </form>
         </div>
