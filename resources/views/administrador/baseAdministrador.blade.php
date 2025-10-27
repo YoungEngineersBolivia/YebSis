@@ -256,10 +256,6 @@
             }
         });
     });
-    @yield('scripts')
-    <script src="{{ auto_asset('js/administrador/baseAdministrador.js') }}"></script>
-    @stack('scripts')
-
     setTimeout(() => {
         document.querySelectorAll('.alert').forEach(alert => {
             const bsAlert = new bootstrap.Alert(alert);
@@ -267,7 +263,5 @@
         });
     }, 5000);
 </script>
-@yield('scripts')
-@stack('scripts')
 </body>
 </html>
