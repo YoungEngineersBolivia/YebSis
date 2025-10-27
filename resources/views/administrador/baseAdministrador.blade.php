@@ -256,6 +256,9 @@
             }
         });
     });
+    @yield('scripts')
+    <script src="{{ auto_asset('js/administrador/baseAdministrador.js') }}"></script>
+    @stack('scripts')
 
     setTimeout(() => {
         document.querySelectorAll('.alert').forEach(alert => {
