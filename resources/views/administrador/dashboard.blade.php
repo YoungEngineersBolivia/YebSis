@@ -4,23 +4,9 @@
 @section('styles')
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-<link href="{{ asset('css/dashboard.css') }}" rel="stylesheet">
+<link href="{{ auto_asset('css/dashboard.css') }}" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<style>
-.metric-card {
-    transition: transform 0.2s;
-    border-left: 4px solid #007bff;
-}
-.metric-card:hover {
-    transform: translateY(-2px);
-}
-.chart-container {
-    position: relative;
-    height: 300px;
-}
-.growth-positive { color: #28a745; }
-.growth-negative { color: #dc3545; }
-</style>
+<link href="{{ auto_asset('css/administrador/dashboard.css') }}" rel="stylesheet">
 @endsection
 
 @section('content')
@@ -240,87 +226,12 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-// Configuración de Chart.js
-Chart.defaults.font.family = "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif";
-Chart.defaults.color = '#666';
-
-// Gráfico de ingresos diarios
-const ctxDiarios = document.getElementById('ingresosDiarios').getContext('2d');
-new Chart(ctxDiarios, {
-    type: 'line',
-    data: {
-        labels: {!! json_encode($ingresosPorDia->pluck('fecha')) !!},
-        datasets: [{
-            label: 'Ingresos Diarios',
-            data: {!! json_encode($ingresosPorDia->pluck('total')) !!},
-            borderColor: 'rgb(54, 162, 235)',
-            backgroundColor: 'rgba(54, 162, 235, 0.1)',
-            borderWidth: 2,
-            fill: true,
-            tension: 0.4
-        }]
-    },
-    options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-            legend: {
-                display: false
-            }
-        },
-        scales: {
-            y: {
-                beginAtZero: true,
-                ticks: {
-                    callback: function(value) {
-                        return 'Bs ' + value.toLocaleString();
-                    }
-                }
-            }
-        },
-        elements: {
-            point: {
-                radius: 4,
-                hoverRadius: 8
-            }
-        }
-    }
-});
-
-// Gráfico de ingresos mensuales
-const ctxMensuales = document.getElementById('ingresosMensuales').getContext('2d');
-new Chart(ctxMensuales, {
-    type: 'bar',
-    data: {
-        labels: {!! json_encode($ingresosPorMes->pluck('mes_nombre')) !!},
-        datasets: [{
-            label: 'Ingresos Mensuales',
-            data: {!! json_encode($ingresosPorMes->pluck('total')) !!},
-            backgroundColor: 'rgba(40, 167, 69, 0.8)',
-            borderColor: 'rgba(40, 167, 69, 1)',
-            borderWidth: 1
-        }]
-    },
-    options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-            legend: {
-                display: false
-            }
-        },
-        scales: {
-            y: {
-                beginAtZero: true,
-                ticks: {
-                    callback: function(value) {
-                        return 'Bs ' + value.toLocaleString();
-                    }
-                }
-            }
-        }
-    }
-});
+    window.ingresosPorDia = @json($ingresosPorDia->pluck('total'));
+    window.fechasPorDia = @json($ingresosPorDia->pluck('fecha'));
+    window.ingresosPorMes = @json($ingresosPorMes->pluck('total'));
+    window.mesesPorMes = @json($ingresosPorMes->pluck('mes_nombre'));
 </script>
+<script src="{{ auto_asset('js/administrador/dashboard.js') }}"></script>
 @endsection

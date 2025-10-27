@@ -134,7 +134,7 @@
                     <td>{{ $pub->Descripcion }}</td>
                     <td>
                         @if($pub->Imagen)
-                            <a href="{{ asset('storage/' . $pub->Imagen) }}" target="_blank">Ver archivo</a>
+                            <a href="{{ auto_asset('storage/' . $pub->Imagen) }}" target="_blank">Ver archivo</a>
                         @else
                             N/A
                         @endif

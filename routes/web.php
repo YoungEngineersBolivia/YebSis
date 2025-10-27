@@ -220,6 +220,36 @@ Route::middleware(['auth', 'role:administrador'])->prefix('administrador')->grou
 
 
 /* ============================================
+   RUTAS PARA COMERCIAL
+   ============================================ */
+
+Route::middleware(['auth', 'role:administrador'])->prefix('comercial')->group(function () {
+    
+    /* ----------------- ESTUDIANTES ACTIVOS ----------------- */
+    Route::get('/estudiantesActivos', [EstudiantesActivosController::class, 'index'])->name('estudiantesActivos');
+    Route::get('/estudiantesActivos/exportar', [EstudiantesActivosController::class, 'exportar'])->name('estudiantesActivos.exportar');
+    Route::put('/estudiantes/desactivar/{id}', [EstudiantesActivosController::class, 'desactivar'])->name('estudiantes.desactivar');
+    Route::get('/estudianteActivoComercial', fn() => view('comercial.estudianteActivoComercial'))->name('comercial.estudianteActivoComercial');
+    
+    /* ----------------- ESTUDIANTES INACTIVOS ----------------- */
+    Route::get('/estudiantesNoActivos', [EstudiantesInactivosController::class, 'index'])->name('estudiantesNoActivos');
+    Route::put('/estudiantes/activar/{id}', [EstudiantesInactivosController::class, 'reactivar'])->name('estudiantes.reactivar');
+    
+    /* ----------------- REPORTES DE TALLERES ----------------- */
+    Route::get('/talleresComercial', [ReporteTalleresController::class, 'index'])->name('reportes.talleres');
+    Route::get('/reportes/talleres/exportar', [ReporteTalleresController::class, 'exportar'])->name('reportes.talleres.exportar');
+    Route::get('/api/reportes/talleres/datos', [ReporteTalleresController::class, 'obtenerDatos'])->name('api.reportes.talleres.datos');
+    
+    /* ----------------- PROSPECTOS ----------------- */
+    Route::get('/prospectosComercial', [ProspectoController::class, 'index'])->name('prospectos.comercial');
+    Route::put('/prospectos/{id}/estado', [ProspectoController::class, 'updateEstado'])->name('prospectos.updateEstado');
+    
+    /* ----------------- CLASES DE PRUEBA ----------------- */
+    Route::post('/claseprueba/store', [ClasePruebaController::class, 'store'])->name('claseprueba.store');
+});
+
+
+/* ============================================
    RUTAS PARA PROFESOR
    ============================================ */
 

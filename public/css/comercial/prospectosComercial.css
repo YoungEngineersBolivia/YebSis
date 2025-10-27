@@ -1,0 +1,129 @@
+.avatar-circle {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: bold;
+        font-size: 14px;
+        flex-shrink: 0;
+    }
+
+    .estado-select {
+        border: 1px solid #dee2e6;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-weight: 500;
+        border-radius: 6px;
+    }
+
+    .estado-select:focus {
+        box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+        background-color: white;
+    }
+
+    /* Estilos específicos para cada estado */
+    .estado-nuevo {
+        background-color: #d1edcc !important;
+        color: #0f5132 !important;
+        border-color: #28a745 !important;
+    }
+
+    .estado-contactado {
+        background-color: #cfe2ff !important;
+        color: #084298 !important;
+        border-color: #007bff !important;
+    }
+
+    .estado-clase.de.prueba {
+        background-color: #fff3cd !important;
+        color: #664d03 !important;
+        border-color: #ffc107 !important;
+    }
+
+    /* Estilos para badges */
+    .estado-badge {
+        font-size: 13px;
+        font-weight: 600;
+        padding: 8px 14px;
+        border-radius: 20px;
+        letter-spacing: 0.3px;
+    }
+
+    .clase-badge {
+        font-size: 12px;
+        font-weight: 500;
+        padding: 6px 12px;
+        border-radius: 15px;
+    }
+
+    .table-hover tbody tr:hover {
+        background-color: rgba(0, 123, 255, 0.05);
+    }
+
+    .card {
+        border-radius: 12px;
+        overflow: hidden;
+    }
+
+    .btn {
+        border-radius: 6px;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+
+    .btn:hover {
+        transform: translateY(-1px);
+    }
+
+    .badge {
+        font-size: 12px;
+        font-weight: 500;
+        padding: 6px 12px;
+        border-radius: 20px;
+    }
+
+    .modal-content {
+        border-radius: 12px;
+    }
+
+    .text-gray-800 {
+        color: #2d3748 !important;
+    }
+
+    .bg-light {
+        background-color: #f8f9fa !important;
+    }
+
+    .filtro-fecha-box {
+        box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+        border-radius: 16px;
+        background: #fff;
+        min-width: 420px;
+    }
+    .filtro-fecha-box .btn-light {
+        box-shadow: none;
+        border: none;
+        background: #f8f9fa;
+    }
+    .filtro-fecha-box .btn-light:active, .filtro-fecha-box .btn-light:focus {
+        background: #e2e6ea;
+    }
+    .filtro-fecha-box #filtroFechaTexto {
+        min-width: 180px;
+        text-align: center;
+        font-size: 1rem;
+        letter-spacing: 0.5px;
+    }
+
+    .filtro-fecha-box input[type="date"] {
+        min-width: 120px;
+        max-width: 160px;
+        margin-left: 0 !important;
+    }
+    .filtro-fecha-box .form-select-sm {
+        min-width: 120px;
+    }
