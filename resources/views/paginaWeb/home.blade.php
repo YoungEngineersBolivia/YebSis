@@ -292,7 +292,6 @@ function toggleNavbar() {
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bodymovin/5.7.6/lottie.min.js"></script>
     <script>
-<<<<<<< HEAD
         // ========== ANIMACIONES Y ELEMENTOS FLOTANTES ==========
         const style = document.createElement('style');
         style.textContent = `
@@ -463,9 +462,7 @@ function toggleNavbar() {
         }
         window.addEventListener('scroll', revealTitlesOnScroll);
         document.addEventListener('DOMContentLoaded', revealTitlesOnScroll);
-=======
         window.publicacionesCount = {{ $publicaciones->count() ?? 0 }};
->>>>>>> a47a3fd99d0f9da3286e5c78198df0f0684bd13a
     </script>
     <script src="{{ asset('js/paginaWeb/home.js') }}"></script>
 
