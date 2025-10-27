@@ -5,7 +5,9 @@ namespace App\Models;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Contracts\Auth\CanResetPassword;
-use App\Notifications\ResetPasswordNotification; // IMPORTANTE: Agregar este import
+use App\Notifications\ResetPasswordNotification;
+
+// ✅ IMPORTACIONES NECESARIAS PARA RELACIONES
 use App\Models\Persona;
 use App\Models\Tutores;
 use App\Models\Profesor;
@@ -42,14 +44,12 @@ class Usuario extends Authenticatable implements CanResetPassword
         $this->attributes['Correo'] = $value;
     }
 
-    // Método para enviar la notificación de reset
     public function sendPasswordResetNotification($token)
     {
         $this->notify(new ResetPasswordNotification($token));
     }
 
-    // ... resto de tus métodos (persona, tutor, profesor, etc.)
-    
+    // ✅ Relaciones
     public function persona()
     {
         return $this->belongsTo(Persona::class, 'Id_personas', 'Id_personas');
@@ -87,13 +87,13 @@ class Usuario extends Authenticatable implements CanResetPassword
     {
         $roles = is_array($roles) ? $roles : func_get_args();
         $userRole = $this->rol;
-        
+
         foreach ($roles as $role) {
             if ($userRole === strtolower($role)) {
                 return true;
             }
         }
-        
+
         return false;
     }
 }
