@@ -56,5 +56,5 @@
     @endif
 </div>
 
-<script src="{{ auto_asset('js/profesor/listadoAlumnos.js') }}"></script>
+<script src="{{ asset('js/profesor/listadoAlumnos.js') }}"></script>
 @endsection

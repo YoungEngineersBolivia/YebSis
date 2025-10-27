@@ -18,6 +18,6 @@
 
     </main>
 
-<script src="{{ auto_asset('js/profesor/homeProfesor.js') }}"></script>
+<script src="{{ asset('js/profesor/homeProfesor.js') }}"></script>
 @endsection
 
