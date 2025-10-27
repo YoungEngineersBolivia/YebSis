@@ -7,7 +7,7 @@ use Illuminate\Notifications\Notifiable;
 use Illuminate\Contracts\Auth\CanResetPassword;
 use App\Notifications\ResetPasswordNotification;
 
-// ✅ IMPORTACIONES NECESARIAS PARA RELACIONES
+//IMPORTACIONES NECESARIAS PARA RELACIONES
 use App\Models\Persona;
 use App\Models\Tutores;
 use App\Models\Profesor;
@@ -49,7 +49,7 @@ class Usuario extends Authenticatable implements CanResetPassword
         $this->notify(new ResetPasswordNotification($token));
     }
 
-    // ✅ Relaciones
+    // Relaciones
     public function persona()
     {
         return $this->belongsTo(Persona::class, 'Id_personas', 'Id_personas');
