@@ -51,7 +51,7 @@ class AdministradorController extends Controller
 
         Usuario::create([
             'Correo' => $request->correo,
-            'Contrasania' => bcrypt($clave),
+            'Contrasenia' => bcrypt($clave),
             'Id_personas' => $persona->Id_personas,
         ]);
 
@@ -148,7 +148,7 @@ class AdministradorController extends Controller
 
             Usuario::create([
                 'Correo' => $request->correo,
-                'Contrasania' => bcrypt($clave),
+                'Contrasenia' => bcrypt($clave),
                 'Id_personas' => $persona->Id_personas,
             ]);
 

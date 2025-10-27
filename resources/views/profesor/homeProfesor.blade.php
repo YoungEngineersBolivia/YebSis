@@ -92,6 +92,7 @@
         .menu-button.evaluate {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+            width: 800px;
         }
 
         .menu-button.assigned {
@@ -188,6 +189,7 @@
         </a>
 
 
+        <a href="{{ route()}}"></a>
         <button class="menu-button assigned" onclick="handleAssigned()">
             Inventario
         </button>
