@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Jóvenes Ingenieros - Login</title>
-    <link href="{{ auto_asset('css/login.css') }}" rel="stylesheet">
+    <link href="{{ auto_asset('css/paginaWeb/login.css') }}" rel="stylesheet">
 </head>
 <body>
     <div class="container">

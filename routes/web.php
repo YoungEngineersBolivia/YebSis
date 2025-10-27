@@ -60,10 +60,10 @@ Route::middleware(['auth', 'role:administrador'])->prefix('administrador')->grou
     Route::get('/registrosAdministrador', fn() => view('/administrador/registrosAdministradores'));
     
     /* ----------------- GESTIÓN DE ADMINISTRADORES ----------------- */
-    Route::post('/administradores/registrar', [AdministradorController::class, 'registrarAdmin'])->name('administrador.registrar');
-    Route::post('/administradores/registrarC', [AdministradorController::class, 'registrarComercial'])->name('administrador.registrarC');
-    Route::post('/administradores/registrarT', [AdministradorController::class, 'registrarTutor'])->name('administrador.registrarT');
-    Route::post('/administradores/registrarP', [AdministradorController::class, 'registrarProfesor'])->name('administrador.registrarP');
+    Route::post('/registrar', [AdministradorController::class, 'registrarAdmin'])->name('administrador.registrar');
+    Route::post('/registrarC', [AdministradorController::class, 'registrarComercial'])->name('administrador.registrarC');
+    Route::post('/registrarT', [AdministradorController::class, 'registrarTutor'])->name('administrador.registrarT');
+    Route::post('/registrarP', [AdministradorController::class, 'registrarProfesor'])->name('administrador.registrarP');
     
     Route::get('/registrarProfesor', fn() => view('/administrador/registrarProfesor'));
     Route::get('/registrarTutor', fn() => view('/administrador/registrarTutor'));

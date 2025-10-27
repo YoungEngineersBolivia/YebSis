@@ -126,12 +126,15 @@
             <hr>
 
             <!-- Cerrar sesión -->
-            <div>
-                <a href="#" class="d-flex align-items-center link-dark text-decoration-none gap-2">
-                    <button type="button" class="btn btn-danger w-75">Cerrar sesión</button>
-                   
-                </a>
-            </div>
+           <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
+                    @csrf
+                </form>
+
+                <button type="button" class="btn btn-danger w-75"
+                        onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                    Cerrar sesión
+                </button>
+
         </div>
 
         <!-- Contenido Principal -->
@@ -143,6 +146,16 @@
     </div>
 
     @yield('scripts')
+    <script>
+        if (window.history.replaceState) {
+            window.history.replaceState(null, null, window.location.href);
+        }
+        window.onpageshow = function(event) {
+            if (event.persisted) {
+                window.location.reload();
+            }
+        };
+    </script>
     @stack('scripts')
 
 </body>

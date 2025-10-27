@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Young Engineers La Paz - STEM para Niños</title>
-    <link href="{{ auto_asset('css/home.css') }}" rel="stylesheet">
+    <link href="{{ auto_asset('css/paginaWeb/home.css') }}" rel="stylesheet">
 </head>
 
 <body>
