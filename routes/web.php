@@ -52,7 +52,7 @@ Route::post('/logout', [CustomLoginController::class, 'logout'])->name('logout')
    RUTAS PARA ADMINISTRADOR
    ============================================ */
 
-Route::middleware(['auth', 'role:administrador'])->prefix('administrador')->group(function () {
+Route::middleware(['auth', 'role:administrador'])->prefix('administrador')->group(function () {     
     
     // Dashboard
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('admin.dashboard');
