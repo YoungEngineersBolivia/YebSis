@@ -4,30 +4,7 @@
 @section('styles')
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
-    <style>
-        .card-soft {
-            border: 1px solid #eee;
-            border-radius: 16px;
-            box-shadow: 0 6px 18px rgba(0,0,0,0.04);
-        }
-        .chart-wrap {
-            background: #fff;
-            border-radius: 16px;
-            padding: 16px;
-        }
-        .toolbar {
-            display: flex; gap: 12px; align-items: center; flex-wrap: wrap;
-        }
-        .toolbar .form-select, .toolbar .form-control {
-            border-radius: 12px;
-        }
-        .table thead th { white-space: nowrap; }
-        .btn-ghost {
-            border-radius: 10px;
-            border: 1px solid #eaeaea;
-            background: #fff;
-        }
-    </style>
+    <link href="{{ auto_asset('css/comercial/estudiantesNoActivos.css') }}" rel="stylesheet">
 @endsection
 
 @section('content')
@@ -136,36 +113,6 @@
 <script>
     const rawSeries = @json($fechasInactivacion);
 
-    const monthFmt = new Intl.DateTimeFormat('es-BO', { month: 'short' });
-    const labels = rawSeries.map(s => monthFmt.format(new Date(s.mes_iso + 'T00:00:00')));
-    const data   = rawSeries.map(s => Number(s.cantidad));
-
-    const ctx = document.getElementById('chartInactivos').getContext('2d');
-    new Chart(ctx, {
-        type: 'line',
-        data: {
-            labels,
-            datasets: [{
-                label: 'Estudiantes Inactivos',
-                data,
-                tension: 0.35,
-                borderWidth: 2,
-                pointRadius: 5,
-                pointHoverRadius: 6,
-                fill: true,
-                borderColor: 'rgba(121, 80, 242, 1)',
-                backgroundColor: 'rgba(121, 80, 242, 0.12)',
-                pointBackgroundColor: '#fff',
-                pointBorderColor: 'rgba(121, 80, 242, 1)'
-            }]
-        },
-        options: {
-            plugins: { legend: { display: false } },
-            scales: {
-                y: { beginAtZero: true, ticks: { precision: 0 } },
-                x: { grid: { display: false } }
-            }
-        }
-    });
 </script>
+<script src="{{ auto_asset('js/comercial/estudiantesNoActivos.js') }}"></script>
 @endsection

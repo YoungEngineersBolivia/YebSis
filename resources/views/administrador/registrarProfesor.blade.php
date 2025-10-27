@@ -17,7 +17,8 @@
 @endif
 
 
-<form action="/administradores/registrarP" method="POST">
+<form action="{{ route('administrador.registrarP') }}" method="POST">
+
     @csrf
 
     <div class="d-flex align-items-end gap-3 mb-3">
