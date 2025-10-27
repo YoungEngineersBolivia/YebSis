@@ -3,7 +3,7 @@
 @section('title', 'Horarios de Estudiantes')
 
 @section('styles')
-<link href="{{ asset('css/style.css') }}" rel="stylesheet">
+<link href="{{ auto_asset('css/style.css') }}" rel="stylesheet">
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 {{-- Si usas Bootstrap Icons en los botones (bi bi-*) asegúrate de cargar su CSS en el layout base --}}
 @endsection

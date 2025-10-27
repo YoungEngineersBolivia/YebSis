@@ -2,7 +2,7 @@
 @extends('profesor.baseProfesor')
 
 @section('styles')
-<link rel="stylesheet" href="{{ asset('css/profesor/evaluarAlumno.css') }}">
+<link rel="stylesheet" href="{{ auto_asset('css/profesor/evaluarAlumno.css') }}">
 @endsection
 
 @section('content')

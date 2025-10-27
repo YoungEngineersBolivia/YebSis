@@ -2,7 +2,7 @@
 
 @section('title', 'Egresos')
 @section('styles')
-<link href="{{ asset('css/style.css') }}" rel="stylesheet">
+<link href="{{ auto_asset('css/style.css') }}" rel="stylesheet">
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 @endsection
 

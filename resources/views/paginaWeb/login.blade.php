@@ -4,20 +4,20 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Jóvenes Ingenieros - Login</title>
-    <link href="{{ asset('css/login.css') }}" rel="stylesheet">
+    <link href="{{ auto_asset('css/login.css') }}" rel="stylesheet">
 </head>
 <body>
     <div class="container">
         <div class="left-section">
             <div class="grid-pattern"></div>
             <div class="logo-section">
-                <img src="{{ Vite::asset('resources/img/ES_logo-grande.png') }}" alt="Logo YE Bolivia" width="500px" class="me-2">
+                <img src="{{ Vite::auto_asset('resources/img/ES_logo-grande.png') }}" alt="Logo YE Bolivia" width="500px" class="me-2">
             </div>
         </div>
         <div class="right-section">
             <div class="login-header">
                 <!--<div class="small-logo"></div>-->
-                <img src="{{ Vite::asset('resources/img/ES_logo-02.webp') }}" alt="Logo YE Bolivia" width="150px" class="me-2">
+                <img src="{{ Vite::auto_asset('resources/img/ES_logo-02.webp') }}" alt="Logo YE Bolivia" width="150px" class="me-2">
             </div>
             <p class="welcome-text">
                 <b>
