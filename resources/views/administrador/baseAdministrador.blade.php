@@ -125,7 +125,7 @@
 
             <hr>
 
-            < <!-- Usuario y Cerrar sesión -->
+        <!-- Usuario y Cerrar sesión -->
             <div class="d-flex align-items-center justify-content-between">
                 <div class="d-flex align-items-center gap-2">
                     <img src="https://ui-avatars.com/api/?name={{ auth()->user()->persona->Nombre ?? 'Usuario' }}&background=0d6efd&color=fff" alt="perfil" width="32" height="32" class="rounded-circle">
