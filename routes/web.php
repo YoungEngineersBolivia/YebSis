@@ -29,6 +29,8 @@ use App\Http\Controllers\ComponentesController;
 use App\Http\Controllers\ProfesorController;
 use App\Http\Controllers\ProfesoresController;
 use App\Http\Controllers\MotoresAsignadosController;
+use App\Http\Controllers\ForgotPasswordController;
+use App\Http\Controllers\ResetPasswordController;
 
 /* ============================================
    RUTAS PÚBLICAS (Sin autenticación)
@@ -55,46 +57,64 @@ Route::middleware(['auth', 'role:administrador'])->prefix('administrador')->grou
     // Dashboard
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('admin.dashboard');
     
-    // Vista base
+    // Vistas base
     Route::get('/inicioAdministrador', fn() => view('/administrador/inicioAdministrador'));
     Route::get('/registrosAdministrador', fn() => view('/administrador/registrosAdministradores'));
     
-    /* ----------------- GESTIÓN DE ADMINISTRADORES ----------------- */
-    Route::post('/administradores/registrar', [AdministradorController::class, 'registrarAdmin'])->name('administrador.registrar');
-    Route::post('/administradores/registrarC', [AdministradorController::class, 'registrarComercial'])->name('administrador.registrarC');
-    Route::post('/administradores/registrarT', [AdministradorController::class, 'registrarTutor'])->name('administrador.registrarT');
-    Route::post('/administradores/registrarP', [AdministradorController::class, 'registrarProfesor'])->name('administrador.registrarP');
+    /* ----------------- GESTIÓN DE ADMINISTRADORES Y PERSONAL ----------------- */
+    Route::prefix('administradores')->name('administrador.')->group(function () {
+        Route::post('/registrar', [AdministradorController::class, 'registrarAdmin'])->name('registrar');
+        Route::post('/registrarC', [AdministradorController::class, 'registrarComercial'])->name('registrarC');
+        Route::post('/registrarT', [AdministradorController::class, 'registrarTutor'])->name('registrarT');
+        Route::post('/registrarP', [AdministradorController::class, 'registrarProfesor'])->name('registrarP');
+    });
     
     Route::get('/registrarProfesor', fn() => view('/administrador/registrarProfesor'));
     Route::get('/registrarTutor', fn() => view('/administrador/registrarTutor'));
     Route::get('/registrarComercial', fn() => view('/administrador/registrarComercial'));
     
     /* ----------------- GESTIÓN DE TUTORES ----------------- */
-    Route::get('/tutoresAdministrador', [TutoresController::class, 'index'])->name('tutores.index');
-    Route::get('/tutores/{id}', [TutoresController::class, 'show'])->name('tutores.show');
-    Route::get('/tutores/{id}/edit', [TutoresController::class, 'edit'])->name('tutores.edit');
-    Route::put('/tutores/{id}', [TutoresController::class, 'update'])->name('tutores.update');
-    Route::delete('/tutores/{id}', [TutoresController::class, 'destroy'])->name('tutores.destroy');
+    Route::prefix('tutores')->name('tutores.')->group(function () {
+        Route::get('/', [TutoresController::class, 'index'])->name('index');
+        Route::get('/{id}', [TutoresController::class, 'show'])->name('show');
+        Route::get('/{id}/edit', [TutoresController::class, 'edit'])->name('edit');
+        Route::put('/{id}', [TutoresController::class, 'update'])->name('update');
+        Route::delete('/{id}', [TutoresController::class, 'destroy'])->name('destroy');
+    });
+    Route::get('/tutoresAdministrador', [TutoresController::class, 'index']);
     
     /* ----------------- GESTIÓN DE USUARIOS ----------------- */
+    Route::prefix('usuarios')->name('usuarios.')->group(function () {
+        Route::get('/{id}', [UsuariosController::class, 'show'])->name('show');
+        Route::get('/{id}/edit', [UsuariosController::class, 'edit'])->name('edit');
+        Route::put('/{id}', [UsuariosController::class, 'update'])->name('update');
+        Route::delete('/{id}', [UsuariosController::class, 'destroy'])->name('destroy');
+    });
     Route::get('/usuariosAdministrador', [UsuariosController::class, 'index'])->name('usuarios.index');
-    Route::get('/usuarios/{id}', [UsuariosController::class, 'show'])->name('usuarios.show');
-    Route::get('/usuarios/{id}/edit', [UsuariosController::class, 'edit'])->name('usuarios.edit');
-    Route::put('/usuarios/{id}', [UsuariosController::class, 'update'])->name('usuarios.update');
-    Route::delete('/usuarios/{id}', [UsuariosController::class, 'destroy'])->name('usuarios.destroy');
     
     /* ----------------- GESTIÓN DE HORARIOS ----------------- */
+    Route::prefix('horarios')->name('horarios.')->group(function () {
+        Route::get('/create', [HorariosController::class, 'create'])->name('create');
+        Route::post('/', [HorariosController::class, 'store'])->name('store');
+        Route::get('/{id}', [HorariosController::class, 'show'])->name('show');
+        Route::get('/{id}/edit', [HorariosController::class, 'edit'])->name('edit');
+        Route::put('/{id}', [HorariosController::class, 'update'])->name('update');
+        Route::delete('/{id}', [HorariosController::class, 'destroy'])->name('destroy');
+        Route::post('/asignar', [HorariosController::class, 'asignar'])->name('asignar');
+    });
     Route::get('/horariosAdministrador', [HorariosController::class, 'index'])->name('horarios.index');
-    Route::get('/horarios/create', [HorariosController::class, 'create'])->name('horarios.create');
-    Route::post('/horarios', [HorariosController::class, 'store'])->name('horarios.store');
-    Route::get('/horarios/{id}', [HorariosController::class, 'show'])->name('horarios.show');
-    Route::get('/horarios/{id}/edit', [HorariosController::class, 'edit'])->name('horarios.edit');
-    Route::put('/horarios/{id}', [HorariosController::class, 'update'])->name('horarios.update');
-    Route::delete('/horarios/{id}', [HorariosController::class, 'destroy'])->name('horarios.destroy');
-    Route::post('/horarios/asignar', [HorariosController::class, 'asignar'])->name('horarios.asignar');
     
     /* ----------------- GESTIÓN DE ESTUDIANTES ----------------- */
     Route::get('/estudiantesAdministrador', [EstudianteController::class, 'index'])->name('admin.estudiantes');
+    
+    // Estudiantes Activos
+    Route::get('/estudiantesActivos', [EstudiantesActivosController::class, 'index'])->name('estudiantesActivos');
+    Route::get('/estudiantes-activos/exportar', [EstudiantesActivosController::class, 'exportar'])->name('estudiantesActivos.exportar');
+    Route::put('/estudiantes/desactivar/{id}', [EstudiantesActivosController::class, 'desactivar'])->name('estudiantes.desactivar');
+    
+    // Estudiantes Inactivos
+    Route::get('/estudiantesNoActivos', [EstudiantesInactivosController::class, 'index'])->name('estudiantesNoActivos');
+    Route::put('/estudiantes/activar/{id}', [EstudiantesInactivosController::class, 'reactivar'])->name('estudiantes.reactivar');
     
     // Inscripción de estudiantes antiguos
     Route::get('/registrarEstudianteAntiguo', [InscripcionEstudianteController::class, 'mostrarFormulario'])->name('inscripcionEstudiante.mostrar');
@@ -136,51 +156,61 @@ Route::middleware(['auth', 'role:administrador'])->prefix('administrador')->grou
     Route::post('/tutorEstudianteAdministrador', [RegistroCombinadoController::class, 'registrar'])->name('registroCombinado.registrar');
     
     /* ----------------- COMPONENTES/MOTORES ----------------- */
-    Route::get('/componentes', [ComponentesController::class, 'index'])->name('componentes.index');
-    Route::post('/componentes/nuevo', [ComponentesController::class, 'store'])->name('componentes.store');
-    Route::post('/componentes/entrada', [ComponentesController::class, 'registrarEntrada'])->name('componentes.registrarEntrada');
-    Route::post('/componentes/salida', [ComponentesController::class, 'registrarSalida'])->name('componentes.registrarSalida');
-    Route::delete('/componentes/{motor}', [ComponentesController::class, 'destroy'])->name('componentes.destroy');
-    Route::get('/componentes/{id}/historial', [ComponentesController::class, 'historial'])->name('componentes.historial');
-    Route::put('/componentes/{id}', [ComponentesController::class, 'update'])->name('componentes.update');
+    Route::prefix('componentes')->name('componentes.')->group(function () {
+        Route::get('/', [ComponentesController::class, 'index'])->name('index');
+        Route::post('/nuevo', [ComponentesController::class, 'store'])->name('store');
+        Route::post('/entrada', [ComponentesController::class, 'registrarEntrada'])->name('registrarEntrada');
+        Route::post('/salida', [ComponentesController::class, 'registrarSalida'])->name('registrarSalida');
+        Route::get('/{id}/historial', [ComponentesController::class, 'historial'])->name('historial');
+        Route::put('/{id}', [ComponentesController::class, 'update'])->name('update');
+        Route::delete('/{motor}', [ComponentesController::class, 'destroy'])->name('destroy');
+    });
     
     /* ----------------- GESTIÓN DE PROFESORES ----------------- */
-    Route::get('/profesores', [ProfesoresController::class, 'index'])->name('profesores.index');
-    Route::get('/profesores/{id}', [ProfesoresController::class, 'show'])->name('profesores.show');
-    Route::get('/profesores/{id}/edit', [ProfesoresController::class, 'edit'])->name('profesores.edit');
-    Route::post('/profesores', [ProfesoresController::class, 'store'])->name('profesores.store');
-    Route::put('/profesores/{id}', [ProfesoresController::class, 'update'])->name('profesores.update');
-    Route::delete('/profesores/{id}', [ProfesoresController::class, 'destroy'])->name('profesores.destroy');
+    Route::prefix('profesores')->name('profesores.')->group(function () {
+        Route::get('/', [ProfesoresController::class, 'index'])->name('index');
+        Route::post('/', [ProfesoresController::class, 'store'])->name('store');
+        Route::get('/{id}', [ProfesoresController::class, 'show'])->name('show');
+        Route::get('/{id}/edit', [ProfesoresController::class, 'edit'])->name('edit');
+        Route::put('/{id}', [ProfesoresController::class, 'update'])->name('update');
+        Route::delete('/{id}', [ProfesoresController::class, 'destroy'])->name('destroy');
+    });
     
     /* ----------------- MOTORES ASIGNADOS ----------------- */
-    Route::prefix('motores')->group(function () {
-        Route::get('/asignaciones', [MotoresAsignadosController::class, 'index'])->name('motores.asignaciones.index');
-        Route::get('/asignar', [MotoresAsignadosController::class, 'create'])->name('motores.asignar.create');
-        Route::post('/asignar', [MotoresAsignadosController::class, 'store'])->name('motores.asignar.store');
-        Route::post('/entrada/{id}', [MotoresAsignadosController::class, 'registrarEntrada'])->name('motores.registrar.entrada');
-        Route::post('/reporte/{id}', [MotoresAsignadosController::class, 'storeReporte'])->name('motores.reporte.store');
+    Route::prefix('motores')->name('motores.')->group(function () {
+        Route::get('/asignaciones', [MotoresAsignadosController::class, 'index'])->name('asignaciones.index');
+        Route::get('/asignar', [MotoresAsignadosController::class, 'create'])->name('asignar.create');
+        Route::post('/asignar', [MotoresAsignadosController::class, 'store'])->name('asignar.store');
+        Route::post('/entrada/{id}', [MotoresAsignadosController::class, 'registrarEntrada'])->name('registrar.entrada');
+        Route::post('/reporte/{id}', [MotoresAsignadosController::class, 'storeReporte'])->name('reporte.store');
+        Route::get('/{id}', [MotoresAsignadosController::class, 'show'])->name('show');
+        Route::delete('/{id}', [MotoresAsignadosController::class, 'destroy'])->name('destroy');
     });
-});
-
-
-/* ============================================
-   RUTAS COMPARTIDAS: ADMINISTRADOR Y COMERCIAL
-   ============================================ */
-
-Route::middleware(['auth', 'role:administrador,comercial'])->group(function () {
     
-    /* ----------------- ESTUDIANTES CRUD ----------------- */
+    /* ----------------- REPORTES DE TALLERES ----------------- */
+    Route::get('/talleresComercial', [ReporteTalleresController::class, 'index'])->name('reportes.talleres');
+    Route::get('/reportes/talleres/exportar', [ReporteTalleresController::class, 'exportar'])->name('reportes.talleres.exportar');
+    Route::get('/api/reportes/talleres/datos', [ReporteTalleresController::class, 'obtenerDatos'])->name('api.reportes.talleres.datos');
+    
+    /* ----------------- PROSPECTOS (ÁREA COMERCIAL) ----------------- */
+    Route::get('/prospectosComercial', [ProspectoController::class, 'index'])->name('prospectos.comercial');
+    Route::put('/prospectos/{id}/estado', [ProspectoController::class, 'updateEstado'])->name('prospectos.updateEstado');
+    
+    /* ----------------- CLASES DE PRUEBA ----------------- */
+    Route::post('/claseprueba/store', [ClasePruebaController::class, 'store'])->name('claseprueba.store');
+    
+    /* ----------------- ESTUDIANTES CRUD (compartido) ----------------- */
     Route::get('/estudiantes', [EstudianteController::class, 'index'])->name('estudiantes.index');
     Route::put('/estudiantes/editar/{id}', [EstudianteController::class, 'editar'])->name('estudiantes.editar');
     Route::delete('/estudiantes/{id}', [EstudianteController::class, 'eliminar'])->name('estudiantes.eliminar');
     Route::get('/estudiantes/{id}', [EstudianteController::class, 'ver'])->name('estudiantes.ver');
     Route::put('/estudiantes/{id}/cambiar-estado', [EstudianteController::class, 'cambiarEstado'])->name('estudiantes.cambiarEstado');
     
-    /* ----------------- PROGRAMAS CRUD ----------------- */
+    /* ----------------- PROGRAMAS CRUD (compartido) ----------------- */
     Route::get('/programas', [ProgramaController::class, 'index'])->name('programas.index');
     Route::post('/programas', [ProgramaController::class, 'store'])->name('programas.store');
     Route::get('/programas/{id}', [ProgramaController::class, 'show'])->name('programas.show');
-    Route::get('/admin/programas/{id}/edit', [ProgramaController::class, 'edit'])->name('programas.edit');
+    Route::get('/programas/{id}/edit', [ProgramaController::class, 'edit'])->name('programas.edit');
     Route::put('/programas/{id}', [ProgramaController::class, 'update'])->name('programas.update');
     Route::delete('/programas/{id}', [ProgramaController::class, 'destroy'])->name('programas.destroy');
     
@@ -273,8 +303,24 @@ Route::middleware(['auth', 'role:tutor'])->prefix('tutor')->name('tutor.')->grou
 
 
 /* ============================================
-   RUTAS ADICIONALES (Sin clasificar específicamente)
+   RUTAS ANTIGUAS (mantener por compatibilidad)
    ============================================ */
 
-// Ruta base del administrador (ajustar según necesites)
-Route::get('/administrador/baseAdministrador', fn() => view('/administrador/baseAdministrador'));
+// Rutas comercial antiguas (redirigen a administrador)
+Route::middleware(['auth', 'role:administrador'])->prefix('comercial')->group(function () {
+    Route::get('/estudiantesActivos', fn() => redirect('/administrador/estudiantesActivos'));
+    Route::get('/estudiantesNoActivos', fn() => redirect('/administrador/estudiantesNoActivos'));
+    Route::get('/talleresComercial', fn() => redirect('/administrador/talleresComercial'));
+    Route::get('/prospectosComercial', fn() => redirect('/administrador/prospectosComercial'));
+    Route::get('/estudianteActivoComercial', fn() => redirect('/administrador/estudiantesActivos'));
+});
+
+// Rutas sin prefijo para profesores (acceso directo)
+Route::middleware(['auth', 'role:administrador'])->group(function () {
+    Route::get('/profesores', fn() => redirect('/administrador/profesores'));
+});
+
+Route::get('forgot-password', [ForgotPasswordController::class, 'showLinkRequestForm'])->name('password.request');
+Route::post('forgot-password', [ForgotPasswordController::class, 'sendResetLinkEmail'])->name('password.email');
+Route::get('password/reset/{token}', [ResetPasswordController::class, 'showResetForm'])->name('password.reset');
+Route::post('password/reset', [ResetPasswordController::class, 'reset'])->name('password.update');

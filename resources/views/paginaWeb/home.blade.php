@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Young Engineers La Paz - STEM para Niños</title>
-    <link href="{{ auto_asset('css/home.css') }}" rel="stylesheet">
+    <link href="{{ auto_asset('css/paginaWeb/home.css') }}" rel="stylesheet">
 </head>
 
 <body>
@@ -290,177 +290,11 @@ function toggleNavbar() {
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bodymovin/5.7.6/lottie.min.js"></script>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bodymovin/5.7.6/lottie.min.js"></script>
     <script>
-        // ========== ANIMACIONES Y ELEMENTOS FLOTANTES ==========
-        const style = document.createElement('style');
-        style.textContent = `
-            @keyframes fadeInUp {
-                from { opacity: 0; transform: translateY(30px); }
-                to { opacity: 1; transform: translateY(0); }
-            }
-        `;
-        document.head.appendChild(style);
-
-        function createFloatingElement() {
-            const element = document.createElement('div');
-            element.className = 'floating-element';
-            element.style.left = Math.random() * 100 + '%';
-            element.style.animationDelay = Math.random() * 2 + 's';
-            element.style.animationDuration = (15 + Math.random() * 10) + 's';
-            
-            const colors = ['rgba(255, 255, 255, 0.1)', 'rgba(78, 205, 196, 0.1)', 'rgba(255, 107, 107, 0.1)'];
-            element.style.background = colors[Math.floor(Math.random() * colors.length)];
-            
-            document.querySelector('.floating-elements').appendChild(element);
-            
-            setTimeout(() => element.remove(), 25000);
-        }
-
-        setInterval(createFloatingElement, 3000);
-
-        // Animación WhatsApp
-        lottie.loadAnimation({
-            container: document.getElementById('whatsapp-animation'),
-            renderer: 'svg',
-            loop: true,
-            autoplay: true,
-            path: "{{ auto_asset('animaciones/whatsapp.json') }}"
-        });
-
-        // ========== MODAL DE CONTACTO ==========
-        function openContactModal() {
-            const modal = document.getElementById('contactModal');
-            modal.classList.add('show');
-            document.body.style.overflow = 'hidden';
-        }
-
-        function closeContactModal() {
-            const modal = document.getElementById('contactModal');
-            modal.classList.remove('show');
-            document.body.style.overflow = 'auto';
-        }
-
-        function closeContactModalOnOverlay(event) {
-            if (event.target === event.currentTarget) {
-                closeContactModal();
-            }
-        }
-
-        // ========== MODAL DE PUBLICACIONES ==========
-        function openPublicacionesModal() {
-            var modal = document.getElementById('publicacionesModal');
-            if(modal) {
-                modal.classList.add('show');
-                document.body.style.overflow = 'hidden';
-            }
-        }
-
-        function closePublicacionesModal() {
-            var modal = document.getElementById('publicacionesModal');
-            if(modal) {
-                modal.classList.remove('show');
-                document.body.style.overflow = 'auto';
-            }
-        }
-
-        function closePublicacionesModalOnOverlay(event) {
-            if (event.target === event.currentTarget) {
-                closePublicacionesModal();
-            }
-        }
-
-        // ========== FORMULARIO DE CONTACTO ========== 
-        // Eliminado el JS personalizado para que el formulario se envíe normalmente
-        // document.getElementById('contactForm').addEventListener('submit', function(e) {
-        //     e.preventDefault();
-        //     const formData = new FormData(this);
-        //     fetch("{{ route('prospectos.store') }}", {
-        //         method: "POST",
-        //         headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
-        //         body: formData
-        //     })
-        //     .then(response => response.json())
-        //     .then(data => {
-        //         alert(data.message);
-        //         this.reset();
-        //         closeContactModal();
-        //     })
-        //     .catch(error => {
-        //         console.error('Error:', error);
-        //         alert('Ocurrió un error al enviar tus datos.');
-        //     });
-        // });
-
-        // ========== DEBUG Y AUTO-ABRIR MODAL ==========
-        function updateDebugInfo(message) {
-            const debugElement = document.getElementById('debugText');
-            const publicacionesCount = {{ $publicaciones->count() ?? 0 }};
-            const timestamp = new Date().toLocaleTimeString();
-            
-            if(debugElement) {
-                debugElement.innerHTML = `
-                    Publicaciones en BD: ${publicacionesCount}<br>
-                    Variable existe: {{ isset($publicaciones) ? 'SÍ' : 'NO' }}<br>
-                    Última acción: ${message}<br>
-                    Hora: ${timestamp}
-                `;
-            }
-        }
-
-        // ========== EVENTOS Y AUTO-ABRIR ==========
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log("🚀 DOM cargado - Iniciando verificaciones...");
-            
-            const publicacionesCount = {{ $publicaciones->count() ?? 0 }};
-            const hayPublicaciones = publicacionesCount > 0;
-            
-            updateDebugInfo("DOM cargado");
-            
-            console.log("📊 Datos de publicaciones:");
-            console.log("- Count:", publicacionesCount);
-            console.log("- Hay publicaciones:", hayPublicaciones);
-            console.log("- Datos:", @json($publicaciones ?? []));
-            
-            // AUTO-ABRIR SI HAY PUBLICACIONES
-            if(hayPublicaciones) {
-                console.log("✨ Hay publicaciones, abriendo modal automáticamente...");
-                setTimeout(() => {
-                    openPublicacionesModal();
-                    updateDebugInfo("Modal abierto automáticamente");
-                }, 1000); // Esperar 1 segundo
-            } else {
-                console.log("📭 No hay publicaciones para mostrar");
-                updateDebugInfo("Sin publicaciones para mostrar");
-            }
-        });
-
-        // Cerrar modales con ESC
-        document.addEventListener('keydown', function(event) {
-            if (event.key === 'Escape') {
-                closeContactModal();
-                closePublicacionesModal();
-            }
-        });
-
-        // OCULTAR DEBUG DESPUÉS DE 10 SEGUNDOS (opcional)
-        setTimeout(() => {
-            const debugElement = document.getElementById('debugInfo');
-            if(debugElement) {
-                debugElement.style.display = 'none';
-            }
-        }, 10000);
-
-        // Animación de aparición de títulos al hacer scroll
-        function revealTitlesOnScroll() {
-            document.querySelectorAll('.section-title, .program-card').forEach(function(el) {
-                var rect = el.getBoundingClientRect();
-                if (rect.top < window.innerHeight - 60) {
-                    el.classList.add('visible');
-                }
-            });
-        }
-        window.addEventListener('scroll', revealTitlesOnScroll);
-        document.addEventListener('DOMContentLoaded', revealTitlesOnScroll);
+        window.publicacionesCount = {{ $publicaciones->count() ?? 0 }};
     </script>
+    <script src="{{ asset('js/paginaWeb/home.js') }}"></script>
+
 </body>
 </html>

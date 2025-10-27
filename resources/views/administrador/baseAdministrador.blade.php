@@ -112,37 +112,65 @@
                             <i class="bi bi-caret-down-fill ms-auto"></i>
                         </a>
                         <div class="collapse ps-4" id="submenuComercial">
-                            <ul class="nav flex-column">
-                                <li><a class="nav-link" href="{{ route('prospectos.comercial') }}">Prospectos</a></li>
-                                <li><a class="nav-link" href="{{ route('estudiantesActivos') }}">Estudiantes activos</a></li>
-                                <li><a class="nav-link" href="{{ route('estudiantesNoActivos') }}">Estudiantes no activos</a></li>
-                                <li><a class="nav-link" href="{{ route('reportes.talleres') }}">Talleres</a></li>
-                            </ul>
-                        </div>
+                        <ul class="nav flex-column">
+                            <li><a class="nav-link" href="{{ route('prospectos.comercial') }}">Prospectos</a></li>
+                            <li><a class="nav-link" href="{{ route('estudiantesActivos') }}">Estudiantes activos</a></li>
+                            <li><a class="nav-link" href="{{ route('estudiantesNoActivos') }}">Estudiantes no activos</a></li>
+                            <li><a class="nav-link" href="{{ route('reportes.talleres') }}">Talleres</a></li>
+                        </ul>
+                    </div>
                     </li>
                 </ul>
             </div>
 
             <hr>
 
-            <!-- Cerrar sesión -->
-            <div>
-                <a href="#" class="d-flex align-items-center link-dark text-decoration-none gap-2">
-                    <button type="button" class="btn btn-danger w-75">Cerrar sesión</button>
-                   
-                </a>
+        <!-- Usuario y Cerrar sesión -->
+            <div class="d-flex align-items-center justify-content-between">
+                <div class="d-flex align-items-center gap-2">
+                    <img src="https://ui-avatars.com/api/?name={{ auth()->user()->persona->Nombre ?? 'Usuario' }}&background=0d6efd&color=fff" alt="perfil" width="32" height="32" class="rounded-circle">
+                    <div class="d-flex flex-column" style="line-height: 1.2;">
+                        <small class="fw-bold">{{ auth()->user()->persona->Nombre ?? 'Usuario' }}</small>
+                        <small class="text-muted" style="font-size: 0.75rem;">{{ ucfirst(auth()->user()->rol ?? 'Admin') }}</small>
+                    </div>
+                </div>
+                <form action="{{ route('logout') }}" method="POST" class="m-0">
+                    @csrf
+                    <button type="submit" class="btn btn-sm btn-danger" title="Cerrar sesión">
+                        <i class="bi bi-box-arrow-right"></i>
+                    </button>
+                </form>
             </div>
         </div>
 
         <!-- Contenido Principal -->
         <div class="flex-grow-1" style="margin-left: 280px;">
+
+            <!-- Contenido -->
             <div class="container-fluid p-4">
+                <!-- Mensajes de éxito/error -->
+                @if(session('success'))
+                    <div class="alert alert-success alert-dismissible fade show" role="alert">
+                        <i class="bi bi-check-circle-fill me-2"></i>
+                        {{ session('success') }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                @endif
+
+                @if(session('error'))
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                        {{ session('error') }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                @endif
+
                 @yield('content')
             </div>
         </div>
-    </div>
 
     @yield('scripts')
+    <script src="{{ asset('js/administrador/baseAdministrador.js') }}"></script>
     @stack('scripts')
 
 </body>
