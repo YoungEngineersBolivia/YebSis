@@ -6,65 +6,7 @@
     @vite('resources/css/dashboard.css')
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
-    <style>
-        .table thead th { white-space: nowrap; }
-        .badge-status { font-size: .85rem; }
-        .search-hint { font-size: .9rem; color:#666; }
-        .pagination { justify-content: center; }
-
-        /* --- Tabla a tarjetas en móvil --- */
-        @media (max-width: 576px) {
-            .responsive-table thead {
-                display: none;
-            }
-            .responsive-table tbody tr {
-                display: block;
-                margin-bottom: 1rem;
-                border: 1px solid #e9ecef;
-                border-radius: .5rem;
-                overflow: hidden;
-                background: #fff;
-            }
-            .responsive-table tbody td {
-                display: flex;
-                justify-content: space-between;
-                gap: .75rem;
-                padding: .75rem 1rem;
-                border-bottom: 1px solid #f1f3f5;
-            }
-            .responsive-table tbody td:last-child {
-                border-bottom: 0;
-            }
-            .responsive-table tbody td::before {
-                content: attr(data-label);
-                font-weight: 600;
-                color: #555;
-                min-width: 44%;
-                text-align: left;
-            }
-            /* Botones en una línea con wrap */
-            .actions-mobile {
-                display: flex;
-                flex-wrap: wrap;
-                gap: .5rem;
-                width: 100%;
-                justify-content: flex-start;
-            }
-        }
-
-        /* Correcciones visuales */
-        .truncate-mail {
-            max-width: 260px;
-            display: inline-block;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            vertical-align: bottom;
-        }
-        @media (max-width: 576px) {
-            .truncate-mail { max-width: 60%; }
-        }
-    </style>
+   <link href="{{ auto_asset('css/administrador/profesoresAdministrador.css') }}" rel="stylesheet">
 @endsection
 
 @section('content')
@@ -301,21 +243,5 @@
 @endsection
 
 @section('scripts')
-<script>
-    (function () {
-        const input = document.querySelector('input[name="search"]');
-        const table = document.getElementById('teachersTable');
-        if (!input || !table) return;
-
-        input.addEventListener('input', function () {
-            const q = this.value.trim().toLowerCase();
-            const rows = table.querySelectorAll('tbody tr');
-
-            rows.forEach(row => {
-                const text = row.innerText.toLowerCase();
-                row.style.display = text.includes(q) ? '' : 'none';
-            });
-        });
-    })();
-</script>
+<script src="{{ auto_asset('js/administrador/profesoresAdministrador.js') }}"></script>
 @endsection

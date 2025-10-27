@@ -193,11 +193,11 @@ Route::middleware(['auth', 'role:administrador,comercial'])->group(function () {
    RUTAS PARA COMERCIAL
    ============================================ */
 
-Route::middleware(['auth', 'role:admnistrador'])->prefix('administrador')->group(function () {
+Route::middleware(['auth', 'role:administrador'])->prefix('comercial')->group(function () {
     
     /* ----------------- ESTUDIANTES ACTIVOS ----------------- */
     Route::get('/estudiantesActivos', [EstudiantesActivosController::class, 'index'])->name('estudiantesActivos');
-    Route::get('/estudiantes-activos/exportar', [EstudiantesActivosController::class, 'exportar'])->name('estudiantesActivos.exportar');
+    Route::get('/estudiantesActivos/exportar', [EstudiantesActivosController::class, 'exportar'])->name('estudiantesActivos.exportar');
     Route::put('/estudiantes/desactivar/{id}', [EstudiantesActivosController::class, 'desactivar'])->name('estudiantes.desactivar');
     Route::get('/estudianteActivoComercial', fn() => view('comercial.estudianteActivoComercial'))->name('comercial.estudianteActivoComercial');
     
