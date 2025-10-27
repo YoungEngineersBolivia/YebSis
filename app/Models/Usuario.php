@@ -6,6 +6,9 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Contracts\Auth\CanResetPassword;
 use App\Notifications\ResetPasswordNotification; // IMPORTANTE: Agregar este import
+use App\Models\Persona;
+use App\Models\Tutores;
+use App\Models\Profesor;
 
 class Usuario extends Authenticatable implements CanResetPassword
 {
@@ -59,7 +62,7 @@ class Usuario extends Authenticatable implements CanResetPassword
 
     public function profesor()
     {
-        return $this->hasOne(\App\Models\Profesor::class, 'Id_usuarios', 'Id_usuarios');
+        return $this->hasOne(Profesor::class, 'Id_usuarios', 'Id_usuarios');
     }
 
     public function getRolAttribute()
