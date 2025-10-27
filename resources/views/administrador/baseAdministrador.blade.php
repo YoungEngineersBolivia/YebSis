@@ -172,7 +172,7 @@
         </div>
 
     @yield('scripts')
-    <script src="{{ asset('js/administrador/baseAdministrador.js') }}"></script>
+    <script src="{{ auto_asset('js/administrador/baseAdministrador.js') }}"></script>
     @stack('scripts')
 
 </body>
