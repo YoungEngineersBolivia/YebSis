@@ -1,0 +1,22 @@
+ .card-soft {
+            border: 1px solid #eee;
+            border-radius: 16px;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.04);
+        }
+        .chart-wrap {
+            background: #fff;
+            border-radius: 16px;
+            padding: 16px;
+        }
+        .toolbar {
+            display: flex; gap: 12px; align-items: center; flex-wrap: wrap;
+        }
+        .toolbar .form-select, .toolbar .form-control {
+            border-radius: 12px;
+        }
+        .table thead th { white-space: nowrap; }
+        .btn-ghost {
+            border-radius: 10px;
+            border: 1px solid #eaeaea;
+            background: #fff;
+        }

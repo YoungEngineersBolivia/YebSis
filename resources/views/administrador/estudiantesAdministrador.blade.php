@@ -6,34 +6,7 @@
     @vite('resources/css/dashboard.css')
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
-    <style>
-        .table thead th {
-            white-space: nowrap;
-        }
-        .badge-status {
-            font-size: .85rem;
-        }
-        .search-hint {
-            font-size: .9rem; color:#666;
-        }
-
-        /* Estilo del botón de desactivar/activar */
-        .btn-toggle-status {
-            transition: background-color 0.3s ease, color 0.3s ease;
-        }
-        .btn-toggle-status.active {
-            background-color: #28a745;
-            color: white;
-        }
-        .btn-toggle-status.inactive {
-            background-color: #dc3545;
-            color: white;
-        }
-
-        .pagination {
-            justify-content: center;
-        }
-    </style>
+    <link href="{{ auto_asset('css/administrador/estudiantesAdministrador.css') }}" rel="stylesheet">
 @endsection
 
 @section('content')
