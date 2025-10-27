@@ -10,7 +10,7 @@
     <button class="menu-button assigned">Alumnos</button>
     </a>
 
-    <a href="{{ route('profesor.inventario') }}">
+    <a href="#">
         <button class="menu-button assigned" onclick="handleAssigned()">
             Inventario
         </button>
