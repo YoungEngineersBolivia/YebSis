@@ -2,7 +2,7 @@
 @extends('profesor.baseProfesor')
 
 @section('styles')
-<link href="{{ asset('css/profesor/editarEvaluacion.css') }}" rel="stylesheet">
+<link href="{{ auto_asset('css/profesor/editarEvaluacion.css') }}" rel="stylesheet">
 @endsection
 
 @section('content')
@@ -138,5 +138,5 @@
     </form>
 </div>
 
-<script src="{{ asset('js/profesor/editarEvaluacion.js') }}"></script>
+<script src="{{ auto_asset('js/profesor/editarEvaluacion.js') }}"></script>
 @endsection
