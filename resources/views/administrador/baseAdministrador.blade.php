@@ -4,14 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@yield('title', 'Mi Aplicación Laravel')</title>
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
-
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
-    
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
 </head>
 <body class="font-sans ">
 
@@ -20,7 +16,7 @@
         <div class="d-flex flex-column flex-shrink-0 p-3 bg-light position-fixed" style="width: 280px; height: 100vh;">
             <!-- Logo -->
             <a href="/" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto link-dark text-decoration-none">
-                <img src="{{ Vite::asset('resources/img/ES_logo-02.webp') }}" alt="Logo YE Bolivia" width="250px" class="me-2">
+                <img src="{{ auto_asset('img/ES_logo-02.webp') }}" alt="Logo YE Bolivia" width="250px" class="me-2">
             </a>
             <hr>
 
@@ -118,10 +114,9 @@
                         <div class="collapse ps-4" id="submenuComercial">
                             <ul class="nav flex-column">
                                 <li><a class="nav-link" href="{{ route('prospectos.comercial') }}">Prospectos</a></li>
-
-                                <li><a class="nav-link" href="/comercial/estudiantesActivos">Estudiantes activos</a></li>
-                                <li><a class="nav-link" href="/comercial/estudiantesNoActivos">Estudiantes no activos</a></li>
-                                <li><a class="nav-link" href="/comercial/talleresComercial">Talleres</a></li>
+                                <li><a class="nav-link" href="{{ route('estudiantesActivos') }}">Estudiantes activos</a></li>
+                                <li><a class="nav-link" href="{{ route('estudiantesNoActivos') }}">Estudiantes no activos</a></li>
+                                <li><a class="nav-link" href="{{ route('reportes.talleres') }}">Talleres</a></li>
                             </ul>
                         </div>
                     </li>
@@ -134,7 +129,7 @@
             <div>
                 <a href="#" class="d-flex align-items-center link-dark text-decoration-none gap-2">
                     <button type="button" class="btn btn-danger w-75">Cerrar sesión</button>
-                    <img src="https://github.com/mdo.png" alt="perfil" width="32" height="32" class="rounded-circle">
+                   
                 </a>
             </div>
         </div>
