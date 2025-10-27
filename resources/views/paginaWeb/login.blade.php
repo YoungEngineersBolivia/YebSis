@@ -49,7 +49,13 @@
                         <input type="password" name="Contrasenia" id="password" class="form-input" placeholder="Contraseña" required>
                         <button type="button" class="password-toggle" onclick="togglePassword()">👁</button>
                     </div>
+                    <div class="forgot-pwd">
+                        <a href="{{route('password.request')}}">
+                            <button type="button">Te olvidaste tu contraseña?</button>
+                        </a>
+                    </div>
                 </div>
+
                 <button type="submit" class="login-button">Iniciar Sesión</button>
             </form>
         </div>

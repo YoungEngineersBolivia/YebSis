@@ -4,28 +4,49 @@ namespace App\Models;
 
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Contracts\Auth\CanResetPassword;
+use App\Notifications\ResetPasswordNotification; // IMPORTANTE: Agregar este import
 
-class Usuario extends Authenticatable
+class Usuario extends Authenticatable implements CanResetPassword
 {
     use Notifiable;
 
-    // Mapea la tabla 'usuarios' creada en tu migration
     protected $table = 'usuarios';
     protected $primaryKey = 'Id_usuarios';
     public $timestamps = true;
     public $incrementing = true;
     protected $keyType = 'int';
 
-    // Nombre del campo que contiene la contraseña en tu tabla
+    protected $guarded = [];
+
     public function getAuthPassword()
     {
         return $this->Contrasenia;
     }
 
-    // Opcional: evita que se asigne masivamente campos no deseados
-    protected $guarded = [];
+    public function getEmailForPasswordReset()
+    {
+        return $this->Correo;
+    }
 
-    // Relación con persona
+    public function getEmailAttribute()
+    {
+        return $this->attributes['Correo'] ?? null;
+    }
+
+    public function setEmailAttribute($value)
+    {
+        $this->attributes['Correo'] = $value;
+    }
+
+    // Método para enviar la notificación de reset
+    public function sendPasswordResetNotification($token)
+    {
+        $this->notify(new ResetPasswordNotification($token));
+    }
+
+    // ... resto de tus métodos (persona, tutor, profesor, etc.)
+    
     public function persona()
     {
         return $this->belongsTo(Persona::class, 'Id_personas', 'Id_personas');
@@ -41,18 +62,12 @@ class Usuario extends Authenticatable
         return $this->hasOne(\App\Models\Profesor::class, 'Id_usuarios', 'Id_usuarios');
     }
 
-    /**
-     * Accessor para obtener el rol del usuario
-     * Obtiene el nombre del rol desde: usuario -> persona -> role
-     */
     public function getRolAttribute()
     {
-        // Si no está cargada la relación, cargarla
         if (!$this->relationLoaded('persona')) {
             $this->load('persona.rol');
         }
 
-        // Retornar el nombre del rol en minúsculas
         if ($this->persona && $this->persona->rol) {
             return strtolower($this->persona->rol->Nombre_rol);
         }
@@ -60,17 +75,11 @@ class Usuario extends Authenticatable
         return null;
     }
 
-    /**
-     * Verificar si el usuario tiene un rol específico
-     */
     public function hasRole($role)
     {
         return $this->rol === strtolower($role);
     }
 
-    /**
-     * Verificar si el usuario tiene alguno de los roles dados
-     */
     public function hasAnyRole($roles)
     {
         $roles = is_array($roles) ? $roles : func_get_args();
