@@ -7,7 +7,7 @@
     <h1 class="me-2">Registrar administrador</h1>
 </div>
 
-<form action="/administradores/registrar" method="POST">
+<form action="{{ route('administrador.registrar') }}" method="POST">
     @csrf
 
     <div class="d-flex align-items-end gap-3 mb-3">
