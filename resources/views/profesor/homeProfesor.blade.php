@@ -1,7 +1,7 @@
 @extends('profesor.baseProfesor')
 
 @section('styles')
-<link rel="stylesheet" href="{{ asset('css/profesor/homeProfesor.css') }}">
+<link rel="stylesheet" href="{{ auto_asset('css/profesor/homeProfesor.css') }}">
 @endsection
 
 @section('content')
@@ -18,6 +18,6 @@
 
     </main>
 
-<script src="{{ asset('js/profesor/homeProfesor.js') }}"></script>
+<script src="{{ auto_asset('js/profesor/homeProfesor.js') }}"></script>
 @endsection
 
