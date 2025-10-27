@@ -74,6 +74,6 @@ class CustomLoginController extends Controller
         Auth::logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
-        return redirect()->route('login')->with('status', 'Sesión cerrada');
+        return redirect()->route('home')->with('status', 'Sesión cerrada');
     }
 }

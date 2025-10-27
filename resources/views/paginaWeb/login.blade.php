@@ -4,24 +4,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Jóvenes Ingenieros - Login</title>
-    <link href="{{ asset('css/login.css') }}" rel="stylesheet">
-    <style>
-        .forgot-pwd button {
-            background-color: transparent;
-            color: #007bff;
-            border: none;
-            padding: 0;
-            font-size: 14px;
-            text-decoration: underline;
-            cursor: pointer;
-        }
+    <link href="{{ auto_asset('css/paginaWeb/login.css') }}" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-        .forgot-pwd button:hover {
-            color: #0056b3;
-        }
-    </style>
 </head>
 <body>
+      <a href="{{ route('home') }}" class="btn-home">
+            <i class="fas fa-home"></i> Inicio
+        </a>
+
+
+
     <div class="container">
         <div class="left-section">
             <div class="grid-pattern"></div>
@@ -75,37 +68,6 @@
             </form>
         </div>
     </div>
-    <script>
-        function togglePassword() {
-            const passwordInput = document.getElementById('password');
-            const toggleButton = document.querySelector('.password-toggle');
-            if (!passwordInput) return;
-            if (passwordInput.type === 'password') {
-                passwordInput.type = 'text';
-                toggleButton.textContent = '👁‍🗨';
-            } else {
-                passwordInput.type = 'password';
-                toggleButton.textContent = '👁';
-            }
-        }
-
-        // Animación de los engranajes
-        document.addEventListener('DOMContentLoaded', function() {
-            const gears = document.querySelectorAll('.gear');
-            gears.forEach((gear, index) => {
-                gear.style.animation = `rotate ${2 + index}s linear infinite`;
-            });
-        });
-
-        // CSS Animation para los engranajes
-        const style = document.createElement('style');
-        style.textContent = `
-            @keyframes rotate {
-                from { transform: rotate(0deg); }
-                to { transform: rotate(360deg); }
-            }
-        `;
-        document.head.appendChild(style);
-    </script>
+    <script src="{{ asset('js/paginaWeb/login.js') }}"></script>
 </body>
 </html>
