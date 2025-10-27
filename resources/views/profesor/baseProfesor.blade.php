@@ -6,7 +6,6 @@
     <title>Panel del Profesor</title>
 
     {{-- Estilos propios de cada vista --}}
-    @yield('styles')
     <link rel="stylesheet" href="{{ asset('css/profesor/baseProfesor.css') }}">
 </head>
 <body>
