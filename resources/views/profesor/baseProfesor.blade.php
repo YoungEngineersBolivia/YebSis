@@ -7,6 +7,7 @@
 
     {{-- Estilos propios de cada vista --}}
     <link rel="stylesheet" href="{{ auto_asset('css/profesor/baseProfesor.css') }}">
+     @yield('styles')
 </head>
 <body>
     <div class="container">
