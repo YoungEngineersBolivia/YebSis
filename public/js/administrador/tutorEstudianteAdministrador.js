@@ -1,111 +1,130 @@
-document.addEventListener('DOMContentLoaded', function() {
-    const programaSelect = document.querySelector('select[name="programa"]');
-    const precioInput = document.getElementById('Precio_programa');
-    const matriculaInput = document.getElementById('Monto_matricula');
-    const cuotasInput = document.getElementById('nro_cuotas');
-    const montoTotalInput = document.getElementById('Monto_total');
-    const descuentoInput = document.getElementById('Descuento_aplicado');
-    const descuentoPorcentajeInput = document.getElementById('tutor_descuento');
-    const totalConDescuentoInput = document.getElementById('Total_con_descuento');
-    const tablaCuotas = document.getElementById('tabla-cuotas-auto').querySelector('tbody');
-    const cuotasAutoHiddenInputs = document.getElementById('cuotas-auto-hidden-inputs');
+// public/js/registro-combinado.js
 
-    function getDescuentoPorcentaje() {
-        let val = descuentoPorcentajeInput ? parseFloat(descuentoPorcentajeInput.value) : 0;
+class RegistroCombinado {
+    constructor(programas) {
+        this.programas = programas;
+        this.initElements();
+        this.initEventListeners();
+        this.init();
+    }
+
+    initElements() {
+        this.programaSelect = document.querySelector('select[name="programa"]');
+        this.precioInput = document.getElementById('Precio_programa');
+        this.matriculaInput = document.getElementById('Monto_matricula');
+        this.cuotasInput = document.getElementById('nro_cuotas');
+        this.montoTotalInput = document.getElementById('Monto_total');
+        this.descuentoInput = document.getElementById('Descuento_aplicado');
+        this.descuentoPorcentajeInput = document.getElementById('tutor_descuento');
+        this.totalConDescuentoInput = document.getElementById('Total_con_descuento');
+        this.tablaCuotas = document.getElementById('tabla-cuotas-auto').querySelector('tbody');
+        this.cuotasAutoHiddenInputs = document.getElementById('cuotas-auto-hidden-inputs');
+        this.partesMatriculaSelect = document.querySelector('select[name="Partes_matricula"]');
+        this.fechaPlanInput = document.querySelector('input[name="fecha_plan_pagos"]');
+    }
+
+    getDescuentoPorcentaje() {
+        let val = this.descuentoPorcentajeInput ? parseFloat(this.descuentoPorcentajeInput.value) : 0;
         return isNaN(val) ? 0 : val;
     }
 
-    function actualizarPrecio() {
-        const selectedId = programaSelect.value;
-        const programa = programas.find(p => String(p.Id_programas) === String(selectedId));
+    actualizarPrecio() {
+        const selectedId = this.programaSelect.value;
+        const programa = this.programas.find(p => String(p.Id_programas) === String(selectedId));
+        
         if (programa) {
-            precioInput.value = programa.Costo;
+            this.precioInput.value = programa.Costo;
         } else {
-            precioInput.value = '';
+            this.precioInput.value = '';
         }
-        actualizarMontoTotal();
+        this.actualizarMontoTotal();
     }
 
-    function actualizarMontoTotal() {
-        const matricula = parseFloat(matriculaInput.value) || 0;
-        const precioPrograma = parseFloat(precioInput.value) || 0;
-        const cuotas = parseInt(cuotasInput.value) || 0;
+    actualizarMontoTotal() {
+        const matricula = parseFloat(this.matriculaInput.value) || 0;
+        const precioPrograma = parseFloat(this.precioInput.value) || 0;
+        const cuotas = parseInt(this.cuotasInput.value) || 0;
+        
         // Monto total es matrícula + (precio del programa * cuotas) SIN descuento
-        const total = Math.round(matricula + (precioPrograma * cuotas));
-
-        montoTotalInput.value = total > 0 ? total : '';
+        const total = matricula + (precioPrograma * cuotas);
+        this.montoTotalInput.value = total > 0 ? total.toFixed(2) : '';
 
         // Descuento: solo al precio del programa (por cuota * cuotas)
-        const descuentoPorcentaje = getDescuentoPorcentaje();
-        // Redondeo a la decena más próxima (por ejemplo, 82.32 -> 82.40)
-        function roundToNearestTenCents(num) {
-            return (Math.ceil(num * 100 / 10) * 10 / 100).toFixed(2);
-        }
+        const descuentoPorcentaje = this.getDescuentoPorcentaje();
+        
         const descuentoRaw = (precioPrograma * (descuentoPorcentaje / 100)) * cuotas;
-        const descuento = cuotas > 0 && !isNaN(descuentoPorcentaje) ? roundToNearestTenCents(descuentoRaw) : '0.00';
+        const descuento = cuotas > 0 && descuentoPorcentaje > 0 ? descuentoRaw.toFixed(2) : '0.00';
+        
         // Total con descuento aplicado
-        const descuentoTotalRaw = total - descuentoRaw;
-        const descuentoTotal = total > 0 && !isNaN(descuentoPorcentaje) ? roundToNearestTenCents(descuentoTotalRaw) : '0.00';
+        const totalConDescuento = (total - descuentoRaw).toFixed(2);
 
-        descuentoInput.value = descuento;
-        totalConDescuentoInput.value = descuentoTotal;
+        this.descuentoInput.value = descuento;
+        this.totalConDescuentoInput.value = totalConDescuento;
+        
+        // Generar cuotas después de actualizar totales
+        this.generarCuotas();
     }
 
-    function addMonths(date, months) {
-        // Suma meses y mantiene el día si es posible
+    addMonths(date, months) {
         const d = new Date(date);
         const day = d.getDate();
         d.setMonth(d.getMonth() + months);
-        // Si el mes siguiente no tiene ese día, ajusta al último día del mes
         if (d.getDate() < day) {
             d.setDate(0);
         }
         return d;
     }
 
-    function pad(num) {
+    pad(num) {
         return num < 10 ? '0' + num : num;
     }
 
-    function formatDate(date) {
-        return date.getFullYear() + '-' + pad(date.getMonth() + 1) + '-' + pad(date.getDate());
+    formatDate(date) {
+        return date.getFullYear() + '-' + this.pad(date.getMonth() + 1) + '-' + this.pad(date.getDate());
     }
 
-    function generarCuotas() {
-        const cuotas = parseInt(cuotasInput.value) || 0;
-        const totalConDescuento = parseFloat(totalConDescuentoInput.value) || 0;
-        const matricula = parseFloat(matriculaInput.value) || 0;
-        const partesMatricula = parseInt(document.querySelector('select[name="Partes_matricula"]').value) || 1;
-        const fechaBase = document.querySelector('input[name="fecha_plan_pagos"]').value || (new Date()).toISOString().slice(0,10);
+    generarCuotas() {
+        const cuotas = parseInt(this.cuotasInput.value) || 0;
+        const totalConDescuento = parseFloat(this.totalConDescuentoInput.value) || 0;
+        const matricula = parseFloat(this.matriculaInput.value) || 0;
+        const partesMatricula = parseInt(this.partesMatriculaSelect.value) || 1;
+        const fechaBase = this.fechaPlanInput.value || (new Date()).toISOString().slice(0,10);
 
-        tablaCuotas.innerHTML = '';
-        cuotasAutoHiddenInputs.innerHTML = '';
+        this.tablaCuotas.innerHTML = '';
+        this.cuotasAutoHiddenInputs.innerHTML = '';
+        
         if (cuotas > 0 && totalConDescuento > 0) {
-            // Calcular cuánto de la matrícula va en cada cuota (solo en las primeras "partesMatricula" cuotas)
-            let matriculaPorCuota = partesMatricula > 0 ? Math.floor((matricula / partesMatricula) * 100) / 100 : 0;
-            let matriculaRestante = matricula - (matriculaPorCuota * partesMatricula);
-
+            // Calcular cuánto de la matrícula va en cada cuota
+            let matriculaPorCuota = partesMatricula > 0 ? (matricula / partesMatricula) : 0;
+            
             // El resto del total (sin matrícula) se distribuye entre todas las cuotas
             let restoTotal = totalConDescuento - matricula;
-            let restoPorCuota = cuotas > 0 ? Math.floor((restoTotal / cuotas) * 100) / 100 : 0;
-            let restoRestante = restoTotal - (restoPorCuota * cuotas);
+            let restoPorCuota = cuotas > 0 ? (restoTotal / cuotas) : 0;
 
             for (let i = 0; i < cuotas; i++) {
-                // Sumar matrícula solo a las primeras "partesMatricula" cuotas
                 let montoCuota = restoPorCuota;
+                
+                // Agregar parte de matrícula solo a las primeras cuotas
                 if (i < partesMatricula) {
                     montoCuota += matriculaPorCuota;
-                    // Ajustar la última cuota de matrícula por redondeo
-                    if (i === partesMatricula - 1) {
-                        montoCuota += matriculaRestante;
-                    }
                 }
-                // Ajustar la última cuota general por redondeo
+                
+                // Ajustar última cuota para compensar redondeos
                 if (i === cuotas - 1) {
-                    montoCuota += restoRestante;
+                    let sumaAcumulada = 0;
+                    for (let j = 0; j < cuotas - 1; j++) {
+                        let tempMonto = restoPorCuota;
+                        if (j < partesMatricula) {
+                            tempMonto += matriculaPorCuota;
+                        }
+                        sumaAcumulada += tempMonto;
+                    }
+                    montoCuota = totalConDescuento - sumaAcumulada;
                 }
-                const fechaVenc = addMonths(new Date(fechaBase), i);
-                const fechaStr = formatDate(fechaVenc);
+                
+                const fechaVenc = this.addMonths(new Date(fechaBase), i);
+                const fechaStr = this.formatDate(fechaVenc);
+                
                 const row = `
                     <tr>
                         <td>${i + 1}</td>
@@ -114,10 +133,9 @@ document.addEventListener('DOMContentLoaded', function() {
                         <td>Pendiente</td>
                     </tr>
                 `;
-                tablaCuotas.insertAdjacentHTML('beforeend', row);
+                this.tablaCuotas.insertAdjacentHTML('beforeend', row);
 
-                // Agrega los inputs ocultos fuera de la tabla para que se envíen correctamente
-                cuotasAutoHiddenInputs.insertAdjacentHTML('beforeend', `
+                this.cuotasAutoHiddenInputs.insertAdjacentHTML('beforeend', `
                     <input type="hidden" name="cuotas_auto[${i}][Nro_de_cuota]" value="${i + 1}">
                     <input type="hidden" name="cuotas_auto[${i}][Fecha_vencimiento]" value="${fechaStr}">
                     <input type="hidden" name="cuotas_auto[${i}][Monto_cuota]" value="${montoCuota.toFixed(2)}">
@@ -127,43 +145,39 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    function initEventListeners() {
-        if (programaSelect) {
-            programaSelect.addEventListener('change', actualizarPrecio);
+    initEventListeners() {
+        if (this.programaSelect) {
+            this.programaSelect.addEventListener('change', () => this.actualizarPrecio());
         }
-        if (matriculaInput) {
-            matriculaInput.addEventListener('input', actualizarMontoTotal);
+        
+        if (this.matriculaInput) {
+            this.matriculaInput.addEventListener('input', () => this.actualizarMontoTotal());
         }
-        if (cuotasInput) {
-            cuotasInput.addEventListener('input', function() {
-                actualizarMontoTotal();
-                generarCuotas();
-            });
+        
+        if (this.cuotasInput) {
+            this.cuotasInput.addEventListener('input', () => this.actualizarMontoTotal());
         }
-        if (descuentoPorcentajeInput) {
-            descuentoPorcentajeInput.addEventListener('input', actualizarMontoTotal);
+        
+        if (this.descuentoPorcentajeInput) {
+            this.descuentoPorcentajeInput.addEventListener('input', () => this.actualizarMontoTotal());
         }
-        if (totalConDescuentoInput) {
-            totalConDescuentoInput.addEventListener('input', generarCuotas);
+        
+        if (this.partesMatriculaSelect) {
+            this.partesMatriculaSelect.addEventListener('change', () => this.actualizarMontoTotal());
         }
-        document.querySelector('input[name="fecha_plan_pagos"]').addEventListener('change', generarCuotas);
-        document.querySelector('select[name="Partes_matricula"]').addEventListener('change', function() {
-            actualizarMontoTotal();
-            generarCuotas();
-        });
-
-        // También actualiza cuotas cuando cambian los valores que afectan el total
-        [matriculaInput, precioInput, descuentoPorcentajeInput].forEach(function(input) {
-            if (input) input.addEventListener('input', function() {
-                actualizarMontoTotal();
-                generarCuotas();
-            });
-        });
+        
+        if (this.fechaPlanInput) {
+            this.fechaPlanInput.addEventListener('change', () => this.generarCuotas());
+        }
     }
 
-    initEventListeners();
+    init() {
+        // Inicializa valores al cargar si hay un programa pre-seleccionado
+        if (this.programaSelect && this.programaSelect.value) {
+            this.actualizarPrecio();
+        }
+    }
+}
 
-    // Inicializa valores al cargar
-    actualizarPrecio();
-    generarCuotas();
-});
+// Exportar para uso global
+window.RegistroCombinado = RegistroCombinado;

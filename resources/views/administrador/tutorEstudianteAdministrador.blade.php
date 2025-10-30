@@ -240,20 +240,18 @@
 
 @endsection
 
-@push('scripts')
-@push('scripts')
+<script src="{{ asset('js/administrador/tutorEstudianteAdministrador.js') }}"></script>
 <script>
-    // Pasar datos de PHP a JS
-    const programas = @json($programas->map(function($p) {
-        return [
+    // Pasar los datos de PHP a JavaScript e inicializar
+    document.addEventListener('DOMContentLoaded', function() {
+        const programas = @json($programas->map(fn($p) => [
             'Id_programas' => $p->Id_programas,
             'Nombre' => $p->Nombre,
             'Costo' => $p->Costo
-        ];
-    }));
-    
+        ]));
+        
+        // Inicializar la clase
+        new RegistroCombinado(programas);
+    });
 </script>
-<script src="{{ auto_asset('js/administrador/tutorEstudianteAdministrador.js') }}"></script>
-
-@endpush
 
