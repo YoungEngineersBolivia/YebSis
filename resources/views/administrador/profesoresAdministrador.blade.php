@@ -14,9 +14,11 @@
     <!-- Toolbar superior -->
     <div class="d-flex flex-wrap gap-2 justify-content-between align-items-center mb-4">
         <h1 class="mb-0">Lista de Profesores</h1>
-        <a href="{{ route('registroCombinado.registrar') }}" class="btn btn-primary">
-            <i class="fas fa-plus me-2"></i>Registrar Profesor
-        </a>
+       <a href="{{ route('administrador.formProfesor') }}" class="btn btn-primary">
+    Registrar Profesor
+</a>
+
+
     </div>
 
     {{-- Mensajes de sesión --}}
