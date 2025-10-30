@@ -240,7 +240,7 @@
 
 @endsection
 
-<script src="{{ asset('js/administrador/tutorEstudianteAdministrador.js') }}"></script>
+<script src="{{ auto_asset('js/administrador/tutorEstudianteAdministrador.js') }}"></script>
 <script>
     // Pasar los datos de PHP a JavaScript e inicializar
     document.addEventListener('DOMContentLoaded', function() {
