@@ -85,10 +85,6 @@
                                             onclick="editarTutor({{ $tutor->Id_tutores }})">
                                         <i class="bi bi-pencil-square"></i>
                                     </button>
-                                    <button class="btn btn-sm btn-outline-danger" title="Eliminar"
-                                            onclick="eliminarTutor({{ $tutor->Id_tutores }})">
-                                        <i class="bi bi-trash3-fill"></i>
-                                    </button>
                                 </div>
                             </td>
                         </tr>

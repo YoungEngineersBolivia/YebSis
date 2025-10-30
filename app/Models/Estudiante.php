@@ -63,7 +63,7 @@ class Estudiante extends Model
     // Relación con el plan de pago del estudiante
     public function planPago()
     {
-        return $this->hasOne(PlanesPago::class, 'Id_estudiantes', 'Id_estudiantes');
+        return $this->hasMany(PlanesPago::class, 'Id_estudiantes', 'Id_estudiantes');
     }
 
     // --- CARGA DE RELACIONES ---
