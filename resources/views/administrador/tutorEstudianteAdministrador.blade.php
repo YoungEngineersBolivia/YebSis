@@ -251,7 +251,7 @@
             'Costo' => $p->Costo
         ];
     }));
-    const programas = @json($arrayProgramas);
+    
 </script>
 <script src="{{ auto_asset('js/administrador/tutorEstudianteAdministrador.js') }}"></script>
 
