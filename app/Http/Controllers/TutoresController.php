@@ -11,25 +11,39 @@ class TutoresController extends Controller
 {
     public function index(Request $request)
     {
-        // Obtén el término de búsqueda de la solicitud
         $search = $request->input('search');
         
-        // Realiza la consulta para obtener los tutores filtrados
         $tutores = Tutores::query()
             ->whereHas('persona', function ($query) use ($search) {
-                // Búsqueda en la tabla 'personas'
                 $query->where('Nombre', 'like', "%$search%")
                     ->orWhere('Apellido', 'like', "%$search%")
                     ->orWhere('Celular', 'like', "%$search%")
                     ->orWhere('Direccion_domicilio', 'like', "%$search%");
             })
             ->orWhereHas('usuario', function ($query) use ($search) {
-                // Búsqueda en la tabla 'usuarios'
                 $query->where('Correo', 'like', "%$search%");
             })
-            ->paginate(10); // Pagina los resultados para no cargar demasiados registros
+            ->paginate(10);
 
         return view('administrador.tutoresAdministrador', compact('tutores'));
+    }
+
+    // Nuevo método para ver detalles
+    public function verDetalles($id)
+    {
+        $tutor = Tutores::with([
+            'persona',
+            'usuario',
+            'estudiantes.persona',
+            'estudiantes.programa',
+            'estudiantes.sucursal',
+            'estudiantes.planPago.cuotas' => function($query) {
+                $query->orderBy('Fecha_vencimiento', 'asc');
+            },
+            'estudiantes.planPago.programa'
+        ])->findOrFail($id);
+
+        return view('administrador.detallesTutor', compact('tutor'));
     }
 
     public function show($id)

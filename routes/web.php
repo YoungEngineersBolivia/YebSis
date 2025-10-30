@@ -85,7 +85,8 @@ Route::prefix('administrador')->name('administrador.')->group(function () {
         Route::get('/{id}/edit', [TutoresController::class, 'edit'])->name('edit');
         Route::put('/{id}', [TutoresController::class, 'update'])->name('update');
         Route::delete('/{id}', [TutoresController::class, 'destroy'])->name('destroy');
-    });
+        Route::get('/{id}/detalles', [TutoresController::class, 'verDetalles'])->name('tutores.detalles');
+    }); 
     Route::get('/tutoresAdministrador', [TutoresController::class, 'index']);
     
     /* ----------------- GESTIÓN DE USUARIOS ----------------- */
