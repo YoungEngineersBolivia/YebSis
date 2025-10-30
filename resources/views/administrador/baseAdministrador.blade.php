@@ -49,7 +49,7 @@
     <div class="d-flex flex-column flex-shrink-0 p-3 bg-light position-fixed" style="width: 280px; height: 100vh;">
         <!-- Logo -->
         <a href="{{ route('admin.dashboard') }}" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto link-dark text-decoration-none">
-            <img src="{{ asset('img/logo-emi.png') }}" alt="Logo YE Bolivia" width="250px" class="me-2">
+            <img src="{{ auto_asset('img/logo-emi.png') }}" alt="Logo YE Bolivia" width="250px" class="me-2">
         </a>
         <hr>
 
