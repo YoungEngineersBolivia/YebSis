@@ -1,5 +1,3 @@
-// public/js/registro-combinado.js
-
 class RegistroCombinado {
     constructor(programas) {
         this.programas = programas;
