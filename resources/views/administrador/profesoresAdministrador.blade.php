@@ -3,8 +3,6 @@
 @section('title', 'Profesores')
 
 @section('styles')
-    @vite('/css/dashboard.css')
-    <link rel="stylesheet" href="style.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
    <link href="{{ auto_asset('css/administrador/profesoresAdministrador.css') }}" rel="stylesheet">
@@ -16,9 +14,11 @@
     <!-- Toolbar superior -->
     <div class="d-flex flex-wrap gap-2 justify-content-between align-items-center mb-4">
         <h1 class="mb-0">Lista de Profesores</h1>
-        <a href="{{ route('registroCombinado.registrar') }}" class="btn btn-primary">
-            <i class="fas fa-plus me-2"></i>Registrar Profesor
-        </a>
+       <a href="{{ route('administrador.formProfesor') }}" class="btn btn-primary">
+    Registrar Profesor
+</a>
+
+
     </div>
 
     {{-- Mensajes de sesión --}}

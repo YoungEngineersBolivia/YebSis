@@ -61,17 +61,22 @@ Route::middleware(['auth', 'role:administrador'])->prefix('administrador')->grou
     Route::get('/inicioAdministrador', fn() => view('/administrador/inicioAdministrador'));
     Route::get('/registrosAdministrador', fn() => view('/administrador/registrosAdministradores'));
     
+  
     /* ----------------- GESTIÓN DE ADMINISTRADORES Y PERSONAL ----------------- */
-    Route::prefix('administradores')->name('administrador.')->group(function () {
-        Route::post('/registrar', [AdministradorController::class, 'registrarAdmin'])->name('registrar');
-        Route::post('/registrarC', [AdministradorController::class, 'registrarComercial'])->name('registrarC');
-        Route::post('/registrarT', [AdministradorController::class, 'registrarTutor'])->name('registrarT');
-        Route::post('/registrarP', [AdministradorController::class, 'registrarProfesor'])->name('registrarP');
-    });
-    
-    Route::get('/registrarProfesor', fn() => view('/administrador/registrarProfesor'));
-    Route::get('/registrarTutor', fn() => view('/administrador/registrarTutor'));
-    Route::get('/registrarComercial', fn() => view('/administrador/registrarComercial'));
+Route::prefix('administrador')->name('administrador.')->group(function () {
+
+    // Rutas POST (procesan los formularios)
+    Route::post('/registrar', [AdministradorController::class, 'registrarAdmin'])->name('registrar');
+    Route::post('/registrarC', [AdministradorController::class, 'registrarComercial'])->name('registrarC');
+    Route::post('/registrarT', [AdministradorController::class, 'registrarTutor'])->name('registrarT');
+    Route::post('/registrarP', [AdministradorController::class, 'registrarProfesor'])->name('registrarP');
+
+    // Rutas GET (muestran formularios)
+    Route::get('/registrarProfesor', fn() => view('administrador.registrarProfesor'))->name('formProfesor');
+    Route::get('/registrarTutor', fn() => view('administrador.registrarTutor'))->name('formTutor');
+    Route::get('/registrarComercial', fn() => view('administrador.registrarComercial'))->name('formComercial');
+});
+
     
     /* ----------------- GESTIÓN DE TUTORES ----------------- */
     Route::prefix('tutores')->name('tutores.')->group(function () {
@@ -325,3 +330,4 @@ Route::get('forgot-password', [ForgotPasswordController::class, 'showLinkRequest
 Route::post('forgot-password', [ForgotPasswordController::class, 'sendResetLinkEmail'])->name('password.email');
 Route::get('password/reset/{token}', [ResetPasswordController::class, 'showResetForm'])->name('password.reset');
 Route::post('password/reset', [ResetPasswordController::class, 'reset'])->name('password.update');
+

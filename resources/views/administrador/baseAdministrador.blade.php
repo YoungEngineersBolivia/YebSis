@@ -4,8 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@yield('title', 'YE Bolivia - Administrador')</title>
-    <link rel="stylesheet" href="{{ asset('css/dashboard/app.css') }}">
-
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
     
@@ -140,8 +138,8 @@
     <!-- Sidebar -->
     <div class="sidebar-container">
         <!-- Logo -->
-        <a href="{{ route('admin.dashboard') }}" class="text-decoration-none mb-3">
-            <img src="{{ asset('img/ES_logo-02.webp') }}" alt="Logo YE Bolivia" class="sidebar-logo">
+        <a href="{{ route('admin.dashboard') }}" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto link-dark text-decoration-none">
+            <img src="{{ auto_asset('img/ES_logo-02.webp') }}" alt="Logo YE Bolivia" width="250px" class="me-2">
         </a>
 
         <!-- Menú con Scroll -->
@@ -371,8 +369,6 @@
     }, 5000);
 </script>
 
-@yield('scripts')
-@stack('scripts')
 
 </body>
 </html>
