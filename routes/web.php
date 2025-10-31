@@ -112,6 +112,12 @@ Route::prefix('administrador')->name('administrador.')->group(function () {
     
     /* ----------------- GESTIÓN DE ESTUDIANTES ----------------- */
     Route::get('/estudiantesAdministrador', [EstudianteController::class, 'index'])->name('admin.estudiantes');
+
+    Route::put('/estudiantes/{id}/actualizar', [EstudianteController::class, 'actualizar'])->name('estudiantes.actualizar');
+    Route::get('/estudiantes/{id}/planes-pago', [EstudianteController::class, 'planesPago'])->name('estudiantes.planesPago');
+    Route::get('/estudiantes/{id}/evaluaciones', [EstudianteController::class, 'evaluaciones'])->name('estudiantes.evaluaciones');
+    Route::get('/estudiantes/{id}/horarios', [EstudianteController::class, 'horarios'])->name('estudiantes.horarios');
+    Route::put('/cuotas/{id}/registrar-pago', [CuotaController::class, 'registrarPago'])->name('cuotas.registrarPago');
     
     // Estudiantes Activos
     Route::get('/estudiantesActivos', [EstudiantesActivosController::class, 'index'])->name('estudiantesActivos');

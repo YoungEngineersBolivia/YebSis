@@ -361,16 +361,7 @@
     <script src="{{ auto_asset('js/administrador/baseAdministrador.js') }}"></script>
     @stack('scripts')
 
-    // Auto-cerrar alertas
-    setTimeout(() => {
-        document.querySelectorAll('.alert').forEach(alert => {
-            const bsAlert = new bootstrap.Alert(alert);
-            bsAlert.close();
-        });
-    }, 5000);
 </script>
-<body>
-    
 
 </body>
 </html>
