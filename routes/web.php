@@ -140,8 +140,15 @@ Route::prefix('administrador')->name('administrador.')->group(function () {
     Route::get('/nuevosProgramasAdministrador', fn() => view('administrador.nuevoProgramaAdministrador'));
     
     /* ----------------- GESTIÓN DE GRADUADOS ----------------- */
-    Route::get('/graduadosAdministrador', [GraduadoController::class, 'index'])->name('graduados.index');
-    
+
+
+Route::get('/graduadosAdministrador', [GraduadoController::class, 'mostrarGraduados'])->name('graduados.mostrar');
+Route::post('/graduados', [GraduadoController::class, 'agregarGraduado'])->name('graduados.agregar');
+Route::put('/graduados/{id}', [GraduadoController::class, 'actualizarGraduado'])->name('graduados.actualizar');
+Route::delete('/graduados/{id}', [GraduadoController::class, 'eliminarGraduado'])->name('graduados.eliminar');
+
+
+  
     /* ----------------- GESTIÓN DE PAGOS ----------------- */
     Route::get('/pagosAdministrador', [PagosController::class, 'form'])->name('pagos.form');
     Route::get('/pagos', [PagosController::class, 'index'])->name('pagos.index');
