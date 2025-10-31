@@ -3,7 +3,6 @@
 @section('title', 'Estudiantes')
 
 @section('styles')
-
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
     <link href="{{ auto_asset('css/administrador/estudiantesAdministrador.css') }}" rel="stylesheet">
@@ -97,6 +96,9 @@
                                 ? trim(($profPersona->Nombre ?? '').' '.($profPersona->Apellido ?? ''))
                                 : ($prof->Nombre ?? null);
                             $profesorNombre = $profesorNombre ?: 'Sin profesor';
+                            
+                            $estadoLower = Str::lower($estudiante->Estado ?? '');
+                            $esActivo = $estadoLower === 'activo';
                         @endphp
                         <tr>
                             <td class="fw-semibold">{{ $estudiante->Cod_estudiante }}</td>
@@ -105,9 +107,9 @@
                             <td>{{ $profesorNombre }}</td>
                             <td>{{ $sucursal }}</td>
                             <td>
-                                @if(Str::lower($estudiante->Estado) === 'activo')
+                                @if($esActivo)
                                     <span class="badge text-bg-success badge-status">Activo</span>
-                                @elseif(Str::lower($estudiante->Estado) === 'inactivo')
+                                @elseif($estadoLower === 'inactivo')
                                     <span class="badge text-bg-secondary badge-status">Inactivo</span>
                                 @else
                                     <span class="badge text-bg-light text-dark badge-status">{{ $estudiante->Estado }}</span>
@@ -115,11 +117,20 @@
                             </td>
                             <td>
                                 <div class="d-flex gap-2">
-                                    <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#editarModal{{ $estudiante->Id_estudiantes }}">
+                                    {{-- Botón Editar --}}
+                                    <button type="button" 
+                                            class="btn btn-sm btn-outline-primary" 
+                                            data-bs-toggle="modal" 
+                                            data-bs-target="#editarModal{{ $estudiante->Id_estudiantes }}"
+                                            title="Editar">
                                         <i class="bi bi-pencil-square"></i>
                                     </button>
 
-                                    <form action="{{ route('estudiantes.eliminar', $estudiante->Id_estudiantes ?? 0) }}" method="POST" onsubmit="return confirm('¿Eliminar este estudiante?');">
+                                    {{-- Botón Eliminar --}}
+                                    <form action="{{ route('estudiantes.eliminar', $estudiante->Id_estudiantes ?? 0) }}" 
+                                          method="POST" 
+                                          class="d-inline"
+                                          onsubmit="return confirm('¿Está seguro de eliminar este estudiante?');">
                                         @csrf
                                         @method('DELETE')
                                         <button type="submit" class="btn btn-sm btn-outline-danger" title="Eliminar">
@@ -127,15 +138,24 @@
                                         </button>
                                     </form>
 
-                                    <a href="{{ route('estudiantes.ver', $estudiante->Id_estudiantes ?? 0) }}" class="btn btn-sm btn-outline-secondary" title="Ver perfil">
+                                    {{-- Botón Ver perfil --}}
+                                    <a href="{{ route('estudiantes.ver', $estudiante->Id_estudiantes ?? 0) }}" 
+                                       class="btn btn-sm btn-outline-secondary" 
+                                       title="Ver perfil">
                                         <i class="bi bi-person-fill"></i>
                                     </a>
 
-                                    <form action="{{ route('estudiantes.cambiarEstado', $estudiante->Id_estudiantes) }}" method="POST" onsubmit="return confirm('¿Cambiar el estado del estudiante?');">
+                                    {{-- Botón Cambiar estado --}}
+                                    <form action="{{ route('estudiantes.cambiarEstado', $estudiante->Id_estudiantes) }}" 
+                                          method="POST" 
+                                          class="d-inline"
+                                          onsubmit="return confirm('¿Cambiar el estado del estudiante?');">
                                         @csrf
                                         @method('PUT')
-                                        <button type="submit" class="btn btn-sm btn-toggle-status {{ $estudiante->Estado === 'Activo' ? 'inactive' : 'active' }}">
-                                            <i class="bi {{ $estudiante->Estado === 'Activo' ? 'bi-toggle-off' : 'bi-toggle-on' }}"></i>
+                                        <button type="submit" 
+                                                class="btn btn-sm btn-toggle-status {{ $esActivo ? 'inactive' : 'active' }}"
+                                                title="{{ $esActivo ? 'Desactivar' : 'Activar' }}">
+                                            <i class="bi {{ $esActivo ? 'bi-toggle-off' : 'bi-toggle-on' }}"></i>
                                         </button>
                                     </form>
                                 </div>
@@ -145,6 +165,35 @@
                 </tbody>
             </table>
         </div>
+
+        {{-- Modales de edición --}}
+        @foreach ($estudiantes as $estudiante)
+            <div class="modal fade" id="editarModal{{ $estudiante->Id_estudiantes }}" tabindex="-1" aria-labelledby="editarModalLabel{{ $estudiante->Id_estudiantes }}" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="editarModalLabel{{ $estudiante->Id_estudiantes }}">Editar Estudiante</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <form action="{{ route('estudiantes.actualizar', $estudiante->Id_estudiantes) }}" method="POST">
+                            @csrf
+                            @method('PUT')
+                            <div class="modal-body">
+                                <div class="mb-3">
+                                    <label for="codigo{{ $estudiante->Id_estudiantes }}" class="form-label">Código</label>
+                                    <input type="text" class="form-control" id="codigo{{ $estudiante->Id_estudiantes }}" name="Cod_estudiante" value="{{ $estudiante->Cod_estudiante }}" required>
+                                </div>
+                                {{-- Agrega más campos según necesites --}}
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                <button type="submit" class="btn btn-primary">Guardar cambios</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        @endforeach
     @endif
 
     <!-- Paginación -->
@@ -172,5 +221,16 @@
             });
         });
     })();
+
+    // Auto-cerrar alertas después de 5 segundos
+    document.addEventListener('DOMContentLoaded', function() {
+        const alerts = document.querySelectorAll('.alert');
+        alerts.forEach(alert => {
+            setTimeout(() => {
+                const bsAlert = new bootstrap.Alert(alert);
+                bsAlert.close();
+            }, 5000);
+        });
+    });
 </script>
 @endsection
