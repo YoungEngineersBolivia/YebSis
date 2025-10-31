@@ -3,146 +3,14 @@
 @section('title', 'Detalles del Estudiante')
 
 @section('styles')
+
+<link href="{{ auto_asset('css/administrador/detallesEstudiantes.css') }}" rel="stylesheet">
 <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
-<style>
-    :root {
-        --primary: #4f46e5;
-        --secondary: #6366f1;
-        --light: #f8fafc;
-        --muted: #64748b;
-        --radius: 16px;
-    }
 
-    body {
-        background-color: var(--light);
-    }
-
-    .student-header {
-        background: linear-gradient(120deg, var(--primary), var(--secondary));
-        color: white;
-        border-radius: var(--radius);
-        padding: 2.5rem 1rem;
-        text-align: center;
-        margin-bottom: 2rem;
-        box-shadow: 0 6px 18px rgba(99, 102, 241, 0.3);
-    }
-
-    .student-avatar {
-        width: 120px;
-        height: 120px;
-        border-radius: 50%;
-        background: white;
-        color: var(--primary);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 3rem;
-        font-weight: 700;
-        margin: 0 auto 1rem auto;
-        border: 6px solid rgba(255, 255, 255, 0.3);
-    }
-
-    .info-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-        gap: 1.5rem;
-        margin-bottom: 6rem;
-    }
-
-    .info-card {
-        background: white;
-        border-radius: var(--radius);
-        box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
-        padding: 1.5rem 1.8rem;
-        transition: transform 0.2s ease, box-shadow 0.3s ease;
-    }
-
-    .info-card:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 8px 22px rgba(0, 0, 0, 0.15);
-    }
-
-    .info-title {
-        font-weight: 700;
-        color: var(--primary);
-        font-size: 1.2rem;
-        margin-bottom: 1rem;
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-    }
-
-    .info-item {
-        display: flex;
-        justify-content: space-between;
-        padding: 0.4rem 0;
-        border-bottom: 1px solid #f1f5f9;
-    }
-
-    .info-item:last-child {
-        border-bottom: none;
-    }
-
-    .info-label {
-        color: var(--muted);
-        font-weight: 500;
-    }
-
-    .info-value {
-        color: #0f172a;
-        font-weight: 600;
-        text-align: right;
-    }
-
-    .status-badge {
-        padding: 0.5rem 1.25rem;
-        border-radius: 25px;
-        font-weight: 600;
-        font-size: 0.9rem;
-    }
-
-    .status-active {
-        background: #d1fae5;
-        color: #065f46;
-    }
-
-    .status-inactive {
-        background: #f3f4f6;
-        color: #6b7280;
-    }
-
-    /* Footer fijo */
-    .action-footer {
-        position: fixed;
-        bottom: 0;
-        left: 0;
-        width: 100%;
-        background: white;
-        border-top: 2px solid #e5e7eb;
-        box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.05);
-        padding: 1rem 0;
-        z-index: 100;
-    }
-
-    .action-footer .btn {
-        border-radius: var(--radius);
-        font-weight: 600;
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-    }
-
-    @media (max-width: 768px) {
-        .action-footer {
-            flex-direction: column;
-            gap: 0.5rem;
-        }
-    }
-</style>
 @endsection
 
 @section('content')
-<div class="container mt-4 mb-5 pb-5">
+<div class="container mt-4 mb-5 container-with-footer">
     @php
         $persona = $estudiante->persona ?? null;
         $nombreCompleto = $persona ? trim(($persona->Nombre ?? '').' '.($persona->Apellido ?? '')) : 'Sin nombre';
@@ -173,7 +41,6 @@
             ->get();
     @endphp
 
-    {{-- Header principal --}}
     <div class="student-header">
         <div class="student-avatar">
             {{ $iniciales }}
@@ -185,9 +52,7 @@
         </span>
     </div>
 
-    {{-- Tarjetas de información --}}
     <div class="info-grid">
-        {{-- Datos personales --}}
         <div class="info-card">
             <div class="info-title"><i class="bi bi-person"></i> Datos personales</div>
             <div class="info-item"><span class="info-label">Nombre</span><span class="info-value">{{ $nombreCompleto }}</span></div>
@@ -198,7 +63,6 @@
             <div class="info-item"><span class="info-label">Dirección</span><span class="info-value">{{ $persona->Direccion_domicilio ?? '—' }}</span></div>
         </div>
 
-        {{-- Información académica --}}
         <div class="info-card">
             <div class="info-title"><i class="bi bi-mortarboard"></i> Información académica</div>
             <div class="info-item"><span class="info-label">Programa</span><span class="info-value">{{ $programa->Nombre ?? '—' }}</span></div>
@@ -208,7 +72,6 @@
             <div class="info-item"><span class="info-label">Cambio estado</span><span class="info-value">{{ \Carbon\Carbon::parse($estudiante->Fecha_estado)->format('d/m/Y') }}</span></div>
         </div>
 
-        {{-- Tutor --}}
         <div class="info-card">
             <div class="info-title"><i class="bi bi-people"></i> Tutor</div>
             @if($tutor && $tutorPersona)
@@ -222,7 +85,6 @@
             @endif
         </div>
 
-        {{-- Horarios --}}
         <div class="info-card">
             <div class="info-title"><i class="bi bi-calendar-week"></i> Horarios</div>
             @if($horarios->isEmpty())
@@ -251,7 +113,6 @@
     </div>
 </div>
 
-{{-- Footer fijo --}}
 <div class="action-footer d-flex justify-content-center gap-3 flex-wrap">
     <a href="{{ route('estudiantes.planesPago', $estudiante->Id_estudiantes) }}" class="btn btn-primary">
         <i class="bi bi-cash"></i> Planes de Pago

@@ -1,0 +1,139 @@
+:root {
+    --primary: #4f46e5;
+    --secondary: #6366f1;
+    --light: #f8fafc;
+    --muted: #64748b;
+    --radius: 16px;
+}
+
+body {
+    background-color: var(--light) !important;
+}
+
+.student-header {
+    background: linear-gradient(120deg, var(--primary), var(--secondary));
+    color: white;
+    border-radius: var(--radius);
+    padding: 2.5rem 1rem;
+    text-align: center;
+    margin-bottom: 2rem;
+    box-shadow: 0 6px 18px rgba(99, 102, 241, 0.3);
+}
+
+.student-avatar {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    background: white;
+    color: var(--primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 3rem;
+    font-weight: 700;
+    margin: 0 auto 1rem auto;
+    border: 6px solid rgba(255, 255, 255, 0.3);
+}
+
+.info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.info-card {
+    background: white;
+    border-radius: var(--radius);
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
+    padding: 1.5rem 1.8rem;
+    transition: transform 0.2s ease, box-shadow 0.3s ease;
+}
+
+.info-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 22px rgba(0, 0, 0, 0.15);
+}
+
+.info-title {
+    font-weight: 700;
+    color: var(--primary);
+    font-size: 1.2rem;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.info-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.4rem 0;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.info-item:last-child {
+    border-bottom: none;
+}
+
+.info-label {
+    color: var(--muted);
+    font-weight: 500;
+}
+
+.info-value {
+    color: #0f172a;
+    font-weight: 600;
+    text-align: right;
+}
+
+.status-badge {
+    padding: 0.5rem 1.25rem;
+    border-radius: 25px;
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+.status-active {
+    background: #d1fae5;
+    color: #065f46;
+}
+
+.status-inactive {
+    background: #f3f4f6;
+    color: #6b7280;
+}
+
+.action-footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background: white;
+    border-top: 2px solid #e5e7eb;
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.05);
+    padding: 1rem 0;
+    z-index: 100;
+}
+
+.action-footer .btn {
+    border-radius: var(--radius);
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.container-with-footer {
+    padding-bottom: 120px !important;
+}
+
+@media (max-width: 768px) {
+    .info-grid {
+        grid-template-columns: 1fr;
+    }
+    .action-footer {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+}
