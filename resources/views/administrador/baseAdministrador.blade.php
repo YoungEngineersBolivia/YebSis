@@ -188,7 +188,8 @@
                             <li><a class="nav-link link-dark submenu-item" href="{{ route('inscripcionEstudiante.mostrar') }}">Inscribir a Taller</a></li>
                             <li><a class="nav-link link-dark submenu-item" href="{{ route('estudiantesActivos') }}">Estudiantes Activos</a></li>
                             <li><a class="nav-link link-dark submenu-item" href="{{ route('estudiantesNoActivos') }}">Estudiantes Inactivos</a></li>
-                            <li><a class="nav-link link-dark submenu-item" href="{{ route('graduados.index') }}">Graduados</a></li>
+                            <li><a class="nav-link link-dark submenu-item" href="{{ route('graduados.mostrar') }}">Graduados</a></li>
+
                         </ul>
                     </div>
                 </li>
@@ -360,15 +361,7 @@
     <script src="{{ auto_asset('js/administrador/baseAdministrador.js') }}"></script>
     @stack('scripts')
 
-    // Auto-cerrar alertas
-    setTimeout(() => {
-        document.querySelectorAll('.alert').forEach(alert => {
-            const bsAlert = new bootstrap.Alert(alert);
-            bsAlert.close();
-        });
-    }, 5000);
 </script>
-
 
 </body>
 </html>

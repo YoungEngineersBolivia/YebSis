@@ -11,7 +11,6 @@ class Graduados extends Model
 
     protected $table = 'graduados';
     protected $primaryKey = 'Id_graduado';
-
     public $incrementing = true;
     protected $keyType = 'int';
 

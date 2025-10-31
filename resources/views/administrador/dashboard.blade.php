@@ -233,4 +233,5 @@
     window.mesesPorMes = @json($ingresosPorMes->pluck('mes_nombre'));
 </script>
 <script src="{{ auto_asset('js/administrador/dashboard.js') }}"></script>
+
 @endsection
