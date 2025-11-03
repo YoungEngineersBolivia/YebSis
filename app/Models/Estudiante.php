@@ -5,7 +5,6 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-
 class Estudiante extends Model
 {
     use HasFactory;
@@ -30,6 +29,8 @@ class Estudiante extends Model
         'Id_sucursales',
         'Id_tutores',
     ];
+
+    // --- RELACIONES ---
 
     public function persona()
     {
@@ -61,17 +62,36 @@ class Estudiante extends Model
     }
 
     // Relación con el plan de pago del estudiante
-    public function planPago()
+    public function planesPago()
     {
         return $this->hasMany(PlanesPago::class, 'Id_estudiantes', 'Id_estudiantes');
     }
 
-    // --- CARGA DE RELACIONES ---
+    // CORREGIDO: Relación con horarios (PLURAL)
+    public function horarios()
+    {
+        return $this->hasMany(Horario::class, 'Id_estudiantes', 'Id_estudiantes');
+    }
 
-    // Este método no debería incluir relaciones anidadas como 'profesor.persona' en $with.
-    // Asegúrate de cargarlas solo cuando sea necesario, usando 'with()' en los métodos del controlador.
+    // Relación con talleres inscritos
+    public function talleresInscritos()
+    {
+        return $this->hasMany(EstudianteTaller::class, 'Id_estudiantes', 'Id_estudiantes');
+    }
 
-    // Puedes utilizar el siguiente atributo para cargar las relaciones necesarias de manera predeterminada:
+    // Relación con evaluaciones
+    public function evaluaciones()
+    {
+        return $this->hasMany(Evaluacion::class, 'Id_estudiantes', 'Id_estudiantes');
+    }
+
+    // Relación con modelo
+    public function modelo()
+    {
+        return $this->belongsTo(Modelo::class, 'Id_modelo', 'Id_modelo');
+    }
+
+    // --- CARGA DE RELACIONES PREDETERMINADAS ---
     protected $with = [
         'persona',
         'programa',
@@ -79,32 +99,55 @@ class Estudiante extends Model
         'profesor',
     ];
 
-    // --- OTROS MÉTODOS PERSONALIZADOS ---
+    // --- MÉTODOS PERSONALIZADOS ---
 
     /**
      * Obtener el nombre completo del estudiante (nombre + apellido)
      */
     public function getFullNameAttribute()
     {
-        return $this->persona->Nombre . ' ' . $this->persona->Apellido;
+        if (!$this->persona) {
+            return 'Sin nombre';
+        }
+        return trim(($this->persona->Nombre ?? '') . ' ' . ($this->persona->Apellido ?? ''));
     }
 
-    // app/Models/Estudiante.php
+    /**
+     * Verificar si el estudiante está activo
+     */
+    public function getEsActivoAttribute()
+    {
+        return strtolower($this->Estado ?? '') === 'activo';
+    }
+
+    /**
+     * Obtener las iniciales del estudiante
+     */
+    public function getInicialesAttribute()
+    {
+        if (!$this->persona) {
+            return 'SN';
+        }
+        $nombre = substr($this->persona->Nombre ?? 'S', 0, 1);
+        $apellido = substr($this->persona->Apellido ?? 'N', 0, 1);
+        return strtoupper($nombre . $apellido);
+    }
+
+    // --- EVENTOS DEL MODELO ---
     protected static function booted()
     {
-        static::updating(function ($est) {
-            if ($est->isDirty('Estado')) {
-                $est->Fecha_estado = now(); // actualiza la fecha al cambiar el estado
+        static::updating(function ($estudiante) {
+            if ($estudiante->isDirty('Estado')) {
+                $estudiante->Fecha_estado = now();
             }
         });
     }
 
-    public function talleresInscritos()
-    {
-        return $this->hasMany(EstudianteTaller::class, 'Id_estudiantes', 'Id_estudiantes');
-    }
+    // --- MÉTODOS DE TALLERES ---
 
-    // Método para verificar si está inscrito en un taller específico
+    /**
+     * Método para verificar si está inscrito en un taller específico
+     */
     public function estaInscritoEnTaller($idTaller)
     {
         return $this->talleresInscritos()
@@ -113,21 +156,42 @@ class Estudiante extends Model
                     ->exists();
     }
 
-    // Obtener talleres activos del estudiante
+    /**
+     * Obtener talleres activos del estudiante
+     */
     public function talleresActivos()
     {
         return $this->talleresInscritos()
                     ->where('Estado_inscripcion', 'inscrito')
                     ->with('taller');
     }
-    public function horario()
-{
-    return $this->hasOne(Horario::class, 'Id_estudiantes', 'Id_estudiantes');
-}
-public function modelo()
+
+    // --- SCOPES ---
+
+    /**
+     * Scope para obtener solo estudiantes activos
+     */
+    public function scopeActivos($query)
     {
-        return $this->belongsTo(Modelo::class, 'Id_modelo', 'Id_modelo');
+        return $query->where('Estado', 'Activo');
     }
 
+    /**
+     * Scope para obtener solo estudiantes inactivos
+     */
+    public function scopeInactivos($query)
+    {
+        return $query->where('Estado', 'Inactivo');
+    }
 
+    /**
+     * Scope para buscar estudiantes por nombre o código
+     */
+    public function scopeBuscar($query, $termino)
+    {
+        return $query->whereHas('persona', function($q) use ($termino) {
+            $q->where('Nombre', 'like', "%{$termino}%")
+              ->orWhere('Apellido', 'like', "%{$termino}%");
+        })->orWhere('Cod_estudiante', 'like', "%{$termino}%");
+    }
 }

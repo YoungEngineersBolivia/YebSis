@@ -1,36 +1,36 @@
 <?php
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Horario extends Model
 {
+    use HasFactory;
+
     protected $table = 'horarios';
     protected $primaryKey = 'Id_horarios';
-    public $timestamps = true;
 
     protected $fillable = [
-        'Horario_clase_uno',
-        'Dia_clase_uno',
-        'Horario_clase_dos',
-        'Dia_clase_dos',
+        'Dia',
+        'Hora',
         'Id_programas',
         'Id_profesores',
-        'Id_estudiantes',
+        'Id_estudiantes'
     ];
 
     public function estudiante()
     {
-        return $this->belongsTo(Estudiante::class, 'Id_estudiantes', 'Id_estudiantes')/*->withDefault()*/;
+        return $this->belongsTo(Estudiante::class, 'Id_estudiantes', 'Id_estudiantes');
     }
 
     public function profesor()
     {
-        return $this->belongsTo(Profesor::class, 'Id_profesores', 'Id_profesores')/*->withDefault()*/;
+        return $this->belongsTo(Profesor::class, 'Id_profesores', 'Id_profesores');
     }
 
     public function programa()
     {
-        return $this->belongsTo(Programa::class, 'Id_programas', 'Id_programas')/*->withDefault()*/;
+        return $this->belongsTo(Programa::class, 'Id_programas', 'Id_programas');
     }
 }

@@ -178,66 +178,90 @@ class EstudianteController extends Controller
 
     public function ver($id)
     {
-        // Buscar el estudiante para mostrar sus detalles con todas las relaciones necesarias
+        // Cargar el estudiante con todas sus relaciones
         $estudiante = Estudiante::with([
             'persona',
             'programa',
             'sucursal',
+            'profesor.persona',
             'tutor.persona',
-            'profesor.persona'
+            'horarios' => function($query) {
+                $query->orderBy('Dia', 'asc')->orderBy('Hora', 'asc');
+            },
+            'horarios.programa',
+            'horarios.profesor.persona',
+            'planesPago' => function($query) {
+                $query->latest('fecha_plan_pagos')->limit(3);
+            },
+            'planesPago.programa',
+            'evaluaciones' => function($query) {
+                $query->latest('fecha_evaluacion')->limit(5);
+            },
+            'evaluaciones.programa',
+            'evaluaciones.profesor.persona',
         ])->findOrFail($id);
 
-        return view('administrador.detallesEstudiante', compact('estudiante'));
+        // Calcular estadísticas adicionales
+        $estadisticas = [
+            'total_horarios'   => $estudiante->horarios->count(),
+            'total_planes_pago' => $estudiante->planesPago->count(),
+            'total_evaluaciones' => $estudiante->evaluaciones()->count(),
+            'planes_activos'   => $estudiante->planesPago->where('Estado_plan', 'Activo')->count(),
+        ];
+
+        return view('administrador.detallesEstudiante', compact('estudiante', 'estadisticas'));
     }
 
-    // Método para cambiar el estado de un estudiante (Activo/Inactivo)
+
+    /**
+     * Cambiar estado del estudiante (Activo/Inactivo)
+     */
     public function cambiarEstado($id)
     {
-        // Buscar al estudiante por su ID
-        $estudiante = Estudiante::find($id);
-
-        if (!$estudiante) {
-            return back()->withErrors(['error' => 'Estudiante no encontrado.']);
-        }
+        $estudiante = Estudiante::findOrFail($id);
 
         // Cambiar el estado
         $nuevoEstado = $estudiante->Estado === 'Activo' ? 'Inactivo' : 'Activo';
+        
         $estudiante->update([
             'Estado' => $nuevoEstado,
             'Fecha_estado' => now()
         ]);
 
-        return redirect()->route('estudiantes.index')->with('success', 'Estado del estudiante actualizado.');
+        return redirect()
+            ->route('estudiantes.ver', $id)
+            ->with('success', "Estado del estudiante actualizado a: {$nuevoEstado}");
     }
 
-    // Método para ver los planes de pago del estudiante
+    /**
+     * Ver planes de pago del estudiante
+     */
     public function planesPago($id)
     {
-        $estudiante = Estudiante::with([
-            'persona',
-            'programa'
-        ])->findOrFail($id);
+        $estudiante = Estudiante::with(['persona', 'programa'])
+            ->findOrFail($id);
 
-        // Obtener todos los planes de pago del estudiante con sus relaciones
         $planesPago = PlanesPago::where('Id_estudiantes', $id)
-            ->with(['programa', 'cuotas' => function($query) {
-                $query->orderBy('Nro_de_cuota', 'asc');
-            }])
+            ->with([
+                'programa',
+                'cuotas' => function($query) {
+                    $query->orderBy('Nro_de_cuota', 'asc');
+                }
+            ])
             ->orderBy('fecha_plan_pagos', 'desc')
             ->get();
 
         return view('administrador.planesPagoEstudiante', compact('estudiante', 'planesPago'));
     }
 
-    // Método para ver las evaluaciones del estudiante
+    /**
+     * Ver evaluaciones del estudiante
+     */
     public function evaluaciones($id)
     {
-        $estudiante = Estudiante::with([
-            'persona',
-            'programa'
-        ])->findOrFail($id);
+        $estudiante = Estudiante::with(['persona', 'programa'])
+            ->findOrFail($id);
 
-        // Obtener todas las evaluaciones del estudiante
         $evaluaciones = Evaluacion::where('Id_estudiantes', $id)
             ->with([
                 'pregunta',
@@ -255,15 +279,14 @@ class EstudianteController extends Controller
         return view('administrador.evaluacionesEstudiante', compact('estudiante', 'evaluacionesAgrupadas'));
     }
 
-    // Método para ver los horarios del estudiante
+    /**
+     * Ver horarios del estudiante
+     */
     public function horarios($id)
     {
-        $estudiante = Estudiante::with([
-            'persona',
-            'programa'
-        ])->findOrFail($id);
+        $estudiante = Estudiante::with(['persona', 'programa'])
+            ->findOrFail($id);
 
-        // Obtener todos los horarios del estudiante
         $horarios = Horario::where('Id_estudiantes', $id)
             ->with(['programa', 'profesor.persona'])
             ->get();
