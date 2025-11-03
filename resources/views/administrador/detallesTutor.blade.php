@@ -83,15 +83,24 @@
 
 @section('content')
 <div class="container-fluid mt-4">
+
+    {{-- Mensajes de sesión --}}
+    @if(session('success'))
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            {{ session('success') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+        </div>
+    @endif
+    @if(session('error'))
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            {{ session('error') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+        </div>
+    @endif
+
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h1 class="mb-0"><i class="bi bi-person-badge"></i> Detalles del Tutor</h1>
         <div class="d-flex gap-2">
-            <button type="button" 
-                    class="btn btn-primary" 
-                    id="btn-editar-tutor"
-                    data-id="{{ $tutor->Id_tutores }}">
-                <i class="bi bi-pencil-square"></i> Editar Tutor
-            </button>
             <a href="{{ route('tutores.index') }}" class="btn btn-secondary">
                 <i class="bi bi-arrow-left"></i> Volver
             </a>
@@ -110,13 +119,13 @@
                 <div class="info-row">
                     <span class="info-label">Celular:</span>
                     <span class="info-value">
-                        <i class="bi bi-phone"></i> {{ $tutor->persona->Celular }}
+                        <i class="bi bi-phone"></i> {{ $tutor->persona->Celular ?? 'No especificado' }}
                     </span>
                 </div>
                 <div class="info-row">
                     <span class="info-label">Dirección:</span>
                     <span class="info-value">
-                        <i class="bi bi-geo-alt"></i> {{ $tutor->persona->Direccion_domicilio }}
+                        <i class="bi bi-geo-alt"></i> {{ $tutor->persona->Direccion_domicilio ?? 'No especificado' }}
                     </span>
                 </div>
                 <div class="info-row">
@@ -332,7 +341,8 @@
                                                         $estadoTexto = $cuota->Estado_cuota === 'Pagado' ? 'Pagado' : 
                                                                       ($estaVencida ? 'Vencido' : 'Pendiente');
                                                         $fechaVencimiento = \Carbon\Carbon::parse($cuota->Fecha_vencimiento);
-                                                        $diasRestantes = $fechaVencimiento->diffInDays(\Carbon\Carbon::now(), false);
+                                                        // Convertir a entero los días
+                                                        $diasRestantes = (int) $fechaVencimiento->diffInDays(\Carbon\Carbon::now(), false);
                                                     @endphp
                                                     <tr class="{{ $estaVencida ? 'table-danger' : '' }}">
                                                         <td><strong>{{ $cuota->Nro_de_cuota }}</strong></td>
@@ -392,200 +402,21 @@
         @endif
     </div>
 
-    {{-- Modal Editar Tutor --}}
-    <div class="modal fade" id="modalEditarTutor" tabindex="-1" aria-labelledby="modalEditarLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg">
-            <form method="POST" id="formEditarTutor">
-                @csrf
-                @method('PUT')
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="modalEditarLabel">Editar Tutor</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-                    </div>
-                    <div class="modal-body">
-                        <div class="row g-3">
-                            <div class="col-md-6">
-                                <label class="form-label">Nombre</label>
-                                <input type="text" name="nombre" id="editarNombre" class="form-control" required>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label">Apellido</label>
-                                <input type="text" name="apellido" id="editarApellido" class="form-control" required>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label">Celular</label>
-                                <input type="text" name="celular" id="editarCelular" class="form-control">
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label">Dirección</label>
-                                <input type="text" name="direccion_domicilio" id="editarDireccion" class="form-control">
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label">Correo</label>
-                                <input type="email" name="correo" id="editarCorreo" class="form-control" required>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label">Parentesco</label>
-                                <input type="text" name="parentezco" id="editarParentesco" class="form-control" required>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label">Descuento (%)</label>
-                                <input type="number" name="descuento" id="editarDescuento" class="form-control" step="0.01" min="0" max="100">
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label">NIT</label>
-                                <input type="text" name="nit" id="editarNit" class="form-control">
-                            </div>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="submit" class="btn btn-primary">Guardar Cambios</button>
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    </div>
-                </div>
-            </form>
-        </div>
-    </div>
-
 </div>
 @endsection
 
 @section('scripts')
 <script>
-console.log('Script cargado');
-
 (function () {
-    const BASE_URL = "{{ url('/tutores') }}";
-    const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content;
-    const tutorId = "{{ $tutor->Id_tutores }}";
-
-    console.log('BASE_URL:', BASE_URL);
-    console.log('CSRF Token:', csrfToken);
-    console.log('Tutor ID:', tutorId);
-
-    function ensureJson(res) {
-        const ct = res.headers.get('content-type') || '';
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        if (!ct.includes('application/json')) {
-            return res.text().then(t => { throw new Error('Respuesta no JSON:\n' + t.slice(0, 400)); });
-        }
-        return res.json();
-    }
-
-    document.addEventListener('DOMContentLoaded', function() {
-        console.log('DOM cargado');
-        
-        const btnEditar = document.getElementById('btn-editar-tutor');
-        console.log('Botón editar encontrado:', btnEditar);
-
-        if (btnEditar) {
-            btnEditar.addEventListener('click', function () {
-                console.log('Click en botón editar');
-                const id = this.getAttribute('data-id');
-                console.log('ID del tutor:', id);
-                
-                fetch(`${BASE_URL}/${id}/edit`, { 
-                    headers: { 'Accept': 'application/json' } 
-                })
-                .then(res => {
-                    console.log('Respuesta recibida:', res);
-                    return ensureJson(res);
-                })
-                .then(data => {
-                    console.log('Datos del tutor:', data);
-                    
-                    document.getElementById('editarNombre').value      = data.persona?.Nombre || '';
-                    document.getElementById('editarApellido').value    = data.persona?.Apellido || '';
-                    document.getElementById('editarCelular').value     = data.persona?.Celular || '';
-                    document.getElementById('editarDireccion').value   = data.persona?.Direccion_domicilio || '';
-                    document.getElementById('editarCorreo').value      = data.usuario?.Correo || '';
-                    document.getElementById('editarParentesco').value  = data.Parentesco || '';
-                    document.getElementById('editarDescuento').value   = data.Descuento ?? '';
-                    document.getElementById('editarNit').value         = data.Nit ?? '';
-
-                    const form = document.getElementById('formEditarTutor');
-                    form.setAttribute('action', `${BASE_URL}/${id}`);
-
-                    console.log('Abriendo modal...');
-                    const modalElement = document.getElementById('modalEditarTutor');
-                    console.log('Modal encontrado:', modalElement);
-
-                    if (modalElement) {
-                        const modal = new bootstrap.Modal(modalElement);
-                        modal.show();
-                        console.log('Modal mostrado');
-                    } else {
-                        console.error('No se encontró el elemento modal');
-                    }
-                })
-                .catch(err => { 
-                    console.error('Error completo:', err); 
-                    alert('No se pudo cargar los datos del tutor:\n' + err.message); 
-                });
-            });
-        } else {
-            console.error('No se encontró el botón con id "btn-editar-tutor"');
-        }
-
-        const formEditar = document.getElementById('formEditarTutor');
-        console.log('Formulario encontrado:', formEditar);
-
-        if (formEditar) {
-            formEditar.addEventListener('submit', function (e) {
-                e.preventDefault();
-                console.log('Formulario enviado');
-                
-                if (!csrfToken) {
-                    alert('CSRF token no encontrado.');
-                    return;
-                }
-
-                const action = this.getAttribute('action');
-                const fd = new FormData(this);
-                fd.set('_method', 'PUT');
-
-                console.log('Enviando a:', action);
-
-                const submitBtn = this.querySelector('button[type="submit"]');
-                const originalText = submitBtn.innerHTML;
-                submitBtn.disabled = true;
-                submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Guardando...';
-
-                fetch(action, {
-                    method: 'POST',
-                    headers: {
-                        'X-CSRF-TOKEN': csrfToken,
-                        'Accept': 'application/json'
-                    },
-                    body: fd
-                })
-                .then(ensureJson)
-                .then(data => {
-                    console.log('Respuesta del servidor:', data);
-                    if (data.success) {
-                        const modal = bootstrap.Modal.getInstance(document.getElementById('modalEditarTutor'));
-                        if (modal) modal.hide();
-                        
-                        alert('Tutor actualizado correctamente.');
-                        location.reload();
-                    } else {
-                        alert('No se pudo actualizar el tutor.');
-                        submitBtn.disabled = false;
-                        submitBtn.innerHTML = originalText;
-                    }
-                })
-                .catch(err => { 
-                    console.error('Error al guardar:', err); 
-                    alert('Error al actualizar:\n' + err.message);
-                    submitBtn.disabled = false;
-                    submitBtn.innerHTML = originalText;
-                });
-            });
-        }
-
-        console.log('Detalles del tutor cargados correctamente');
+    // Autocierre de alertas después de 5 segundos
+    document.querySelectorAll('.alert').forEach(alertEl => {
+        setTimeout(() => {
+            const bsAlert = bootstrap.Alert.getOrCreateInstance(alertEl);
+            bsAlert.close();
+        }, 5000);
     });
+
+    console.log('Detalles del tutor cargados correctamente');
 })();
 </script>
 @endsection
