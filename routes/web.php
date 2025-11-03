@@ -81,13 +81,13 @@ Route::prefix('administrador')->name('administrador.')->group(function () {
     /* ----------------- GESTIÓN DE TUTORES ----------------- */
     Route::prefix('tutores')->name('tutores.')->group(function () {
         Route::get('/', [TutoresController::class, 'index'])->name('index');
-        Route::get('/{id}', [TutoresController::class, 'show'])->name('show');
+        Route::get('/{id}/detalles', [TutoresController::class, 'detalles'])->name('detalles'); // Nueva ruta
         Route::get('/{id}/edit', [TutoresController::class, 'edit'])->name('edit');
         Route::put('/{id}', [TutoresController::class, 'update'])->name('update');
         Route::delete('/{id}', [TutoresController::class, 'destroy'])->name('destroy');
-        Route::get('/{id}/detalles', [TutoresController::class, 'verDetalles'])->name('tutores.detalles');
-    }); 
+    });
     Route::get('/tutoresAdministrador', [TutoresController::class, 'index']);
+
     
     /* ----------------- GESTIÓN DE USUARIOS ----------------- */
     Route::prefix('usuarios')->name('usuarios.')->group(function () {
@@ -226,12 +226,13 @@ Route::delete('/graduados/{id}', [GraduadoController::class, 'eliminarGraduado']
     Route::put('/estudiantes/{id}/cambiar-estado', [EstudianteController::class, 'cambiarEstado'])->name('estudiantes.cambiarEstado');
     
     /* ----------------- PROGRAMAS CRUD (compartido) ----------------- */
-    Route::get('/programas', [ProgramaController::class, 'index'])->name('programas.index');
-    Route::post('/programas', [ProgramaController::class, 'store'])->name('programas.store');
-    Route::get('/programas/{id}', [ProgramaController::class, 'show'])->name('programas.show');
-    Route::get('/programas/{id}/edit', [ProgramaController::class, 'edit'])->name('programas.edit');
-    Route::put('/programas/{id}', [ProgramaController::class, 'update'])->name('programas.update');
-    Route::delete('/programas/{id}', [ProgramaController::class, 'destroy'])->name('programas.destroy');
+    
+Route::get('/programas', [ProgramaController::class, 'index'])->name('programas.index');
+Route::post('/programas', [ProgramaController::class, 'store'])->name('programas.store');
+Route::get('/programas/{id}', [ProgramaController::class, 'show'])->name('programas.show');
+Route::get('/programas/{id}/edit', [ProgramaController::class, 'edit'])->name('programas.edit');
+Route::put('/programas/{id}', [ProgramaController::class, 'update'])->name('programas.update');
+Route::delete('/programas/{id}', [ProgramaController::class, 'destroy'])->name('programas.destroy');
     
     /* ----------------- PLANES DE PAGO ----------------- */
     Route::post('/planes-pago/registrar', [App\Http\Controllers\PlanesPagoController::class, 'registrar'])->name('planes-pago.registrar');

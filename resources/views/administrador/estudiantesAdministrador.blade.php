@@ -78,7 +78,7 @@
                         <th style="min-width:220px;">Profesor</th>
                         <th style="min-width:160px;">Sucursal</th>
                         <th style="min-width:120px;">Estado</th>
-                        <th style="min-width:160px;">Acciones</th>
+                        <th style="min-width:140px;">Acciones</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -146,18 +146,7 @@
                                     </a>
 
                                     {{-- Botón Cambiar estado --}}
-                                    <form action="{{ route('estudiantes.cambiarEstado', $estudiante->Id_estudiantes) }}" 
-                                          method="POST" 
-                                          class="d-inline"
-                                          onsubmit="return confirm('¿Cambiar el estado del estudiante?');">
-                                        @csrf
-                                        @method('PUT')
-                                        <button type="submit" 
-                                                class="btn btn-sm btn-toggle-status {{ $esActivo ? 'inactive' : 'active' }}"
-                                                title="{{ $esActivo ? 'Desactivar' : 'Activar' }}">
-                                            <i class="bi {{ $esActivo ? 'bi-toggle-off' : 'bi-toggle-on' }}"></i>
-                                        </button>
-                                    </form>
+                                    
                                 </div>
                             </td>
                         </tr>

@@ -4,12 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@yield('title', 'YE Bolivia - Administrador')</title>
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
-    
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
+    @yield('styles')
     <style>
         /* Prevenir scroll horizontal en toda la página */
         body {
@@ -207,7 +207,6 @@
                     <div class="collapse" id="submenuProgramas">
                         <ul class="nav flex-column">
                             <li><a class="nav-link link-dark submenu-item" href="{{ url('administrador/programasAdministrador') }}">Ver Programas</a></li>
-                            <li><a class="nav-link link-dark submenu-item" href="{{ url('administrador/nuevosProgramasAdministrador') }}">Crear Programa</a></li>
                             <li><a class="nav-link link-dark submenu-item" href="{{ route('reportes.talleres') }}">Reportes de Talleres</a></li>
                         </ul>
                     </div>
@@ -363,5 +362,6 @@
 
 </script>
 
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
