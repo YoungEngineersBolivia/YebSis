@@ -126,18 +126,6 @@
                                         <i class="bi bi-pencil-square"></i>
                                     </button>
 
-                                    {{-- Botón Eliminar --}}
-                                    <form action="{{ route('estudiantes.eliminar', $estudiante->Id_estudiantes ?? 0) }}" 
-                                          method="POST" 
-                                          class="d-inline"
-                                          onsubmit="return confirm('¿Está seguro de eliminar este estudiante?');">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="btn btn-sm btn-outline-danger" title="Eliminar">
-                                            <i class="bi bi-trash3-fill"></i>
-                                        </button>
-                                    </form>
-
                                     {{-- Botón Ver perfil --}}
                                     <a href="{{ route('estudiantes.ver', $estudiante->Id_estudiantes ?? 0) }}" 
                                        class="btn btn-sm btn-outline-secondary" 

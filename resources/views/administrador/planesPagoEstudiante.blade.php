@@ -170,9 +170,9 @@
                 </div>
 
                 <div class="card-body">
-                    <h6 class="mb-3">
+                    <h5 class="mb-3">
                         <i class="bi bi-list-check"></i> Detalle de Cuotas
-                    </h6>
+                    </h5>
 
                     @if($cuotas->isEmpty())
                         <p class="text-muted mb-0">No hay cuotas registradas para este plan.</p>
@@ -224,52 +224,10 @@
                                             {{ ucfirst($cuota->Estado_cuota ?? 'Pendiente') }}
                                         </span>
                                     </div>
-                                    <div class="col-md-1 text-end">
-                                        @if($estadoCuota !== 'pagado')
-                                            <button class="btn btn-sm btn-primary" 
-                                                    data-bs-toggle="modal" 
-                                                    data-bs-target="#pagarCuotaModal{{ $cuota->Id_cuotas }}">
-                                                <i class="bi bi-cash"></i>
-                                            </button>
-                                        @endif
-                                    </div>
+                                    
                                 </div>
                             </div>
 
-                            {{-- Modal para registrar pago (opcional) --}}
-                            <div class="modal fade" id="pagarCuotaModal{{ $cuota->Id_cuotas }}" tabindex="-1">
-                                <div class="modal-dialog">
-                                    <div class="modal-content">
-                                        <div class="modal-header">
-                                            <h5 class="modal-title">Registrar Pago - Cuota #{{ $cuota->Nro_de_cuota }}</h5>
-                                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                                        </div>
-                                        <form action="{{ route('cuotas.registrarPago', $cuota->Id_cuotas) }}" method="POST">
-                                            @csrf
-                                            @method('PUT')
-                                            <div class="modal-body">
-                                                <div class="mb-3">
-                                                    <label class="form-label">Monto a pagar</label>
-                                                    <input type="number" step="0.01" name="monto_pago" 
-                                                           class="form-control" 
-                                                           max="{{ $cuota->Monto_cuota }}" 
-                                                           value="{{ $cuota->Monto_cuota }}" required>
-                                                </div>
-                                                <div class="mb-3">
-                                                    <label class="form-label">Fecha de pago</label>
-                                                    <input type="date" name="fecha_pago" 
-                                                           class="form-control" 
-                                                           value="{{ date('Y-m-d') }}" required>
-                                                </div>
-                                            </div>
-                                            <div class="modal-footer">
-                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                                                <button type="submit" class="btn btn-primary">Registrar Pago</button>
-                                            </div>
-                                        </form>
-                                    </div>
-                                </div>
-                            </div>
                         @endforeach
                     @endif
                 </div>
