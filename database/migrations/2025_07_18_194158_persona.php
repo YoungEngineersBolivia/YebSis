@@ -265,21 +265,14 @@ return new class extends Migration
 
         Schema::create('horarios', function (Blueprint $table) {
             $table->id('Id_horarios');
-            $table->string('Horario_clase_uno')->nullable();
-            $table->string('Dia_clase_uno')->nullable();
-            $table->string('Horario_clase_dos')->nullable();
-            $table->string('Dia_clase_dos')->nullable();
-            $table->foreignId('Id_programas')
-                  ->constrained('programas', 'Id_programas')
-                  ->onDelete('cascade');
-            $table->foreignId('Id_profesores')
-                  ->constrained('profesores', 'Id_profesores')
-                  ->onDelete('cascade');
-            $table->foreignId('Id_estudiantes')
-                  ->constrained('estudiantes', 'Id_estudiantes')
-                  ->onDelete('cascade');
+            $table->string('Dia'); // Lunes, Martes, etc.
+            $table->time('Hora');
+            $table->foreignId('Id_programas')->constrained('programas', 'Id_programas')->onDelete('cascade');
+            $table->foreignId('Id_profesores')->nullable()->constrained('profesores', 'Id_profesores')->onDelete('set null');
+            $table->foreignId('Id_estudiantes')->constrained('estudiantes', 'Id_estudiantes')->onDelete('cascade');
             $table->timestamps();
-        });
+            });
+
 
         Schema::create('citas', function (Blueprint $table) {
             $table->id('Id_citas');
