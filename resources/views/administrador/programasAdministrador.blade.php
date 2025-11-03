@@ -176,4 +176,64 @@
 
 @section('scripts')
 <script src="{{ auto_asset('js/administrador/programasAdministrador.js') }}"></script>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    // Obtener todos los botones de acciones
+    const eliminarBtns = document.querySelectorAll('button[onclick^="eliminarPrograma"]');
+    const editarBtns = document.querySelectorAll('button[onclick^="editarPrograma"]');
+    const verBtns = document.querySelectorAll('button[onclick^="verPrograma"]');
+
+    // Función eliminar
+    window.eliminarPrograma = function(id) {
+        if(confirm('¿Estás seguro de eliminar este programa?')) {
+            // Buscar el formulario de eliminación o enviar un fetch/submit
+            // Aquí hacemos submit a un formulario oculto
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = `/programas/${id}`; // Ajusta la ruta
+            form.innerHTML = `
+                @csrf
+                @method('DELETE')
+            `;
+            document.body.appendChild(form);
+            form.submit();
+        }
+    }
+
+    // Función editar
+    window.editarPrograma = function(id) {
+        // Abrir modal de edición
+        const modal = document.getElementById(`editarProgramaModal${id}`);
+        if(modal){
+            const bsModal = new bootstrap.Modal(modal);
+            bsModal.show();
+        }
+    }
+
+    // Función ver
+    window.verPrograma = function(id) {
+        // Abrir modal de ver detalles
+        const modal = document.getElementById(`verProgramaModal${id}`);
+        if(modal){
+            const bsModal = new bootstrap.Modal(modal);
+            bsModal.show();
+        }
+    }
+
+    // Buscador puro JS
+    const input = document.getElementById('searchInput');
+    const table = document.querySelector('table tbody');
+    if(input && table){
+        input.addEventListener('input', function(){
+            const query = this.value.toLowerCase();
+            table.querySelectorAll('tr').forEach(tr => {
+                const text = tr.innerText.toLowerCase();
+                tr.style.display = text.includes(query) ? '' : 'none';
+            });
+        });
+    }
+});
+</script>
+
+
 @endsection
