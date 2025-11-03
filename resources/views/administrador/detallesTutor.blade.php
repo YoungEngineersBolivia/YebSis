@@ -1,7 +1,9 @@
 @extends('/administrador/baseAdministrador')
 
 @section('title', 'Detalles del Tutor')
+
 @section('styles')
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <link href="{{ auto_asset ('css/style.css') }}" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
@@ -81,11 +83,28 @@
 
 @section('content')
 <div class="container-fluid mt-4">
+
+    {{-- Mensajes de sesión --}}
+    @if(session('success'))
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            {{ session('success') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+        </div>
+    @endif
+    @if(session('error'))
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            {{ session('error') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+        </div>
+    @endif
+
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h1 class="mb-0"><i class="bi bi-person-badge"></i> Detalles del Tutor</h1>
-        <a href="{{ route('tutores.index') }}" class="btn btn-secondary">
-            <i class="bi bi-arrow-left"></i> Volver
-        </a>
+        <div class="d-flex gap-2">
+            <a href="{{ route('tutores.index') }}" class="btn btn-secondary">
+                <i class="bi bi-arrow-left"></i> Volver
+            </a>
+        </div>
     </div>
 
     <!-- Información del Tutor -->
@@ -100,13 +119,13 @@
                 <div class="info-row">
                     <span class="info-label">Celular:</span>
                     <span class="info-value">
-                        <i class="bi bi-phone"></i> {{ $tutor->persona->Celular }}
+                        <i class="bi bi-phone"></i> {{ $tutor->persona->Celular ?? 'No especificado' }}
                     </span>
                 </div>
                 <div class="info-row">
                     <span class="info-label">Dirección:</span>
                     <span class="info-value">
-                        <i class="bi bi-geo-alt"></i> {{ $tutor->persona->Direccion_domicilio }}
+                        <i class="bi bi-geo-alt"></i> {{ $tutor->persona->Direccion_domicilio ?? 'No especificado' }}
                     </span>
                 </div>
                 <div class="info-row">
@@ -322,7 +341,8 @@
                                                         $estadoTexto = $cuota->Estado_cuota === 'Pagado' ? 'Pagado' : 
                                                                       ($estaVencida ? 'Vencido' : 'Pendiente');
                                                         $fechaVencimiento = \Carbon\Carbon::parse($cuota->Fecha_vencimiento);
-                                                        $diasRestantes = $fechaVencimiento->diffInDays(\Carbon\Carbon::now(), false);
+                                                        // Convertir a entero los días
+                                                        $diasRestantes = (int) $fechaVencimiento->diffInDays(\Carbon\Carbon::now(), false);
                                                     @endphp
                                                     <tr class="{{ $estaVencida ? 'table-danger' : '' }}">
                                                         <td><strong>{{ $cuota->Nro_de_cuota }}</strong></td>
@@ -381,11 +401,22 @@
             @endforeach
         @endif
     </div>
+
 </div>
 @endsection
 
 @section('scripts')
 <script>
+(function () {
+    // Autocierre de alertas después de 5 segundos
+    document.querySelectorAll('.alert').forEach(alertEl => {
+        setTimeout(() => {
+            const bsAlert = bootstrap.Alert.getOrCreateInstance(alertEl);
+            bsAlert.close();
+        }, 5000);
+    });
+
     console.log('Detalles del tutor cargados correctamente');
+})();
 </script>
 @endsection

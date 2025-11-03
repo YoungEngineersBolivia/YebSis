@@ -1,33 +1,33 @@
-@extends('/administrador/baseAdministrador')
+@extends('administrador.baseAdministrador')
 
 @section('title', 'Tutores')
+
 @section('styles')
-    <link href="{{ auto_asset ('css/style.css') }}" rel="stylesheet">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <link href="{{ auto_asset('css/style.css') }}" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 @endsection
 
 @section('content')
 <div class="container-fluid mt-4">
+
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h1 class="mb-0">Tutores</h1>
-        
     </div>
 
-    <!-- Mostrar mensajes -->
+    {{-- Mensajes --}}
     @if(session('success'))
         <div class="alert alert-success alert-dismissible fade show" role="alert">
             {{ session('success') }}
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
         </div>
     @endif
-
     @if(session('error'))
         <div class="alert alert-danger alert-dismissible fade show" role="alert">
             {{ session('error') }}
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
         </div>
     @endif
-
     @if($errors->any())
         <div class="alert alert-danger alert-dismissible fade show" role="alert">
             <ul class="mb-0">
@@ -39,14 +39,16 @@
         </div>
     @endif
 
+    {{-- Buscador --}}
     <div class="row mb-3">
         <div class="col-md-6">
-            <div class="input-group">
-                <span class="input-group-text"><i class="fas fa-search"></i></span>
-                <form action="{{ route('tutores.index') }}" method="GET">
-                    <input type="text" class="form-control" name="search" placeholder="Buscar Tutor" value="{{ request()->search }}">
-                </form>
-            </div>
+            <form action="{{ route('tutores.index') }}" method="GET" class="w-100">
+                <div class="input-group">
+                    <span class="input-group-text"><i class="fas fa-search"></i></span>
+                    <input type="text" class="form-control" name="search" placeholder="Buscar Tutor" value="{{ $search ?? '' }}">
+                    <button type="submit" class="btn btn-primary">Buscar</button>
+                </div>
+            </form>
         </div>
     </div>
 
@@ -57,137 +59,127 @@
             <table class="table table-hover">
                 <thead class="table-light">
                     <tr>
-                        <th class="fw-bold text-dark">Nombre <i class="fbi bi-arrow-down"></i></th>
-                        <th class="fw-bold text-dark">Apellido <i class="fbi bi-arrow-down"></i></th>
-                        <th class="fw-bold text-dark">Celular <i class="fbi bi-arrow-down"></i></th>
-                        <th class="fw-bold text-dark">Dirección <i class="fbi bi-arrow-down"></i></th>
-                        <th class="fw-bold text-dark">Correo <i class="fbi bi-arrow-down"></i></th>
-                        <th class="fw-bold text-dark">Parentesco <i class="fbi bi-arrow-down"></i></th>
-                        <th class="fw-bold text-dark">Acciones <i class="fbi bi-arrow-down"></i></th>
+                        <th>Nombre</th>
+                        <th>Apellido</th>
+                        <th>Celular</th>
+                        <th>Dirección</th>
+                        <th>Correo</th>
+                        <th>Parentesco</th>
+                        <th style="min-width:140px;">Acciones</th>
                     </tr>
                 </thead>
                 <tbody>
                     @foreach ($tutores as $tutor)
                         <tr>
-                            <td class="fw-normal">{{ $tutor->persona->Nombre }}</td>
-                            <td class="text-muted">{{ $tutor->persona->Apellido }}</td>
-                            <td class="text-muted">{{ $tutor->persona->Celular }}</td>
-                            <td class="text-muted">{{ $tutor->persona->Direccion_domicilio }}</td>
-                            <td class="text-muted">{{ $tutor->usuario->Correo }}</td>
-                            <td class="text-muted">{{ $tutor->Parentesco }}</td>
+                            <td>{{ $tutor->persona->Nombre ?? '—' }}</td>
+                            <td>{{ $tutor->persona->Apellido ?? '—' }}</td>
+                            <td>{{ $tutor->persona->Celular ?? '—' }}</td>
+                            <td>{{ $tutor->persona->Direccion_domicilio ?? '—' }}</td>
+                            <td>{{ $tutor->usuario->Correo ?? '—' }}</td>
+                            <td>{{ $tutor->Parentesco ?? '—' }}</td>
                             <td>
                                 <div class="d-flex gap-2">
-                                    <button class="btn btn-sm btn-outline-secondary" title="Ver detalles"
-                                            onclick="verTutor({{ $tutor->Id_tutores }})">
-                                        <i class="bi bi-person-fill"></i>
+                                    {{-- Botón Ver - Redirige a detalles --}}
+                                    <a href="{{ route('tutores.detalles', $tutor->Id_tutores) }}" 
+                                       class="btn btn-sm btn-outline-secondary"
+                                       title="Ver detalles">
+                                        <i class="fa fa-eye"></i>
+                                    </a>
+
+                                    {{-- Botón Editar - Abre modal --}}
+                                    <button type="button"
+                                            class="btn btn-sm btn-outline-primary"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#modalEditar{{ $tutor->Id_tutores }}">
+                                        <i class="fa fa-pencil-alt"></i>
                                     </button>
-                                    <button class="btn btn-sm btn-outline-primary" title="Editar"
-                                            onclick="editarTutor({{ $tutor->Id_tutores }})">
-                                        <i class="bi bi-pencil-square"></i>
-                                    </button>
+
+                                
                                 </div>
                             </td>
                         </tr>
+
+                        {{-- Modal Editar para cada tutor --}}
+                        <div class="modal fade" id="modalEditar{{ $tutor->Id_tutores }}" tabindex="-1" aria-labelledby="modalEditarLabel{{ $tutor->Id_tutores }}" aria-hidden="true">
+                            <div class="modal-dialog modal-lg modal-dialog-scrollable">
+                                <form action="{{ route('tutores.update', $tutor->Id_tutores) }}" method="POST">
+                                    @csrf
+                                    @method('PUT')
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="modalEditarLabel{{ $tutor->Id_tutores }}">Editar Tutor</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <div class="row g-3">
+                                                <div class="col-12 col-sm-6">
+                                                    <label class="form-label">Nombre</label>
+                                                    <input type="text" name="nombre" class="form-control" value="{{ $tutor->persona->Nombre ?? '' }}" required>
+                                                </div>
+                                                <div class="col-12 col-sm-6">
+                                                    <label class="form-label">Apellido</label>
+                                                    <input type="text" name="apellido" class="form-control" value="{{ $tutor->persona->Apellido ?? '' }}" required>
+                                                </div>
+                                                <div class="col-12 col-sm-6">
+                                                    <label class="form-label">Celular</label>
+                                                    <input type="text" name="celular" class="form-control" value="{{ $tutor->persona->Celular ?? '' }}">
+                                                </div>
+                                                <div class="col-12 col-sm-6">
+                                                    <label class="form-label">Dirección</label>
+                                                    <input type="text" name="direccion_domicilio" class="form-control" value="{{ $tutor->persona->Direccion_domicilio ?? '' }}">
+                                                </div>
+                                                <div class="col-12 col-sm-6">
+                                                    <label class="form-label">Correo</label>
+                                                    <input type="email" name="correo" class="form-control" value="{{ $tutor->usuario->Correo ?? '' }}" required>
+                                                </div>
+                                                <div class="col-12 col-sm-6">
+                                                    <label class="form-label">Parentesco</label>
+                                                    <input type="text" name="parentezco" class="form-control" value="{{ $tutor->Parentesco ?? '' }}" required>
+                                                </div>
+                                                <div class="col-12 col-sm-6">
+                                                    <label class="form-label">Descuento (%)</label>
+                                                    <input type="number" name="descuento" class="form-control" step="0.01" min="0" max="100" value="{{ $tutor->Descuento ?? '' }}">
+                                                </div>
+                                                <div class="col-12 col-sm-6">
+                                                    <label class="form-label">NIT</label>
+                                                    <input type="text" name="nit" class="form-control" value="{{ $tutor->Nit ?? '' }}">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                            <button type="submit" class="btn btn-primary">
+                                                <i class="fa fa-save me-1"></i>Guardar Cambios
+                                            </button>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
                     @endforeach
                 </tbody>
             </table>
         </div>
 
-        <!-- Paginación -->
+        {{-- Paginación --}}
         <div class="d-flex justify-content-center mt-4">
             {{ $tutores->links('pagination::bootstrap-5') }}
         </div>
     @endif
 
-    <!-- Modal para ver información -->
-    <div class="modal fade" id="modalVerTutor" tabindex="-1" aria-labelledby="modalVerTutorLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Información del Tutor</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-                </div>
-                <div class="modal-body">
-                    <p><strong>Nombre:</strong> <span id="verNombre"></span></p>
-                    <p><strong>Apellido:</strong> <span id="verApellido"></span></p>
-                    <p><strong>Celular:</strong> <span id="verCelular"></span></p>
-                    <p><strong>Dirección:</strong> <span id="verDireccion"></span></p>
-                    <p><strong>Correo:</strong> <span id="verCorreo"></span></p>
-                    <p><strong>Parentesco:</strong> <span id="verParentesco"></span></p>
-                    <p><strong>Descuento:</strong> <span id="verDescuento"></span>%</p>
-                    <p><strong>NIT:</strong> <span id="verNit"></span></p>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal para edición -->
-    <div class="modal fade" id="modalEditarTutor" tabindex="-1" aria-labelledby="modalEditarLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg">
-            <form method="POST" id="formEditarTutor">
-                @csrf
-                @method('PUT')
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title">Editar Tutor</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-                    </div>
-                    <div class="modal-body">
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label>Nombre</label>
-                                <input type="text" name="nombre" id="editarNombre" class="form-control" required>
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label>Apellido</label>
-                                <input type="text" name="apellido" id="editarApellido" class="form-control" required>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label>Celular</label>
-                                <input type="text" name="celular" id="editarCelular" class="form-control" required>
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label>Dirección</label>
-                                <input type="text" name="direccion_domicilio" id="editarDireccion" class="form-control" required>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label>Correo</label>
-                                <input type="email" name="correo" id="editarCorreo" class="form-control" required>
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label>Parentesco</label>
-                                <input type="text" name="parentezco" id="editarParentesco" class="form-control" required>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label>Descuento (%)</label>
-                                <input type="number" name="descuento" id="editarDescuento" class="form-control" step="0.01" min="0" max="100">
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label>NIT</label>
-                                <input type="text" name="nit" id="editarNit" class="form-control">
-                            </div>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="submit" class="btn btn-primary">Guardar Cambios</button>
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    </div>
-                </div>
-            </form>
-        </div>
-    </div>
 </div>
 @endsection
 
 @section('scripts')
-<script src="{{ auto_asset('js/administrador/tutoresAdministrador.js') }}"></script>
+<script>
+(function () {
+    // Autocierre de alertas después de 5 segundos
+    document.querySelectorAll('.alert').forEach(alertEl => {
+        setTimeout(() => {
+            const bsAlert = bootstrap.Alert.getOrCreateInstance(alertEl);
+            bsAlert.close();
+        }, 5000);
+    });
+})();
+</script>
 @endsection
