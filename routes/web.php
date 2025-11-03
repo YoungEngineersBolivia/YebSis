@@ -81,13 +81,13 @@ Route::prefix('administrador')->name('administrador.')->group(function () {
     /* ----------------- GESTIÓN DE TUTORES ----------------- */
     Route::prefix('tutores')->name('tutores.')->group(function () {
         Route::get('/', [TutoresController::class, 'index'])->name('index');
-        Route::get('/{id}', [TutoresController::class, 'show'])->name('show');
+        Route::get('/{id}/detalles', [TutoresController::class, 'detalles'])->name('detalles'); // Nueva ruta
         Route::get('/{id}/edit', [TutoresController::class, 'edit'])->name('edit');
         Route::put('/{id}', [TutoresController::class, 'update'])->name('update');
         Route::delete('/{id}', [TutoresController::class, 'destroy'])->name('destroy');
-        Route::get('/{id}/detalles', [TutoresController::class, 'verDetalles'])->name('tutores.detalles');
-    }); 
+    });
     Route::get('/tutoresAdministrador', [TutoresController::class, 'index']);
+
     
     /* ----------------- GESTIÓN DE USUARIOS ----------------- */
     Route::prefix('usuarios')->name('usuarios.')->group(function () {
