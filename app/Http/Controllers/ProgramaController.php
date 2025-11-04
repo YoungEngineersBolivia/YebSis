@@ -24,7 +24,7 @@ class ProgramaController extends Controller
             'duracion' => 'required|string|max:100',
             'descripcion' => 'required|string',
             'imagen' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'tipo' => 'required|string|max:255'
+            'tipo' => 'required|string|in:programa,taller'
         ]);
 
         try {
@@ -45,28 +45,37 @@ class ProgramaController extends Controller
 
             $programa->save();
 
-            return redirect()->back()->with('success', 'Programa creado exitosamente');
+            return redirect()->route('programas.index')->with('success', 'Programa creado exitosamente');
 
         } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'Error al crear el programa: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Error al crear el programa: ' . $e->getMessage())->withInput();
         }
     }
 
     public function show($id)
     {
-        $programa = Programa::findOrFail($id);
-        return response()->json($programa);
+        try {
+            $programa = Programa::findOrFail($id);
+            return view('administrador.modelosPrograma', compact('programa'));
+        } catch (\Exception $e) {
+            return redirect()->route('programas.index')->with('error', 'Programa no encontrado');
+        }
     }
 
     public function edit($id)
     {
-        $programa = Programa::findOrFail($id);
-        return view('administrador.nuevoProgramaAdministrador', [
-            'modo' => 'Editar',
-            'programa' => $programa,
-            'action' => route('programas.update', $programa->Id_programas),
-            'readonly' => ''
-        ]);
+        try {
+            $programa = Programa::findOrFail($id);
+            return response()->json([
+                'success' => true,
+                'programa' => $programa
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Programa no encontrado'
+            ], 404);
+        }
     }
 
     public function update(Request $request, $id)
@@ -77,7 +86,7 @@ class ProgramaController extends Controller
             'rango_edad' => 'required|string|max:100',
             'duracion' => 'required|string|max:100',
             'descripcion' => 'required|string',
-            'tipo' => 'required|string|max:255',
+            'tipo' => 'required|string|in:programa,taller',
             'imagen' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048'
         ]);
 
@@ -105,7 +114,7 @@ class ProgramaController extends Controller
             return redirect()->route('programas.index')->with('success', 'Programa actualizado exitosamente');
 
         } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'Error al actualizar el programa: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Error al actualizar el programa: ' . $e->getMessage())->withInput();
         }
     }
 
@@ -113,6 +122,14 @@ class ProgramaController extends Controller
     {
         try {
             $programa = Programa::findOrFail($id);
+
+            // Verificar si el programa tiene estudiantes asociados (opcional)
+            // if ($programa->estudiantes()->count() > 0) {
+            //     return response()->json([
+            //         'success' => false,
+            //         'message' => 'No se puede eliminar el programa porque tiene estudiantes inscritos'
+            //     ], 400);
+            // }
 
             if ($programa->Imagen && Storage::disk('public')->exists($programa->Imagen)) {
                 Storage::disk('public')->delete($programa->Imagen);
