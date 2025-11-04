@@ -186,14 +186,19 @@ Route::delete('/graduados/{id}', [GraduadoController::class, 'eliminarGraduado']
     });
     
     /* ----------------- GESTIÓN DE PROFESORES ----------------- */
-    Route::prefix('profesores')->name('profesores.')->group(function () {
+   Route::prefix('profesores')->name('profesores.')->group(function () {
         Route::get('/', [ProfesoresController::class, 'index'])->name('index');
         Route::post('/', [ProfesoresController::class, 'store'])->name('store');
-        Route::get('/{id}', [ProfesoresController::class, 'show'])->name('show');
+        Route::get('/create', [ProfesoresController::class, 'create'])->name('create');
+        
         Route::get('/{id}/edit', [ProfesoresController::class, 'edit'])->name('edit');
+        
+        Route::get('/{id}', [ProfesoresController::class, 'show'])->name('show');
+        
         Route::put('/{id}', [ProfesoresController::class, 'update'])->name('update');
         Route::delete('/{id}', [ProfesoresController::class, 'destroy'])->name('destroy');
     });
+
     
     /* ----------------- MOTORES ASIGNADOS ----------------- */
     Route::prefix('motores')->name('motores.')->group(function () {

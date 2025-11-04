@@ -34,6 +34,11 @@ class Profesor extends Model
         return $this->belongsTo(Persona::class, 'Id_personas', 'Id_personas');
     }
 
+    public function horarios()
+    {
+        return $this->hasMany(Horario::class, 'Id_profesores', 'Id_profesores');
+    }
+    
     public function usuario()
     {
         return $this->belongsTo(Usuario::class, 'Id_usuarios', 'Id_usuarios');
