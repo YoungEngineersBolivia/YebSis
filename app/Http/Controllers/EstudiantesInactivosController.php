@@ -4,12 +4,12 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
 
 class EstudiantesInactivosController extends Controller
 {
     /**
-     * Listado y gráfica de estudiantes inactivos (MySQL/MariaDB),
-     * filtrable por rango usando la columna Fecha_estado.
+     * Muestra estudiantes inactivos filtrable por rango usando la columna Fecha_estado.
      */
     public function index(Request $request)
     {
@@ -52,19 +52,39 @@ class EstudiantesInactivosController extends Controller
             $serieQuery->whereDate('Fecha_estado', '<=', $to);
         }
 
-        // mes_iso = primer día del mes, para formatear en JS
         $fechasInactivacion = $serieQuery
             ->selectRaw('
                 DATE_FORMAT(Fecha_estado, "%Y-%m-01") AS mes_iso,
-                COUNT(*)                                AS cantidad
+                COUNT(*) AS cantidad
             ')
             ->groupBy('mes_iso')
             ->orderBy('mes_iso')
             ->get();
 
+        // Si no hay datos, mostrar mes actual con 0
+        if ($fechasInactivacion->isEmpty()) {
+            $fechasInactivacion = collect([
+                ['mes_iso' => now()->format('Y-m-01'), 'cantidad' => 0]
+            ]);
+        }
+
+        // Calcular estadísticas para los dropdowns
+        $mesesDisponibles = DB::table('estudiantes')
+            ->where('Estado', 'Inactivo')
+            ->selectRaw('
+                DATE_FORMAT(Fecha_estado, "%Y-%m") AS mes,
+                DATE_FORMAT(Fecha_estado, "%M %Y") AS mes_nombre,
+                COUNT(*) AS total
+            ')
+            ->groupBy('mes', 'mes_nombre')
+            ->orderByDesc('mes')
+            ->limit(12)
+            ->get();
+
         return view('comercial.estudiantesNoActivos', [
             'estudiantesInactivos' => $estudiantesInactivos,
             'fechasInactivacion'   => $fechasInactivacion,
+            'mesesDisponibles'     => $mesesDisponibles,
             'from'                 => $from,
             'to'                   => $to,
         ]);
@@ -72,19 +92,19 @@ class EstudiantesInactivosController extends Controller
 
     /**
      * Cambia el estado de Inactivo a Activo.
-     * Si no quieres tocar Fecha_estado al reactivar, elimina la línea correspondiente.
      */
     public function reactivar($id)
     {
         $affected = DB::table('estudiantes')
             ->where('Id_estudiantes', $id)
+            ->where('Estado', 'Inactivo') // Solo reactivar si está inactivo
             ->update([
                 'Estado'       => 'Activo',
-                'Fecha_estado' => now()->format('Y-m-d'), // quita esto si no debe cambiar
+                'Fecha_estado' => now()->format('Y-m-d'),
             ]);
 
         if ($affected === 0) {
-            return back()->withErrors(['error' => 'Estudiante no encontrado.']);
+            return back()->withErrors(['error' => 'Estudiante no encontrado o ya estaba activo.']);
         }
 
         return redirect()
