@@ -254,144 +254,65 @@
 @endsection
 
 @section('scripts')
+<script src="{{ auto_asset('js/administrador/programasAdministrador.js') }}"></script>
 <script>
-// IMPORTANTE: Verificar que las funciones estén disponibles globalmente
-console.log('Script cargado correctamente');
+document.addEventListener('DOMContentLoaded', () => {
+    // Obtener todos los botones de acciones
+    const eliminarBtns = document.querySelectorAll('button[onclick^="eliminarPrograma"]');
+    const editarBtns = document.querySelectorAll('button[onclick^="editarPrograma"]');
+    const verBtns = document.querySelectorAll('button[onclick^="verPrograma"]');
 
-// Búsqueda en tiempo real
-const searchInput = document.getElementById('searchInput');
-if (searchInput) {
-    searchInput.addEventListener('keyup', function() {
-        const searchValue = this.value.toLowerCase();
-        const tableRows = document.querySelectorAll('#tablaProgramas tbody tr');
-        
-        tableRows.forEach(row => {
-            const text = row.textContent.toLowerCase();
-            row.style.display = text.includes(searchValue) ? '' : 'none';
-        });
-    });
-}
+    // Función eliminar
+    window.eliminarPrograma = function(id) {
+        if(confirm('¿Estás seguro de eliminar este programa?')) {
+            // Buscar el formulario de eliminación o enviar un fetch/submit
+            // Aquí hacemos submit a un formulario oculto
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = `/programas/${id}`; // Ajusta la ruta
+            form.innerHTML = `
+                @csrf
+                @method('DELETE')
+            `;
+            document.body.appendChild(form);
+            form.submit();
+        }
+    }
 
-// Función para editar programa (GLOBAL)
-window.editarPrograma = function(id) {
-    console.log('Editando programa ID:', id);
-    
-    fetch(`/programas/${id}/edit`, {
-        method: 'GET',
-        headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'
+    // Función editar
+    window.editarPrograma = function(id) {
+        // Abrir modal de edición
+        const modal = document.getElementById(`editarProgramaModal${id}`);
+        if(modal){
+            const bsModal = new bootstrap.Modal(modal);
+            bsModal.show();
         }
-    })
-    .then(response => {
-        if (!response.ok) {
-            throw new Error('Error en la respuesta del servidor');
-        }
-        return response.json();
-    })
-    .then(data => {
-        console.log('Datos recibidos:', data);
-        
-        if (data.success) {
-            const programa = data.programa;
-            
-            // Llenar el formulario con los datos
-            document.getElementById('edit_programa_id').value = programa.Id_programas;
-            document.getElementById('edit_nombre').value = programa.Nombre || '';
-            document.getElementById('edit_tipo').value = programa.Tipo || 'programa';
-            document.getElementById('edit_costo').value = programa.Costo || '';
-            document.getElementById('edit_rango_edad').value = programa.Rango_edad || '';
-            document.getElementById('edit_duracion').value = programa.Duracion || '';
-            document.getElementById('edit_descripcion').value = programa.Descripcion || '';
-            
-            // Actualizar la acción del formulario
-            document.getElementById('formEditarPrograma').action = `/programas/${programa.Id_programas}`;
-            
-            // Mostrar imagen actual si existe
-            const imagenActual = document.getElementById('imagenActual');
-            if (programa.Imagen) {
-                imagenActual.innerHTML = `
-                    <div class="alert alert-info">
-                        <strong>Imagen actual:</strong><br>
-                        <img src="/storage/${programa.Imagen}" alt="${programa.Nombre}" style="max-width: 200px; max-height: 150px;" class="img-thumbnail mt-2">
-                    </div>
-                `;
-            } else {
-                imagenActual.innerHTML = '<div class="alert alert-warning">No hay imagen actual</div>';
-            }
-            
-            // Mostrar el modal
-            const modalElement = document.getElementById('editarProgramaModal');
-            const modal = new bootstrap.Modal(modalElement);
-            modal.show();
-        } else {
-            alert('Error al cargar los datos del programa');
-        }
-    })
-    .catch(error => {
-        console.error('Error completo:', error);
-        alert('Error al cargar los datos del programa: ' + error.message);
-    });
-}
+    }
 
-// Función para eliminar programa (GLOBAL)
-window.eliminarPrograma = function(id) {
-    console.log('Eliminando programa ID:', id);
-    
-    if (confirm('¿Está seguro que desea eliminar este programa? Esta acción no se puede deshacer.')) {
-        // Buscar el token CSRF
-        const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
-        
-        if (!csrfToken) {
-            alert('Error: No se encontró el token CSRF. Asegúrate de tener <meta name="csrf-token"> en tu layout.');
-            return;
+    // Función ver
+    window.verPrograma = function(id) {
+        // Abrir modal de ver detalles
+        const modal = document.getElementById(`verProgramaModal${id}`);
+        if(modal){
+            const bsModal = new bootstrap.Modal(modal);
+            bsModal.show();
         }
-        
-        fetch(`/programas/${id}`, {
-            method: 'DELETE',
-            headers: {
-                'X-CSRF-TOKEN': csrfToken,
-                'Accept': 'application/json',
-                'Content-Type': 'application/json'
-            }
-        })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Error en la respuesta del servidor');
-            }
-            return response.json();
-        })
-        .then(data => {
-            console.log('Respuesta:', data);
-            
-            if (data.success) {
-                alert(data.message);
-                location.reload();
-            } else {
-                alert(data.message || 'Error al eliminar el programa');
-            }
-        })
-        .catch(error => {
-            console.error('Error completo:', error);
-            alert('Error al eliminar el programa: ' + error.message);
+    }
+
+    // Buscador puro JS
+    const input = document.getElementById('searchInput');
+    const table = document.querySelector('table tbody');
+    if(input && table){
+        input.addEventListener('input', function(){
+            const query = this.value.toLowerCase();
+            table.querySelectorAll('tr').forEach(tr => {
+                const text = tr.innerText.toLowerCase();
+                tr.style.display = text.includes(query) ? '' : 'none';
+            });
         });
     }
-}
-
-// Auto-cerrar alertas después de 5 segundos
-document.addEventListener('DOMContentLoaded', function() {
-    const alerts = document.querySelectorAll('.alert:not(.alert-warning)');
-    alerts.forEach(alert => {
-        setTimeout(() => {
-            const bsAlert = new bootstrap.Alert(alert);
-            bsAlert.close();
-        }, 5000);
-    });
-    
-    console.log('Funciones globales disponibles:', {
-        editarPrograma: typeof window.editarPrograma,
-        eliminarPrograma: typeof window.eliminarPrograma
-    });
 });
 </script>
+
+
 @endsection
