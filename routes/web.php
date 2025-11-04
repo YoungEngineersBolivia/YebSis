@@ -186,14 +186,19 @@ Route::delete('/graduados/{id}', [GraduadoController::class, 'eliminarGraduado']
     });
     
     /* ----------------- GESTIÓN DE PROFESORES ----------------- */
-    Route::prefix('profesores')->name('profesores.')->group(function () {
+   Route::prefix('profesores')->name('profesores.')->group(function () {
         Route::get('/', [ProfesoresController::class, 'index'])->name('index');
         Route::post('/', [ProfesoresController::class, 'store'])->name('store');
-        Route::get('/{id}', [ProfesoresController::class, 'show'])->name('show');
+        Route::get('/create', [ProfesoresController::class, 'create'])->name('create');
+        
         Route::get('/{id}/edit', [ProfesoresController::class, 'edit'])->name('edit');
+        
+        Route::get('/{id}', [ProfesoresController::class, 'show'])->name('show');
+        
         Route::put('/{id}', [ProfesoresController::class, 'update'])->name('update');
         Route::delete('/{id}', [ProfesoresController::class, 'destroy'])->name('destroy');
     });
+
     
     /* ----------------- MOTORES ASIGNADOS ----------------- */
     Route::prefix('motores')->name('motores.')->group(function () {
@@ -225,14 +230,16 @@ Route::delete('/graduados/{id}', [GraduadoController::class, 'eliminarGraduado']
     Route::get('/estudiantes/{id}', [EstudianteController::class, 'ver'])->name('estudiantes.ver');
     Route::put('/estudiantes/{id}/cambiar-estado', [EstudianteController::class, 'cambiarEstado'])->name('estudiantes.cambiarEstado');
     
-    /* ----------------- PROGRAMAS CRUD (compartido) ----------------- */
+    /* ----------------- PROGRAMAS ----------------- */
     
-Route::get('/programas', [ProgramaController::class, 'index'])->name('programas.index');
-Route::post('/programas', [ProgramaController::class, 'store'])->name('programas.store');
-Route::get('/programas/{id}', [ProgramaController::class, 'show'])->name('programas.show');
-Route::get('/programas/{id}/edit', [ProgramaController::class, 'edit'])->name('programas.edit');
-Route::put('/programas/{id}', [ProgramaController::class, 'update'])->name('programas.update');
-Route::delete('/programas/{id}', [ProgramaController::class, 'destroy'])->name('programas.destroy');
+    Route::prefix('programas')->group(function () {
+        Route::get('/', [ProgramaController::class, 'index'])->name('programas.index');
+        Route::post('/', [ProgramaController::class, 'store'])->name('programas.store');
+        Route::get('/{id}', [ProgramaController::class, 'show'])->name('programas.show');
+        Route::get('/{id}/edit', [ProgramaController::class, 'edit'])->name('programas.edit');
+        Route::put('/{id}', [ProgramaController::class, 'update'])->name('programas.update');
+        Route::delete('/{id}', [ProgramaController::class, 'destroy'])->name('programas.destroy');
+    });
     
     /* ----------------- PLANES DE PAGO ----------------- */
     Route::post('/planes-pago/registrar', [App\Http\Controllers\PlanesPagoController::class, 'registrar'])->name('planes-pago.registrar');

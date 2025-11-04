@@ -5,7 +5,7 @@
 @section('styles')
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
-   <link href="{{ auto_asset('css/administrador/profesoresAdministrador.css') }}" rel="stylesheet">
+    <link href="{{ auto_asset('css/administrador/profesoresAdministrador.css') }}" rel="stylesheet">
 @endsection
 
 @section('content')
@@ -14,11 +14,9 @@
     <!-- Toolbar superior -->
     <div class="d-flex flex-wrap gap-2 justify-content-between align-items-center mb-4">
         <h1 class="mb-0">Lista de Profesores</h1>
-       <a href="{{ route('administrador.formProfesor') }}" class="btn btn-primary">
-    Registrar Profesor
-</a>
-
-
+        <a href="{{ route('administrador.formProfesor') }}" class="btn btn-primary">
+            Registrar Profesor
+        </a>
     </div>
 
     {{-- Mensajes de sesión --}}
@@ -54,7 +52,9 @@
                 <label for="searchInput" class="form-label mb-1">Buscar</label>
                 <div class="input-group">
                     <span class="input-group-text"><i class="fas fa-search"></i></span>
-                    <input id="searchInput" type="text" class="form-control" placeholder="Filtrar por nombre, apellido o correo" name="search" value="{{ request()->search }}">
+                    <input id="searchInput" type="text" class="form-control" 
+                           placeholder="Filtrar por nombre, apellido o correo"
+                           name="search" value="{{ request()->search }}">
                 </div>
             </form>
         </div>
@@ -84,117 +84,98 @@
                     </tr>
                 </thead>
                 <tbody>
-@foreach ($programas as $programa)
-<tr>
-    <td class="fw-normal">{{ $programa->Nombre }}</td>
-    <td class="text-muted">{{ $programa->Tipo ?? 'No especificado' }}</td>
-    <td class="text-muted">{{ number_format($programa->Costo, 0) }} Bs</td>
-    <td class="text-muted">{{ $programa->Rango_edad }}</td>
-    <td class="text-muted">{{ $programa->Duracion }}</td>
-    <td class="text-muted">{{ Str::limit($programa->Descripcion, 50) }}</td>
-    <td>
-        <div class="d-flex gap-2">
-            <button class="btn btn-sm btn-outline-danger" 
-                    onclick="eliminarPrograma({{ $programa->id }})" title="Eliminar">
-                <i class="bi bi-trash3-fill"></i>
-            </button>
-            <button class="btn btn-sm btn-outline-warning" 
-                    data-bs-toggle="modal" data-bs-target="#editarProgramaModal{{ $programa->id }}"
-                    title="Editar">
-                <i class="bi bi-pencil-square"></i>
-            </button>
-            <button class="btn btn-sm btn-outline-dark" 
-                    data-bs-toggle="modal" data-bs-target="#verProgramaModal{{ $programa->id }}"
-                    title="Ver detalles">
-                <i class="bi bi-person-fill"></i>
-            </button>
-        </div>
-    </td>
-</tr>
+                    @foreach ($profesores as $profesor)
+                    <tr>
+                        <td>{{ $profesor->persona->Nombre ?? 'Sin nombre' }}</td>
+                        <td>{{ $profesor->persona->Apellido ?? 'Sin apellido' }}</td>
+                        <td>{{ $profesor->persona->Celular ?? 'No registrado' }}</td>
+                        <td>{{ $profesor->Profesion ?? 'No especificado' }}</td>
+                        <td>{{ $profesor->usuario->Correo ?? 'Sin correo' }}</td>
+                        <td>{{ $profesor->Rol_componentes ?? 'Ninguno' }}</td>
+                        <td>
+                            <div class="d-flex gap-2">
+                                <!-- Ver -->
+                                <a href="{{ route('profesores.show', $profesor->Id_profesores) }}" class="btn btn-sm btn-outline-dark" title="Ver detalles">
+                                    <i class="bi bi-person-fill"></i>
+                                </a>
 
-<!-- Modal Editar -->
-<div class="modal fade" id="editarProgramaModal{{ $programa->id }}" tabindex="-1" aria-labelledby="editarProgramaLabel{{ $programa->id }}" aria-hidden="true">
-  <div class="modal-dialog modal-lg">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="editarProgramaLabel{{ $programa->id }}">Editar Programa</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-      </div>
-      <form action="{{ route('programas.update', $programa->id) }}" method="POST" enctype="multipart/form-data">
-        @csrf
-        @method('PUT')
-        <div class="modal-body">
-            <div class="mb-3">
-                <label class="form-label">Nombre</label>
-                <input type="text" name="nombre" class="form-control" value="{{ $programa->Nombre }}" required>
-            </div>
-            <div class="mb-3">
-                <label class="form-label">Tipo</label>
-                <select name="tipo" class="form-control">
-                    <option value="programa" {{ $programa->Tipo=='programa'?'selected':'' }}>Programa</option>
-                    <option value="taller" {{ $programa->Tipo=='taller'?'selected':'' }}>Taller</option>
-                </select>
-            </div>
-            <div class="mb-3">
-                <label class="form-label">Costo</label>
-                <input type="number" name="costo" class="form-control" value="{{ $programa->Costo }}" required>
-            </div>
-            <div class="mb-3">
-                <label class="form-label">Rango de Edad</label>
-                <input type="text" name="rango_edad" class="form-control" value="{{ $programa->Rango_edad }}" required>
-            </div>
-            <div class="mb-3">
-                <label class="form-label">Duración</label>
-                <input type="text" name="duracion" class="form-control" value="{{ $programa->Duracion }}" required>
-            </div>
-            <div class="mb-3">
-                <label class="form-label">Descripción</label>
-                <textarea name="descripcion" class="form-control" rows="3" required>{{ $programa->Descripcion }}</textarea>
-            </div>
-            <div class="mb-3">
-                <label class="form-label">Imagen</label>
-                <input type="file" name="imagen" class="form-control">
-            </div>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-          <button type="submit" class="btn btn-primary">Guardar Cambios</button>
-        </div>
-      </form>
-    </div>
-  </div>
-</div>
+                                <!-- Editar -->
+                                <button type="button" class="btn btn-sm btn-outline-warning" 
+                                        data-bs-toggle="modal" 
+                                        data-bs-target="#editarProfesorModal{{ $profesor->Id_profesores }}"
+                                        title="Editar">
+                                    <i class="bi bi-pencil-square"></i>
+                                </button>
 
-<!-- Modal Ver -->
-<div class="modal fade" id="verProgramaModal{{ $programa->id }}" tabindex="-1" aria-labelledby="verProgramaLabel{{ $programa->id }}" aria-hidden="true">
-  <div class="modal-dialog modal-lg">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="verProgramaLabel{{ $programa->id }}">Detalles del Programa</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-      </div>
-      <div class="modal-body">
-        <p><strong>Nombre:</strong> {{ $programa->Nombre }}</p>
-        <p><strong>Tipo:</strong> {{ $programa->Tipo }}</p>
-        <p><strong>Costo:</strong> {{ number_format($programa->Costo,0) }} Bs</p>
-        <p><strong>Rango de Edad:</strong> {{ $programa->Rango_edad }}</p>
-        <p><strong>Duración:</strong> {{ $programa->Duracion }}</p>
-        <p><strong>Descripción:</strong> {{ $programa->Descripcion }}</p>
-        @if($programa->Imagen)
-            <p><strong>Imagen:</strong><br>
-            <img src="{{ asset('storage/'.$programa->Imagen) }}" alt="Imagen Programa" class="img-fluid"></p>
-        @endif
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-      </div>
-    </div>
-  </div>
-</div>
-@endforeach
+                                <!-- Eliminar -->
+                                <form action="{{ route('profesores.destroy', $profesor->Id_profesores) }}" method="POST" onsubmit="return confirm('¿Seguro que deseas eliminar este profesor?')">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="btn btn-sm btn-outline-danger" title="Eliminar">
+                                        <i class="bi bi-trash3-fill"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
 
-</tbody>
-
+                    <!-- Modal Editar -->
+                    <div class="modal fade" id="editarProfesorModal{{ $profesor->Id_profesores }}" tabindex="-1" aria-labelledby="editarProfesorLabel{{ $profesor->Id_profesores }}" aria-hidden="true">
+                    <div class="modal-dialog modal-lg">
+                        <div class="modal-content">
+                        <div class="modal-header bg-warning bg-opacity-25">
+                            <h5 class="modal-title" id="editarProfesorLabel{{ $profesor->Id_profesores }}">Editar Profesor</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                        </div>
+                        <form action="{{ route('profesores.update', $profesor->Id_profesores) }}" method="POST">
+                            @csrf
+                            @method('PUT')
+                            <div class="modal-body">
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                <label class="form-label">Nombre</label>
+                                <input type="text" name="nombre" class="form-control" value="{{ $profesor->persona->Nombre ?? '' }}" required>
+                                </div>
+                                <div class="col-md-6">
+                                <label class="form-label">Apellido</label>
+                                <input type="text" name="apellido" class="form-control" value="{{ $profesor->persona->Apellido ?? '' }}" required>
+                                </div>
+                                <div class="col-md-6">
+                                <label class="form-label">Celular</label>
+                                <input type="text" name="celular" class="form-control" value="{{ $profesor->persona->Celular ?? '' }}">
+                                </div>
+                                <div class="col-md-6">
+                                <label class="form-label">Correo electrónico</label>
+                                <input type="email" name="correo" class="form-control" value="{{ $profesor->usuario->Correo ?? '' }}" required>
+                                </div>
+                                <div class="col-md-6">
+                                <label class="form-label">Nueva contraseña (opcional)</label>
+                                <input type="password" name="contrasenia" class="form-control" placeholder="••••••••">
+                                </div>
+                                <div class="col-md-6">
+                                <label class="form-label">Profesión</label>
+                                <input type="text" name="profesion" class="form-control" value="{{ $profesor->Profesion ?? '' }}">
+                                </div>
+                                <div class="col-md-6">
+                                <label class="form-label">Rol en Componentes</label>
+                                <select name="rol_componentes" class="form-select">
+                                    <option value="Ninguno" {{ $profesor->Rol_componentes == 'Ninguno' ? 'selected' : '' }}>Ninguno</option>
+                                    <option value="Tecnico" {{ $profesor->Rol_componentes == 'Tecnico' ? 'selected' : '' }}>Técnico</option>
+                                    <option value="Inventario" {{ $profesor->Rol_componentes == 'Inventario' ? 'selected' : '' }}>Inventario</option>
+                                </select>
+                                </div>
+                            </div>
+                            </div>
+                            <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                            <button type="submit" class="btn btn-primary">Guardar cambios</button>
+                            </div>
+                        </form>
+                        </div>
+                    </div>
+                    </div>
+                    @endforeach
+                </tbody>
             </table>
         </div>
     @endif
@@ -207,7 +188,6 @@
 @endsection
 
 @section('scripts')
-<!--<script src="{{ auto_asset('js/administrador/profesoresAdministrador.js') }}"></script>-->
 <script>
 document.addEventListener('DOMContentLoaded', () => {
     const input = document.querySelector('#searchInput');
@@ -219,16 +199,10 @@ document.addEventListener('DOMContentLoaded', () => {
         const rows = table.querySelectorAll('tbody tr');
 
         rows.forEach(row => {
-            const text = row.innerText.toLowerCase(); // todo el texto de la fila
-            if (text.includes(query)) {
-                row.style.display = ''; // mostrar fila
-            } else {
-                row.style.display = 'none'; // ocultar fila
-            }
+            const text = row.innerText.toLowerCase();
+            row.style.display = text.includes(query) ? '' : 'none';
         });
     });
 });
 </script>
-
-
 @endsection

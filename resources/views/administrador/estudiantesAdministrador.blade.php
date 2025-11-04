@@ -75,7 +75,6 @@
                         <th style="min-width:120px;">Código</th>
                         <th style="min-width:220px;">Nombre</th>
                         <th style="min-width:180px;">Programa</th>
-                        <th style="min-width:220px;">Profesor</th>
                         <th style="min-width:160px;">Sucursal</th>
                         <th style="min-width:120px;">Estado</th>
                         <th style="min-width:140px;">Acciones</th>
@@ -104,7 +103,6 @@
                             <td class="fw-semibold">{{ $estudiante->Cod_estudiante }}</td>
                             <td>{{ $nombreCompletoEst ?: 'Sin datos' }}</td>
                             <td>{{ $programa }}</td>
-                            <td>{{ $profesorNombre }}</td>
                             <td>{{ $sucursal }}</td>
                             <td>
                                 @if($esActivo)
@@ -145,32 +143,121 @@
 
         {{-- Modales de edición --}}
         @foreach ($estudiantes as $estudiante)
-            <div class="modal fade" id="editarModal{{ $estudiante->Id_estudiantes }}" tabindex="-1" aria-labelledby="editarModalLabel{{ $estudiante->Id_estudiantes }}" aria-hidden="true">
-                <div class="modal-dialog">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title" id="editarModalLabel{{ $estudiante->Id_estudiantes }}">Editar Estudiante</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                        </div>
-                        <form action="{{ route('estudiantes.actualizar', $estudiante->Id_estudiantes) }}" method="POST">
-                            @csrf
-                            @method('PUT')
-                            <div class="modal-body">
-                                <div class="mb-3">
-                                    <label for="codigo{{ $estudiante->Id_estudiantes }}" class="form-label">Código</label>
-                                    <input type="text" class="form-control" id="codigo{{ $estudiante->Id_estudiantes }}" name="Cod_estudiante" value="{{ $estudiante->Cod_estudiante }}" required>
-                                </div>
-                                {{-- Agrega más campos según necesites --}}
-                            </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                                <button type="submit" class="btn btn-primary">Guardar cambios</button>
-                            </div>
-                        </form>
+        @php
+            $persona = $estudiante->persona ?? null;
+        @endphp
+        <div class="modal fade" id="editarModal{{ $estudiante->Id_estudiantes }}" tabindex="-1" aria-labelledby="editarModalLabel{{ $estudiante->Id_estudiantes }}" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="editarModalLabel{{ $estudiante->Id_estudiantes }}">Editar Estudiante</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
                     </div>
+                    <form action="{{ route('estudiantes.actualizar', $estudiante->Id_estudiantes) }}" method="POST">
+                        @csrf
+                        @method('PUT')
+                        <div class="modal-body row g-3">
+
+                            <!-- Código estudiante -->
+                            <div class="col-md-6">
+                                <label class="form-label" for="codigo{{ $estudiante->Id_estudiantes }}">Código</label>
+                                <input type="text" id="codigo{{ $estudiante->Id_estudiantes }}" name="codigo_estudiante"
+                                    class="form-control" value="{{ $estudiante->Cod_estudiante }}" required>
+                            </div>
+
+                            <!-- Nombre -->
+                            <div class="col-md-6">
+                                <label class="form-label" for="nombre{{ $estudiante->Id_estudiantes }}">Nombre</label>
+                                <input type="text" id="nombre{{ $estudiante->Id_estudiantes }}" name="nombre"
+                                    class="form-control" value="{{ $persona->Nombre ?? '' }}" required>
+                            </div>
+
+                            <!-- Apellido -->
+                            <div class="col-md-6">
+                                <label class="form-label" for="apellido{{ $estudiante->Id_estudiantes }}">Apellido</label>
+                                <input type="text" id="apellido{{ $estudiante->Id_estudiantes }}" name="apellido"
+                                    class="form-control" value="{{ $persona->Apellido ?? '' }}" required>
+                            </div>
+
+                            <!-- Género -->
+                            <div class="col-md-6">
+                                <label class="form-label" for="genero{{ $estudiante->Id_estudiantes }}">Género</label>
+                                <select class="form-select" name="genero" id="genero{{ $estudiante->Id_estudiantes }}" required>
+                                    <option value="M" {{ $persona->Genero === 'M' ? 'selected' : '' }}>Masculino</option>
+                                    <option value="F" {{ $persona->Genero === 'F' ? 'selected' : '' }}>Femenino</option>
+                                </select>
+                            </div>
+
+                            <!-- Fecha nacimiento -->
+                            <div class="col-md-6">
+                                <label class="form-label" for="fecha_nacimiento{{ $estudiante->Id_estudiantes }}">Fecha de nacimiento</label>
+                                <input type="date" id="fecha_nacimiento{{ $estudiante->Id_estudiantes }}" name="fecha_nacimiento"
+                                    class="form-control" value="{{ $persona->Fecha_nacimiento ?? '' }}" required>
+                            </div>
+
+                            <!-- Celular -->
+                            <div class="col-md-6">
+                                <label class="form-label" for="celular{{ $estudiante->Id_estudiantes }}">Celular</label>
+                                <input type="text" id="celular{{ $estudiante->Id_estudiantes }}" name="celular"
+                                    class="form-control" value="{{ $persona->Celular ?? '' }}" required>
+                            </div>
+
+                            <!-- Dirección -->
+                            <div class="col-md-12">
+                                <label class="form-label" for="direccion{{ $estudiante->Id_estudiantes }}">Dirección</label>
+                                <input type="text" id="direccion{{ $estudiante->Id_estudiantes }}" name="direccion_domicilio"
+                                    class="form-control" value="{{ $persona->Direccion_domicilio ?? '' }}" required>
+                            </div>
+
+                            <!-- Programa -->
+                            <div class="col-md-6">
+                                <label class="form-label" for="programa{{ $estudiante->Id_estudiantes }}">Programa</label>
+                                <select class="form-select" id="programa{{ $estudiante->Id_estudiantes }}" name="programa" required>
+                                    @foreach ($programas as $programa)
+                                        <option value="{{ $programa->Id_programas }}" 
+                                            {{ $programa->Id_programas == $estudiante->Id_programas ? 'selected' : '' }}>
+                                            {{ $programa->Nombre }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+
+                            <!-- Sucursal -->
+                            <div class="col-md-6">
+                                <label class="form-label" for="sucursal{{ $estudiante->Id_estudiantes }}">Sucursal</label>
+                                <select class="form-select" id="sucursal{{ $estudiante->Id_estudiantes }}" name="sucursal" required>
+                                    @foreach ($sucursales as $sucursal)
+                                        <option value="{{ $sucursal->Id_Sucursales }}" 
+                                            {{ $sucursal->Id_Sucursales == $estudiante->Id_sucursales ? 'selected' : '' }}>
+                                            {{ $sucursal->Nombre }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+
+                            <!-- Tutor -->
+                            <div class="col-md-12">
+                                <label class="form-label" for="tutor{{ $estudiante->Id_estudiantes }}">Tutor</label>
+                                <select class="form-select" id="tutor{{ $estudiante->Id_estudiantes }}" name="tutor_estudiante" required>
+                                    @foreach ($tutores as $tutor)
+                                        <option value="{{ $tutor->Id_tutores }}"
+                                            {{ $tutor->Id_tutores == $estudiante->Id_tutores ? 'selected' : '' }}>
+                                            {{ $tutor->persona->Nombre ?? '' }} {{ $tutor->persona->Apellido ?? '' }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+
+                        </div> <!-- modal-body -->
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                            <button type="submit" class="btn btn-primary">Guardar cambios</button>
+                        </div>
+                    </form>
                 </div>
             </div>
-        @endforeach
+        </div>
+    @endforeach
     @endif
 
     <!-- Paginación -->

@@ -279,7 +279,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
         // Form action update
         const form = document.getElementById('formEditar');
-        form.action = `/horarios/${id}`;
+        form.action = "{{ route('horarios.update', ':id') }}".replace(':id', id);
 
         // Set values
         document.getElementById('Id_estudiantes_editar').value = estudiante;

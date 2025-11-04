@@ -12,6 +12,8 @@ use App\Models\Persona;
 use App\Models\PlanesPago;
 use App\Models\Evaluacion;
 use App\Models\Horario;
+use App\Models\Profesor;
+
 
 class EstudianteController extends Controller
 {
@@ -24,7 +26,6 @@ class EstudianteController extends Controller
         $estudiantes = Estudiante::with(['persona', 'programa', 'sucursal', 'profesor', 'profesor.persona'])
             ->when($search, function($query, $search) {
                 return $query->whereHas('persona', function($q) use ($search) {
-                    // Filtrar solo por Nombre y Apellido
                     $q->where('Nombre', 'like', "%$search%")
                     ->orWhere('Apellido', 'like', "%$search%");
                 })
@@ -33,8 +34,13 @@ class EstudianteController extends Controller
             ->orderBy('Id_estudiantes', 'desc')
             ->paginate(10);  // Paginación de resultados
 
-        // Retornar la vista con estudiantes y otras relaciones necesarias
-        return view('administrador.estudiantesAdministrador', compact('estudiantes'));
+        // Obtener las listas adicionales necesarias para los formularios de edición
+        $programas = Programa::all();
+        $sucursales = Sucursal::all();
+        $tutores = Tutores::with('persona')->get();
+
+        // Retornar la vista con los estudiantes y relaciones
+        return view('administrador.estudiantesAdministrador', compact('estudiantes', 'programas', 'sucursales', 'tutores'));
     }
 
 
