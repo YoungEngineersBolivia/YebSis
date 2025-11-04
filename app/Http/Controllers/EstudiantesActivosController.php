@@ -4,11 +4,12 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
 
 class EstudiantesActivosController extends Controller
 {
     /**
-     * filtrable por rango usando la columna Fecha_estado.
+     * Muestra estudiantes activos filtrable por rango usando la columna Fecha_estado.
      */
     public function index(Request $request)
     {
@@ -51,39 +52,59 @@ class EstudiantesActivosController extends Controller
             $serieQuery->whereDate('Fecha_estado', '<=', $to);
         }
 
-        // mes_iso = primer día del mes, para formatear en JS
         $fechasActivacion = $serieQuery
             ->selectRaw('
                 DATE_FORMAT(Fecha_estado, "%Y-%m-01") AS mes_iso,
-                COUNT(*)                                AS cantidad
+                COUNT(*) AS cantidad
             ')
             ->groupBy('mes_iso')
             ->orderBy('mes_iso')
             ->get();
 
+        // Si no hay datos, mostrar mes actual con 0
+        if ($fechasActivacion->isEmpty()) {
+            $fechasActivacion = collect([
+                ['mes_iso' => now()->format('Y-m-01'), 'cantidad' => 0]
+            ]);
+        }
+
+        // Calcular estadísticas para los dropdowns
+        $mesesDisponibles = DB::table('estudiantes')
+            ->where('Estado', 'Activo')
+            ->selectRaw('
+                DATE_FORMAT(Fecha_estado, "%Y-%m") AS mes,
+                DATE_FORMAT(Fecha_estado, "%M %Y") AS mes_nombre,
+                COUNT(*) AS total
+            ')
+            ->groupBy('mes', 'mes_nombre')
+            ->orderByDesc('mes')
+            ->limit(12)
+            ->get();
+
         return view('comercial.estudiantesActivosComercial', [
             'estudiantesActivos' => $estudiantesActivos,
             'fechasActivacion'   => $fechasActivacion,
-            'from'                 => $from,
-            'to'                   => $to,
+            'mesesDisponibles'   => $mesesDisponibles,
+            'from'               => $from,
+            'to'                 => $to,
         ]);
     }
 
     /**
-     * Cambia el estado de Inactivo a Activo.
-     * Si no quieres tocar Fecha_estado al reactivar, elimina la línea correspondiente.
+     * Cambia el estado de Activo a Inactivo.
      */
     public function desactivar($id)
     {
         $affected = DB::table('estudiantes')
             ->where('Id_estudiantes', $id)
+            ->where('Estado', 'Activo') // Solo desactivar si está activo
             ->update([
                 'Estado'       => 'Inactivo',
-                'Fecha_estado' => now()->format('Y-m-d'), // quita esto si no debe cambiar
+                'Fecha_estado' => now()->format('Y-m-d'),
             ]);
 
         if ($affected === 0) {
-            return back()->withErrors(['error' => 'Estudiante no encontrado.']);
+            return back()->withErrors(['error' => 'Estudiante no encontrado o ya estaba inactivo.']);
         }
 
         return redirect()
@@ -91,4 +112,3 @@ class EstudiantesActivosController extends Controller
             ->with('success', 'Estudiante desactivado correctamente.');
     }
 }
-
