@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Programa; 
+use App\Models\Modelo;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
@@ -56,7 +57,11 @@ class ProgramaController extends Controller
     {
         try {
             $programa = Programa::findOrFail($id);
-            return view('administrador.modelosPrograma', compact('programa'));
+            $modelos = Modelo::where('Id_programa', $id)
+                            ->orderBy('created_at', 'desc')
+                            ->get();
+            
+            return view('administrador.modelosPrograma', compact('programa', 'modelos'));
         } catch (\Exception $e) {
             return redirect()->route('programas.index')->with('error', 'Programa no encontrado');
         }
