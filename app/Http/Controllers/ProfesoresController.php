@@ -19,11 +19,11 @@ class ProfesoresController extends Controller
         $profesores = Profesor::with(['persona.rol', 'usuario'])
             ->when($search, function ($q) use ($search) {
                 $q->whereHas('persona', function ($p) use ($search) {
-                    $p->where('Nombre', 'ilike', "%{$search}%")
-                      ->orWhere('Apellido', 'ilike', "%{$search}%");
+                    $p->where('Nombre', 'like', "%{$search}%")
+                      ->orWhere('Apellido', 'like', "%{$search}%");
                 })
                 ->orWhereHas('usuario', function ($u) use ($search) {
-                    $u->where('Correo', 'ilike', "%{$search}%");
+                    $u->where('Correo', 'like', "%{$search}%");
                 });
             })
             ->orderBy('Id_profesores', 'desc')
