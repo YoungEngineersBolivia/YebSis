@@ -17,6 +17,7 @@
         </button>
     </div>
 
+    {{-- Mensajes --}}
     @if(session('success'))
         <div class="alert alert-success alert-dismissible fade show" role="alert">
             <i class="bi bi-check-circle-fill me-2"></i>{{ session('success') }}
@@ -42,6 +43,7 @@
         </div>
     @endif
 
+    {{-- Buscador --}}
     <div class="row mb-3">
         <div class="col-md-6">
             <div class="input-group">
@@ -60,19 +62,19 @@
             <table class="table table-hover" id="tablaProgramas">
                 <thead class="table-light">
                     <tr>
-                        <th class="fw-bold text-dark">Nombre</th>
-                        <th class="fw-bold text-dark">Tipo</th>
-                        <th class="fw-bold text-dark">Costo</th>
-                        <th class="fw-bold text-dark">Rango de Edad</th>
-                        <th class="fw-bold text-dark">Duración</th>
-                        <th class="fw-bold text-dark">Descripción</th>
-                        <th class="fw-bold text-dark text-center">Acciones</th>
+                        <th>Nombre</th>
+                        <th>Tipo</th>
+                        <th>Costo</th>
+                        <th>Rango de Edad</th>
+                        <th>Duración</th>
+                        <th>Descripción</th>
+                        <th class="text-center">Acciones</th>
                     </tr>
                 </thead>
                 <tbody>
                     @foreach ($programas as $programa)
                         <tr>
-                            <td class="fw-normal">{{ $programa->Nombre }}</td>
+                            <td>{{ $programa->Nombre }}</td>
                             <td>
                                 @if($programa->Tipo === 'programa')
                                     <span class="badge bg-primary">Programa</span>
@@ -80,46 +82,124 @@
                                     <span class="badge bg-info">Taller</span>
                                 @endif
                             </td>
-                            <td class="text-muted">{{ number_format($programa->Costo, 2) }} Bs</td>
-                            <td class="text-muted">{{ $programa->Rango_edad }}</td>
-                            <td class="text-muted">{{ $programa->Duracion }}</td>
-                            <td class="text-muted">{{ Str::limit($programa->Descripcion, 50) }}</td>
-                            <td>
+                            <td>{{ number_format($programa->Costo, 2) }} Bs</td>
+                            <td>{{ $programa->Rango_edad }}</td>
+                            <td>{{ $programa->Duracion }}</td>
+                            <td>{{ Str::limit($programa->Descripcion, 50) }}</td>
+                            <td class="text-center">
                                 <div class="d-flex gap-2 justify-content-center">
-                                    <a href="{{ route('programas.show', $programa->Id_programas) }}" 
-                                       class="btn btn-sm btn-outline-dark" 
-                                       title="Ver detalles">
+                                    {{-- Ver --}}
+                                    <a href="{{ route('programas.show', $programa->Id_programas) }}" class="btn btn-sm btn-outline-dark" title="Ver detalles">
                                         <i class="bi bi-eye-fill"></i>
                                     </a>
-                                    <button type="button" class="btn btn-sm btn-outline-warning" 
-                                            onclick="editarPrograma({{ $programa->Id_programas }})"
-                                            title="Editar">
+
+                                    {{-- Editar --}}
+                                    <button type="button" class="btn btn-sm btn-outline-warning" data-bs-toggle="modal"
+                                        data-bs-target="#editarProgramaModal{{ $programa->Id_programas }}" title="Editar">
                                         <i class="bi bi-pencil-square"></i>
                                     </button>
-                                    <button type="button" class="btn btn-sm btn-outline-danger" 
-                                            onclick="eliminarPrograma({{ $programa->Id_programas }})"
-                                            title="Eliminar">
-                                        <i class="bi bi-trash3-fill"></i>
-                                    </button>
+
+                                    {{-- Eliminar --}}
+                                    <form action="{{ route('programas.destroy', $programa->Id_programas) }}" method="POST" onsubmit="return confirm('¿Seguro que deseas eliminar este programa?');">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="btn btn-sm btn-outline-danger" title="Eliminar">
+                                            <i class="bi bi-trash3-fill"></i>
+                                        </button>
+                                    </form>
                                 </div>
                             </td>
                         </tr>
+
+                        {{-- Modal Editar --}}
+                        <div class="modal fade" id="editarProgramaModal{{ $programa->Id_programas }}" tabindex="-1"
+                            aria-labelledby="editarProgramaLabel{{ $programa->Id_programas }}" aria-hidden="true">
+                            <div class="modal-dialog modal-lg">
+                                <div class="modal-content">
+                                    <div class="modal-header bg-warning bg-opacity-25">
+                                        <h5 class="modal-title" id="editarProgramaLabel{{ $programa->Id_programas }}">
+                                            Editar Programa
+                                        </h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                                    </div>
+                                    <form action="{{ route('programas.update', $programa->Id_programas) }}" method="POST" enctype="multipart/form-data">
+                                        @csrf
+                                        @method('PUT')
+                                        <div class="modal-body">
+                                            <div class="row">
+                                                <div class="col-md-6 mb-3">
+                                                    <label class="form-label">Nombre</label>
+                                                    <input type="text" name="nombre" class="form-control" value="{{ $programa->Nombre }}" required>
+                                                </div>
+                                                <div class="col-md-6 mb-3">
+                                                    <label class="form-label">Tipo</label>
+                                                    <select name="tipo" class="form-control" required>
+                                                        <option value="programa" {{ $programa->Tipo==='programa' ? 'selected' : '' }}>Programa</option>
+                                                        <option value="taller" {{ $programa->Tipo==='taller' ? 'selected' : '' }}>Taller</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+
+                                            <div class="row">
+                                                <div class="col-md-6 mb-3">
+                                                    <label class="form-label">Costo (Bs)</label>
+                                                    <input type="number" step="0.01" name="costo" class="form-control" value="{{ $programa->Costo }}" required>
+                                                </div>
+                                                <div class="col-md-6 mb-3">
+                                                    <label class="form-label">Rango de Edad</label>
+                                                    <input type="text" name="rango_edad" class="form-control" value="{{ $programa->Rango_edad }}" required>
+                                                </div>
+                                            </div>
+
+                                            <div class="mb-3">
+                                                <label class="form-label">Duración</label>
+                                                <input type="text" name="duracion" class="form-control" value="{{ $programa->Duracion }}" required>
+                                            </div>
+
+                                            <div class="mb-3">
+                                                <label class="form-label">Descripción</label>
+                                                <textarea name="descripcion" class="form-control" rows="3" required>{{ $programa->Descripcion }}</textarea>
+                                            </div>
+
+                                            <div class="mb-3">
+                                                <label class="form-label">Imagen</label>
+                                                <input type="file" name="imagen" class="form-control" accept="image/*">
+                                                <small class="text-muted">Dejar vacío para mantener la imagen actual</small>
+                                                <div class="mt-2">
+                                                    @if($programa->Imagen)
+                                                        <p class="text-muted mb-1">Imagen actual:</p>
+                                                        <img src="{{ asset('storage/'.$programa->Imagen) }}" class="img-thumbnail rounded" style="max-width: 180px;">
+                                                    @else
+                                                        <p class="text-muted">Sin imagen</p>
+                                                    @endif
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                            <button type="submit" class="btn btn-primary">Actualizar Programa</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
                     @endforeach
                 </tbody>
             </table>
         </div>
 
-        <!-- Paginación -->
+        {{-- Paginación --}}
         <div class="d-flex justify-content-center mt-4">
             {{ $programas->links('pagination::bootstrap-5') }}
         </div>
     @endif
 
-    <!-- Modal para añadir programa -->
+    {{-- Modal Añadir --}}
     <div class="modal fade" id="nuevoProgramaModal" tabindex="-1" aria-labelledby="nuevoProgramaLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
-                <div class="modal-header">
+                <div class="modal-header bg-primary bg-opacity-25">
                     <h5 class="modal-title">Nuevo Programa</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
                 </div>
@@ -127,52 +207,49 @@
                     <form id="formNuevoPrograma" action="{{ route('programas.store') }}" method="POST" enctype="multipart/form-data">
                         @csrf
                         <div class="row">
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label for="nombre" class="form-label">Nombre del Programa</label>
-                                    <input type="text" class="form-control" id="nombre" name="nombre" required value="{{ old('nombre') }}">
-                                </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Nombre</label>
+                                <input type="text" name="nombre" class="form-control" required>
                             </div>
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label for="tipo" class="form-label">Tipo de Programa</label>
-                                    <select class="form-control" id="tipo" name="tipo" required>
-                                        <option value="">Seleccione...</option>
-                                        <option value="programa" {{ old('tipo') === 'programa' ? 'selected' : '' }}>Programa</option>
-                                        <option value="taller" {{ old('tipo') === 'taller' ? 'selected' : '' }}>Taller</option>
-                                    </select>
-                                </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Tipo</label>
+                                <select name="tipo" class="form-control" required>
+                                    <option value="">Seleccione...</option>
+                                    <option value="programa">Programa</option>
+                                    <option value="taller">Taller</option>
+                                </select>
                             </div>
                         </div>
+
                         <div class="row">
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label for="costo" class="form-label">Costo (Bs)</label>
-                                    <input type="number" class="form-control" id="costo" name="costo" step="0.01" required value="{{ old('costo') }}">
-                                </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Costo (Bs)</label>
+                                <input type="number" step="0.01" name="costo" class="form-control" required>
                             </div>
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label for="rango_edad" class="form-label">Rango de Edad</label>
-                                    <input type="text" class="form-control" id="rango_edad" name="rango_edad" placeholder="Ej: 6-12 años" required value="{{ old('rango_edad') }}">
-                                </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Rango de Edad</label>
+                                <input type="text" name="rango_edad" class="form-control" placeholder="Ej: 6-12 años" required>
                             </div>
                         </div>
+
                         <div class="mb-3">
-                            <label for="duracion" class="form-label">Duración</label>
-                            <input type="text" class="form-control" id="duracion" name="duracion" placeholder="Ej: 3 meses" required value="{{ old('duracion') }}">
+                            <label class="form-label">Duración</label>
+                            <input type="text" name="duracion" class="form-control" placeholder="Ej: 3 meses" required>
                         </div>
+
                         <div class="mb-3">
-                            <label for="descripcion" class="form-label">Descripción</label>
-                            <textarea class="form-control" id="descripcion" name="descripcion" rows="3" required>{{ old('descripcion') }}</textarea>
+                            <label class="form-label">Descripción</label>
+                            <textarea name="descripcion" class="form-control" rows="3" required></textarea>
                         </div>
+
                         <div class="mb-3">
-                            <label for="imagen" class="form-label">Foto del Programa</label>
-                            <input type="file" class="form-control" id="imagen" name="imagen" accept="image/*">
-                            <small class="text-muted">Formatos permitidos: JPG, PNG, GIF. Tamaño máximo: 2MB</small>
+                            <label class="form-label">Imagen</label>
+                            <input type="file" name="imagen" class="form-control" accept="image/*">
+                            <small class="text-muted">Formatos: JPG, PNG, GIF (máx. 2MB)</small>
                         </div>
                     </form>
                 </div>
+
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
                     <button type="submit" form="formNuevoPrograma" class="btn btn-primary">Guardar Programa</button>
@@ -180,139 +257,32 @@
             </div>
         </div>
     </div>
-
-    <!-- Modal para editar programa -->
-    <div class="modal fade" id="editarProgramaModal" tabindex="-1" aria-labelledby="editarProgramaLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Editar Programa</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-                </div>
-                <div class="modal-body">
-                    <form id="formEditarPrograma" method="POST" enctype="multipart/form-data">
-                        @csrf
-                        @method('PUT')
-                        <input type="hidden" id="edit_programa_id" name="programa_id">
-                        
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label for="edit_nombre" class="form-label">Nombre del Programa</label>
-                                    <input type="text" class="form-control" id="edit_nombre" name="nombre" required>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label for="edit_tipo" class="form-label">Tipo de Programa</label>
-                                    <select class="form-control" id="edit_tipo" name="tipo" required>
-                                        <option value="programa">Programa</option>
-                                        <option value="taller">Taller</option>
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label for="edit_costo" class="form-label">Costo (Bs)</label>
-                                    <input type="number" class="form-control" id="edit_costo" name="costo" step="0.01" required>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label for="edit_rango_edad" class="form-label">Rango de Edad</label>
-                                    <input type="text" class="form-control" id="edit_rango_edad" name="rango_edad" required>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="mb-3">
-                            <label for="edit_duracion" class="form-label">Duración</label>
-                            <input type="text" class="form-control" id="edit_duracion" name="duracion" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="edit_descripcion" class="form-label">Descripción</label>
-                            <textarea class="form-control" id="edit_descripcion" name="descripcion" rows="3" required></textarea>
-                        </div>
-                        <div class="mb-3">
-                            <label for="edit_imagen" class="form-label">Nueva Foto del Programa</label>
-                            <input type="file" class="form-control" id="edit_imagen" name="imagen" accept="image/*">
-                            <small class="text-muted">Dejar vacío para mantener la imagen actual</small>
-                            <div id="imagenActual" class="mt-2"></div>
-                        </div>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="submit" form="formEditarPrograma" class="btn btn-primary">Actualizar Programa</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
 </div>
 @endsection
 
 @section('scripts')
-<script src="{{ auto_asset('js/administrador/programasAdministrador.js') }}"></script>
 <script>
 document.addEventListener('DOMContentLoaded', () => {
-    // Obtener todos los botones de acciones
-    const eliminarBtns = document.querySelectorAll('button[onclick^="eliminarPrograma"]');
-    const editarBtns = document.querySelectorAll('button[onclick^="editarPrograma"]');
-    const verBtns = document.querySelectorAll('button[onclick^="verPrograma"]');
-
-    // Función eliminar
-    window.eliminarPrograma = function(id) {
-        if(confirm('¿Estás seguro de eliminar este programa?')) {
-            // Buscar el formulario de eliminación o enviar un fetch/submit
-            // Aquí hacemos submit a un formulario oculto
-            const form = document.createElement('form');
-            form.method = 'POST';
-            form.action = `/programas/${id}`; // Ajusta la ruta
-            form.innerHTML = `
-                @csrf
-                @method('DELETE')
-            `;
-            document.body.appendChild(form);
-            form.submit();
-        }
-    }
-
-    // Función editar
-    window.editarPrograma = function(id) {
-        // Abrir modal de edición
-        const modal = document.getElementById(`editarProgramaModal${id}`);
-        if(modal){
-            const bsModal = new bootstrap.Modal(modal);
-            bsModal.show();
-        }
-    }
-
-    // Función ver
-    window.verPrograma = function(id) {
-        // Abrir modal de ver detalles
-        const modal = document.getElementById(`verProgramaModal${id}`);
-        if(modal){
-            const bsModal = new bootstrap.Modal(modal);
-            bsModal.show();
-        }
-    }
-
-    // Buscador puro JS
     const input = document.getElementById('searchInput');
-    const table = document.querySelector('table tbody');
-    if(input && table){
-        input.addEventListener('input', function(){
-            const query = this.value.toLowerCase();
-            table.querySelectorAll('tr').forEach(tr => {
-                const text = tr.innerText.toLowerCase();
-                tr.style.display = text.includes(query) ? '' : 'none';
+    const table = document.querySelector('#tablaProgramas tbody');
+    if (input && table) {
+        input.addEventListener('input', function() {
+            const query = this.value.toLowerCase().trim();
+            table.querySelectorAll('tr').forEach(row => {
+                const text = row.textContent.toLowerCase();
+                row.style.display = text.includes(query) ? '' : 'none';
             });
         });
     }
+
+    // Cierre automático de alertas
+    const alerts = document.querySelectorAll('.alert');
+    alerts.forEach(alert => {
+        setTimeout(() => {
+            const bsAlert = new bootstrap.Alert(alert);
+            bsAlert.close();
+        }, 5000);
+    });
 });
 </script>
-
-
 @endsection
