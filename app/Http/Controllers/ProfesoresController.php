@@ -80,24 +80,26 @@ class ProfesoresController extends Controller
 
     public function show($id)
     {
-        $profesor = Profesor::with(['persona.rol', 'usuario'])->findOrFail($id);
+        $profesor = Profesor::with([
+            // Datos personales y rol
+            'persona.rol',
+            
+            // Usuario del profesor (correo, contraseña)
+            'usuario',
 
-        return response()->json([
-            'Id_profesores' => $profesor->Id_profesores,
-            'Profesion' => $profesor->Profesion,
-            'Rol_componentes' => $profesor->Rol_componentes,
-            'Persona' => [
-                'Nombre' => $profesor->persona->Nombre ?? '',
-                'Apellido' => $profesor->persona->Apellido ?? '',
-                'Genero' => $profesor->persona->Genero ?? '',
-                'Celular' => $profesor->persona->Celular ?? '',
-                'Rol' => $profesor->persona->rol->Nombre_rol ?? '',
-            ],
-            'Usuario' => [
-                'Correo' => $profesor->usuario->Correo ?? '',
-            ],
-        ]);
+            // Horarios del profesor, ordenados por día y horas
+            'horarios' => function($query) {
+                $query->orderBy('Dia', 'asc')->orderBy('Hora', 'asc');
+            },
+
+            // Relaciones anidadas dentro de horarios
+            'horarios.programa',                // Programa al que pertenece cada horario
+            'horarios.estudiante.persona',     // Persona del estudiante asignado al horario
+        ])->findOrFail($id);
+
+        return view('administrador.detallesProfesor', compact('profesor'));
     }
+
 
     public function update(Request $request, $id)
     {

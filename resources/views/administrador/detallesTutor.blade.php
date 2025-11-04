@@ -206,12 +206,12 @@
                         </div>
                     </div>
 
-                    @if($estudiante->planPago->isEmpty())
+                    @if($estudiante->planesPago->isEmpty())
                         <div class="alert alert-warning mb-0">
                             <i class="bi bi-exclamation-triangle"></i> No hay planes de pago registrados para este estudiante.
                         </div>
                     @else
-                        @foreach($estudiante->planPago as $index => $plan)
+                        @foreach($estudiante->planesPago as $index => $plan)
                             <div class="plan-card">
                                 <div class="d-flex justify-content-between align-items-start mb-3">
                                     <div>
