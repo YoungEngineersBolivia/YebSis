@@ -31,6 +31,7 @@ use App\Http\Controllers\ProfesoresController;
 use App\Http\Controllers\MotoresAsignadosController;
 use App\Http\Controllers\ForgotPasswordController;
 use App\Http\Controllers\ResetPasswordController;
+use App\Http\Controllers\ModeloController;
 
 /* ============================================
    RUTAS PÚBLICAS (Sin autenticación)
@@ -240,6 +241,15 @@ Route::delete('/graduados/{id}', [GraduadoController::class, 'eliminarGraduado']
         Route::get('/{id}/edit', [ProgramaController::class, 'edit']);
         Route::put('/{id}', [ProgramaController::class, 'update'])->name('programas.update');
         Route::delete('/{id}', [ProgramaController::class, 'destroy'])->name('programas.destroy');
+    });
+
+    // Rutas de modelos
+    Route::prefix('programas/{programaId}/modelos')->group(function () {
+        Route::get('/', [ModeloController::class, 'index'])->name('modelos.index');
+        Route::post('/', [ModeloController::class, 'store'])->name('modelos.store');
+        Route::get('/{modeloId}/edit', [ModeloController::class, 'edit'])->name('modelos.edit');
+        Route::put('/{modeloId}', [ModeloController::class, 'update'])->name('modelos.update');
+        Route::delete('/{modeloId}', [ModeloController::class, 'destroy'])->name('modelos.destroy');
     });
     
     /* ----------------- PLANES DE PAGO ----------------- */

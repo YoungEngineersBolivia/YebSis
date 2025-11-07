@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Programa; 
+use App\Models\Modelo;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
@@ -56,7 +57,11 @@ class ProgramaController extends Controller
     {
         try {
             $programa = Programa::findOrFail($id);
-            return view('administrador.modelosPrograma', compact('programa'));
+            $modelos = Modelo::where('Id_programa', $id)
+                            ->orderBy('created_at', 'desc')
+                            ->get();
+            
+            return view('administrador.modelosPrograma', compact('programa', 'modelos'));
         } catch (\Exception $e) {
             return redirect()->route('programas.index')->with('error', 'Programa no encontrado');
         }
@@ -111,34 +116,19 @@ class ProgramaController extends Controller
     }
 
     public function destroy($id)
-    {
-        try {
+        {
             $programa = Programa::findOrFail($id);
 
-            // Verificar si el programa tiene estudiantes asociados (opcional)
-            // if ($programa->estudiantes()->count() > 0) {
-            //     return response()->json([
-            //         'success' => false,
-            //         'message' => 'No se puede eliminar el programa porque tiene estudiantes inscritos'
-            //     ], 400);
-            // }
-
-            if ($programa->Imagen && Storage::disk('public')->exists($programa->Imagen)) {
-                Storage::disk('public')->delete($programa->Imagen);
+            // Si tiene imagen, eliminarla
+            if ($programa->Imagen) {
+                Storage::delete($programa->Imagen);
             }
 
             $programa->delete();
 
-            return response()->json([
-                'success' => true,
-                'message' => 'Programa eliminado exitosamente'
-            ]);
-
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Error al eliminar el programa: ' . $e->getMessage()
-            ], 500);
+            // Redirigir con mensaje de sesión
+            return redirect()->route('programas.index')
+                            ->with('success', 'Programa eliminado exitosamente');
         }
-    }
+
 }
