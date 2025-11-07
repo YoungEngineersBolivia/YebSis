@@ -10,8 +10,9 @@ class Egreso extends Model
     use HasFactory;
 
     protected $table = 'egresos';
-    public $timestamps = false; // Add this line to disable timestamps
-    
+    protected $primaryKey = 'Id_egreso';
+    public $timestamps = true; 
+
     protected $fillable = [
         'Tipo',
         'Descripcion_egreso',
