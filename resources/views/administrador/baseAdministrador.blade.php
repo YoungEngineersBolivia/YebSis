@@ -356,12 +356,14 @@
             }
         });
     });
-    @yield('scripts')
-    <script src="{{ auto_asset('js/administrador/baseAdministrador.js') }}"></script>
-    @stack('scripts')
+    
+    
+    
 
 </script>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+@yield('scripts')
+@stack('scripts')
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="{{ auto_asset('js/administrador/baseAdministrador.js') }}"></script>
 </body>
 </html>

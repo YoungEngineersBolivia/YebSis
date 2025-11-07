@@ -6,69 +6,383 @@
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
 <style>
+    :root {
+        --primary-color: #6366f1;
+        --primary-dark: #4f46e5;
+        --secondary-color: #8b5cf6;
+        --success-color: #10b981;
+        --warning-color: #f59e0b;
+        --danger-color: #ef4444;
+        --info-color: #3b82f6;
+        --dark-color: #1f2937;
+        --light-bg: #f9fafb;
+        --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        --card-shadow-hover: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    }
+
+    body {
+        background-color: var(--light-bg);
+    }
+
+    /* Modales */
     .modal-content { 
-        border-radius: 15px; 
+        border-radius: 16px; 
         border: none; 
-        box-shadow: 0 10px 40px rgba(0,0,0,0.2); 
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
     }
+    
     .modal-header { 
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+        background-color: var(--primary-color);
         color: white; 
-        border-radius: 15px 15px 0 0; 
-        padding: 20px 25px; 
+        border-radius: 16px 16px 0 0; 
+        padding: 24px 28px;
+        border-bottom: none;
     }
+    
     .modal-title { 
         font-weight: 700; 
-        font-size: 1.3rem; 
+        font-size: 1.4rem; 
+        letter-spacing: -0.025em;
     }
+    
     .btn-close-white { 
-        filter: brightness(0) invert(1); 
+        filter: brightness(0) invert(1);
+        opacity: 0.8;
     }
+    
+    .btn-close-white:hover {
+        opacity: 1;
+    }
+
+    /* Formularios */
     .form-label { 
         font-weight: 600; 
-        color: #495057; 
-        margin-bottom: 8px; 
+        color: var(--dark-color); 
+        margin-bottom: 8px;
+        font-size: 0.95rem;
     }
+    
     .form-control, .form-select { 
-        border: 2px solid #e0e0e0; 
-        border-radius: 8px; 
-        padding: 10px 14px; 
-        transition: all 0.3s ease; 
-    }
-    .form-control:focus, .form-select:focus { 
-        border-color: #667eea; 
-        box-shadow: 0 0 0 0.2rem rgba(102,126,234,0.15); 
-    }
-    .modal-footer { 
-        border-top: 1px solid #dee2e6; 
-        padding: 15px 25px; 
-    }
-    .img-preview { 
-        max-height: 200px; 
+        border: 2px solid #e5e7eb; 
         border-radius: 10px; 
-        box-shadow: 0 4px 8px rgba(0,0,0,0.1); 
-        object-fit: cover;
+        padding: 12px 16px; 
+        transition: all 0.2s ease;
+        font-size: 0.95rem;
     }
-    .badge-custom { 
-        padding: 8px 15px; 
-        border-radius: 8px; 
-        font-weight: 600; 
+    
+    .form-control:focus, .form-select:focus { 
+        border-color: var(--primary-color); 
+        box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        outline: none;
     }
-    .table-hover tbody tr:hover { 
-        background-color: #f8f9fa; 
-        transform: scale(1.01); 
-        box-shadow: 0 2px 8px rgba(0,0,0,0.08); 
-        transition: all 0.3s ease; 
+    
+    .modal-footer { 
+        border-top: 1px solid #e5e7eb; 
+        padding: 20px 28px;
+        background-color: #f9fafb;
+        border-radius: 0 0 16px 16px;
     }
-    .card-header {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
+
+    /* Header Principal */
+    .page-header {
+        background: white;
+        padding: 32px;
+        border-radius: 16px;
+        box-shadow: var(--card-shadow);
+        margin-bottom: 24px;
+    }
+
+    .page-header h1 {
+        font-size: 2rem;
+        font-weight: 700;
+        color: var(--dark-color);
+        margin-bottom: 4px;
+        letter-spacing: -0.025em;
+    }
+
+    .page-header p {
+        color: #6b7280;
+        font-size: 1rem;
+    }
+
+    /* Botones */
+    .btn {
+        border-radius: 10px;
+        padding: 10px 20px;
         font-weight: 600;
+        transition: all 0.2s ease;
+        border: none;
     }
+
+    .btn-lg {
+        padding: 14px 28px;
+        font-size: 1rem;
+    }
+
+    .btn-primary {
+        background-color: var(--primary-color);
+        color: white;
+    }
+
+    .btn-primary:hover {
+        background-color: var(--primary-dark);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
+    }
+
+    .btn-secondary {
+        background-color: #6b7280;
+        color: white;
+    }
+
+    .btn-secondary:hover {
+        background-color: #4b5563;
+    }
+
+    .btn-outline-primary {
+        border: 2px solid var(--primary-color);
+        color: var(--primary-color);
+        background: white;
+    }
+
+    .btn-outline-primary:hover,
+    .btn-outline-primary.active {
+        background-color: var(--primary-color);
+        color: white;
+    }
+
+    .btn-outline-info {
+        border: 2px solid var(--info-color);
+        color: var(--info-color);
+        background: white;
+    }
+
+    .btn-outline-info:hover,
+    .btn-outline-info.active {
+        background-color: var(--info-color);
+        color: white;
+    }
+
+    /* Botones de acción pequeños */
+    .btn-sm {
+        padding: 6px 12px;
+        font-size: 0.875rem;
+    }
+
+    .btn-outline-dark {
+        border: 2px solid var(--dark-color);
+        color: var(--dark-color);
+    }
+
+    .btn-outline-dark:hover {
+        background-color: var(--dark-color);
+        color: white;
+    }
+
+    .btn-outline-warning {
+        border: 2px solid var(--warning-color);
+        color: var(--warning-color);
+    }
+
+    .btn-outline-warning:hover {
+        background-color: var(--warning-color);
+        color: white;
+    }
+
+    .btn-outline-danger {
+        border: 2px solid var(--danger-color);
+        color: var(--danger-color);
+    }
+
+    .btn-outline-danger:hover {
+        background-color: var(--danger-color);
+        color: white;
+    }
+
+    /* Alertas */
+    .alert {
+        border-radius: 12px;
+        border: none;
+        padding: 16px 20px;
+        font-weight: 500;
+        box-shadow: var(--card-shadow);
+    }
+
+    .alert-success {
+        background-color: #d1fae5;
+        color: #065f46;
+    }
+
+    .alert-danger {
+        background-color: #fee2e2;
+        color: #991b1b;
+    }
+
+    .alert-warning {
+        background-color: #fef3c7;
+        color: #92400e;
+    }
+
+    /* Buscador */
     .search-box {
         background: white;
+        border-radius: 12px;
+        box-shadow: var(--card-shadow);
+        border: 2px solid #e5e7eb;
+        overflow: hidden;
+        transition: all 0.2s ease;
+    }
+
+    .search-box:focus-within {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+    }
+
+    .search-box .input-group-text {
+        background: white;
+        border: none;
+        padding-left: 20px;
+    }
+
+    .search-box .form-control {
+        border: none;
+        box-shadow: none;
+        padding: 14px 20px 14px 8px;
+    }
+
+    .search-box .form-control:focus {
+        box-shadow: none;
+        border: none;
+    }
+
+    /* Tarjetas */
+    .card {
+        border-radius: 16px;
+        border: none;
+        box-shadow: var(--card-shadow);
+        background: white;
+    }
+
+    .card-header {
+        background-color: var(--primary-color);
+        color: white;
+        font-weight: 600;
+        border-radius: 16px 16px 0 0;
+        padding: 20px;
+        border: none;
+    }
+
+    /* Tabla */
+    .table-responsive {
+        border-radius: 16px;
+    }
+
+    .table {
+        margin-bottom: 0;
+    }
+
+    .table thead th {
+        background-color: #f9fafb;
+        color: var(--dark-color);
+        font-weight: 700;
+        text-transform: uppercase;
+        font-size: 0.75rem;
+        letter-spacing: 0.05em;
+        padding: 16px;
+        border-bottom: 2px solid #e5e7eb;
+    }
+
+    .table tbody td {
+        padding: 16px;
+        vertical-align: middle;
+        border-bottom: 1px solid #f3f4f6;
+        color: #374151;
+    }
+
+    .table-hover tbody tr {
+        transition: all 0.2s ease;
+    }
+
+    .table-hover tbody tr:hover { 
+        background-color: #f9fafb;
+        transform: scale(1.002);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    }
+
+    /* Badges */
+    .badge {
+        padding: 6px 12px;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 0.8rem;
+        letter-spacing: 0.025em;
+    }
+
+    .badge.bg-primary {
+        background-color: var(--primary-color) !important;
+    }
+
+    .badge.bg-info {
+        background-color: var(--info-color) !important;
+    }
+
+    /* Grupo de botones de filtro */
+    .btn-group {
+        box-shadow: var(--card-shadow);
         border-radius: 10px;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+        overflow: hidden;
+    }
+
+    /* Imágenes */
+    .img-thumbnail {
+        border: 2px solid #e5e7eb;
+        border-radius: 10px;
+        padding: 4px;
+    }
+
+    /* Paginación */
+    .pagination {
+        gap: 8px;
+    }
+
+    .page-link {
+        border-radius: 8px;
+        border: 2px solid #e5e7eb;
+        color: var(--primary-color);
+        font-weight: 600;
+        padding: 8px 16px;
+        margin: 0;
+    }
+
+    .page-link:hover {
+        background-color: var(--primary-color);
+        border-color: var(--primary-color);
+        color: white;
+    }
+
+    .page-item.active .page-link {
+        background-color: var(--primary-color);
+        border-color: var(--primary-color);
+    }
+
+    /* Texto */
+    .text-success {
+        color: var(--success-color) !important;
+    }
+
+    .fw-semibold {
+        font-weight: 600;
+    }
+
+    /* Contenedor de imagen actual */
+    .bg-light {
+        background-color: #f9fafb !important;
+    }
+
+    /* Animaciones suaves */
+    * {
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
     }
 </style>
 @endsection
@@ -78,37 +392,39 @@
     {{-- Header Section --}}
     <div class="row mb-4">
         <div class="col-12">
-            <div class="d-flex justify-content-between align-items-center">
-                <div>
-                    <h1 class="mb-1">
-                        <i class="fas fa-graduation-cap text-primary me-2"></i>Gestión de Programas
-                    </h1>
-                    <p class="text-muted mb-0">Administra los programas y talleres educativos</p>
+            <div class="page-header">
+                <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+                    <div>
+                        <h1>
+                            <i class="fas fa-graduation-cap me-2" style="color: var(--primary-color);"></i>Gestión de Programas
+                        </h1>
+                        <p class="mb-0">Administra los programas y talleres educativos</p>
+                    </div>
+                    <button type="button" class="btn btn-primary btn-lg shadow" data-bs-toggle="modal" data-bs-target="#nuevoProgramaModal">
+                        <i class="fas fa-plus me-2"></i>Nuevo Programa
+                    </button>
                 </div>
-                <button type="button" class="btn btn-primary btn-lg shadow" data-bs-toggle="modal" data-bs-target="#nuevoProgramaModal">
-                    <i class="fas fa-plus me-2"></i>Nuevo Programa
-                </button>
             </div>
         </div>
     </div>
 
     {{-- Alert Messages --}}
     @if(session('success'))
-        <div class="alert alert-success alert-dismissible fade show shadow-sm" role="alert">
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
             <i class="fas fa-check-circle me-2"></i>{{ session('success') }}
             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         </div>
     @endif
     
     @if(session('error'))
-        <div class="alert alert-danger alert-dismissible fade show shadow-sm" role="alert">
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
             <i class="fas fa-exclamation-circle me-2"></i>{{ session('error') }}
             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         </div>
     @endif
 
     @if($errors->any())
-        <div class="alert alert-danger alert-dismissible fade show shadow-sm" role="alert">
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
             <i class="fas fa-exclamation-triangle me-2"></i>
             <strong>Errores de validación:</strong>
             <ul class="mb-0 mt-2">
@@ -124,17 +440,16 @@
     <div class="row mb-4">
         <div class="col-lg-6 col-md-8 mb-3 mb-lg-0">
             <div class="input-group input-group-lg search-box">
-                <span class="input-group-text bg-white border-0">
+                <span class="input-group-text">
                     <i class="fas fa-search text-muted"></i>
                 </span>
                 <input type="text" 
-                       class="form-control border-0" 
+                       class="form-control" 
                        placeholder="Buscar por nombre, tipo o descripción..." 
                        id="searchInput">
             </div>
         </div>
         <div class="col-lg-6 col-md-4 text-end">
-            <!-- Agregado id al grupo para delegación y accesibilidad aria-label -->
             <div class="btn-group" id="filterButtonsGroup" role="group" aria-label="Filtrar programas por tipo">
                 <button type="button" class="btn btn-outline-primary active" data-filter="all" aria-pressed="true">
                     <i class="fas fa-list me-1"></i>Todos
@@ -153,7 +468,7 @@
     @if($programas->isEmpty())
         <div class="row">
             <div class="col-12">
-                <div class="alert alert-warning shadow-sm d-flex align-items-center" role="alert">
+                <div class="alert alert-warning d-flex align-items-center" role="alert">
                     <i class="fas fa-info-circle fa-2x me-3"></i>
                     <div>
                         <h5 class="mb-1">No hay programas registrados</h5>
@@ -165,11 +480,11 @@
     @else
         <div class="row">
             <div class="col-12">
-                <div class="card shadow-sm border-0">
+                <div class="card">
                     <div class="card-body p-0">
                         <div class="table-responsive">
                             <table class="table table-hover mb-0" id="programasTable">
-                                <thead class="table-light">
+                                <thead>
                                     <tr>
                                         <th class="ps-4">Nombre</th>
                                         <th>Tipo</th>
@@ -490,7 +805,7 @@
 
 @endsection
 
-
+@section('scripts')
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const searchInput = document.getElementById('searchInput');
@@ -507,7 +822,6 @@ document.addEventListener('DOMContentLoaded', function() {
         const query = searchInput ? normalize(searchInput.value) : '';
 
         rows.forEach(row => {
-            // tomar data-tipo en minúsculas
             const tipo = normalize(row.getAttribute('data-tipo'));
             const text = normalize(row.textContent);
             const matchesFilter = (currentFilter === 'all') || (tipo === currentFilter);
@@ -524,7 +838,7 @@ document.addEventListener('DOMContentLoaded', function() {
             if (!btn) return;
             currentFilter = normalize(btn.getAttribute('data-filter') || 'all');
 
-            // actualizar estado visual de botones
+            // Actualizar estado visual de botones
             Array.from(filterGroup.querySelectorAll('button[data-filter]')).forEach(b => {
                 b.classList.remove('active');
                 b.setAttribute('aria-pressed', 'false');
@@ -536,23 +850,26 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // búsqueda en tiempo real
+    // Búsqueda en tiempo real
     if (searchInput) {
         searchInput.addEventListener('input', applyFilters);
     }
 
-    // aplicar filtro inicial
+    // Aplicar filtro inicial
     applyFilters();
 
-    // auto-cerrar alertas
+    // Auto-cerrar alertas después de 5 segundos
     const alerts = document.querySelectorAll('.alert:not(.alert-warning)');
     alerts.forEach(alert => {
         setTimeout(() => {
             try {
-                bootstrap.Alert.getOrCreateInstance(alert).close();
-            } catch (e) {}
+                const bsAlert = bootstrap.Alert.getOrCreateInstance(alert);
+                bsAlert.close();
+            } catch (e) {
+                console.log('Error al cerrar alerta:', e);
+            }
         }, 5000);
     });
 });
 </script>
-
+@endsection
