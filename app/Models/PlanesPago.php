@@ -16,13 +16,17 @@ class PlanesPago extends Model
         'fecha_plan_pagos',
         'Estado_plan',
         'Id_programas',
-        'Id_pagos',
         'Id_estudiantes',
     ];
 
     public function cuotas()
     {
         return $this->hasMany(Cuota::class, 'Id_planes_pagos', 'Id_planes_pagos');
+    }
+
+    public function pagos()
+    {
+        return $this->hasMany(Pago::class, 'Id_planes_pagos', 'Id_planes_pagos');
     }
 
     public function programa()

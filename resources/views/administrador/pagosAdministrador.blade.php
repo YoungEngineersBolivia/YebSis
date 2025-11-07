@@ -47,7 +47,7 @@
                     </p>
                     <h6>Cuotas:</h6>
                     <ul>
-                        @if($estudiante->planPago && $estudiante->planPago->cuotas && count($estudiante->planPago->cuotas) > 0)
+                        @if($estudiante->planesPago && $estudiante->planesPago->cuotas && count($estudiante->planesPago->cuotas) > 0)
                             <table class="table table-bordered table-sm">
                                 <thead>
                                     <tr>
@@ -62,7 +62,7 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @foreach($estudiante->planPago->cuotas as $cuota)
+                                    @foreach($estudiante->planesPago->cuotas as $cuota)
                                         <tr>
                                     
                                             <td>{{ $cuota->Nro_de_cuota }}</td>
@@ -89,9 +89,9 @@
                                     @endforeach
                                 </tbody>
                             </table>
-                        @elseif($estudiante->planPago)
+                        @elseif($estudiante->planesPago)
                             <li>
-                                El estudiante tiene un plan de pago (ID: {{ $estudiante->planPago->id }}), pero no tiene cuotas registradas.
+                                El estudiante tiene un plan de pago (ID: {{ $estudiante->planesPago->id }}), pero no tiene cuotas registradas.
                             </li>
                         @else
                             <li>

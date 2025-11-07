@@ -164,6 +164,8 @@ Route::delete('/graduados/{id}', [GraduadoController::class, 'eliminarGraduado']
     Route::post('/egresosAdministrador', [EgresosController::class, 'store'])->name('egresos.store');
     Route::get('/egresos/crear', [EgresosController::class, 'create'])->name('egresos.crear');
     Route::post('/egresos/registrar', [EgresosController::class, 'store'])->name('egresos.registrar');
+    Route::put('/egresos/{Id_egreso}', [EgresosController::class, 'update'])->name('egresos.update');
+    Route::delete('/egresos/{Id_egreso}', [EgresosController::class, 'destroy'])->name('egresos.destroy');
     
     /* ----------------- PUBLICACIONES Y NOTIFICACIONES ----------------- */
     Route::get('/pubnotAdministrador', [PubNot::class, 'index'])->name('publicaciones.index');
