@@ -88,16 +88,17 @@ Route::prefix('administrador')->name('administrador.')->group(function () {
     });
     Route::get('/tutoresAdministrador', [TutoresController::class, 'index']);
 
-    
-    /* ----------------- GESTIÓN DE USUARIOS ----------------- */
-    Route::prefix('usuarios')->name('usuarios.')->group(function () {
-        Route::get('/{id}', [UsuariosController::class, 'show'])->name('show');
-        Route::get('/{id}/edit', [UsuariosController::class, 'edit'])->name('edit');
-        Route::put('/{id}', [UsuariosController::class, 'update'])->name('update');
-        Route::delete('/{id}', [UsuariosController::class, 'destroy'])->name('destroy');
-    });
-    Route::get('/usuariosAdministrador', [UsuariosController::class, 'index'])->name('usuarios.index');
-    
+
+   /* ----------------- GESTIÓN DE USUARIOS ----------------- */
+Route::get('/usuarios', [UsuariosController::class, 'index'])->name('usuarios.index');
+
+// Actualizar usuario (desde modal)
+Route::put('/usuarios/{id}', [UsuariosController::class, 'update'])->name('usuarios.update');
+
+// Eliminar usuario
+Route::delete('/usuarios/{id}', [UsuariosController::class, 'destroy'])->name('usuarios.destroy');
+
+
     /* ----------------- GESTIÓN DE HORARIOS ----------------- */
     Route::prefix('horarios')->name('horarios.')->group(function () {
         Route::get('/create', [HorariosController::class, 'create'])->name('create');
@@ -232,11 +233,11 @@ Route::delete('/graduados/{id}', [GraduadoController::class, 'eliminarGraduado']
     
     /* ----------------- PROGRAMAS ----------------- */
     
-    Route::prefix('programas')->group(function () {
+    Route::prefix('programa')->group(function () {
         Route::get('/', [ProgramaController::class, 'index'])->name('programas.index');
         Route::post('/', [ProgramaController::class, 'store'])->name('programas.store');
         Route::get('/{id}', [ProgramaController::class, 'show'])->name('programas.show');
-        Route::get('/{id}/edit', [ProgramaController::class, 'edit'])->name('programas.edit');
+        Route::get('/{id}/edit', [ProgramaController::class, 'edit']);
         Route::put('/{id}', [ProgramaController::class, 'update'])->name('programas.update');
         Route::delete('/{id}', [ProgramaController::class, 'destroy'])->name('programas.destroy');
     });

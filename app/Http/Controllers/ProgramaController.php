@@ -62,21 +62,13 @@ class ProgramaController extends Controller
         }
     }
 
-    public function edit($id)
-    {
-        try {
-            $programa = Programa::findOrFail($id);
-            return response()->json([
-                'success' => true,
-                'programa' => $programa
-            ]);
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Programa no encontrado'
-            ], 404);
-        }
-    }
+  public function edit($id)
+{
+    $programa = Programa::findOrFail($id);
+    return response()->json($programa);
+}
+
+
 
     public function update(Request $request, $id)
     {

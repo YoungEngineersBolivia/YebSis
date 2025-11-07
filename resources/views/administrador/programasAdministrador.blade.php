@@ -3,9 +3,22 @@
 @section('title', 'Programas')
 
 @section('styles')
-    <link href="{{ asset('css/style.css') }}" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+<link href="{{ asset('css/style.css') }}" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+<style>
+    .modal-content { border-radius: 15px; border: none; box-shadow: 0 10px 40px rgba(0,0,0,0.2); }
+    .modal-header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 15px 15px 0 0; padding: 20px 25px; }
+    .modal-title { font-weight: 700; font-size: 1.3rem; }
+    .btn-close-white { filter: brightness(0) invert(1); }
+    .form-label { font-weight: 600; color: #495057; margin-bottom: 8px; }
+    .form-control, .form-select { border: 2px solid #e0e0e0; border-radius: 8px; padding: 10px 14px; transition: all 0.3s ease; }
+    .form-control:focus, .form-select:focus { border-color: #667eea; box-shadow: 0 0 0 0.2rem rgba(102,126,234,0.15); }
+    .modal-footer { border-top: 1px solid #dee2e6; padding: 15px 25px; }
+    .img-preview { max-height: 200px; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+    .badge-custom { padding: 8px 15px; border-radius: 8px; font-weight: 600; }
+    .table-hover tbody tr:hover { background-color: #f8f9fa; transform: scale(1.01); box-shadow: 0 2px 8px rgba(0,0,0,0.08); transition: all 0.3s ease; }
+</style>
 @endsection
 
 @section('content')
@@ -18,301 +31,204 @@
     </div>
 
     @if(session('success'))
-        <div class="alert alert-success alert-dismissible fade show" role="alert">
-            <i class="bi bi-check-circle-fill me-2"></i>{{ session('success') }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        <div class="alert alert-success alert-dismissible fade show">
+            {{ session('success') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         </div>
     @endif
-
     @if(session('error'))
-        <div class="alert alert-danger alert-dismissible fade show" role="alert">
-            <i class="bi bi-exclamation-triangle-fill me-2"></i>{{ session('error') }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        <div class="alert alert-danger alert-dismissible fade show">
+            {{ session('error') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         </div>
     @endif
-
-    @if($errors->any())
-        <div class="alert alert-danger alert-dismissible fade show" role="alert">
-            <ul class="mb-0">
-                @foreach($errors->all() as $error)
-                    <li>{{ $error }}</li>
-                @endforeach
-            </ul>
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-    @endif
-
-    <div class="row mb-3">
-        <div class="col-md-6">
-            <div class="input-group">
-                <span class="input-group-text"><i class="fas fa-search"></i></span>
-                <input type="text" class="form-control" placeholder="Buscar Programa" id="searchInput">
-            </div>
-        </div>
-    </div>
 
     @if($programas->isEmpty())
-        <div class="alert alert-warning">
-            <i class="bi bi-info-circle me-2"></i>No hay programas registrados.
-        </div>
+        <div class="alert alert-warning">No hay programas registrados.</div>
     @else
         <div class="table-responsive">
-            <table class="table table-hover" id="tablaProgramas">
+            <table class="table table-hover">
                 <thead class="table-light">
                     <tr>
-                        <th class="fw-bold text-dark">Nombre</th>
-                        <th class="fw-bold text-dark">Tipo</th>
-                        <th class="fw-bold text-dark">Costo</th>
-                        <th class="fw-bold text-dark">Rango de Edad</th>
-                        <th class="fw-bold text-dark">Duración</th>
-                        <th class="fw-bold text-dark">Descripción</th>
-                        <th class="fw-bold text-dark text-center">Acciones</th>
+                        <th>Nombre</th>
+                        <th>Tipo</th>
+                        <th>Costo</th>
+                        <th>Rango de Edad</th>
+                        <th>Duración</th>
+                        <th>Descripción</th>
+                        <th class="text-center">Acciones</th>
                     </tr>
                 </thead>
                 <tbody>
                     @foreach ($programas as $programa)
-                        <tr>
-                            <td class="fw-normal">{{ $programa->Nombre }}</td>
-                            <td>
-                                @if($programa->Tipo === 'programa')
-                                    <span class="badge bg-primary">Programa</span>
-                                @else
-                                    <span class="badge bg-info">Taller</span>
-                                @endif
-                            </td>
-                            <td class="text-muted">{{ number_format($programa->Costo, 2) }} Bs</td>
-                            <td class="text-muted">{{ $programa->Rango_edad }}</td>
-                            <td class="text-muted">{{ $programa->Duracion }}</td>
-                            <td class="text-muted">{{ Str::limit($programa->Descripcion, 50) }}</td>
-                            <td>
-                                <div class="d-flex gap-2 justify-content-center">
-                                    <a href="{{ route('programas.show', $programa->Id_programas) }}" 
-                                       class="btn btn-sm btn-outline-dark" 
-                                       title="Ver detalles">
-                                        <i class="bi bi-eye-fill"></i>
-                                    </a>
-                                    <button type="button" class="btn btn-sm btn-outline-warning" 
-                                            onclick="editarPrograma({{ $programa->Id_programas }})"
-                                            title="Editar">
-                                        <i class="bi bi-pencil-square"></i>
-                                    </button>
-                                    <button type="button" class="btn btn-sm btn-outline-danger" 
-                                            onclick="eliminarPrograma({{ $programa->Id_programas }})"
-                                            title="Eliminar">
-                                        <i class="bi bi-trash3-fill"></i>
-                                    </button>
+                    <tr>
+                        <td>{{ $programa->Nombre }}</td>
+                        <td>
+                            @if($programa->Tipo === 'programa')
+                                <span class="badge bg-primary">Programa</span>
+                            @else
+                                <span class="badge bg-info">Taller</span>
+                            @endif
+                        </td>
+                        <td>{{ number_format($programa->Costo,2) }} Bs</td>
+                        <td>{{ $programa->Rango_edad }}</td>
+                        <td>{{ $programa->Duracion }}</td>
+                        <td>{{ Str::limit($programa->Descripcion,50) }}</td>
+                        <td class="text-center">
+                            <!-- Ver detalles con modal -->
+                            <button class="btn btn-sm btn-outline-dark" data-bs-toggle="modal" data-bs-target="#verProgramaModal{{ $programa->Id_programas }}">
+                                <i class="bi bi-eye-fill"></i>
+                            </button>
+
+                            <!-- Editar con modal -->
+                            <button class="btn btn-sm btn-outline-warning" data-bs-toggle="modal" data-bs-target="#editarProgramaModal{{ $programa->Id_programas }}">
+                                <i class="bi bi-pencil-square"></i>
+                            </button>
+
+                            <!-- Eliminar con formulario -->
+                            <form action="{{ route('programas.destroy', $programa->Id_programas) }}" method="POST" style="display:inline-block;">
+                                @csrf
+                                @method('DELETE')
+                                <button class="btn btn-sm btn-outline-danger" onclick="return confirm('¿Desea eliminar este programa?')">
+                                    <i class="bi bi-trash3-fill"></i>
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+
+                    <!-- Modal Ver Programa -->
+                    <div class="modal fade" id="verProgramaModal{{ $programa->Id_programas }}" tabindex="-1">
+                        <div class="modal-dialog modal-lg modal-dialog-centered">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title">Detalles de {{ $programa->Nombre }}</h5>
+                                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                                 </div>
-                            </td>
-                        </tr>
+                                <div class="modal-body">
+                                    @if($programa->Imagen)
+                                        <img src="{{ asset('storage/'.$programa->Imagen) }}" class="img-preview mb-3" alt="Imagen del programa">
+                                    @endif
+                                    <p><strong>Tipo:</strong> {{ ucfirst($programa->Tipo) }}</p>
+                                    <p><strong>Costo:</strong> Bs {{ number_format($programa->Costo,2) }}</p>
+                                    <p><strong>Rango de Edad:</strong> {{ $programa->Rango_edad }}</p>
+                                    <p><strong>Duración:</strong> {{ $programa->Duracion }}</p>
+                                    <p><strong>Descripción:</strong> {{ $programa->Descripcion }}</p>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Modal Editar Programa -->
+                    <div class="modal fade" id="editarProgramaModal{{ $programa->Id_programas }}" tabindex="-1">
+                        <div class="modal-dialog modal-lg modal-dialog-centered">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title">Editar {{ $programa->Nombre }}</h5>
+                                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <form action="{{ route('programas.update', $programa->Id_programas) }}" method="POST" enctype="multipart/form-data">
+                                        @csrf
+                                        @method('PUT')
+                                        <div class="mb-3">
+                                            <label class="form-label">Nombre</label>
+                                            <input type="text" class="form-control" name="nombre" value="{{ $programa->Nombre }}" required>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label">Tipo</label>
+                                            <select class="form-select" name="tipo" required>
+                                                <option value="programa" {{ $programa->Tipo=='programa'?'selected':'' }}>Programa</option>
+                                                <option value="taller" {{ $programa->Tipo=='taller'?'selected':'' }}>Taller</option>
+                                            </select>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label">Costo</label>
+                                            <input type="number" class="form-control" name="costo" step="0.01" value="{{ $programa->Costo }}" required>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label">Rango de Edad</label>
+                                            <input type="text" class="form-control" name="rango_edad" value="{{ $programa->Rango_edad }}" required>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label">Duración</label>
+                                            <input type="text" class="form-control" name="duracion" value="{{ $programa->Duracion }}" required>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label">Descripción</label>
+                                            <textarea class="form-control" name="descripcion" rows="3" required>{{ $programa->Descripcion }}</textarea>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label">Imagen</label>
+                                            <input type="file" class="form-control" name="imagen">
+                                            @if($programa->Imagen)
+                                                <img src="{{ asset('storage/'.$programa->Imagen) }}" class="img-preview mt-2">
+                                            @endif
+                                        </div>
+                                        <button type="submit" class="btn btn-primary">Actualizar Programa</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                     @endforeach
                 </tbody>
             </table>
         </div>
-
-        <!-- Paginación -->
-        <div class="d-flex justify-content-center mt-4">
-            {{ $programas->links('pagination::bootstrap-5') }}
-        </div>
     @endif
 
-    <!-- Modal para añadir programa -->
-    <div class="modal fade" id="nuevoProgramaModal" tabindex="-1" aria-labelledby="nuevoProgramaLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg">
+    {{-- Modal Nuevo Programa --}}
+    <div class="modal fade" id="nuevoProgramaModal" tabindex="-1">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title">Nuevo Programa</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
-                    <form id="formNuevoPrograma" action="{{ route('programas.store') }}" method="POST" enctype="multipart/form-data">
+                    <form action="{{ route('programas.store') }}" method="POST" enctype="multipart/form-data">
                         @csrf
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label for="nombre" class="form-label">Nombre del Programa</label>
-                                    <input type="text" class="form-control" id="nombre" name="nombre" required value="{{ old('nombre') }}">
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label for="tipo" class="form-label">Tipo de Programa</label>
-                                    <select class="form-control" id="tipo" name="tipo" required>
-                                        <option value="">Seleccione...</option>
-                                        <option value="programa" {{ old('tipo') === 'programa' ? 'selected' : '' }}>Programa</option>
-                                        <option value="taller" {{ old('tipo') === 'taller' ? 'selected' : '' }}>Taller</option>
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label for="costo" class="form-label">Costo (Bs)</label>
-                                    <input type="number" class="form-control" id="costo" name="costo" step="0.01" required value="{{ old('costo') }}">
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label for="rango_edad" class="form-label">Rango de Edad</label>
-                                    <input type="text" class="form-control" id="rango_edad" name="rango_edad" placeholder="Ej: 6-12 años" required value="{{ old('rango_edad') }}">
-                                </div>
-                            </div>
+                        <div class="mb-3">
+                            <label class="form-label">Nombre</label>
+                            <input type="text" class="form-control" name="nombre" required>
                         </div>
                         <div class="mb-3">
-                            <label for="duracion" class="form-label">Duración</label>
-                            <input type="text" class="form-control" id="duracion" name="duracion" placeholder="Ej: 3 meses" required value="{{ old('duracion') }}">
+                            <label class="form-label">Tipo</label>
+                            <select class="form-select" name="tipo" required>
+                                <option value="">Seleccione...</option>
+                                <option value="programa">Programa</option>
+                                <option value="taller">Taller</option>
+                            </select>
                         </div>
                         <div class="mb-3">
-                            <label for="descripcion" class="form-label">Descripción</label>
-                            <textarea class="form-control" id="descripcion" name="descripcion" rows="3" required>{{ old('descripcion') }}</textarea>
+                            <label class="form-label">Costo</label>
+                            <input type="number" class="form-control" name="costo" step="0.01" required>
                         </div>
                         <div class="mb-3">
-                            <label for="imagen" class="form-label">Foto del Programa</label>
-                            <input type="file" class="form-control" id="imagen" name="imagen" accept="image/*">
-                            <small class="text-muted">Formatos permitidos: JPG, PNG, GIF. Tamaño máximo: 2MB</small>
+                            <label class="form-label">Rango de Edad</label>
+                            <input type="text" class="form-control" name="rango_edad" required>
                         </div>
+                        <div class="mb-3">
+                            <label class="form-label">Duración</label>
+                            <input type="text" class="form-control" name="duracion" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Descripción</label>
+                            <textarea class="form-control" name="descripcion" rows="3" required></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Imagen</label>
+                            <input type="file" class="form-control" name="imagen">
+                        </div>
+                        <button type="submit" class="btn btn-primary">Guardar Programa</button>
                     </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="submit" form="formNuevoPrograma" class="btn btn-primary">Guardar Programa</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal para editar programa -->
-    <div class="modal fade" id="editarProgramaModal" tabindex="-1" aria-labelledby="editarProgramaLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Editar Programa</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-                </div>
-                <div class="modal-body">
-                    <form id="formEditarPrograma" method="POST" enctype="multipart/form-data">
-                        @csrf
-                        @method('PUT')
-                        <input type="hidden" id="edit_programa_id" name="programa_id">
-                        
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label for="edit_nombre" class="form-label">Nombre del Programa</label>
-                                    <input type="text" class="form-control" id="edit_nombre" name="nombre" required>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label for="edit_tipo" class="form-label">Tipo de Programa</label>
-                                    <select class="form-control" id="edit_tipo" name="tipo" required>
-                                        <option value="programa">Programa</option>
-                                        <option value="taller">Taller</option>
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label for="edit_costo" class="form-label">Costo (Bs)</label>
-                                    <input type="number" class="form-control" id="edit_costo" name="costo" step="0.01" required>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label for="edit_rango_edad" class="form-label">Rango de Edad</label>
-                                    <input type="text" class="form-control" id="edit_rango_edad" name="rango_edad" required>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="mb-3">
-                            <label for="edit_duracion" class="form-label">Duración</label>
-                            <input type="text" class="form-control" id="edit_duracion" name="duracion" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="edit_descripcion" class="form-label">Descripción</label>
-                            <textarea class="form-control" id="edit_descripcion" name="descripcion" rows="3" required></textarea>
-                        </div>
-                        <div class="mb-3">
-                            <label for="edit_imagen" class="form-label">Nueva Foto del Programa</label>
-                            <input type="file" class="form-control" id="edit_imagen" name="imagen" accept="image/*">
-                            <small class="text-muted">Dejar vacío para mantener la imagen actual</small>
-                            <div id="imagenActual" class="mt-2"></div>
-                        </div>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="submit" form="formEditarPrograma" class="btn btn-primary">Actualizar Programa</button>
                 </div>
             </div>
         </div>
     </div>
 
 </div>
-@endsection
-
-@section('scripts')
-<script src="{{ auto_asset('js/administrador/programasAdministrador.js') }}"></script>
-<script>
-document.addEventListener('DOMContentLoaded', () => {
-    // Obtener todos los botones de acciones
-    const eliminarBtns = document.querySelectorAll('button[onclick^="eliminarPrograma"]');
-    const editarBtns = document.querySelectorAll('button[onclick^="editarPrograma"]');
-    const verBtns = document.querySelectorAll('button[onclick^="verPrograma"]');
-
-    // Función eliminar
-    window.eliminarPrograma = function(id) {
-        if(confirm('¿Estás seguro de eliminar este programa?')) {
-            // Buscar el formulario de eliminación o enviar un fetch/submit
-            // Aquí hacemos submit a un formulario oculto
-            const form = document.createElement('form');
-            form.method = 'POST';
-            form.action = `/programas/${id}`; // Ajusta la ruta
-            form.innerHTML = `
-                @csrf
-                @method('DELETE')
-            `;
-            document.body.appendChild(form);
-            form.submit();
-        }
-    }
-
-    // Función editar
-    window.editarPrograma = function(id) {
-        // Abrir modal de edición
-        const modal = document.getElementById(`editarProgramaModal${id}`);
-        if(modal){
-            const bsModal = new bootstrap.Modal(modal);
-            bsModal.show();
-        }
-    }
-
-    // Función ver
-    window.verPrograma = function(id) {
-        // Abrir modal de ver detalles
-        const modal = document.getElementById(`verProgramaModal${id}`);
-        if(modal){
-            const bsModal = new bootstrap.Modal(modal);
-            bsModal.show();
-        }
-    }
-
-    // Buscador puro JS
-    const input = document.getElementById('searchInput');
-    const table = document.querySelector('table tbody');
-    if(input && table){
-        input.addEventListener('input', function(){
-            const query = this.value.toLowerCase();
-            table.querySelectorAll('tr').forEach(tr => {
-                const text = tr.innerText.toLowerCase();
-                tr.style.display = text.includes(query) ? '' : 'none';
-            });
-        });
-    }
-});
-</script>
-
-
 @endsection

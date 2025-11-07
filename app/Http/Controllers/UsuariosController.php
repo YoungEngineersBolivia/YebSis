@@ -42,68 +42,54 @@ class UsuariosController extends Controller
         ]);
     }
 
-    // Obtener datos de usuario para edición
-    public function edit($id)
-    {
-        $usuario = Usuario::with('persona.rol')->findOrFail($id);
+ public function edit($id)
+{
+    $usuario = Usuario::with('persona.rol')->find($id);
 
-        return response()->json([
-            'Nombre' => $usuario->persona->Nombre ?? '',
-            'Apellido' => $usuario->persona->Apellido ?? '',
-            'Correo' => $usuario->Correo,
-            'Rol' => $usuario->persona->rol->Nombre_rol ?? '',
-        ]);
+    if (!$usuario) {
+        return response()->json(['error' => 'Usuario no encontrado'], 404);
     }
 
-    // Actualizar datos de usuario
-    public function update(Request $request, $id)
-    {
-        $request->validate([
-            'nombre'   => 'required|string|max:255',
-            'apellido' => 'required|string|max:255',
-            'correo'   => 'required|email|max:255|unique:usuarios,Correo,' . $id . ',Id_usuarios',
-        ]);
+    return response()->json([
+        'Nombre'   => $usuario->persona->Nombre ?? '',
+        'Apellido' => $usuario->persona->Apellido ?? '',
+        'Correo'   => $usuario->Correo,
+        'Rol'      => $usuario->persona->rol->Nombre_rol ?? '',
+    ]);
+}
 
-        $usuario = Usuario::findOrFail($id);
-        $persona = $usuario->persona;
+public function update(Request $request, $id)
+{
+    $request->validate([
+        'nombre' => 'required|string|max:255',
+        'apellido' => 'required|string|max:255',
+        'correo' => 'required|email|max:255|unique:usuarios,Correo,' . $id . ',Id_usuarios',
+    ]);
 
-        // Actualizar datos personales
-        $persona->Nombre = $request->nombre;
-        $persona->Apellido = $request->apellido;
-        $persona->save();
+    $usuario = Usuario::findOrFail($id);
+    $persona = $usuario->persona;
 
-        // Actualizar correo
-        $usuario->Correo = $request->correo;
-        $usuario->save();
+    $persona->Nombre = $request->nombre;
+    $persona->Apellido = $request->apellido;
+    $persona->save();
 
-        return redirect()->back()->with('success', 'Usuario actualizado correctamente.');
-    }
+    $usuario->Correo = $request->correo;
+    $usuario->save();
+
+    return redirect()->route('usuarios.index')->with('success', 'Usuario actualizado correctamente.');
+}
 
     // Eliminar usuario
-    public function destroy($id)
-    {
-        try {
-            DB::beginTransaction();
-
-            $usuario = Usuario::findOrFail($id);
-
-            // Opcional: eliminar persona si no está relacionada con otra entidad
-            $persona = $usuario->persona;
-
-            $usuario->delete();
-
-            if ($persona) {
-                $persona->delete();
-            }
-
-            DB::commit();
-
-            return response()->json(['success' => true]);
-        } catch (\Exception $e) {
-            DB::rollBack();
-
-            return response()->json(['success' => false, 'message' => $e->getMessage()]);
-        }
+   
+public function destroy($id)
+{
+    $usuario = Usuario::find($id);
+    if (!$usuario) {
+        return response()->json(['success' => false, 'message' => 'Usuario no encontrado']);
     }
+
+    $usuario->delete();
+    return response()->json(['success' => true]);
+}
    
 }
