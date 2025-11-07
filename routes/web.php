@@ -32,6 +32,7 @@ use App\Http\Controllers\MotoresAsignadosController;
 use App\Http\Controllers\ForgotPasswordController;
 use App\Http\Controllers\ResetPasswordController;
 use App\Http\Controllers\ModeloController;
+use App\Http\Controllers\CuotaController;
 
 /* ============================================
    RUTAS PÚBLICAS (Sin autenticación)
