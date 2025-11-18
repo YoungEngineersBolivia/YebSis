@@ -3,6 +3,17 @@
 @section('title', 'Registro Estudiante y Tutor')
 
 @section('content')
+<div class="row mb-3">
+    <div class="col-md-12">
+        <label><b>Buscar Tutor</b></label>
+        <input type="text" id="buscarTutor" class="form-control" placeholder="Escriba el nombre del tutor">
+        <ul id="listaTutor" class="list-group position-absolute" style="z-index:1000;"></ul>
+    </div>
+</div>
+
+{{-- Cargar todos los tutores en un input oculto como JSON --}}
+<input type="hidden" id="tutoresJson" value='@json($tutores)'>
+
 <div class="container mt-4">
     <h2>Registro Combinado</h2>
 
@@ -32,6 +43,7 @@
             <div class="col-md-6">
                 <label>Nombre</label>
                 <input type="text" name="tutor_nombre" class="form-control" value="{{ old('tutor_nombre') }}" required>
+                <input type="hidden" name="tutor_id_existente" id="tutor_id_existente" value="">
             </div>
             <div class="col-md-6">
                 <label>Apellido</label>
@@ -114,7 +126,7 @@
                 <input type="date" name="estudiante_fecha_nacimiento" class="form-control" value="{{ old('estudiante_fecha_nacimiento') }}" required>
             </div>
             <div class="col-md-4">
-                <label>Celular</label>
+                <label>Número de referencia</label>
                 <input type="text" name="estudiante_celular" class="form-control" value="{{ old('estudiante_celular') }}" required>
             </div>
             <div class="col-md-12">
@@ -429,6 +441,62 @@
         }
     }
 }
+document.addEventListener('DOMContentLoaded', function() {
+    const inputBuscar = document.getElementById('buscarTutor');
+    const listaTutor = document.getElementById('listaTutor');
+    const tutores = JSON.parse(document.getElementById('tutoresJson').value);
+
+    inputBuscar.addEventListener('input', function() {
+        const valor = this.value.toLowerCase();
+        listaTutor.innerHTML = '';
+
+        if (valor.length === 0) return; // si no hay texto, no mostrar nada
+
+        const coincidencias = tutores.filter(t => 
+            t.Nombre.toLowerCase().includes(valor) || t.Apellido.toLowerCase().includes(valor)
+        );
+
+        coincidencias.forEach(t => {
+            const li = document.createElement('li');
+            li.classList.add('list-group-item', 'list-group-item-action');
+            li.textContent = t.Nombre + ' ' + t.Apellido + ' - ' + t.Correo;
+            li.style.cursor = 'pointer';
+
+            li.addEventListener('click', () => {
+                // Rellenar los campos del formulario
+                document.querySelector('input[name="tutor_nombre"]').value = t.Nombre;
+                document.querySelector('input[name="tutor_apellido"]').value = t.Apellido;
+                document.querySelector('select[name="tutor_genero"]').value = t.Genero;
+                document.querySelector('input[name="tutor_fecha_nacimiento"]').value = t.Fecha_nacimiento;
+                document.querySelector('input[name="tutor_celular"]').value = t.Celular;
+                document.querySelector('input[name="tutor_direccion"]').value = t.Direccion_domicilio;
+                document.querySelector('input[name="tutor_email"]').value = t.Correo;
+                document.querySelector('select[name="tutor_parentesco"]').value = t.Parentesco;
+                document.querySelector('input[name="tutor_nit"]').value = t.Nit || '';
+                document.querySelector('input[name="tutor_nombre_factura"]').value = t.Nombre_factura || '';
+                document.querySelector('input[name="tutor_descuento"]').value = t.Descuento || '';
+
+                // Guardar ID del tutor existente
+                document.getElementById('tutor_id_existente').value = t.Id_tutores;
+
+                // Ocultar la lista
+                listaTutor.innerHTML = '';
+                inputBuscar.value = t.Nombre + ' ' + t.Apellido;
+            });
+
+
+            listaTutor.appendChild(li);
+        });
+    });
+
+    // Ocultar lista si se hace click fuera
+    document.addEventListener('click', function(e) {
+        if (!listaTutor.contains(e.target) && e.target !== inputBuscar) {
+            listaTutor.innerHTML = '';
+        }
+    });
+});
+
 
 // Exportar para uso global
 window.RegistroCombinado = RegistroCombinado;
