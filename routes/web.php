@@ -204,14 +204,36 @@ Route::delete('/graduados/{id}', [GraduadoController::class, 'eliminarGraduado']
 
     
     /* ----------------- MOTORES ASIGNADOS ----------------- */
+    // Rutas para Gestión de Componentes (Inventario)
+    Route::prefix('componentes')->name('componentes.')->group(function () {
+        Route::get('/', [ComponentesController::class, 'index'])->name('index');
+        Route::post('/nuevo', [ComponentesController::class, 'store'])->name('store');
+        Route::post('/entrada', [ComponentesController::class, 'registrarEntrada'])->name('registrarEntrada');
+        Route::post('/salida', [ComponentesController::class, 'registrarSalida'])->name('registrarSalida');
+        Route::get('/{id}/historial', [ComponentesController::class, 'historial'])->name('historial');
+        Route::put('/{id}', [ComponentesController::class, 'update'])->name('update');
+        Route::delete('/{motor}', [ComponentesController::class, 'destroy'])->name('destroy');
+    });
+
+    // Rutas para Motores Asignados a Técnicos
     Route::prefix('motores')->name('motores.')->group(function () {
+        // Lista de motores asignados (solo en proceso)
         Route::get('/asignaciones', [MotoresAsignadosController::class, 'index'])->name('asignaciones.index');
+        
+        // Formulario para asignar motor a técnico
         Route::get('/asignar', [MotoresAsignadosController::class, 'create'])->name('asignar.create');
+        
+        // Guardar asignación de motor
         Route::post('/asignar', [MotoresAsignadosController::class, 'store'])->name('asignar.store');
-        Route::post('/entrada/{id}', [MotoresAsignadosController::class, 'registrarEntrada'])->name('registrar.entrada');
+        
+        // Registrar entrada del motor (devolución al inventario)
+        Route::post('/registrar-entrada/{id}', [MotoresAsignadosController::class, 'registrarEntrada'])->name('registrar.entrada');
+        
+        // Guardar reporte de mantenimiento
         Route::post('/reporte/{id}', [MotoresAsignadosController::class, 'storeReporte'])->name('reporte.store');
-        Route::get('/{id}', [MotoresAsignadosController::class, 'show'])->name('show');
-        Route::delete('/{id}', [MotoresAsignadosController::class, 'destroy'])->name('destroy');
+        
+        // Historial de asignaciones completadas (opcional)
+        Route::get('/historial', [MotoresAsignadosController::class, 'historial'])->name('historial');
     });
     
     /* ----------------- REPORTES DE TALLERES ----------------- */

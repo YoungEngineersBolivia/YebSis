@@ -15,10 +15,12 @@ use Illuminate\Support\Facades\DB;
 
 class MotoresAsignadosController extends Controller
 {
-    // Lista de motores asignados
+    // Lista de motores asignados (SOLO EN PROCESO)
     public function index()
     {
+        // Solo mostrar asignaciones en proceso (motores que aún no han sido devueltos)
         $asignaciones = MotorAsignado::with(['motor.sucursal', 'profesor.persona', 'reportes'])
+            ->where('Estado_asignacion', 'En Proceso')
             ->orderBy('Fecha_asignacion', 'desc')
             ->get();
 
@@ -30,8 +32,11 @@ class MotoresAsignadosController extends Controller
     // Formulario para asignar motor
     public function create()
     {
-        // Solo motores disponibles (Funcionando o Descompuesto)
+        // Solo motores que NO estén asignados actualmente
         $motoresDisponibles = Motor::with('sucursal')
+            ->whereDoesntHave('asignaciones', function($query) {
+                $query->where('Estado_asignacion', 'En Proceso');
+            })
             ->whereIn('Estado', ['Funcionando', 'Descompuesto', 'En Proceso'])
             ->get();
 
@@ -60,6 +65,17 @@ class MotoresAsignadosController extends Controller
             $motor = Motor::findOrFail($request->Id_motores);
             $profesor = Profesor::with('persona')->findOrFail($request->Id_profesores);
 
+            // Validar que el motor no esté asignado actualmente
+            $asignacionActiva = MotorAsignado::where('Id_motores', $motor->Id_motores)
+                ->where('Estado_asignacion', 'En Proceso')
+                ->exists();
+
+            if ($asignacionActiva) {
+                return redirect()->back()
+                    ->with('error', 'Este motor ya está asignado a un técnico.')
+                    ->withInput();
+            }
+
             // Actualizar estado del motor
             $motor->update([
                 'Estado' => $request->estado_motor,
@@ -71,7 +87,7 @@ class MotoresAsignadosController extends Controller
                 'Id_profesores' => $request->Id_profesores,
                 'Estado_asignacion' => 'En Proceso',
                 'Fecha_asignacion' => $request->fecha_asignacion,
-                'Fecha_entrega' => null, // Se definirá cuando se registre la entrada
+                'Fecha_entrega' => null,
                 'Observacion_inicial' => $request->observacion_inicial,
             ]);
 
@@ -126,7 +142,7 @@ class MotoresAsignadosController extends Controller
             // Actualizar asignación con la fecha de entrega real
             $asignacion->update([
                 'Estado_asignacion' => 'Completado',
-                'Fecha_entrega' => $request->fecha_entrega, // Fecha real de entrega
+                'Fecha_entrega' => $request->fecha_entrega,
             ]);
 
             // Actualizar motor
@@ -136,11 +152,11 @@ class MotoresAsignadosController extends Controller
                 'Observacion' => $request->observaciones,
             ]);
 
-            // Registrar movimiento de ENTRADA con la fecha real de entrega
+            // Registrar movimiento de ENTRADA
             MotorMovimiento::create([
                 'Id_motores' => $asignacion->motor->Id_motores,
                 'Tipo_movimiento' => 'Entrada',
-                'Fecha' => $request->fecha_entrega, // Fecha real de entrega
+                'Fecha' => $request->fecha_entrega,
                 'Id_sucursales' => $request->Id_sucursales,
                 'Estado_ubicacion' => 'Entrada',
                 'Ultimo_tecnico' => $asignacion->profesor->persona->Nombre . ' ' . 
@@ -154,7 +170,7 @@ class MotoresAsignadosController extends Controller
                 'Id_motores_asignados' => $asignacion->Id_motores_asignados,
                 'Estado_final' => $request->estado_final,
                 'Observaciones' => $request->observaciones ?? 'Motor devuelto al inventario',
-                'Fecha_reporte' => $request->fecha_entrega, // Fecha real de entrega
+                'Fecha_reporte' => $request->fecha_entrega,
             ]);
 
             DB::commit();
@@ -212,5 +228,16 @@ class MotoresAsignadosController extends Controller
             return redirect()->back()
                 ->with('error', 'Error al guardar el reporte: ' . $e->getMessage());
         }
+    }
+
+    // Ver historial completo de asignaciones completadas
+    public function historial()
+    {
+        $asignaciones = MotorAsignado::with(['motor.sucursal', 'profesor.persona', 'reportes'])
+            ->whereIn('Estado_asignacion', ['Completado', 'Cancelado'])
+            ->orderBy('Fecha_entrega', 'desc')
+            ->get();
+
+        return view('componentes.historialAsignaciones', compact('asignaciones'));
     }
 }

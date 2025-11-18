@@ -30,6 +30,13 @@ class Motor extends Model
         return $this->hasMany(MotorMovimiento::class, 'Id_motores', 'Id_motores');
     }
 
+    public function asignacionActiva()
+    {
+        return $this->hasOne(MotorAsignado::class, 'Id_motores', 'Id_motores')
+            ->where('Estado_asignacion', 'En Proceso')
+            ->latest('Fecha_asignacion');
+    }
+
     public function ultimoMovimiento()
     {
         return $this->hasOne(MotorMovimiento::class, 'Id_motores', 'Id_motores')

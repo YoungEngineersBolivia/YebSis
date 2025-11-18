@@ -254,6 +254,7 @@
                             <li><a class="nav-link link-dark submenu-item" href="{{ route('componentes.index') }}">Componentes/Motores</a></li>
                             <li><a class="nav-link link-dark submenu-item" href="{{ route('motores.asignaciones.index') }}">Asignaciones</a></li>
                             <li><a class="nav-link link-dark submenu-item" href="{{ route('motores.asignar.create') }}">Asignar Motor</a></li>
+                            <li><a class="nav-link link-dark submenu-item" href="{{ route('motores.historial') }}">Historial de Asignaciones</a></li>
                         </ul>
                     </div>
                 </li>
