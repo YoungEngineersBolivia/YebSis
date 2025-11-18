@@ -48,7 +48,8 @@ class ComponentesController extends Controller
     public function update(Request $request, $id)
     {
         $request->validate([
-            'id_motor' => 'required|string|unique:motores,Id_motor,' . $id . ',Id_componentes',
+            // Cambia 'Id_componentes' por 'Id_motores'
+            'id_motor' => 'required|string|unique:motores,Id_motor,' . $id . ',Id_motores',
             'estado' => 'required|in:Funcionando,Descompuesto,En Proceso',
             'Id_sucursales' => 'required|exists:sucursales,Id_Sucursales',
             'observacion' => 'nullable|string',
