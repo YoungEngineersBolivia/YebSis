@@ -38,11 +38,7 @@ class ProfesorController extends Controller
             ->with('success', 'Profesor registrado correctamente');
     }
 
-    public function show($id)
-    {
-        $profesor = Profesor::findOrFail($id);
-        return view('profesor.show', compact('profesor'));
-    }
+
 
     public function edit($id)
     {
@@ -50,27 +46,45 @@ class ProfesorController extends Controller
         return view('profesor.edit', compact('profesor'));
     }
 
-    public function update(Request $request, $id)
-    {
-        $request->validate([
-            'Nombre' => 'required',
-        ]);
+   public function update(Request $request, $id)
+{
+    $request->validate([
+        'nombre' => 'required',
+        'apellido' => 'required',
+        'correo' => 'required|email',
+    ]);
 
-        $profesor = Profesor::findOrFail($id);
-        $profesor->update([
-            'Nombre' => $request->Nombre,
-        ]);
+    $profesor = Profesor::with(['persona', 'usuario'])->findOrFail($id);
 
-        return redirect()->route('profesor.index')
-            ->with('success', 'Profesor actualizado correctamente');
+    // Actualizar persona
+    $profesor->persona->Nombre = $request->nombre;
+    $profesor->persona->Apellido = $request->apellido;
+    $profesor->persona->Celular = $request->celular;
+    $profesor->persona->save();
+
+    // Actualizar usuario
+    $profesor->usuario->Correo = $request->correo;
+    if ($request->contrasenia) {
+        $profesor->usuario->Contrasenia = bcrypt($request->contrasenia);
     }
+    $profesor->usuario->save();
+
+    // Actualizar campos propios de Profesor
+    $profesor->Profesion = $request->profesion;
+    $profesor->Rol_componentes = $request->rol_componentes;
+    $profesor->save();
+
+    return redirect()->route('profesores.index')
+        ->with('success', 'Profesor actualizado correctamente');
+}
+
 
     public function destroy($id)
     {
         $profesor = Profesor::findOrFail($id);
         $profesor->delete();
 
-        return redirect()->route('profesor.index')
+        return redirect()->route('profesores.index')
             ->with('success', 'Profesor eliminado correctamente');
     }
 

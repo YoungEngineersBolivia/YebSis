@@ -89,7 +89,8 @@ public function destroy($id)
     }
 
     $usuario->delete();
-    return response()->json(['success' => true]);
+    return redirect()->route('usuarios.index')
+        ->with('success', 'Usuario eliminado correctamente.');
 }
    
 }

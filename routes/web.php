@@ -190,19 +190,16 @@ Route::delete('/graduados/{id}', [GraduadoController::class, 'eliminarGraduado']
         Route::delete('/{motor}', [ComponentesController::class, 'destroy'])->name('destroy');
     });
     
-    /* ----------------- GESTIÓN DE PROFESORES ----------------- */
-   Route::prefix('profesores')->name('profesores.')->group(function () {
-        Route::get('/', [ProfesorController::class, 'index'])->name('index');
-        Route::post('/', [ProfesorController::class, 'store'])->name('store');
-        Route::get('/create', [ProfesorController::class, 'create'])->name('create');
-        
-        Route::get('/{id}/edit', [ProfesorController::class, 'edit'])->name('edit');
-        
-        Route::get('/{id}', [ProfesorController::class, 'show'])->name('show');
-        
-        Route::put('/{id}', [ProfesorController::class, 'update'])->name('update');
-        Route::delete('/{id}', [ProfesorController::class, 'destroy'])->name('destroy');
-    });
+ Route::prefix('profesores')->name('profesores.')->group(function () {
+    Route::get('/', [ProfesorController::class, 'index'])->name('index');
+    Route::post('/', [ProfesorController::class, 'store'])->name('store');
+    Route::get('/create', [ProfesorController::class, 'create'])->name('create');
+    Route::get('/{id}/edit', [ProfesorController::class, 'edit'])->name('edit');
+    Route::put('/{id}', [ProfesorController::class, 'update'])->name('update');
+    Route::delete('/{id}', [ProfesorController::class, 'destroy'])->name('destroy');
+
+  
+});
 
     
     /* ----------------- MOTORES ASIGNADOS ----------------- */
