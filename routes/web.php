@@ -192,16 +192,16 @@ Route::delete('/graduados/{id}', [GraduadoController::class, 'eliminarGraduado']
     
     /* ----------------- GESTIÓN DE PROFESORES ----------------- */
    Route::prefix('profesores')->name('profesores.')->group(function () {
-        Route::get('/', [ProfesoresController::class, 'index'])->name('index');
-        Route::post('/', [ProfesoresController::class, 'store'])->name('store');
-        Route::get('/create', [ProfesoresController::class, 'create'])->name('create');
+        Route::get('/', [ProfesorController::class, 'index'])->name('index');
+        Route::post('/', [ProfesorController::class, 'store'])->name('store');
+        Route::get('/create', [ProfesorController::class, 'create'])->name('create');
         
-        Route::get('/{id}/edit', [ProfesoresController::class, 'edit'])->name('edit');
+        Route::get('/{id}/edit', [ProfesorController::class, 'edit'])->name('edit');
         
-        Route::get('/{id}', [ProfesoresController::class, 'show'])->name('show');
+        Route::get('/{id}', [ProfesorController::class, 'show'])->name('show');
         
-        Route::put('/{id}', [ProfesoresController::class, 'update'])->name('update');
-        Route::delete('/{id}', [ProfesoresController::class, 'destroy'])->name('destroy');
+        Route::put('/{id}', [ProfesorController::class, 'update'])->name('update');
+        Route::delete('/{id}', [ProfesorController::class, 'destroy'])->name('destroy');
     });
 
     
