@@ -7,7 +7,7 @@ use App\Models\Tutores;
 use App\Models\Estudiante;
 use Illuminate\Support\Facades\Auth;
 
-class TutorhomeController extends Controller
+class TutorHomeController extends Controller
 {
     public function index()
     {
