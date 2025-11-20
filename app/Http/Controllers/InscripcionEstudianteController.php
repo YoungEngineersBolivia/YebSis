@@ -20,45 +20,79 @@ class InscripcionEstudianteController extends Controller
     public function mostrarFormulario()
     {
         try {
-            $programas = Programa::where('Tipo', 'LIKE', '%programa%')
-                                ->select('Id_programas', 'Nombre', 'Costo', 'Tipo')
-                                ->get();
+            Log::info('=== INICIO mostrarFormulario ===');
+            
+            // Paso 1: Obtener programas
+            Log::info('Paso 1: Obteniendo programas...');
+            $programas = Programa::where(function($query) {
+                    $query->where('Tipo', 'LIKE', '%programa%')
+                          ->orWhereNull('Tipo');
+                })
+                ->select('Id_programas', 'Nombre', 'Costo', 'Tipo')
+                ->get();
+            Log::info('Programas obtenidos: ' . $programas->count());
 
+            // Paso 2: Obtener talleres
+            Log::info('Paso 2: Obteniendo talleres...');
             $talleres = Programa::where('Tipo', 'LIKE', '%taller%')
                                ->select('Id_programas', 'Nombre', 'Costo', 'Tipo')
                                ->get();
+            Log::info('Talleres obtenidos: ' . $talleres->count());
 
+            // Paso 3: Si no hay clasificación por tipo
             if ($programas->isEmpty() && $talleres->isEmpty()) {
-                Log::info('No se encontraron programas por tipo, obteniendo todos los activos');
-                $todosLosProgramas = Programa::select('Id_programas', 'Nombre', 'Costo', 'Tipo')
-                                            ->get();
-
-                $programas = $todosLosProgramas;
-                $talleres = collect(); 
+                Log::warning('No se encontraron programas clasificados por tipo, obteniendo todos');
+                $programas = Programa::select('Id_programas', 'Nombre', 'Costo', 'Tipo')->get();
+                $talleres = collect();
+                Log::info('Programas totales: ' . $programas->count());
             }
 
+            // Paso 4: Obtener sucursales
+            Log::info('Paso 3: Obteniendo sucursales...');
             $sucursales = Sucursal::select('Id_Sucursales', 'Nombre')->get();
-            $profesores = Profesor::with(['persona' => function($query) {
-                $query->select('Id_personas', 'Nombre', 'Apellido');
-            }])->select('Id_profesores', 'Id_personas')->get();
+            Log::info('Sucursales obtenidas: ' . $sucursales->count());
 
-            Log::info('Programas encontrados: ' . $programas->count());
-            Log::info('Talleres encontrados: ' . $talleres->count());
-            Log::info('Sucursales encontradas: ' . $sucursales->count());
-            Log::info('Profesores encontrados: ' . $profesores->count());
+            // Paso 5: Obtener profesores SIN relación primero
+            Log::info('Paso 4: Obteniendo profesores...');
+            $profesores = Profesor::select('Id_profesores', 'Id_personas')->get();
+            Log::info('Profesores obtenidos: ' . $profesores->count());
+            
+            // Paso 6: Cargar relación persona manualmente
+            Log::info('Paso 5: Cargando personas de profesores...');
+            foreach ($profesores as $profesor) {
+                $profesor->load('persona:Id_personas,Nombre,Apellido');
+            }
+            Log::info('Personas cargadas exitosamente');
+
+            Log::info('=== FIN mostrarFormulario - TODO OK ===');
 
             return view('administrador.inscripcionEstudiante', compact('programas', 'talleres', 'sucursales', 'profesores'));
             
         } catch (\Exception $e) {
-            Log::error('Error al cargar formulario de inscripción: ' . $e->getMessage());
-            return back()->withErrors(['error' => 'Error al cargar el formulario: ' . $e->getMessage()]);
+            Log::error('=== ERROR en mostrarFormulario ===');
+            Log::error('Mensaje: ' . $e->getMessage());
+            Log::error('Línea: ' . $e->getLine());
+            Log::error('Archivo: ' . $e->getFile());
+            Log::error('Stack trace: ' . $e->getTraceAsString());
+            
+            // Mostrar error detallado en desarrollo
+            if (config('app.debug')) {
+                dd([
+                    'error' => $e->getMessage(),
+                    'line' => $e->getLine(),
+                    'file' => $e->getFile(),
+                    'trace' => $e->getTraceAsString()
+                ]);
+            }
+            
+            return back()->withErrors(['error' => 'Error al cargar el formulario. Revise los logs para más detalles.']);
         }
     }
 
     public function buscarPorCodigo(Request $request)
     {
         try {
-            $codigo = $request->input('codigo');
+            $codigo = trim($request->input('codigo'));
             
             if (empty($codigo)) {
                 return response()->json([
@@ -67,25 +101,29 @@ class InscripcionEstudianteController extends Controller
                 ]);
             }
             
-            $estudiante = Estudiante::with(['persona:Id_personas,Nombre,Apellido', 'programa:Id_programas,Nombre'])
-                                   ->where('Cod_estudiante', $codigo)
-                                   ->first();
+            // Buscar estudiante con sus relaciones
+            $estudiante = Estudiante::where('Cod_estudiante', $codigo)->first();
 
-            if ($estudiante) {
+            if (!$estudiante) {
                 return response()->json([
-                    'success' => true,
-                    'estudiante' => [
-                        'Id_estudiantes' => $estudiante->Id_estudiantes,
-                        'codigo' => $estudiante->Cod_estudiante,
-                        'nombre_completo' => ($estudiante->persona->Nombre ?? '') . ' ' . ($estudiante->persona->Apellido ?? ''),
-                        'programa_actual' => $estudiante->programa->Nombre ?? 'Sin programa'
-                    ]
+                    'success' => false,
+                    'message' => 'Estudiante no encontrado'
                 ]);
             }
 
+            // Obtener datos relacionados de forma segura
+            $persona = Persona::find($estudiante->Id_personas);
+            $programa = $estudiante->Id_programas ? Programa::find($estudiante->Id_programas) : null;
+
             return response()->json([
-                'success' => false,
-                'message' => 'Estudiante no encontrado'
+                'success' => true,
+                'estudiante' => [
+                    'Id_estudiantes' => $estudiante->Id_estudiantes,
+                    'codigo' => $estudiante->Cod_estudiante,
+                    'nombre_completo' => ($persona ? $persona->Nombre . ' ' . $persona->Apellido : 'Sin nombre'),
+                    'programa_actual' => ($programa ? $programa->Nombre : 'Sin programa'),
+                    'estado' => $estudiante->Estado ?? 'Activo'
+                ]
             ]);
             
         } catch (\Exception $e) {
@@ -93,14 +131,14 @@ class InscripcionEstudianteController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Error interno del servidor'
-            ]);
+            ], 500);
         }
     }
 
     public function buscarPorNombre(Request $request)
     {
         try {
-            $nombre = $request->input('nombre');
+            $nombre = trim($request->input('nombre'));
             
             if (empty($nombre)) {
                 return response()->json([
@@ -109,33 +147,37 @@ class InscripcionEstudianteController extends Controller
                 ]);
             }
             
-            $estudiantes = Estudiante::with(['persona:Id_personas,Nombre,Apellido', 'programa:Id_programas,Nombre'])
-                                    ->whereHas('persona', function($query) use ($nombre) {
-                                        $query->where('Nombre', 'LIKE', "%{$nombre}%")
-                                              ->orWhere('Apellido', 'LIKE', "%{$nombre}%");
-                                    })
-                                    ->limit(10) 
-                                    ->get();
+            // Buscar estudiantes por nombre o apellido
+            $estudiantes = Estudiante::whereHas('persona', function($query) use ($nombre) {
+                    $query->where('Nombre', 'LIKE', "%{$nombre}%")
+                          ->orWhere('Apellido', 'LIKE', "%{$nombre}%");
+                })
+                ->with(['persona:Id_personas,Nombre,Apellido'])
+                ->limit(10)
+                ->get();
 
-            if ($estudiantes->count() > 0) {
-                $resultados = $estudiantes->map(function($estudiante) {
-                    return [
-                        'Id_estudiantes' => $estudiante->Id_estudiantes,
-                        'codigo' => $estudiante->Cod_estudiante,
-                        'nombre_completo' => ($estudiante->persona->Nombre ?? '') . ' ' . ($estudiante->persona->Apellido ?? ''),
-                        'programa_actual' => $estudiante->programa->Nombre ?? 'Sin programa'
-                    ];
-                });
-
+            if ($estudiantes->isEmpty()) {
                 return response()->json([
-                    'success' => true,
-                    'estudiantes' => $resultados
+                    'success' => false,
+                    'message' => 'No se encontraron estudiantes con ese nombre'
                 ]);
             }
 
+            $resultados = $estudiantes->map(function($estudiante) {
+                $programa = $estudiante->Id_programas ? Programa::find($estudiante->Id_programas) : null;
+                
+                return [
+                    'Id_estudiantes' => $estudiante->Id_estudiantes,
+                    'codigo' => $estudiante->Cod_estudiante,
+                    'nombre_completo' => ($estudiante->persona ? $estudiante->persona->Nombre . ' ' . $estudiante->persona->Apellido : 'Sin nombre'),
+                    'programa_actual' => ($programa ? $programa->Nombre : 'Sin programa'),
+                    'estado' => $estudiante->Estado ?? 'Activo'
+                ];
+            });
+
             return response()->json([
-                'success' => false,
-                'message' => 'No se encontraron estudiantes con ese nombre'
+                'success' => true,
+                'estudiantes' => $resultados
             ]);
             
         } catch (\Exception $e) {
@@ -143,70 +185,12 @@ class InscripcionEstudianteController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Error interno del servidor'
-            ]);
-        }
-    }
-
-    public function obtenerPorTipo(Request $request)
-    {
-        try {
-            $tipo = $request->input('tipo');
-            Log::info("Buscando tipo: $tipo");
-            
-            if ($tipo === 'programa') {
-                $items = Programa::where(function($query) {
-                        $query->where('Tipo', 'LIKE', '%programa%')
-                              ->orWhere('Tipo', 'LIKE', '%Programa%')
-                              ->orWhere('Tipo', 'LIKE', '%PROGRAMA%')
-                              ->orWhereNull('Tipo'); 
-                    })
-                    ->select('Id_programas', 'Nombre', 'Costo', 'Tipo')
-                    ->get();
-                
-            } elseif ($tipo === 'taller') {
-                $items = Programa::where(function($query) {
-                        $query->where('Tipo', 'LIKE', '%taller%')
-                              ->orWhere('Tipo', 'LIKE', '%Taller%')
-                              ->orWhere('Tipo', 'LIKE', '%TALLER%');
-                    })
-                    ->select('Id_programas', 'Nombre', 'Costo', 'Tipo')
-                    ->get();
-            } else {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Tipo no válido. Debe ser "programa" o "taller"'
-                ]);
-            }
-
-            if ($items->isEmpty()) {
-                Log::warning("No se encontraron items para tipo: $tipo. Buscando todos los programas activos...");
-                
-                $items = Programa::select('Id_programas', 'Nombre', 'Costo', 'Tipo')
-                       ->get();
-                       
-                Log::info("Programas encontrados: " . $items->count());
-            }
-
-            Log::info("Items encontrados para $tipo:", $items->toArray());
-
-            return response()->json([
-                'success' => true,
-                'items' => $items,
-                'message' => $items->isEmpty() ? 'No se encontraron elementos disponibles' : null
-            ]);
-            
-        } catch (\Exception $e) {
-            Log::error('Error al obtener programas por tipo: ' . $e->getMessage());
-            return response()->json([
-                'success' => false,
-                'message' => 'Error interno del servidor: ' . $e->getMessage()
-            ]);
+            ], 500);
         }
     }
 
     public function inscribir(Request $request)
     {
-        // Validación básica
         $request->validate([
             'Id_estudiantes' => 'required|exists:estudiantes,Id_estudiantes',
             'tipo_seleccion' => 'required|in:programa,taller',
@@ -220,7 +204,7 @@ class InscripcionEstudianteController extends Controller
             $estudiante = Estudiante::findOrFail($request->Id_estudiantes);
             $programa = Programa::findOrFail($request->programa_taller);
 
-            Log::info("Inscribiendo estudiante {$estudiante->Id_estudiantes} en {$request->tipo_seleccion}: {$programa->Nombre}");
+            Log::info("Inscribiendo estudiante {$estudiante->Id_estudiantes} en {$request->tipo_seleccion}");
 
             if ($request->tipo_seleccion === 'programa') {
                 $result = $this->inscribirPrograma($request, $estudiante, $programa);
@@ -233,11 +217,11 @@ class InscripcionEstudianteController extends Controller
 
         } catch (\Illuminate\Validation\ValidationException $e) {
             DB::rollBack();
-            Log::error('Error de validación al inscribir:', $e->errors());
+            Log::error('Error de validación:', $e->errors());
             return back()->withErrors($e->validator)->withInput();
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error('Error al inscribir estudiante: ' . $e->getMessage());
+            Log::error('Error al inscribir: ' . $e->getMessage());
             return back()->withErrors(['error' => 'Error al inscribir: ' . $e->getMessage()])->withInput();
         }
     }
@@ -251,19 +235,12 @@ class InscripcionEstudianteController extends Controller
             'Total_con_descuento' => 'required|numeric|min:0'
         ]);
 
-        // Verificar si ya tiene un programa activo
-        if ($estudiante->Id_programas) {
-            $programaActual = Programa::find($estudiante->Id_programas);
-            if ($programaActual && stripos($programaActual->Tipo, 'programa') !== false) {
-                return back()->withErrors(['error' => 'El estudiante ya tiene un programa regular activo.']);
-            }
-        }
-
-        // Actualizar datos del estudiante
+        // Actualizar estudiante
         $estudiante->update([
             'Id_programas' => $programa->Id_programas,
             'Id_sucursales' => $request->sucursal,
             'Id_profesores' => $request->profesor ?: null,
+            'Estado' => 'Activo',
             'Fecha_estado' => now()->format('Y-m-d')
         ]);
 
@@ -280,15 +257,13 @@ class InscripcionEstudianteController extends Controller
         // Crear cuotas
         if ($request->has('cuotas_programa') && is_array($request->cuotas_programa)) {
             foreach ($request->cuotas_programa as $cuotaData) {
-                if (isset($cuotaData['Nro_de_cuota'], $cuotaData['Fecha_vencimiento'], $cuotaData['Monto_cuota'])) {
-                    Cuota::create([
-                        'Nro_de_cuota' => $cuotaData['Nro_de_cuota'],
-                        'Fecha_vencimiento' => $cuotaData['Fecha_vencimiento'],
-                        'Monto_cuota' => $cuotaData['Monto_cuota'],
-                        'Estado_cuota' => 'Pendiente',
-                        'Id_planes_pagos' => $planPago->Id_planes_pagos,
-                    ]);
-                }
+                Cuota::create([
+                    'Nro_de_cuota' => $cuotaData['Nro_de_cuota'],
+                    'Fecha_vencimiento' => $cuotaData['Fecha_vencimiento'],
+                    'Monto_cuota' => $cuotaData['Monto_cuota'],
+                    'Estado_cuota' => 'Pendiente',
+                    'Id_planes_pagos' => $planPago->Id_planes_pagos,
+                ]);
             }
         }
 
@@ -297,16 +272,14 @@ class InscripcionEstudianteController extends Controller
 
     private function inscribirTaller($request, $estudiante, $programa)
     {
-        // CORREGIDO: Validación específica para talleres (sin Nro_cuotas)
         $request->validate([
             'monto_taller_descuento' => 'required|numeric|min:0',
             'fecha_pago_taller' => 'required|date',
             'metodo_pago_taller' => 'required|string',
-            'estado_pago_taller' => 'required|in:pagado,pendiente',
-            'descripcion_taller' => 'nullable|string'
+            'estado_pago_taller' => 'required|in:pagado,pendiente'
         ]);
 
-        // Verificar si ya está inscrito en este taller
+        // Verificar duplicado
         $yaInscrito = EstudianteTaller::where('Id_estudiantes', $estudiante->Id_estudiantes)
                                 ->where('Id_programas', $programa->Id_programas)
                                 ->exists();
@@ -320,51 +293,24 @@ class InscripcionEstudianteController extends Controller
             'Id_estudiantes' => $estudiante->Id_estudiantes,
             'Id_programas' => $programa->Id_programas,
             'Fecha_inscripcion' => now()->format('Y-m-d'),
+            'Estado_inscripcion' => 'inscrito', // AGREGADO: Estado por defecto
+            'Observaciones' => null
         ]);
 
+        Log::info("Inscripción taller creada con ID: {$inscripcionTaller->Id_estudiantes_talleres}");
+
         // Crear pago del taller
-        PagoTaller::create([
+        $pagoTaller = PagoTaller::create([
             'Descripcion' => $request->descripcion_taller ?: ('Pago ' . $programa->Nombre),
             'Monto_pago' => $request->monto_taller_descuento,
             'Fecha_pago' => $request->fecha_pago_taller,
             'Metodo_pago' => $request->metodo_pago_taller,
+            'Estado_pago' => $request->estado_pago_taller, // AGREGADO: Estado del pago
             'Id_estudiantes_talleres' => $inscripcionTaller->Id_estudiantes_talleres
         ]);
 
-        return redirect()->back()->with('success', 'Estudiante inscrito exitosamente al taller: ' . $programa->Nombre);
-    }
+        Log::info("Pago taller creado con ID: {$pagoTaller->Id_pagos_talleres}");
 
-    // MÉTODO TEMPORAL PARA DEBUG - ELIMINAR DESPUÉS
-    public function debugProgramas()
-    {
-        try {
-            $programas = Programa::all();
-            $tipos = Programa::distinct()->pluck('Tipo');
-            
-            Log::info('=== DEBUG PROGRAMAS COMPLETO ===');
-            Log::info('Total programas en BD: ' . $programas->count());
-            Log::info('Tipos encontrados: ' . $tipos->toJson());
-            
-            foreach ($programas as $programa) {
-                Log::info("ID: {$programa->Id_programas}, Nombre: {$programa->Nombre}, Tipo: '{$programa->Tipo}'");
-            }
-            
-            return response()->json([
-                'total' => $programas->count(),
-                'tipos' => $tipos,
-                'programas' => $programas->map(function($p) {
-                    return [
-                        'id' => $p->Id_programas,
-                        'nombre' => $p->Nombre,
-                        'tipo' => $p->Tipo,
-                        'costo' => $p->Costo
-                    ];
-                })
-            ]);
-            
-        } catch (\Exception $e) {
-            Log::error('Error en debug: ' . $e->getMessage());
-            return response()->json(['error' => $e->getMessage()]);
-        }
+        return redirect()->back()->with('success', 'Estudiante inscrito exitosamente al taller: ' . $programa->Nombre);
     }
 }
