@@ -67,21 +67,13 @@ class ProgramaController extends Controller
         }
     }
 
-    public function edit($id)
-    {
-        try {
-            $programa = Programa::findOrFail($id);
-            return response()->json([
-                'success' => true,
-                'programa' => $programa
-            ]);
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Programa no encontrado'
-            ], 404);
-        }
-    }
+  public function edit($id)
+{
+    $programa = Programa::findOrFail($id);
+    return response()->json($programa);
+}
+
+
 
     public function update(Request $request, $id)
     {
@@ -124,34 +116,19 @@ class ProgramaController extends Controller
     }
 
     public function destroy($id)
-    {
-        try {
+        {
             $programa = Programa::findOrFail($id);
 
-            // Verificar si el programa tiene estudiantes asociados (opcional)
-            // if ($programa->estudiantes()->count() > 0) {
-            //     return response()->json([
-            //         'success' => false,
-            //         'message' => 'No se puede eliminar el programa porque tiene estudiantes inscritos'
-            //     ], 400);
-            // }
-
-            if ($programa->Imagen && Storage::disk('public')->exists($programa->Imagen)) {
-                Storage::disk('public')->delete($programa->Imagen);
+            // Si tiene imagen, eliminarla
+            if ($programa->Imagen) {
+                Storage::delete($programa->Imagen);
             }
 
             $programa->delete();
 
-            return response()->json([
-                'success' => true,
-                'message' => 'Programa eliminado exitosamente'
-            ]);
-
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Error al eliminar el programa: ' . $e->getMessage()
-            ], 500);
+            // Redirigir con mensaje de sesión
+            return redirect()->route('programas.index')
+                            ->with('success', 'Programa eliminado exitosamente');
         }
-    }
+
 }
