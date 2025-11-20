@@ -20,7 +20,16 @@
             <nav class="nav-links" id="mainNavLinks">
                 <span>RECONOCIDO POR:</span>
                 <img src="{{auto_asset('img/recognized_by.png')}}" alt="Reconocimiento" width="200px" class="me-2">
-                <span>REDES SOCIALES</span>
+                <div class="social-icons" style="margin-top: -10px;">
+                            <a href="https://www.facebook.com/youngengineerszonasurlapaz/" class="social-icon" target="_blank">
+                                  <img src="{{ asset('img/facebook.svg') }}" alt="Facebook" width="54" height="54">
+                            </a>
+                            <a href="https://www.tiktok.com/@youngengineersbolivia" class="social-icon" target="_blank">
+                                <img src="{{ asset('img/tiktok.svg') }}" alt="tiktok" width="45" height="45">
+
+                            </a>
+                        </div>
+
                 <a href="{{ route('login') }}" class="btn-iniciar">Iniciar Sesión</a>
             </nav>
         </div>
@@ -257,8 +266,13 @@ function toggleNavbar() {
                     </div>
                     <div class="footer-text">
                         <div class="social-icons">
-                            <a href="https://www.facebook.com/youngengineerszonasurlapaz/" class="social-icon">f</a>
-                            <a href="#" class="social-icon">▶</a>
+                            <a href="https://www.facebook.com/youngengineerszonasurlapaz/" class="social-icon">
+                                  <img src="{{ asset('img/facebook.svg') }}" alt="Facebook" width="54" height="54">
+                            </a>
+                            <a href="#" class="social-icon">
+                                <img src="{{ asset('img/tiktok.svg') }}" alt="tiktok" width="45" height="45">
+
+                            </a>
                         </div>
                     </div>
                 </div>
