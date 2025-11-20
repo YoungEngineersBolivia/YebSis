@@ -4,7 +4,7 @@
 @section('styles')
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
-    <link href="{{ asset('css/comercial/estudiantesActivosComercial.css') }}" rel="stylesheet">
+    <link href="{{ auto_asset('css/comercial/estudiantesActivosComercial.css') }}" rel="stylesheet">
 @endsection
 
 @section('content')
@@ -71,7 +71,7 @@
             </span>
             @endif
         </div>
-        <canvas id="chartActivos" style="height: 250px"></canvas>
+        <canvas id="chartActivos"></canvas>
     </div>
 
     <!-- Filtros + tabla -->

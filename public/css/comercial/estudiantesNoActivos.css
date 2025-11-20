@@ -7,6 +7,13 @@
             background: #fff;
             border-radius: 16px;
             padding: 16px;
+            position: relative;
+            height: 380px;
+            width: 100%;
+        }
+        .chart-wrap canvas {
+            max-height: 300px !important;
+            height: 300px !important;
         }
         .toolbar {
             display: flex; gap: 12px; align-items: center; flex-wrap: wrap;
