@@ -7,7 +7,6 @@ function toggleNavbar() {
 }
 
 // Animaciones y elementos flotantes
-const style = document.createElement('style');
 style.textContent = `
     @keyframes fadeInUp {
         from { opacity: 0; transform: translateY(30px); }

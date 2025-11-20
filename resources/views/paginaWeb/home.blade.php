@@ -208,6 +208,7 @@ function toggleNavbar() {
                     </div>
                 </div>
             </div>
+        </section>
 
     <!-- MODAL PUBLICACIONES -->
     <div class="modal-overlay" id="publicacionesModal" onclick="closePublicacionesModalOnOverlay(event)">
@@ -256,7 +257,7 @@ function toggleNavbar() {
                     </div>
                     <div class="footer-text">
                         <div class="social-icons">
-                            <a href="#" class="social-icon">f</a>
+                            <a href="https://www.facebook.com/youngengineerszonasurlapaz/" class="social-icon">f</a>
                             <a href="#" class="social-icon">▶</a>
                         </div>
                     </div>
@@ -347,122 +348,80 @@ function toggleNavbar() {
             }
         }
 
-        // ========== MODAL DE PUBLICACIONES ==========
-        function openPublicacionesModal() {
-            var modal = document.getElementById('publicacionesModal');
-            if(modal) {
-                modal.classList.add('show');
-                document.body.style.overflow = 'hidden';
-            }
+        // ================= MODAL DE PUBLICACIONES SECUENCIAL =================
+    let publicaciones = @json($publicaciones ?? []);
+
+    // Invertir array para que se muestre primero la publicación más antigua
+    publicaciones = publicaciones.reverse();
+
+    let currentModalIndex = 0;
+
+    function closeCurrentModal() {
+        const modal = document.getElementById('publicacionesModal' + currentModalIndex);
+        if (modal) {
+            modal.classList.remove('show');
         }
+        document.body.style.overflow = 'auto';
 
-        function closePublicacionesModal() {
-            var modal = document.getElementById('publicacionesModal');
-            if(modal) {
-                modal.classList.remove('show');
-                document.body.style.overflow = 'auto';
-            }
+        // Abrir la siguiente publicación automáticamente
+        if (currentModalIndex + 1 < publicaciones.length) {
+            currentModalIndex++;
+            setTimeout(() => {
+                openCurrentModal();
+            }, 300);
         }
+    }
 
-        function closePublicacionesModalOnOverlay(event) {
-            if (event.target === event.currentTarget) {
-                closePublicacionesModal();
-            }
+    function openCurrentModal() {
+        const modal = document.getElementById('publicacionesModal' + currentModalIndex);
+        if (modal) {
+            modal.classList.add('show');
+            document.body.style.overflow = 'hidden';
         }
+    }
 
-        // ========== FORMULARIO DE CONTACTO ========== 
-        // Eliminado el JS personalizado para que el formulario se envíe normalmente
-        // document.getElementById('contactForm').addEventListener('submit', function(e) {
-        //     e.preventDefault();
-        //     const formData = new FormData(this);
-        //     fetch("{{ route('prospectos.store') }}", {
-        //         method: "POST",
-        //         headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
-        //         body: formData
-        //     })
-        //     .then(response => response.json())
-        //     .then(data => {
-        //         alert(data.message);
-        //         this.reset();
-        //         closeContactModal();
-        //     })
-        //     .catch(error => {
-        //         console.error('Error:', error);
-        //         alert('Ocurrió un error al enviar tus datos.');
-        //     });
-        // });
+    function closeOnOverlay(event) {
+        if (event.target === event.currentTarget) closeCurrentModal();
+    }
 
-        // ========== DEBUG Y AUTO-ABRIR MODAL ==========
-        function updateDebugInfo(message) {
-            const debugElement = document.getElementById('debugText');
-            const publicacionesCount = {{ $publicaciones->count() ?? 0 }};
-            const timestamp = new Date().toLocaleTimeString();
+    // ================= GENERAR MODALES =================
+    function generateModalsHTML() {
+        const container = document.createElement('div');
+        publicaciones.forEach((pub, index) => {
+            const modal = document.createElement('div');
+            modal.id = 'publicacionesModal' + index;
+            modal.className = 'modal-overlay';
+            modal.setAttribute('onclick', 'closeOnOverlay(event)');
+            modal.innerHTML = `
+                <div class="modal-container">
+                    <div class="modal-header">
+                        <button class="close-btn" onclick="closeCurrentModal()">&times;</button>
             
-            if(debugElement) {
-                debugElement.innerHTML = `
-                    Publicaciones en BD: ${publicacionesCount}<br>
-                    Variable existe: {{ isset($publicaciones) ? 'SÍ' : 'NO' }}<br>
-                    Última acción: ${message}<br>
-                    Hora: ${timestamp}
-                `;
-            }
-        }
-
-        // ========== EVENTOS Y AUTO-ABRIR ==========
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log("🚀 DOM cargado - Iniciando verificaciones...");
-            
-            const publicacionesCount = {{ $publicaciones->count() ?? 0 }};
-            const hayPublicaciones = publicacionesCount > 0;
-            
-            updateDebugInfo("DOM cargado");
-            
-            console.log("📊 Datos de publicaciones:");
-            console.log("- Count:", publicacionesCount);
-            console.log("- Hay publicaciones:", hayPublicaciones);
-            console.log("- Datos:", @json($publicaciones ?? []));
-            
-            // AUTO-ABRIR SI HAY PUBLICACIONES
-            if(hayPublicaciones) {
-                console.log("✨ Hay publicaciones, abriendo modal automáticamente...");
-                setTimeout(() => {
-                    openPublicacionesModal();
-                    updateDebugInfo("Modal abierto automáticamente");
-                }, 1000); // Esperar 1 segundo
-            } else {
-                console.log("📭 No hay publicaciones para mostrar");
-                updateDebugInfo("Sin publicaciones para mostrar");
-            }
+                    </div>
+                    <div class="modal-body" style="max-height:80%; overflow-y:auto;">
+                        ${pub.Imagen ? `<img src="{{ asset('storage/${pub.Imagen}') }}" style="width:100%; max-height:500px; object-fit:cover; border-radius:8px;">` : '<p>No hay imagen disponible</p>'}
+        
+                    </div>
+                </div>
+            `;
+            container.appendChild(modal);
         });
+        document.body.appendChild(container);
+    }
 
-        // Cerrar modales con ESC
+    generateModalsHTML();
+
+    // ================= AUTO-ABRIR LA PRIMERA =================
+    document.addEventListener('DOMContentLoaded', function() {
+        if (publicaciones.length > 0) {
+            openCurrentModal();
+        }
+
+        // Cerrar con ESC
         document.addEventListener('keydown', function(event) {
-            if (event.key === 'Escape') {
-                closeContactModal();
-                closePublicacionesModal();
-            }
+            if (event.key === 'Escape') closeCurrentModal();
         });
-
-        // OCULTAR DEBUG DESPUÉS DE 10 SEGUNDOS (opcional)
-        setTimeout(() => {
-            const debugElement = document.getElementById('debugInfo');
-            if(debugElement) {
-                debugElement.style.display = 'none';
-            }
-        }, 10000);
-
-        // Animación de aparición de títulos al hacer scroll
-        function revealTitlesOnScroll() {
-            document.querySelectorAll('.section-title, .program-card').forEach(function(el) {
-                var rect = el.getBoundingClientRect();
-                if (rect.top < window.innerHeight - 60) {
-                    el.classList.add('visible');
-                }
-            });
-        }
-        window.addEventListener('scroll', revealTitlesOnScroll);
-        document.addEventListener('DOMContentLoaded', revealTitlesOnScroll);
-        window.publicacionesCount = {{ $publicaciones->count() ?? 0 }};
+    });
     </script>
     <script src="{{ asset('js/paginaWeb/home.js') }}"></script>
 
