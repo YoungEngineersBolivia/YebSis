@@ -60,18 +60,14 @@
                             <td>{{ $horario->estudiante?->persona?->Nombre ?? '—' }}</td>
                             <td>{{ $horario->estudiante?->persona?->Apellido ?? '—' }}</td>
                             <td>{{ $horario->programa?->Nombre ?? '—' }}</td>
-
                             <td>{{ $horario->Dia ?? '—' }}</td>
                             <td>{{ $horario->Hora ?? '—' }}</td>
-
                             <td>
                                 @php $pp = $horario->profesor?->persona; @endphp
                                 {{ ($pp?->Nombre && $pp?->Apellido) ? ($pp->Nombre.' '.$pp->Apellido) : 'Sin profesor' }}
                             </td>
-
                             <td class="text-center">
                                 <div class="d-flex justify-content-center gap-2">
-
                                     {{-- Abrir modal de edición --}}
                                     <button type="button"
                                             class="btn btn-sm btn-outline-success btn-editar"
@@ -122,14 +118,13 @@
         </div>
 
         <div class="modal-body">
-
           {{-- Estudiante --}}
           <div class="mb-3">
             <label for="Id_estudiantes_crear" class="form-label">Estudiante</label>
             <select class="form-select" id="Id_estudiantes_crear" name="Id_estudiantes" required>
               <option value="" disabled selected>Seleccione un estudiante</option>
               @foreach($estudiantes as $e)
-                <option value="{{ $e->Id_estudiantes }}">
+                <option value="{{ $e->Id_estudiantes }}" data-profesor="{{ $e->Id_profesores }}">
                   {{ $e->persona?->Nombre }} {{ $e->persona?->Apellido }}
                 </option>
               @endforeach
@@ -176,7 +171,6 @@
             <label for="Hora_crear" class="form-label">Hora</label>
             <input type="time" class="form-control" id="Hora_crear" name="Hora" required>
           </div>
-
         </div>
 
         <div class="modal-footer">
@@ -201,7 +195,6 @@
         </div>
 
         <div class="modal-body">
-
           {{-- Estudiante --}}
           <div class="mb-3">
             <label for="Id_estudiantes_editar" class="form-label">Estudiante</label>
@@ -251,7 +244,6 @@
             <label for="Hora_editar" class="form-label">Hora</label>
             <input type="time" class="form-control" id="Hora_editar" name="Hora" required>
           </div>
-
         </div>
 
         <div class="modal-footer">
@@ -263,31 +255,43 @@
   </div>
 </div>
 
-{{-- Script para pasar datos al modal de edición --}}
+{{-- Script para asignar profesor automáticamente y pasar datos al modal de edición --}}
 <script>
 document.addEventListener('DOMContentLoaded', function () {
+    // Modal de edición
     const modalEditar = document.getElementById('modalEditar');
+    if (modalEditar) {
+        modalEditar.addEventListener('show.bs.modal', function (event) {
+            const button = event.relatedTarget;
+            const id = button.getAttribute('data-id');
+            const estudiante = button.getAttribute('data-estudiante');
+            const profesor = button.getAttribute('data-profesor');
+            const programa = button.getAttribute('data-programa');
+            const dia = button.getAttribute('data-dia');
+            const hora = button.getAttribute('data-hora');
 
-    modalEditar.addEventListener('show.bs.modal', function (event) {
-        const button = event.relatedTarget;
-        const id = button.getAttribute('data-id');
-        const estudiante = button.getAttribute('data-estudiante');
-        const profesor = button.getAttribute('data-profesor');
-        const programa = button.getAttribute('data-programa');
-        const dia = button.getAttribute('data-dia');
-        const hora = button.getAttribute('data-hora');
+            const form = document.getElementById('formEditar');
+            form.action = "{{ route('horarios.update', ':id') }}".replace(':id', id);
 
-        // Form action update
-        const form = document.getElementById('formEditar');
-        form.action = "{{ route('horarios.update', ':id') }}".replace(':id', id);
+            document.getElementById('Id_estudiantes_editar').value = estudiante;
+            document.getElementById('Id_profesores_editar').value = profesor;
+            document.getElementById('Id_programas_editar').value = programa;
+            document.getElementById('Dia_editar').value = dia;
+            document.getElementById('Hora_editar').value = hora;
+        });
+    }
 
-        // Set values
-        document.getElementById('Id_estudiantes_editar').value = estudiante;
-        document.getElementById('Id_profesores_editar').value = profesor;
-        document.getElementById('Id_programas_editar').value = programa;
-        document.getElementById('Dia_editar').value = dia;
-        document.getElementById('Hora_editar').value = hora;
-    });
+    // Asignar profesor automáticamente al seleccionar estudiante (crear)
+    const estudianteCrear = document.getElementById('Id_estudiantes_crear');
+    const profesorCrear = document.getElementById('Id_profesores_crear');
+
+    if (estudianteCrear && profesorCrear) {
+        estudianteCrear.addEventListener('change', function () {
+            const selectedOption = estudianteCrear.selectedOptions[0];
+            const profesorId = selectedOption.getAttribute('data-profesor') || '';
+            profesorCrear.value = profesorId;
+        });
+    }
 });
 </script>
 

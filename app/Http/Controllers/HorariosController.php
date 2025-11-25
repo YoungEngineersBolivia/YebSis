@@ -62,4 +62,19 @@ class HorariosController extends Controller
 
         return redirect()->route('horarios.index')->with('success', 'Horario eliminado correctamente.');
     }
+     public function buscarProfesor($idEstudiante)
+{
+    $estudiante = Estudiante::find($idEstudiante);
+
+    if (!$estudiante) {
+        return response()->json([]);
+    }
+
+    $profesor = $estudiante->profesor; // o la relación correcta que tengas
+
+    return response()->json([
+        'Id_profesores' => $profesor?->Id_profesores
+    ]);
+}
+
 }
