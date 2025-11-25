@@ -24,3 +24,24 @@ document.getElementById('modalAsignar')?.addEventListener('show.bs.modal', funct
   setVal('Horario_clase_dos', hora2);
   setVal('Id_profesores', profesorId);
 });
+
+document.getElementById('Id_estudiantes_crear')?.addEventListener('change', async function () {
+    const idEstudiante = this.value;
+    if (!idEstudiante) return;
+
+    try {
+        const response = await fetch(`/horarios/buscar-profesor/${idEstudiante}`);
+        const data = await response.json();
+
+        const profesorSelect = document.getElementById('Id_profesores_crear');
+
+        if (data?.Id_profesores) {
+            profesorSelect.value = data.Id_profesores;
+        } else {
+            profesorSelect.value = "";
+        }
+
+    } catch (err) {
+        console.error("Error buscando profesor:", err);
+    }
+});

@@ -32,6 +32,7 @@ use App\Http\Controllers\MotoresAsignadosController;
 use App\Http\Controllers\ForgotPasswordController;
 use App\Http\Controllers\ResetPasswordController;
 use App\Http\Controllers\ModeloController;
+use App\Http\Controllers\CuotaController;
 
 /* ============================================
    RUTAS PÚBLICAS (Sin autenticación)
@@ -89,16 +90,17 @@ Route::prefix('administrador')->name('administrador.')->group(function () {
     });
     Route::get('/tutoresAdministrador', [TutoresController::class, 'index']);
 
-    
-    /* ----------------- GESTIÓN DE USUARIOS ----------------- */
-    Route::prefix('usuarios')->name('usuarios.')->group(function () {
-        Route::get('/{id}', [UsuariosController::class, 'show'])->name('show');
-        Route::get('/{id}/edit', [UsuariosController::class, 'edit'])->name('edit');
-        Route::put('/{id}', [UsuariosController::class, 'update'])->name('update');
-        Route::delete('/{id}', [UsuariosController::class, 'destroy'])->name('destroy');
-    });
-    Route::get('/usuariosAdministrador', [UsuariosController::class, 'index'])->name('usuarios.index');
-    
+
+   /* ----------------- GESTIÓN DE USUARIOS ----------------- */
+Route::get('/usuarios', [UsuariosController::class, 'index'])->name('usuarios.index');
+
+// Actualizar usuario (desde modal)
+Route::put('/usuarios/{id}', [UsuariosController::class, 'update'])->name('usuarios.update');
+
+// Eliminar usuario
+Route::delete('/usuarios/{id}', [UsuariosController::class, 'destroy'])->name('usuarios.destroy');
+
+
     /* ----------------- GESTIÓN DE HORARIOS ----------------- */
     Route::prefix('horarios')->name('horarios.')->group(function () {
         Route::get('/create', [HorariosController::class, 'create'])->name('create');
@@ -110,7 +112,8 @@ Route::prefix('administrador')->name('administrador.')->group(function () {
         Route::post('/asignar', [HorariosController::class, 'asignar'])->name('asignar');
     });
     Route::get('/horariosAdministrador', [HorariosController::class, 'index'])->name('horarios.index');
-    
+    Route::get('/horarios/buscar-profesor/{idEstudiante}', [HorariosController::class, 'buscarProfesor']);
+
     /* ----------------- GESTIÓN DE ESTUDIANTES ----------------- */
     Route::get('/estudiantesAdministrador', [EstudianteController::class, 'index'])->name('admin.estudiantes');
 
@@ -188,30 +191,49 @@ Route::delete('/graduados/{id}', [GraduadoController::class, 'eliminarGraduado']
         Route::delete('/{motor}', [ComponentesController::class, 'destroy'])->name('destroy');
     });
     
-    /* ----------------- GESTIÓN DE PROFESORES ----------------- */
-   Route::prefix('profesores')->name('profesores.')->group(function () {
-        Route::get('/', [ProfesoresController::class, 'index'])->name('index');
-        Route::post('/', [ProfesoresController::class, 'store'])->name('store');
-        Route::get('/create', [ProfesoresController::class, 'create'])->name('create');
-        
-        Route::get('/{id}/edit', [ProfesoresController::class, 'edit'])->name('edit');
-        
-        Route::get('/{id}', [ProfesoresController::class, 'show'])->name('show');
-        
-        Route::put('/{id}', [ProfesoresController::class, 'update'])->name('update');
-        Route::delete('/{id}', [ProfesoresController::class, 'destroy'])->name('destroy');
-    });
+ Route::prefix('profesores')->name('profesores.')->group(function () {
+    Route::get('/', [ProfesorController::class, 'index'])->name('index');
+    Route::post('/', [ProfesorController::class, 'store'])->name('store');
+    Route::get('/create', [ProfesorController::class, 'create'])->name('create');
+    Route::get('/{id}/edit', [ProfesorController::class, 'edit'])->name('edit');
+    Route::put('/{id}', [ProfesorController::class, 'update'])->name('update');
+    Route::delete('/{id}', [ProfesorController::class, 'destroy'])->name('destroy');
+
+  
+});
 
     
     /* ----------------- MOTORES ASIGNADOS ----------------- */
+    // Rutas para Gestión de Componentes (Inventario)
+    Route::prefix('componentes')->name('componentes.')->group(function () {
+        Route::get('/', [ComponentesController::class, 'index'])->name('index');
+        Route::post('/nuevo', [ComponentesController::class, 'store'])->name('store');
+        Route::post('/entrada', [ComponentesController::class, 'registrarEntrada'])->name('registrarEntrada');
+        Route::post('/salida', [ComponentesController::class, 'registrarSalida'])->name('registrarSalida');
+        Route::get('/{id}/historial', [ComponentesController::class, 'historial'])->name('historial');
+        Route::put('/{id}', [ComponentesController::class, 'update'])->name('update');
+        Route::delete('/{motor}', [ComponentesController::class, 'destroy'])->name('destroy');
+    });
+
+    // Rutas para Motores Asignados a Técnicos
     Route::prefix('motores')->name('motores.')->group(function () {
+        // Lista de motores asignados (solo en proceso)
         Route::get('/asignaciones', [MotoresAsignadosController::class, 'index'])->name('asignaciones.index');
+        
+        // Formulario para asignar motor a técnico
         Route::get('/asignar', [MotoresAsignadosController::class, 'create'])->name('asignar.create');
+        
+        // Guardar asignación de motor
         Route::post('/asignar', [MotoresAsignadosController::class, 'store'])->name('asignar.store');
-        Route::post('/entrada/{id}', [MotoresAsignadosController::class, 'registrarEntrada'])->name('registrar.entrada');
+        
+        // Registrar entrada del motor (devolución al inventario)
+        Route::post('/registrar-entrada/{id}', [MotoresAsignadosController::class, 'registrarEntrada'])->name('registrar.entrada');
+        
+        // Guardar reporte de mantenimiento
         Route::post('/reporte/{id}', [MotoresAsignadosController::class, 'storeReporte'])->name('reporte.store');
-        Route::get('/{id}', [MotoresAsignadosController::class, 'show'])->name('show');
-        Route::delete('/{id}', [MotoresAsignadosController::class, 'destroy'])->name('destroy');
+        
+        // Historial de asignaciones completadas (opcional)
+        Route::get('/historial', [MotoresAsignadosController::class, 'historial'])->name('historial');
     });
     
     /* ----------------- REPORTES DE TALLERES ----------------- */
@@ -235,11 +257,11 @@ Route::delete('/graduados/{id}', [GraduadoController::class, 'eliminarGraduado']
     
     /* ----------------- PROGRAMAS ----------------- */
     
-    Route::prefix('programas')->group(function () {
+    Route::prefix('programa')->group(function () {
         Route::get('/', [ProgramaController::class, 'index'])->name('programas.index');
         Route::post('/', [ProgramaController::class, 'store'])->name('programas.store');
         Route::get('/{id}', [ProgramaController::class, 'show'])->name('programas.show');
-        Route::get('/{id}/edit', [ProgramaController::class, 'edit'])->name('programas.edit');
+        Route::get('/{id}/edit', [ProgramaController::class, 'edit']);
         Route::put('/{id}', [ProgramaController::class, 'update'])->name('programas.update');
         Route::delete('/{id}', [ProgramaController::class, 'destroy'])->name('programas.destroy');
     });

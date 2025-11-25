@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
+
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use App\Models\Estudiante;
@@ -19,19 +20,39 @@ use App\Models\Cuota;
 
 class RegistroCombinadoController extends Controller
 {
+    // Mostrar formulario
     public function mostrarFormulario()
     {
         $programas = Programa::all();
         $sucursales = Sucursal::all();
-        $profesores = Profesor::all(); 
- 
-        return view('administrador.tutorEstudianteAdministrador', compact('programas', 'sucursales', 'profesores'));
+        $profesores = Profesor::with('persona')
+            ->whereHas('persona', function ($q) {$q->where('Id_roles', 2); }) ->get();
+
+        $tutores = Tutores::with('persona', 'usuario')->get()->map(function($t){
+            return [
+                'Id_tutores' => $t->Id_tutores,
+                'Nombre' => $t->persona->Nombre,
+                'Apellido' => $t->persona->Apellido,
+                'Genero' => $t->persona->Genero,
+                'Direccion_domicilio' => $t->persona->Direccion_domicilio,
+                'Fecha_nacimiento' => $t->persona->Fecha_nacimiento,
+                'Celular' => $t->persona->Celular,
+                'Correo' => $t->usuario->Correo,
+                'Parentesco' => $t->Parentesco,
+                'Descuento' => $t->Descuento,
+                'Nit' => $t->Nit,
+                'Nombre_factura' => $t->Nombre_factura,
+            ];
+        });
+
+        return view('administrador.tutorEstudianteAdministrador', compact('programas', 'sucursales', 'profesores', 'tutores')); 
     }
 
+    // Registrar tutor y estudiante
     public function registrar(Request $request)
     {
         $request->validate([
-            'tutor_email' => 'required|email|unique:usuarios,Correo',
+            'tutor_email' => 'required|email',
             'tutor_nombre' => 'required|string|max:255',
             'tutor_apellido' => 'required|string|max:255',
             'tutor_genero' => 'required|string',
@@ -55,6 +76,7 @@ class RegistroCombinadoController extends Controller
         ]);
 
         try {
+            // Roles
             $rolEstudiante = Rol::where('Nombre_rol', 'Estudiante')->first();
             $rolTutor = Rol::where('Nombre_rol', 'Tutor')->first();
 
@@ -62,35 +84,59 @@ class RegistroCombinadoController extends Controller
                 return back()->withErrors(['error' => 'Roles no encontrados en el sistema.']);
             }
 
-            $personaTutor = Persona::create([
-                'Nombre' => $request->tutor_nombre,
-                'Apellido' => $request->tutor_apellido,
-                'Genero' => $request->tutor_genero,
-                'Direccion_domicilio' => $request->tutor_direccion,
-                'Fecha_nacimiento' => $request->tutor_fecha_nacimiento,
-                'Fecha_registro' => now()->format('Y-m-d'),
-                'Celular' => $request->tutor_celular,
-                'Id_roles' => $rolTutor->Id_roles,
-            ]);
+            // ---------------------------
+            // Tutor existente o nuevo
+            // ---------------------------
+            $tutorIdExistente = $request->input('tutor_id_existente');
 
-            $contraseñaTemporal = Str::random(8);
-            $usuarioTutor = Usuario::create([
-                'Correo' => $request->tutor_email,
-                'Contrasenia' => bcrypt($contraseñaTemporal),
-                'Id_personas' => $personaTutor->Id_personas, 
-            ]);
+            if ($tutorIdExistente) {
+                $tutor = Tutores::find($tutorIdExistente);
+                $personaTutor = $tutor->persona;
+            } else {
+                // Validar correo tutor
+                if (Usuario::where('Correo', $request->tutor_email)->exists()) {
+                    return back()->withErrors(['tutor_email' => 'El correo del tutor ya está en uso.']);
+                }
 
-            Mail::to($request->tutor_email)->send(new ClaveGeneradaAdmin($request->tutor_nombre, $request->tutor_email, $contraseñaTemporal));
+                // Crear persona y usuario tutor
+                $personaTutor = Persona::create([
+                    'Nombre' => $request->tutor_nombre,
+                    'Apellido' => $request->tutor_apellido,
+                    'Genero' => $request->tutor_genero,
+                    'Direccion_domicilio' => $request->tutor_direccion,
+                    'Fecha_nacimiento' => $request->tutor_fecha_nacimiento,
+                    'Fecha_registro' => now()->format('Y-m-d'),
+                    'Celular' => $request->tutor_celular,
+                    'Id_roles' => $rolTutor->Id_roles,
+                ]);
 
-            $tutor = Tutores::create([
-                'Descuento' => $request->tutor_descuento,
-                'Parentesco' => $request->tutor_parentesco,
-                'Nit' => $request->tutor_nit,
-                'Nombre_factura' => $request->tutor_nombre_factura,
-                'Id_personas' => $personaTutor->Id_personas,
-                'Id_usuarios' => $usuarioTutor->Id_usuarios,
-            ]);
+                $contraseñaTemporal = Str::random(8);
 
+                $usuarioTutor = Usuario::create([
+                    'Correo' => $request->tutor_email,
+                    'Contrasenia' => bcrypt($contraseñaTemporal),
+                    'Id_personas' => $personaTutor->Id_personas,
+                ]);
+
+                Mail::to($request->tutor_email)->send(new ClaveGeneradaAdmin(
+                    $request->tutor_nombre,
+                    $request->tutor_email,
+                    $contraseñaTemporal
+                ));
+
+                $tutor = Tutores::create([
+                    'Descuento' => $request->tutor_descuento,
+                    'Parentesco' => $request->tutor_parentesco,
+                    'Nit' => $request->tutor_nit,
+                    'Nombre_factura' => $request->tutor_nombre_factura,
+                    'Id_personas' => $personaTutor->Id_personas,
+                    'Id_usuarios' => $usuarioTutor->Id_usuarios,
+                ]);
+            }
+
+            // ---------------------------
+            // Crear estudiante
+            // ---------------------------
             $personaEstudiante = Persona::create([
                 'Nombre' => $request->estudiante_nombre,
                 'Apellido' => $request->estudiante_apellido,
@@ -113,6 +159,9 @@ class RegistroCombinadoController extends Controller
                 'Id_tutores' => $tutor->Id_tutores,
             ]);
 
+            // ---------------------------
+            // Plan de pago
+            // ---------------------------
             $planPago = PlanesPago::create([
                 'Monto_total' => $request->Monto_total,
                 'Nro_cuotas' => $request->Nro_cuotas,
@@ -122,6 +171,9 @@ class RegistroCombinadoController extends Controller
                 'Id_estudiantes' => $estudiante->Id_estudiantes,
             ]);
 
+            // ---------------------------
+            // Pagos y cuotas
+            // ---------------------------
             if ($request->filled('Descripcion') || $request->filled('Monto_pago') || $request->filled('Fecha_pago')) {
                 Pago::create([
                     'Descripcion' => $request->Descripcion,

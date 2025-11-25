@@ -7,341 +7,225 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 @endsection
 
-@section('scripts')
-<script src="{{ auto_asset('js/componentes/listaAsignacion.js') }}"></script>
-@endsection
-
 @section('content')
 <div class="container-fluid mt-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1 class="mb-0">Motores Asignados a Técnicos</h1>
+        <div>
+            <h1 class="mb-0">Motores Asignados</h1>
+            <p class="text-muted">Gestión de motores en mantenimiento</p>
+        </div>
         <a href="{{ route('motores.asignar.create') }}" class="btn btn-primary">
-            <i class="bi bi-tools me-2"></i>Asignar Motor
+            <i class="bi bi-tools me-2"></i>Nueva Asignación
         </a>
     </div>
 
     @if(session('success'))
         <div class="alert alert-success alert-dismissible fade show" role="alert">
-            {{ session('success') }}
+            <i class="bi bi-check-circle me-2"></i>{{ session('success') }}
             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         </div>
     @endif
 
     @if(session('error'))
         <div class="alert alert-danger alert-dismissible fade show" role="alert">
-            {{ session('error') }}
+            <i class="bi bi-exclamation-triangle me-2"></i>{{ session('error') }}
             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         </div>
     @endif
 
-    <div class="row mb-3">
-        <div class="col-md-6">
-            <div class="input-group">
-                <span class="input-group-text"><i class="bi bi-search"></i></span>
-                <input type="text" class="form-control" placeholder="Buscar..." id="searchInput">
+    @if($asignaciones->isEmpty())
+        <div class="card shadow-sm">
+            <div class="card-body text-center py-5">
+                <i class="bi bi-inbox text-muted" style="font-size: 4rem;"></i>
+                <h5 class="mt-3 text-muted">No hay motores asignados</h5>
+                <p class="text-muted">Todos los motores están disponibles en el inventario</p>
             </div>
         </div>
-        <div class="col-md-3">
-            <select class="form-select" id="filtroEstado">
-                <option value="todos">Todos los estados</option>
-                <option value="En Proceso">En Proceso</option>
-                <option value="Completado">Completado</option>
-                <option value="Cancelado">Cancelado</option>
-            </select>
-        </div>
-    </div>
-
-    @if($asignaciones->isEmpty())
-        <div class="alert alert-warning">No hay motores asignados.</div>
     @else
-        <div class="table-responsive">
-            <table class="table table-hover">
-                <thead class="table-light">
-                    <tr>
-                        <th class="fw-bold text-dark">Fecha Asignación</th>
-                        <th class="fw-bold text-dark">ID Motor</th>
-                        <th class="fw-bold text-dark">Estado Motor</th>
-                        <th class="fw-bold text-dark">Técnico</th>
-                        <th class="fw-bold text-dark">Estado Asignación</th>
-                        <th class="fw-bold text-dark">Fecha Entrega</th>
-                        <th class="fw-bold text-dark">Acciones</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach($asignaciones as $asignacion)
-                        <tr data-estado="{{ $asignacion->Estado_asignacion }}">
-                            <td>{{ \Carbon\Carbon::parse($asignacion->Fecha_asignacion)->format('d/m/Y') }}</td>
-                            <td>{{ $asignacion->motor->Id_motor }}</td>
-                            <td>
-                                <span class="badge 
-                                    @if($asignacion->motor->Estado == 'Funcionando') bg-success
-                                    @elseif($asignacion->motor->Estado == 'Descompuesto') bg-danger
-                                    @else bg-warning text-dark
-                                    @endif">
-                                    {{ $asignacion->motor->Estado }}
-                                </span>
-                            </td>
-                            <td>
-                                {{ $asignacion->profesor->persona->Nombre ?? '' }} 
-                                {{ $asignacion->profesor->persona->Apellido_paterno ?? '' }}
-                            </td>
-                            <td>
-                                <span class="badge 
-                                    @if($asignacion->Estado_asignacion == 'En Proceso') bg-info
-                                    @elseif($asignacion->Estado_asignacion == 'Completado') bg-success
-                                    @else bg-secondary
-                                    @endif">
-                                    {{ $asignacion->Estado_asignacion }}
-                                </span>
-                            </td>
-                            <td>{{ $asignacion->Fecha_entrega ? \Carbon\Carbon::parse($asignacion->Fecha_entrega)->format('d/m/Y') : '-' }}</td>
-                            <td>
-                                <div class="d-flex gap-2">
-                                    @if($asignacion->Estado_asignacion == 'En Proceso')
-                                        <button class="btn btn-sm btn-outline-success" 
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th>ID Motor</th>
+                                <th>Técnico Asignado</th>
+                                <th>Fecha Asignación</th>
+                                <th>Días en Proceso</th>
+                                <th>Estado</th>
+                                <th class="text-center">Acción</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($asignaciones as $asignacion)
+                                @php
+                                    $diasEnProceso = (int) \Carbon\Carbon::parse($asignacion->Fecha_asignacion)->diffInDays(now());
+                                @endphp
+                                <tr>
+                                    <td>
+                                        <strong class="text-primary">{{ $asignacion->motor->Id_motor }}</strong>
+                                    </td>
+                                    <td>
+                                        <i class="bi bi-person-fill text-muted me-1"></i>
+                                        {{ $asignacion->profesor->persona->Nombre ?? '' }} 
+                                        {{ $asignacion->profesor->persona->Apellido_paterno ?? '' }}
+                                    </td>
+                                    <td>
+                                        {{ \Carbon\Carbon::parse($asignacion->Fecha_asignacion)->format('d/m/Y') }}
+                                    </td>
+                                    <td>
+                                        <span class="badge {{ $diasEnProceso > 7 ? 'bg-warning text-dark' : 'bg-info' }}">
+                                            {{ $diasEnProceso }} {{ $diasEnProceso == 1 ? 'día' : 'días' }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span class="badge 
+                                            @if($asignacion->motor->Estado == 'Funcionando') bg-success
+                                            @elseif($asignacion->motor->Estado == 'Descompuesto') bg-danger
+                                            @else bg-warning text-dark
+                                            @endif">
+                                            {{ $asignacion->motor->Estado }}
+                                        </span>
+                                    </td>
+                                    <td class="text-center">
+                                        <button class="btn btn-sm btn-success" 
                                                 data-bs-toggle="modal" 
                                                 data-bs-target="#entregaModal{{ $asignacion->Id_motores_asignados }}"
-                                                title="Registrar Entrega">
-                                            <i class="bi bi-box-arrow-in-down"></i>
+                                                title="Registrar Entrada">
+                                            <i class="bi bi-box-arrow-in-down me-1"></i>Registrar Entrada
                                         </button>
-                                        <button class="btn btn-sm btn-outline-primary" 
-                                                data-bs-toggle="modal" 
-                                                data-bs-target="#reporteModal{{ $asignacion->Id_motores_asignados }}"
-                                                title="Agregar Reporte">
-                                            <i class="bi bi-clipboard-check"></i>
-                                        </button>
-                                    @endif
-                                    <button class="btn btn-sm btn-outline-info" 
-                                            data-bs-toggle="modal" 
-                                            data-bs-target="#detalleModal{{ $asignacion->Id_motores_asignados }}"
-                                            title="Ver Detalles">
-                                        <i class="bi bi-eye"></i>
-                                    </button>
-                                </div>
-                            </td>
-                        </tr>
+                                    </td>
+                                </tr>
 
-                        <!-- Modal: Registrar Entrega (Entrada al Inventario) -->
-                        <div class="modal fade" id="entregaModal{{ $asignacion->Id_motores_asignados }}" tabindex="-1" aria-hidden="true">
-                            <div class="modal-dialog">
-                                <div class="modal-content">
-                                    <div class="modal-header bg-success text-white">
-                                        <h5 class="modal-title"><i class="bi bi-box-arrow-in-down me-2"></i>Registrar Entrada de Motor</h5>
-                                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-                                    </div>
-                                    <form action="{{ route('motores.registrar.entrada', $asignacion->Id_motores_asignados) }}" method="POST">
-                                        @csrf
-                                        <div class="modal-body">
-                                            <div class="alert alert-info">
-                                                <strong>Motor:</strong> {{ $asignacion->motor->Id_motor }}<br>
-                                                <strong>Técnico:</strong> {{ $asignacion->profesor->persona->Nombre ?? '' }} {{ $asignacion->profesor->persona->Apellido_paterno ?? '' }}
+                                <!-- Modal: Registrar Entrada -->
+                                <div class="modal fade" id="entregaModal{{ $asignacion->Id_motores_asignados }}" tabindex="-1" aria-hidden="true">
+                                    <div class="modal-dialog modal-lg">
+                                        <div class="modal-content">
+                                            <div class="modal-header bg-success text-white">
+                                                <h5 class="modal-title">
+                                                    <i class="bi bi-box-arrow-in-down me-2"></i>Registrar Entrada de Motor
+                                                </h5>
+                                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                                             </div>
-
-                                            <div class="mb-3">
-                                                <label for="fecha_entrega{{ $asignacion->Id_motores_asignados }}" class="form-label">Fecha de Entrega <span class="text-danger">*</span></label>
-                                                <input type="date" class="form-control" 
-                                                       id="fecha_entrega{{ $asignacion->Id_motores_asignados }}" 
-                                                       name="fecha_entrega" value="{{ date('Y-m-d') }}" required>
-                                            </div>
-
-                                            <div class="mb-3">
-                                                <label for="estado_final{{ $asignacion->Id_motores_asignados }}" class="form-label">Estado Final del Motor <span class="text-danger">*</span></label>
-                                                <select class="form-select" 
-                                                        id="estado_final{{ $asignacion->Id_motores_asignados }}" 
-                                                        name="estado_final" required>
-                                                    <option value="">Seleccione estado</option>
-                                                    <option value="Funcionando">Funcionando</option>
-                                                    <option value="Descompuesto">Descompuesto</option>
-                                                    <option value="En Proceso">En Proceso</option>
-                                                </select>
-                                            </div>
-
-                                            <div class="mb-3">
-                                                <label for="Id_sucursales{{ $asignacion->Id_motores_asignados }}" class="form-label">Sucursal de Entrada <span class="text-danger">*</span></label>
-                                                <select class="form-select" 
-                                                        id="Id_sucursales{{ $asignacion->Id_motores_asignados }}" 
-                                                        name="Id_sucursales" required>
-                                                    <option value="">Seleccione sucursal</option>
-                                                    @foreach($sucursales as $sucursal)
-                                                        <option value="{{ $sucursal->Id_Sucursales }}">{{ $sucursal->Nombre }}</option>
-                                                    @endforeach
-                                                </select>
-                                            </div>
-
-                                            <div class="mb-3">
-                                                <label for="observaciones_entrega{{ $asignacion->Id_motores_asignados }}" class="form-label">Observaciones</label>
-                                                <textarea class="form-control" 
-                                                          id="observaciones_entrega{{ $asignacion->Id_motores_asignados }}" 
-                                                          name="observaciones" rows="3" 
-                                                          placeholder="Reparaciones realizadas, estado final, etc."></textarea>
-                                            </div>
-                                        </div>
-                                        <div class="modal-footer">
-                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                                                <i class="bi bi-x-circle me-2"></i>Cancelar
-                                            </button>
-                                            <button type="submit" class="btn btn-success">
-                                                <i class="bi bi-check-circle me-2"></i>Registrar Entrada
-                                            </button>
-                                        </div>
-                                    </form>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Modal: Agregar Reporte de Mantenimiento -->
-                        <div class="modal fade" id="reporteModal{{ $asignacion->Id_motores_asignados }}" tabindex="-1" aria-hidden="true">
-                            <div class="modal-dialog">
-                                <div class="modal-content">
-                                    <div class="modal-header bg-primary text-white">
-                                        <h5 class="modal-title"><i class="bi bi-clipboard-check me-2"></i>Reporte de Mantenimiento</h5>
-                                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-                                    </div>
-                                    <form action="{{ route('motores.reporte.store', $asignacion->Id_motores_asignados) }}" method="POST">
-                                        @csrf
-                                        <div class="modal-body">
-                                            <div class="alert alert-info">
-                                                <strong>Motor:</strong> {{ $asignacion->motor->Id_motor }}<br>
-                                                <strong>Técnico:</strong> {{ $asignacion->profesor->persona->Nombre ?? '' }} {{ $asignacion->profesor->persona->Apellido_paterno ?? '' }}
-                                            </div>
-
-                                            <div class="mb-3">
-                                                <label for="fecha_reporte{{ $asignacion->Id_motores_asignados }}" class="form-label">Fecha del Reporte <span class="text-danger">*</span></label>
-                                                <input type="date" class="form-control" 
-                                                       id="fecha_reporte{{ $asignacion->Id_motores_asignados }}" 
-                                                       name="fecha_reporte" value="{{ date('Y-m-d') }}" required>
-                                            </div>
-
-                                            <div class="mb-3">
-                                                <label for="estado_final_reporte{{ $asignacion->Id_motores_asignados }}" class="form-label">Estado del Motor <span class="text-danger">*</span></label>
-                                                <select class="form-select" 
-                                                        id="estado_final_reporte{{ $asignacion->Id_motores_asignados }}" 
-                                                        name="estado_final" required>
-                                                    <option value="">Seleccione estado</option>
-                                                    <option value="Funcionando">Funcionando</option>
-                                                    <option value="Descompuesto">Descompuesto</option>
-                                                    <option value="En Proceso">En Proceso</option>
-                                                </select>
-                                            </div>
-
-                                            <div class="mb-3">
-                                                <label for="observaciones_reporte{{ $asignacion->Id_motores_asignados }}" class="form-label">Observaciones <span class="text-danger">*</span></label>
-                                                <textarea class="form-control" 
-                                                          id="observaciones_reporte{{ $asignacion->Id_motores_asignados }}" 
-                                                          name="observaciones" rows="4" required
-                                                          placeholder="Describa el trabajo realizado, problemas encontrados, etc."></textarea>
-                                            </div>
-                                        </div>
-                                        <div class="modal-footer">
-                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                                                <i class="bi bi-x-circle me-2"></i>Cancelar
-                                            </button>
-                                            <button type="submit" class="btn btn-primary">
-                                                <i class="bi bi-floppy me-2"></i>Guardar Reporte
-                                            </button>
-                                        </div>
-                                    </form>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Modal: Ver Detalles -->
-                        <div class="modal fade" id="detalleModal{{ $asignacion->Id_motores_asignados }}" tabindex="-1" aria-hidden="true">
-                            <div class="modal-dialog modal-lg">
-                                <div class="modal-content">
-                                    <div class="modal-header bg-info text-white">
-                                        <h5 class="modal-title"><i class="bi bi-info-circle me-2"></i>Detalles de Asignación</h5>
-                                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-                                    </div>
-                                    <div class="modal-body">
-                                        <h6 class="border-bottom pb-2 mb-3">Información General</h6>
-                                        <div class="row mb-3">
-                                            <div class="col-md-6">
-                                                <strong>ID Motor:</strong> {{ $asignacion->motor->Id_motor }}
-                                            </div>
-                                            <div class="col-md-6">
-                                                <strong>Estado Actual:</strong> 
-                                                <span class="badge 
-                                                    @if($asignacion->motor->Estado == 'Funcionando') bg-success
-                                                    @elseif($asignacion->motor->Estado == 'Descompuesto') bg-danger
-                                                    @else bg-warning text-dark
-                                                    @endif">
-                                                    {{ $asignacion->motor->Estado }}
-                                                </span>
-                                            </div>
-                                        </div>
-                                        <div class="row mb-3">
-                                            <div class="col-md-6">
-                                                <strong>Técnico:</strong> {{ $asignacion->profesor->persona->Nombre ?? '' }} {{ $asignacion->profesor->persona->Apellido_paterno ?? '' }}
-                                            </div>
-                                            <div class="col-md-6">
-                                                <strong>Estado Asignación:</strong> 
-                                                <span class="badge 
-                                                    @if($asignacion->Estado_asignacion == 'En Proceso') bg-info
-                                                    @elseif($asignacion->Estado_asignacion == 'Completado') bg-success
-                                                    @else bg-secondary
-                                                    @endif">
-                                                    {{ $asignacion->Estado_asignacion }}
-                                                </span>
-                                            </div>
-                                        </div>
-                                        <div class="row mb-3">
-                                            <div class="col-md-6">
-                                                <strong>Fecha Asignación:</strong> {{ \Carbon\Carbon::parse($asignacion->Fecha_asignacion)->format('d/m/Y') }}
-                                            </div>
-                                            <div class="col-md-6">
-                                                <strong>Fecha Entrega:</strong> {{ $asignacion->Fecha_entrega ? \Carbon\Carbon::parse($asignacion->Fecha_entrega)->format('d/m/Y') : 'Pendiente' }}
-                                            </div>
-                                        </div>
-
-                                        @if($asignacion->Observacion_inicial)
-                                            <h6 class="border-bottom pb-2 mb-3 mt-4">Observación Inicial</h6>
-                                            <p>{{ $asignacion->Observacion_inicial }}</p>
-                                        @endif
-
-                                        @if($asignacion->reportes->count() > 0)
-                                            <h6 class="border-bottom pb-2 mb-3 mt-4">Reportes de Mantenimiento</h6>
-                                            <div class="table-responsive">
-                                                <table class="table table-sm">
-                                                    <thead>
-                                                        <tr>
-                                                            <th>Fecha</th>
-                                                            <th>Estado</th>
-                                                            <th>Observaciones</th>
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody>
-                                                        @foreach($asignacion->reportes as $reporte)
-                                                            <tr>
-                                                                <td>{{ \Carbon\Carbon::parse($reporte->Fecha_reporte)->format('d/m/Y') }}</td>
-                                                                <td>
-                                                                    <span class="badge 
-                                                                        @if($reporte->Estado_final == 'Funcionando') bg-success
-                                                                        @elseif($reporte->Estado_final == 'Descompuesto') bg-danger
-                                                                        @else bg-warning text-dark
-                                                                        @endif">
-                                                                        {{ $reporte->Estado_final }}
+                                            <form action="{{ route('motores.registrar.entrada', $asignacion->Id_motores_asignados) }}" method="POST">
+                                                @csrf
+                                                <div class="modal-body">
+                                                    <!-- Información de la Asignación -->
+                                                    <div class="card bg-light mb-4">
+                                                        <div class="card-body">
+                                                            <h6 class="card-title mb-3">
+                                                                <i class="bi bi-info-circle me-2"></i>Información de la Asignación
+                                                            </h6>
+                                                            <div class="row">
+                                                                <div class="col-md-6 mb-2">
+                                                                    <strong>Motor:</strong> 
+                                                                    <span class="text-primary">{{ $asignacion->motor->Id_motor }}</span>
+                                                                </div>
+                                                                <div class="col-md-6 mb-2">
+                                                                    <strong>Técnico:</strong> 
+                                                                    {{ $asignacion->profesor->persona->Nombre ?? '' }} 
+                                                                    {{ $asignacion->profesor->persona->Apellido_paterno ?? '' }}
+                                                                </div>
+                                                                <div class="col-md-6 mb-2">
+                                                                    <strong>Fecha Asignación:</strong> 
+                                                                    {{ \Carbon\Carbon::parse($asignacion->Fecha_asignacion)->format('d/m/Y') }}
+                                                                </div>
+                                                                <div class="col-md-6 mb-2">
+                                                                    <strong>Días en Proceso:</strong> 
+                                                                    <span class="badge {{ $diasEnProceso > 7 ? 'bg-warning text-dark' : 'bg-info' }}">
+                                                                        {{ $diasEnProceso }} {{ $diasEnProceso == 1 ? 'día' : 'días' }}
                                                                     </span>
-                                                                </td>
-                                                                <td>{{ Str::limit($reporte->Observaciones, 50) }}</td>
-                                                            </tr>
-                                                        @endforeach
-                                                    </tbody>
-                                                </table>
-                                            </div>
-                                        @endif
-                                    </div>
-                                    <div class="modal-footer">
-                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                                            <i class="bi bi-x-circle me-2"></i>Cerrar
-                                        </button>
+                                                                </div>
+                                                            </div>
+                                                            @if($asignacion->Observacion_inicial)
+                                                                <div class="mt-3">
+                                                                    <strong>Observación Inicial:</strong>
+                                                                    <p class="mb-0 mt-1">{{ $asignacion->Observacion_inicial }}</p>
+                                                                </div>
+                                                            @endif
+                                                        </div>
+                                                    </div>
+
+                                                    <!-- Formulario de Entrada -->
+                                                    <div class="row">
+                                                        <div class="col-md-6 mb-3">
+                                                            <label for="fecha_entrega{{ $asignacion->Id_motores_asignados }}" class="form-label">
+                                                                <i class="bi bi-calendar-event me-1"></i>Fecha de Entrega 
+                                                                <span class="text-danger">*</span>
+                                                            </label>
+                                                            <input type="date" 
+                                                                   class="form-control" 
+                                                                   id="fecha_entrega{{ $asignacion->Id_motores_asignados }}" 
+                                                                   name="fecha_entrega" 
+                                                                   value="{{ date('Y-m-d') }}" 
+                                                                   min="{{ $asignacion->Fecha_asignacion }}"
+                                                                   max="{{ date('Y-m-d') }}"
+                                                                   required>
+                                                            <small class="text-muted">Debe ser posterior a la fecha de asignación</small>
+                                                        </div>
+
+                                                        <div class="col-md-6 mb-3">
+                                                            <label for="estado_final{{ $asignacion->Id_motores_asignados }}" class="form-label">
+                                                                <i class="bi bi-gear-fill me-1"></i>Estado Final del Motor 
+                                                                <span class="text-danger">*</span>
+                                                            </label>
+                                                            <select class="form-select" 
+                                                                    id="estado_final{{ $asignacion->Id_motores_asignados }}" 
+                                                                    name="estado_final" required>
+                                                                <option value="">Seleccione el estado</option>
+                                                                <option value="Funcionando">Funcionando</option>
+                                                                <option value="Descompuesto">Descompuesto</option>
+                                                                <option value="En Proceso">En Proceso</option>
+                                                            </select>
+                                                        </div>
+
+                                                        <div class="col-12 mb-3">
+                                                            <label for="Id_sucursales{{ $asignacion->Id_motores_asignados }}" class="form-label">
+                                                                <i class="bi bi-building me-1"></i>Sucursal de Entrada 
+                                                                <span class="text-danger">*</span>
+                                                            </label>
+                                                            <select class="form-select" 
+                                                                    id="Id_sucursales{{ $asignacion->Id_motores_asignados }}" 
+                                                                    name="Id_sucursales" required>
+                                                                <option value="">Seleccione la sucursal</option>
+                                                                @foreach($sucursales as $sucursal)
+                                                                    <option value="{{ $sucursal->Id_Sucursales }}"
+                                                                        {{ $asignacion->motor->Id_sucursales == $sucursal->Id_Sucursales ? 'selected' : '' }}>
+                                                                        {{ $sucursal->Nombre }}
+                                                                    </option>
+                                                                @endforeach
+                                                            </select>
+                                                        </div>
+
+                                                        <div class="col-12 mb-3">
+                                                            <label for="observaciones_entrega{{ $asignacion->Id_motores_asignados }}" class="form-label">
+                                                                <i class="bi bi-chat-left-text me-1"></i>Observaciones
+                                                            </label>
+                                                            <textarea class="form-control" 
+                                                                      id="observaciones_entrega{{ $asignacion->Id_motores_asignados }}" 
+                                                                      name="observaciones" 
+                                                                      rows="4" 
+                                                                      placeholder="Descripción de reparaciones realizadas, estado final, problemas encontrados, piezas reemplazadas, etc."></textarea>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                                        <i class="bi bi-x-circle me-2"></i>Cancelar
+                                                    </button>
+                                                    <button type="submit" class="btn btn-success">
+                                                        <i class="bi bi-check-circle me-2"></i>Confirmar Entrada
+                                                    </button>
+                                                </div>
+                                            </form>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                        </div>
-                    @endforeach
-                </tbody>
-            </table>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
     @endif
 </div>

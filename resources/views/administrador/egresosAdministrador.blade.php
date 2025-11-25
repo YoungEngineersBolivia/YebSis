@@ -69,20 +69,28 @@
                             <tr>
                                 <td>{{ $egreso->Tipo }}</td>
                                 <td>{{ $egreso->Descripcion_egreso }}</td>
-                                <td>{{ $egreso->Fecha_egreso }}</td>
-                                <td>{{ $egreso->Monto_egreso }}</td>
+                                <td>{{ \Carbon\Carbon::parse($egreso->Fecha_egreso)->format('d/m/Y') }}</td>
+                                <td>Bs {{ number_format($egreso->Monto_egreso, 2) }}</td>
                                 <td>
                                     <div class="d-flex gap-2">
                                         <!-- Botón Editar -->
-                                        <button class="btn btn-sm btn-outline-primary" title="Editar" data-bs-toggle="modal" data-bs-target="#modalEditarEgreso" 
-                                        data-id="{{ $egreso->Id_egreso }}" data-tipo="{{ $egreso->Tipo }}" data-descripcion="{{ $egreso->Descripcion_egreso }}" 
-                                        data-fecha="{{ $egreso->Fecha_egreso }}" data-monto="{{ $egreso->Monto_egreso }}">
+                                        <button class="btn btn-sm btn-outline-primary btn-editar" title="Editar" 
+                                            data-bs-toggle="modal" 
+                                            data-bs-target="#modalEditarEgreso" 
+                                            data-id="{{ $egreso->Id_egreso }}" 
+                                            data-tipo="{{ $egreso->Tipo }}" 
+                                            data-descripcion="{{ $egreso->Descripcion_egreso }}" 
+                                            data-fecha="{{ $egreso->Fecha_egreso }}" 
+                                            data-monto="{{ $egreso->Monto_egreso }}">
                                             <i class="bi bi-pencil-square"></i>
                                         </button>
 
                                         <!-- Botón Eliminar -->
-                                        <button class="btn btn-sm btn-outline-danger" title="Eliminar" data-bs-toggle="modal" data-bs-target="#modalEliminarEgreso" 
-                                        data-id="{{ $egreso->Id_egreso }}">
+                                        <button class="btn btn-sm btn-outline-danger btn-eliminar" title="Eliminar" 
+                                            data-bs-toggle="modal" 
+                                            data-bs-target="#modalEliminarEgreso" 
+                                            data-id="{{ $egreso->Id_egreso }}"
+                                            data-descripcion="{{ $egreso->Descripcion_egreso }}">
                                             <i class="bi bi-trash3-fill"></i>
                                         </button>
                                     </div>
@@ -111,15 +119,15 @@
                             </div>
                             <div class="mb-3">
                                 <label for="descripcion" class="form-label">Descripción</label>
-                                <textarea class="form-control" id="descripcion" name="Descripcion_egreso" required></textarea>
+                                <textarea class="form-control" id="descripcion" name="Descripcion_egreso" rows="3" required></textarea>
                             </div>
                             <div class="mb-3">
                                 <label for="fecha" class="form-label">Fecha</label>
-                                <input type="date" class="form-control" id="fecha" name="Fecha_egreso" required>
+                                <input type="date" class="form-control" id="fecha" name="Fecha_egreso" value="{{ date('Y-m-d') }}" required>
                             </div>
                             <div class="mb-3">
-                                <label for="monto" class="form-label">Monto</label>
-                                <input type="number" step="0.01" class="form-control" id="monto" name="Monto_egreso" required>
+                                <label for="monto" class="form-label">Monto (Bs)</label>
+                                <input type="number" step="0.01" class="form-control" id="monto" name="Monto_egreso" min="0" required>
                             </div>
                         </div>
                         <div class="modal-footer">
@@ -131,11 +139,11 @@
             </div>
         </div>
 
-        <!-- Modal Editar Egreso -->
+        <!-- Modal Editar Egreso - CORREGIDO: Sin $egreso en action -->
         <div class="modal fade" id="modalEditarEgreso" tabindex="-1" aria-labelledby="modalEditarEgresoLabel" aria-hidden="true">
             <div class="modal-dialog">
                 <div class="modal-content">
-                    <form method="POST" action="{{ route('egresos.update', $egreso->Id_egreso) }}" id="formEditarEgreso">
+                    <form method="POST" action="#" id="formEditarEgreso">
                         @csrf
                         @method('PUT')
                         <div class="modal-header">
@@ -149,15 +157,15 @@
                             </div>
                             <div class="mb-3">
                                 <label for="editDescripcion" class="form-label">Descripción</label>
-                                <textarea class="form-control" id="editDescripcion" name="Descripcion_egreso" required></textarea>
+                                <textarea class="form-control" id="editDescripcion" name="Descripcion_egreso" rows="3" required></textarea>
                             </div>
                             <div class="mb-3">
                                 <label for="editFecha" class="form-label">Fecha</label>
                                 <input type="date" class="form-control" id="editFecha" name="Fecha_egreso" required>
                             </div>
                             <div class="mb-3">
-                                <label for="editMonto" class="form-label">Monto</label>
-                                <input type="number" step="0.01" class="form-control" id="editMonto" name="Monto_egreso" required>
+                                <label for="editMonto" class="form-label">Monto (Bs)</label>
+                                <input type="number" step="0.01" class="form-control" id="editMonto" name="Monto_egreso" min="0" required>
                             </div>
                         </div>
                         <div class="modal-footer">
@@ -169,11 +177,11 @@
             </div>
         </div>
 
-        <!-- Modal Eliminar Egreso -->
+        <!-- Modal Eliminar Egreso - CORREGIDO: Sin $egreso en action -->
         <div class="modal fade" id="modalEliminarEgreso" tabindex="-1" aria-labelledby="modalEliminarEgresoLabel" aria-hidden="true">
             <div class="modal-dialog">
                 <div class="modal-content">
-                    <form method="POST" action="{{ route('egresos.destroy', $egreso->Id_egreso) }}" id="formEliminarEgreso">
+                    <form method="POST" action="#" id="formEliminarEgreso">
                         @csrf
                         @method('DELETE')
                         <div class="modal-header">
@@ -182,6 +190,7 @@
                         </div>
                         <div class="modal-body">
                             <p>¿Estás seguro de que deseas eliminar este egreso?</p>
+                            <p class="text-muted"><strong id="egresoEliminarDescripcion"></strong></p>
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
@@ -196,34 +205,49 @@
 @endsection
 
 @section('scripts')
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
-    // Llenar modal de edición con los datos del egreso
-    $('#modalEditarEgreso').on('show.bs.modal', function (event) {
-        var button = $(event.relatedTarget);
-        var id = button.data('id');
-        var tipo = button.data('tipo');
-        var descripcion = button.data('descripcion');
-        var fecha = button.data('fecha');
-        var monto = button.data('monto');
-        var modal = $(this);
-
-        modal.find('#editTipo').val(tipo);
-        modal.find('#editDescripcion').val(descripcion);
-        modal.find('#editFecha').val(fecha);
-        modal.find('#editMonto').val(monto);
-
-        var actionUrl = "{{ route('egresos.update', ':id') }}".replace(':id', id);
-        modal.find('#formEditarEgreso').attr('action', actionUrl);
+$(document).ready(function() {
+    // BÚSQUEDA EN TIEMPO REAL
+    $('#searchInput').on('keyup', function() {
+        const searchValue = $(this).val().toLowerCase();
+        
+        $('tbody tr').filter(function() {
+            $(this).toggle($(this).text().toLowerCase().indexOf(searchValue) > -1);
+        });
     });
 
-    // Llenar modal de eliminación con el id del egreso
-    $('#modalEliminarEgreso').on('show.bs.modal', function (event) {
-        var button = $(event.relatedTarget);
-        var id = button.data('id');
-        var modal = $(this);
+    // MODAL EDITAR - Llenar con datos del egreso
+    $('.btn-editar').on('click', function() {
+        const id = $(this).data('id');
+        const tipo = $(this).data('tipo');
+        const descripcion = $(this).data('descripcion');
+        const fecha = $(this).data('fecha');
+        const monto = $(this).data('monto');
 
-        var actionUrl = "{{ route('egresos.destroy', ':id') }}".replace(':id', id);
-        modal.find('#formEliminarEgreso').attr('action', actionUrl);
+        // Llenar campos del modal
+        $('#editTipo').val(tipo);
+        $('#editDescripcion').val(descripcion);
+        $('#editFecha').val(fecha);
+        $('#editMonto').val(monto);
+
+        // Actualizar action del formulario con el ID correcto
+        const actionUrl = "{{ route('egresos.update', ':id') }}".replace(':id', id);
+        $('#formEditarEgreso').attr('action', actionUrl);
     });
+
+    // MODAL ELIMINAR - Configurar con ID del egreso
+    $('.btn-eliminar').on('click', function() {
+        const id = $(this).data('id');
+        const descripcion = $(this).data('descripcion');
+
+        // Mostrar descripción del egreso a eliminar
+        $('#egresoEliminarDescripcion').text(descripcion);
+
+        // Actualizar action del formulario con el ID correcto
+        const actionUrl = "{{ route('egresos.destroy', ':id') }}".replace(':id', id);
+        $('#formEliminarEgreso').attr('action', actionUrl);
+    });
+});
 </script>
 @endsection

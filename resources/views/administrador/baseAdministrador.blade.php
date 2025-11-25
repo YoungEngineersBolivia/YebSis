@@ -254,6 +254,7 @@
                             <li><a class="nav-link link-dark submenu-item" href="{{ route('componentes.index') }}">Componentes/Motores</a></li>
                             <li><a class="nav-link link-dark submenu-item" href="{{ route('motores.asignaciones.index') }}">Asignaciones</a></li>
                             <li><a class="nav-link link-dark submenu-item" href="{{ route('motores.asignar.create') }}">Asignar Motor</a></li>
+                            <li><a class="nav-link link-dark submenu-item" href="{{ route('motores.historial') }}">Historial de Asignaciones</a></li>
                         </ul>
                     </div>
                 </li>
@@ -356,12 +357,14 @@
             }
         });
     });
-    @yield('scripts')
-    <script src="{{ auto_asset('js/administrador/baseAdministrador.js') }}"></script>
-    @stack('scripts')
+    
+    
+    
 
 </script>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+@yield('scripts')
+@stack('scripts')
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="{{ auto_asset('js/administrador/baseAdministrador.js') }}"></script>
 </body>
 </html>

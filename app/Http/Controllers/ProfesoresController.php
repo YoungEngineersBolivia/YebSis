@@ -1,162 +1,117 @@
 <?php
-
 namespace App\Http\Controllers;
 
-use App\Models\Profesor;
-use App\Models\Persona;
-use App\Models\Usuario;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Validation\Rule;
+use App\Models\Estudiante;
 
 class ProfesoresController extends Controller
 {
-    public function index(Request $request)
+    public function homeProfesor()
     {
-        $search = trim($request->input('search'));
-
-        $profesores = Profesor::with(['persona.rol', 'usuario'])
-            ->when($search, function ($q) use ($search) {
-                $q->whereHas('persona', function ($p) use ($search) {
-                    $p->where('Nombre', 'like', "%{$search}%")
-                      ->orWhere('Apellido', 'like', "%{$search}%");
-                })
-                ->orWhereHas('usuario', function ($u) use ($search) {
-                    $u->where('Correo', 'like', "%{$search}%");
-                });
-            })
-            ->orderBy('Id_profesores', 'desc')
-            ->paginate(10)
-            ->appends(['search' => $search]);
-
-        return view('administrador.profesoresAdministrador', compact('profesores', 'search'));
+        $usuario = Auth::user(); // obtiene el usuario autenticado
+        return view('profesor.homeProfesor', compact('usuario'));
     }
 
-    public function store(Request $request)
+    public function menuAlumnosProfesor()
     {
-        $validated = $request->validate([
-            'nombre' => 'required|string|max:255',
-            'apellido' => 'required|string|max:255',
-            'genero' => 'nullable|string|max:50',
-            'direccion' => 'nullable|string|max:255',
-            'fecha_nacimiento' => 'nullable|date',
-            'celular' => 'nullable|string|max:50',
-            'id_roles' => 'required|integer|exists:roles,Id_roles',
-            'correo' => 'required|email|max:255|unique:usuarios,Correo',
-            'contrasenia' => 'required|string|min:6',
-            'profesion' => 'nullable|string|max:255',
-            'rol_componentes' => ['nullable', Rule::in(['Tecnico', 'Inventario', 'Ninguno'])],
-        ]);
-
-        return DB::transaction(function () use ($validated) {
-            $persona = Persona::create([
-                'Nombre' => $validated['nombre'],
-                'Apellido' => $validated['apellido'],
-                'Genero' => $validated['genero'] ?? null,
-                'Direccion_domicilio' => $validated['direccion'] ?? null,
-                'Fecha_nacimiento' => $validated['fecha_nacimiento'] ?? null,
-                'Fecha_registro' => now()->toDateString(),
-                'Celular' => $validated['celular'] ?? null,
-                'Id_roles' => $validated['id_roles'],
-            ]);
-
-            $usuario = Usuario::create([
-                'Correo' => $validated['correo'],
-                'Contrasenia' => Hash::make($validated['contrasenia']),
-                'Id_personas' => $persona->Id_personas,
-            ]);
-
-            $profesor = Profesor::create([
-                'Profesion' => $validated['profesion'] ?? null,
-                'Rol_componentes' => $validated['rol_componentes'] ?? 'Ninguno',
-                'Id_personas' => $persona->Id_personas,
-                'Id_usuarios' => $usuario->Id_usuarios,
-            ]);
-
-            return redirect()->route('profesores.index')->with('success', 'Profesor registrado correctamente.');
-        });
+        $usuario = Auth::user();
+        return view('profesor.menuAlumnosProfesor', compact('usuario'));
     }
 
-    public function show($id)
+    public function listadoAlumnos($tipo)
     {
-        $profesor = Profesor::with([
-            // Datos personales y rol
-            'persona.rol',
-            
-            // Usuario del profesor (correo, contraseña)
-            'usuario',
+        $usuario = auth()->user();
+        $profesor = $usuario->profesor;
+        $profesorId = $profesor?->Id_profesores;
 
-            // Horarios del profesor, ordenados por día y horas
-            'horarios' => function($query) {
-                $query->orderBy('Dia', 'asc')->orderBy('Hora', 'asc');
-            },
-
-            // Relaciones anidadas dentro de horarios
-            'horarios.programa',                // Programa al que pertenece cada horario
-            'horarios.estudiante.persona',     // Persona del estudiante asignado al horario
-        ])->findOrFail($id);
-
-        return view('administrador.detallesProfesor', compact('profesor'));
-    }
-
-
-    public function update(Request $request, $id)
-    {
-        $profesor = Profesor::with(['persona', 'usuario'])->findOrFail($id);
-
-        $validated = $request->validate([
-            'nombre' => 'required|string|max:255',
-            'apellido' => 'required|string|max:255',
-            'genero' => 'nullable|string|max:50',
-            'direccion' => 'nullable|string|max:255',
-            'celular' => 'nullable|string|max:50',
-            'correo' => [
-                'required', 'email', 'max:255',
-                Rule::unique('usuarios', 'Correo')->ignore($profesor->usuario->Id_usuarios, 'Id_usuarios'),
-            ],
-            'contrasenia' => 'nullable|string|min:6',
-            'profesion' => 'nullable|string|max:255',
-            'rol_componentes' => ['nullable', Rule::in(['Tecnico', 'Inventario', 'Ninguno'])],
-        ]);
-
-        return DB::transaction(function () use ($validated, $profesor) {
-            $profesor->persona->update([
-                'Nombre' => $validated['nombre'],
-                'Apellido' => $validated['apellido'],
-                'Genero' => $validated['genero'] ?? null,
-                'Direccion_domicilio' => $validated['direccion'] ?? null,
-                'Celular' => $validated['celular'] ?? null,
-            ]);
-
-            $profesor->usuario->update([
-                'Correo' => $validated['correo'],
-                'Contrasenia' => !empty($validated['contrasenia'])
-                    ? Hash::make($validated['contrasenia'])
-                    : $profesor->usuario->Contrasenia,
-            ]);
-
-            $profesor->update([
-                'Profesion' => $validated['profesion'] ?? null,
-                'Rol_componentes' => $validated['rol_componentes'] ?? 'Ninguno',
-            ]);
-
-            return redirect()->route('profesores.index')->with('success', 'Profesor actualizado correctamente.');
-        });
-    }
-
-    public function destroy($id)
-    {
-        try {
-            DB::beginTransaction();
-            $profesor = Profesor::findOrFail($id);
-            $profesor->delete();
-            DB::commit();
-
-            return redirect()->route('profesores.index')->with('success', 'Profesor eliminado correctamente.');
-        } catch (\Exception $e) {
-            DB::rollBack();
-            return redirect()->route('profesores.index')->with('error', $e->getMessage());
+        if (!$profesorId) {
+            return redirect()->route('profesor.menu-alumnos')
+                ->with('error', 'No se encontró el perfil de profesor asociado.');
         }
+
+        // Consulta base de estudiantes asignados a este profesor
+        $estudiantesQuery = Estudiante::with(['persona', 'programa', 'horario'])
+            ->where('Estado', 'activo') // solo estudiantes activos
+            ->where('Id_profesores', $profesorId) // asignados a este profesor
+            ->whereHas('persona', function ($query) {
+                $query->where('Id_roles', 4); // solo rol Estudiante
+            });
+
+        // Filtrado por tipo
+        $titulo = '';
+        if ($tipo === 'evaluar') {
+            $titulo = 'Evaluar Estudiantes';
+        } elseif ($tipo === 'asignados') {
+            $titulo = 'Alumnos Asignados';
+        } elseif ($tipo === 'recuperatoria') {
+            $estudiantesQuery->where('clase_recuperatoria', true); // si existe ese campo
+            $titulo = 'Clase Recuperatoria';
+        } else {
+            // Si el tipo no es válido, redirige al menú
+            return redirect()->route('profesor.menu-alumnos');
+        }
+
+        // Obtenemos los estudiantes y los ordenamos por nombre
+        $estudiantes = $estudiantesQuery->get()->sortBy(fn($e) => $e->persona->Nombre);
+
+        return view('profesor.listadoAlumnos', compact('estudiantes', 'tipo', 'titulo'));
+    }
+
+    /**
+     * Muestra el detalle de un estudiante
+     */
+    public function detalleEstudiante($id)
+    {
+        $estudiante = Estudiante::with(['persona', 'programa', 'horario'])->findOrFail($id);
+        return view('profesor.detalleEstudiante', compact('estudiante'));
+    }
+
+    /**
+     * Muestra el formulario para editar un estudiante
+     */
+    public function editarEstudiante($id)
+    {
+        $estudiante = Estudiante::findOrFail($id);
+        return view('profesor.editarEvaluacion', compact('estudiante'));
+    }
+
+    /**
+     * Muestra el formulario de evaluación
+     */
+    public function evaluarEstudiante($id)
+    {
+        $estudiante = Estudiante::with(['persona', 'programa', 'modelo'])
+            ->findOrFail($id);
+        return view('profesor.evaluarAlumno', compact('estudiante'));
+    }
+
+    /**
+     * Guarda la evaluación del estudiante
+     */
+    public function guardarEvaluacion(Request $request)
+    {
+        $request->validate([
+            'estudiante_id' => 'required|exists:estudiantes,id',
+            'participa' => 'required|in:si,no,en_proceso',
+            'secuenciada' => 'required|in:si,no,en_proceso',
+            'paciente' => 'required|in:si,no,en_proceso',
+        ]);
+
+        // Aquí guardarías la evaluación en la base de datos
+        // Ejemplo:
+        // Evaluacion::create([
+        //     'estudiante_id' => $request->estudiante_id,
+        //     'profesor_id' => auth()->id(),
+        //     'participa_clases' => $request->participa,
+        //     'acciones_secuenciadas' => $request->secuenciada,
+        //     'es_paciente' => $request->paciente,
+        //     'fecha_evaluacion' => now(),
+        // ]);
+
+        return redirect()
+            ->route('profesor.detalle-estudiante', $request->estudiante_id)
+            ->with('success', 'Evaluación guardada correctamente');
     }
 }
+
