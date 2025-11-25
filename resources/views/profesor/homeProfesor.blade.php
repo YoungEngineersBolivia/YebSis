@@ -10,13 +10,13 @@
     <button class="menu-button assigned">Alumnos</button>
     </a>
 
-    <a href="#">
+    <a href="{{route('profesor.inventario.index')}}">
         <button class="menu-button assigned" onclick="handleAssigned()">
             Inventario
         </button>
     </a>
 
-    <a href="#">
+    <a href="{{route('profesor.inventario.mis-motores')}}">
         <button class="menu-button assigned" onclick="handleAssigned()">
             Componentes asignados
         </button>

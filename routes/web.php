@@ -33,6 +33,8 @@ use App\Http\Controllers\ForgotPasswordController;
 use App\Http\Controllers\ResetPasswordController;
 use App\Http\Controllers\ModeloController;
 use App\Http\Controllers\CuotaController;
+use App\Http\Controllers\ProfesorInventarioController;
+
 
 /* ============================================
    RUTAS PÚBLICAS (Sin autenticación)
@@ -340,7 +342,37 @@ Route::middleware(['auth', 'role:profesor'])->prefix('profesor')->name('profesor
     Route::get('/estudiante/{id}/evaluar', [ProfesorController::class, 'evaluarEstudiante'])->name('evaluar-estudiante');
     Route::post('/evaluacion/guardar', [ProfesorController::class, 'guardarEvaluacion'])->name('guardar-evaluacion');
     Route::put('/evaluacion/{id}/actualizar', [ProfesorController::class, 'actualizarEvaluacion'])->name('actualizar-evaluacion');
+
+    // ========== RUTAS DE INVENTARIO DE COMPONENTES ==========
+    
+    // Vista principal del inventario de componentes asignados
+    Route::get('/inventario-componentes', [ProfesorInventarioController::class, 'index'])
+        ->name('inventario.index');
+    
+    // Solicitar salida de motor
+    Route::post('/inventario-componentes/solicitar', [ProfesorInventarioController::class, 'solicitarSalida'])
+        ->name('inventario.solicitar');
+    
+    // Asignar componente a profesor
+    Route::post('/inventario-componentes/asignar', [ProfesorInventarioController::class, 'asignarComponente'])
+        ->name('inventario.asignar');
+    
+    // Devolver componente
+    Route::post('/inventario-componentes/{id}/devolver', [ProfesorInventarioController::class, 'devolverComponente'])
+        ->name('inventario.devolver');
+    
+    // Ver detalle de asignación
+    Route::get('/inventario-componentes/{id}/detalle', [ProfesorInventarioController::class, 'verDetalle'])
+        ->name('inventario.detalle');
+    
+    // Obtener estadísticas
+    Route::get('/inventario-componentes/estadisticas', [ProfesorInventarioController::class, 'estadisticas'])
+        ->name('inventario.estadisticas');
+    
+    Route::get('/mis-motores-asignados', [ProfesorInventarioController::class, 'misMotoresAsignados'])
+    ->name('inventario.mis-motores');
 });
+    
 
 
 /* ============================================
