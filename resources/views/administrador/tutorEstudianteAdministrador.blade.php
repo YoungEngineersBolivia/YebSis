@@ -162,7 +162,18 @@
             </select>
         </div>
         
-        </div>
+      <div class="col-md-6">
+    <label>Profesor</label>
+    <select name="profesor" class="form-control" required>
+        <option value="">Seleccione...</option>
+        @foreach ($profesores as $prof)
+            <option value="{{ $prof->Id_profesores }}"
+                {{ old('profesor') == $prof->Id_profesores ? 'selected' : '' }}>
+                {{ $prof->persona->Nombre }} {{ $prof->persona->Apellido }}
+            </option>
+        @endforeach
+    </select>
+</div>
 
 
         <hr>

@@ -115,7 +115,7 @@ class ProfesorController extends Controller
                 ->with('error', 'No se encontró el perfil de profesor asociado.');
         }
 
-        $estudiantesQuery = Estudiante::with(['persona', 'programa', 'horario'])
+        $estudiantesQuery = Estudiante::with(['persona', 'programa', 'horarios'])
             ->where('Estado', 'activo')
             ->where('Id_profesores', $profesorId)
             ->whereHas('persona', function ($query) {
@@ -143,7 +143,7 @@ class ProfesorController extends Controller
 
     public function detalleEstudiante($id)
     {
-        $estudiante = Estudiante::with(['persona', 'programa', 'horario'])->findOrFail($id);
+        $estudiante = Estudiante::with(['persona', 'programa', 'horarios'])->findOrFail($id);
 
         return view('profesor.detalleEstudiante', compact('estudiante'));
     }

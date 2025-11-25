@@ -23,7 +23,7 @@
         >
             {{-- Avatar según género --}}
             <img 
-                src="{{ auto_asset('images/' . ($estudiante->persona?->Genero === 'M' ? 'avatar-boy.png' : 'avatar-girl.png')) }}" 
+                src="{{ auto_asset('img/' . ($estudiante->persona?->Genero === 'M' ? 'boy.png' : 'girl.png')) }}" 
                 alt="{{ $estudiante->persona?->Nombre ?? 'Estudiante' }}" 
                 class="student-avatar"
             >
@@ -34,7 +34,7 @@
                     {{ $estudiante->persona?->Nombre }} {{ $estudiante->persona?->Apellido }}
                 </p>
                 <p class="student-program">
-                    {{ $estudiante->programa?->Nombre_programa ?? 'Sin programa' }}
+                    {{ $estudiante->programa?->Nombre ?? 'Sin programa' }}
                 </p>
             </div>
 
