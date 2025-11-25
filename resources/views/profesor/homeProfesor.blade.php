@@ -16,6 +16,12 @@
         </button>
     </a>
 
+    <a href="#">
+        <button class="menu-button assigned" onclick="handleAssigned()">
+            Componentes asignados
+        </button>
+    </a>
+
     </main>
 
 <script src="{{ auto_asset('js/profesor/homeProfesor.js') }}"></script>
