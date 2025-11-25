@@ -114,7 +114,8 @@ Route::delete('/usuarios/{id}', [UsuariosController::class, 'destroy'])->name('u
         Route::post('/asignar', [HorariosController::class, 'asignar'])->name('asignar');
     });
     Route::get('/horariosAdministrador', [HorariosController::class, 'index'])->name('horarios.index');
-    
+    Route::get('/horarios/buscar-profesor/{idEstudiante}', [HorariosController::class, 'buscarProfesor']);
+
     /* ----------------- GESTIÓN DE ESTUDIANTES ----------------- */
     Route::get('/estudiantesAdministrador', [EstudianteController::class, 'index'])->name('admin.estudiantes');
 

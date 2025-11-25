@@ -25,7 +25,9 @@ class RegistroCombinadoController extends Controller
     {
         $programas = Programa::all();
         $sucursales = Sucursal::all();
-        $profesores = Profesor::all();
+        $profesores = Profesor::with('persona')
+            ->whereHas('persona', function ($q) {$q->where('Id_roles', 2); }) ->get();
+
         $tutores = Tutores::with('persona', 'usuario')->get()->map(function($t){
             return [
                 'Id_tutores' => $t->Id_tutores,
