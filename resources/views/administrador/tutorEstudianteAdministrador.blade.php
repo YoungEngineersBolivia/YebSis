@@ -35,19 +35,19 @@
         </div>
     @endif
 
-    <form action="{{ route('registroCombinado.registrar') }}" method="POST">
+    <form action="{{ route('registroCombinado.registrar') }}" method="POST" id="formRegistroCombinado">
         @csrf
         {{-- ================= TUTOR ================= --}}
         <h4>Datos del Tutor</h4>
         <div class="row">
             <div class="col-md-6">
                 <label>Nombre</label>
-                <input type="text" name="tutor_nombre" class="form-control" value="{{ old('tutor_nombre') }}" required>
+                <input type="text" name="tutor_nombre" class="form-control" value="{{ old('tutor_nombre') }}" placeholder="Ej: Juan" required>
                 <input type="hidden" name="tutor_id_existente" id="tutor_id_existente" value="">
             </div>
             <div class="col-md-6">
                 <label>Apellido</label>
-                <input type="text" name="tutor_apellido" class="form-control" value="{{ old('tutor_apellido') }}" required>
+                <input type="text" name="tutor_apellido" class="form-control" value="{{ old('tutor_apellido') }}" placeholder="Ej: Pérez García" required>
             </div>
             <div class="col-md-4">
                 <label>Género</label>
@@ -63,11 +63,11 @@
             </div>
             <div class="col-md-4">
                 <label>Celular</label>
-                <input type="text" name="tutor_celular" class="form-control" value="{{ old('tutor_celular') }}" required>
+                <input type="text" name="tutor_celular" class="form-control" value="{{ old('tutor_celular') }}" placeholder="Ej: 70123456" required>
             </div>
             <div class="col-md-12">
                 <label>Dirección</label>
-                <input type="text" name="tutor_direccion" class="form-control" value="{{ old('tutor_direccion') }}" required>
+                <input type="text" name="tutor_direccion" class="form-control" value="{{ old('tutor_direccion') }}" placeholder="Ej: Av. Ballivián #123, Zona Sur" required>
             </div>
             <div class="col-md-4">
                     <label>Parentesco</label>
@@ -84,17 +84,17 @@
          
             <div class="col-md-4">
                 <label>NIT</label>
-                <input type="text" name="tutor_nit" class="form-control" value="{{ old('tutor_nit') }}">
+                <input type="text" name="tutor_nit" class="form-control" value="{{ old('tutor_nit') }}" placeholder="Ej: 1234567 (Opcional)">
             </div>
             <div class="col-md-6">
                 <label>Nombre Factura</label>
-                <input type="text" name="tutor_nombre_factura" class="form-control" value="{{ old('tutor_nombre_factura') }}">
+                <input type="text" name="tutor_nombre_factura" class="form-control" value="{{ old('tutor_nombre_factura') }}" placeholder="Ej: Juan Pérez García (Opcional)">
             </div>
 
         <div class="row">
             <div class="col-md-6">
                 <label>Correo</label>
-                <input type="email" name="tutor_email" class="form-control" required>
+                <input type="email" name="tutor_email" class="form-control" value="{{ old('tutor_email') }}" placeholder="Ej: juan.perez@gmail.com" required>
             </div>
 
         </div>
@@ -104,14 +104,17 @@
         <hr>
         {{-- ================= ESTUDIANTE ================= --}}
         <h4>Datos del Estudiante</h4>
-        <div class="row">
+        
+        <input type="hidden" name="estudiante_id_existente" id="estudiante_id_existente" value="">
+        
+        <div class="row" id="form-estudiante">
             <div class="col-md-6">
                 <label>Nombre</label>
-                <input type="text" name="estudiante_nombre" class="form-control" value="{{ old('estudiante_nombre') }}" required>
+                <input type="text" name="estudiante_nombre" class="form-control" value="{{ old('estudiante_nombre') }}" placeholder="Ej: María" required>
             </div>
             <div class="col-md-6">
                 <label>Apellido</label>
-                <input type="text" name="estudiante_apellido" class="form-control" value="{{ old('estudiante_apellido') }}" required>
+                <input type="text" name="estudiante_apellido" class="form-control" value="{{ old('estudiante_apellido') }}" placeholder="Ej: Pérez García" required>
             </div>
             <div class="col-md-4">
                 <label>Género</label>
@@ -127,15 +130,15 @@
             </div>
             <div class="col-md-4">
                 <label>Número de referencia</label>
-                <input type="text" name="estudiante_celular" class="form-control" value="{{ old('estudiante_celular') }}" required>
+                <input type="text" name="estudiante_celular" class="form-control" value="{{ old('estudiante_celular') }}" placeholder="Ej: 70987654" required>
             </div>
             <div class="col-md-12">
                 <label>Dirección</label>
-                <input type="text" name="estudiante_direccion" class="form-control" value="{{ old('estudiante_direccion') }}" required>
+                <input type="text" name="estudiante_direccion" class="form-control" value="{{ old('estudiante_direccion') }}" placeholder="Ej: Calle Los Pinos #456, Zona Norte" required>
             </div>
             <div class="col-md-6">
                 <label>Código de Estudiante</label>
-                <input type="text" name="codigo_estudiante" class="form-control" value="{{ old('codigo_estudiante') }}" required>
+                <input type="text" name="codigo_estudiante" class="form-control" value="{{ old('codigo_estudiante') }}" placeholder="Ej: EST-2024-001" required>
             </div>
             <div class="col-md-6">
                 <label>Programa</label>
@@ -182,7 +185,7 @@
         <div class="row">
             <div class="col-md-4">
                 <label>Matrícula (Bs)</label>
-                <input type="number" step="0.01" name="Monto_matricula" id="Monto_matricula" class="form-control" value="{{ old('Monto_matricula') }}">
+                <input type="number" step="0.01" name="Monto_matricula" id="Monto_matricula" class="form-control" value="{{ old('Monto_matricula') }}" placeholder="Ej: 500">
             </div>
             <div class="col-md-4">
                 <label>Matrícula en cuántas partes</label>
@@ -198,15 +201,15 @@
             </div>
             <div class="col-md-4">
                 <label>Nro de cuotas</label>
-                <input type="number" name="Nro_cuotas" id="nro_cuotas" class="form-control" value="{{ old('Nro_cuotas') }}" required>
+                <input type="number" name="Nro_cuotas" id="nro_cuotas" class="form-control" value="{{ old('Nro_cuotas') }}" placeholder="Ej: 10" required>
             </div>
             <div class="col-md-4">
                 <label>Monto total</label>
-                <input type="number" step="0.01" name="Monto_total" id="Monto_total" class="form-control" value="{{ old('Monto_total') }}" required>
+                <input type="number" step="0.01" name="Monto_total" id="Monto_total" class="form-control" value="{{ old('Monto_total') }}" placeholder="Ej: 5000" required>
             </div>
             <div class="col-md-4">
                 <label>Descuento (%)</label>
-                <input type="number" step="0.01" name="tutor_descuento" id="tutor_descuento" class="form-control" value="{{ old('tutor_descuento') }}">
+                <input type="number" step="0.01" name="tutor_descuento" id="tutor_descuento" class="form-control" value="{{ old('tutor_descuento') }}" placeholder="Ej: 10">
             </div>
             <div class="col-md-4">
                 <label>Descuento aplicado (Bs)</label>
@@ -256,15 +259,71 @@
         <div id="cuotas-auto-hidden-inputs"></div>
         <hr>
 
-        <button type="submit" class="btn btn-primary mt-4">Registrar</button>
+        <button type="submit" class="btn btn-primary mt-4" id="btnRegistrar">
+            <span id="btnText">Registrar</span>
+            <span id="btnSpinner" class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+        </button>
     </form>
+</div>
+
+{{-- Modal para seleccionar hijo existente --}}
+<div class="modal fade" id="modalSeleccionarHijo" tabindex="-1" aria-labelledby="modalSeleccionarHijoLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="modalSeleccionarHijoLabel">
+                    <i class="fas fa-users me-2"></i>Seleccionar Estudiante
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p class="mb-3"><strong>Este tutor tiene los siguientes hijos registrados:</strong></p>
+                <div id="lista-hijos-modal" class="row g-3">
+                    {{-- Se llena dinámicamente con JS --}}
+                </div>
+                <hr>
+                <div class="text-center">
+                    <button type="button" class="btn btn-success btn-lg" id="btn-nuevo-hijo-modal" data-bs-dismiss="modal">
+                        <i class="fas fa-plus me-2"></i>Registrar Nuevo Hijo
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
 @endsection
 
+<style>
+.hover-card {
+    transition: all 0.3s ease;
+    border: 2px solid #dee2e6;
+}
+
+.hover-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+    border-color: #0d6efd;
+}
+</style>
+
 <script>
     // Pasar los datos de PHP a JavaScript e inicializar
     document.addEventListener('DOMContentLoaded', function() {
+        // Prevención de doble envío
+        const form = document.getElementById('formRegistroCombinado');
+        const btn = document.getElementById('btnRegistrar');
+        const btnText = document.getElementById('btnText');
+        const btnSpinner = document.getElementById('btnSpinner');
+
+        form.addEventListener('submit', function() {
+            if (form.checkValidity()) {
+                btn.disabled = true;
+                btnText.textContent = 'Enviando...';
+                btnSpinner.classList.remove('d-none');
+            }
+        });
+
         const programas = @json($programas->map(fn($p) => [
             'Id_programas' => $p->Id_programas,
             'Nombre' => $p->Nombre,
@@ -475,20 +534,23 @@ document.addEventListener('DOMContentLoaded', function() {
 
             li.addEventListener('click', () => {
                 // Rellenar los campos del formulario
-                document.querySelector('input[name="tutor_nombre"]').value = t.Nombre;
-                document.querySelector('input[name="tutor_apellido"]').value = t.Apellido;
-                document.querySelector('select[name="tutor_genero"]').value = t.Genero;
-                document.querySelector('input[name="tutor_fecha_nacimiento"]').value = t.Fecha_nacimiento;
-                document.querySelector('input[name="tutor_celular"]').value = t.Celular;
-                document.querySelector('input[name="tutor_direccion"]').value = t.Direccion_domicilio;
-                document.querySelector('input[name="tutor_email"]').value = t.Correo;
-                document.querySelector('select[name="tutor_parentesco"]').value = t.Parentesco;
+                document.querySelector('input[name="tutor_nombre"]').value = t.Nombre || '';
+                document.querySelector('input[name="tutor_apellido"]').value = t.Apellido || '';
+                document.querySelector('select[name="tutor_genero"]').value = t.Genero || '';
+                document.querySelector('input[name="tutor_fecha_nacimiento"]').value = t.Fecha_nacimiento ? t.Fecha_nacimiento.substring(0, 10) : '';
+                document.querySelector('input[name="tutor_celular"]').value = t.Celular || '';
+                document.querySelector('input[name="tutor_direccion"]').value = t.Direccion_domicilio || '';
+                document.querySelector('input[name="tutor_email"]').value = t.Correo || '';
+                document.querySelector('select[name="tutor_parentesco"]').value = t.Parentesco || '';
                 document.querySelector('input[name="tutor_nit"]').value = t.Nit || '';
                 document.querySelector('input[name="tutor_nombre_factura"]').value = t.Nombre_factura || '';
                 document.querySelector('input[name="tutor_descuento"]').value = t.Descuento || '';
 
                 // Guardar ID del tutor existente
                 document.getElementById('tutor_id_existente').value = t.Id_tutores;
+
+                // Mostrar hijos existentes si los tiene
+                mostrarHijosExistentes(t);
 
                 // Ocultar la lista
                 listaTutor.innerHTML = '';
@@ -498,6 +560,119 @@ document.addEventListener('DOMContentLoaded', function() {
 
             listaTutor.appendChild(li);
         });
+    });
+
+    // Función para mostrar hijos existentes en modal
+    function mostrarHijosExistentes(tutor) {
+        const listaHijosModal = document.getElementById('lista-hijos-modal');
+        const formEstudiante = document.getElementById('form-estudiante');
+        
+        if (tutor.estudiantes && tutor.estudiantes.length > 0) {
+            // Limpiar modal
+            listaHijosModal.innerHTML = '';
+            
+            // Crear tarjetas para cada hijo
+            tutor.estudiantes.forEach(hijo => {
+                const card = `
+                    <div class="col-md-6">
+                        <div class="card hover-card" style="cursor: pointer;" onclick="seleccionarHijoExistente(${JSON.stringify(hijo).replace(/"/g, '&quot;')})">
+                            <div class="card-body">
+                                <h6 class="card-title mb-2">
+                                    <i class="fas fa-user-graduate me-2 text-primary"></i>
+                                    ${hijo.Nombre} ${hijo.Apellido}
+                                </h6>
+                                <p class="card-text mb-1">
+                                    <small class="text-muted">
+                                        <i class="fas fa-id-card me-1"></i>Código: ${hijo.Cod_estudiante}
+                                    </small>
+                                </p>
+                                <p class="card-text mb-0">
+                                    <small class="text-muted">
+                                        <i class="fas fa-birthday-cake me-1"></i>${hijo.Fecha_nacimiento}
+                                    </small>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                listaHijosModal.insertAdjacentHTML('beforeend', card);
+            });
+            
+            // Mostrar modal
+            const modal = new bootstrap.Modal(document.getElementById('modalSeleccionarHijo'));
+            modal.show();
+        } else {
+            // No tiene hijos, mostrar formulario directamente
+            formEstudiante.style.display = '';
+            limpiarFormularioEstudiante();
+        }
+    }
+    
+    // Función para seleccionar hijo existente (ahora global para onclick)
+    window.seleccionarHijoExistente = function(hijo) {
+        const formEstudiante = document.getElementById('form-estudiante');
+        
+        // Guardar ID del estudiante existente
+        document.getElementById('estudiante_id_existente').value = hijo.Id_estudiantes;
+        
+        // Auto-completar datos
+        document.querySelector('input[name="estudiante_nombre"]').value = hijo.Nombre || '';
+        document.querySelector('input[name="estudiante_apellido"]').value = hijo.Apellido || '';
+        document.querySelector('select[name="estudiante_genero"]').value = hijo.Genero || '';
+        document.querySelector('input[name="estudiante_fecha_nacimiento"]').value = hijo.Fecha_nacimiento ? hijo.Fecha_nacimiento.substring(0, 10) : '';
+        document.querySelector('input[name="estudiante_celular"]').value = hijo.Celular || '';
+        document.querySelector('input[name="estudiante_direccion"]').value = hijo.Direccion_domicilio || '';
+        document.querySelector('input[name="codigo_estudiante"]').value = hijo.Cod_estudiante || '';
+        
+        // Deshabilitar campos para que no se puedan editar (género con estilo visual)
+        document.querySelector('input[name="estudiante_nombre"]').readOnly = true;
+        document.querySelector('input[name="estudiante_apellido"]').readOnly = true;
+        const generoSelect = document.querySelector('select[name="estudiante_genero"]');
+        generoSelect.style.pointerEvents = 'none';
+        generoSelect.style.backgroundColor = '#e9ecef';
+        document.querySelector('input[name="estudiante_fecha_nacimiento"]').readOnly = true;
+        document.querySelector('input[name="estudiante_celular"]').readOnly = true;
+        document.querySelector('input[name="estudiante_direccion"]').readOnly = true;
+        document.querySelector('input[name="codigo_estudiante"]').readOnly = true;
+        
+        // Mostrar formulario
+        formEstudiante.style.display = '';
+        
+        // Cerrar modal
+        const modal = bootstrap.Modal.getInstance(document.getElementById('modalSeleccionarHijo'));
+        if (modal) {
+            modal.hide();
+        }
+    }
+    
+    // Función para limpiar formulario de estudiante
+    function limpiarFormularioEstudiante() {
+        document.getElementById('estudiante_id_existente').value = '';
+        document.querySelector('input[name="estudiante_nombre"]').value = '';
+        document.querySelector('input[name="estudiante_apellido"]').value = '';
+        document.querySelector('select[name="estudiante_genero"]').value = '';
+        document.querySelector('input[name="estudiante_fecha_nacimiento"]').value = '';
+        document.querySelector('input[name="estudiante_celular"]').value = '';
+        document.querySelector('input[name="estudiante_direccion"]').value = '';
+        document.querySelector('input[name="codigo_estudiante"]').value = '';
+        
+        // Habilitar campos
+        document.querySelector('input[name="estudiante_nombre"]').readOnly = false;
+        document.querySelector('input[name="estudiante_apellido"]').readOnly = false;
+        const generoSelect = document.querySelector('select[name="estudiante_genero"]');
+        generoSelect.style.pointerEvents = '';
+        generoSelect.style.backgroundColor = '';
+        document.querySelector('input[name="estudiante_fecha_nacimiento"]').readOnly = false;
+        document.querySelector('input[name="estudiante_celular"]').readOnly = false;
+        document.querySelector('input[name="estudiante_direccion"]').readOnly = false;
+        document.querySelector('input[name="codigo_estudiante"]').readOnly = false;
+    }
+    
+    // Botón para registrar nuevo hijo (desde modal)
+    document.getElementById('btn-nuevo-hijo-modal').addEventListener('click', () => {
+        const formEstudiante = document.getElementById('form-estudiante');
+        limpiarFormularioEstudiante();
+        formEstudiante.style.display = '';
     });
 
     // Ocultar lista si se hace click fuera

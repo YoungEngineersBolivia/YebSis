@@ -44,7 +44,7 @@ class ModeloController extends Controller
             $modelo->Id_programa = $programaId;
             $modelo->save();
 
-            return redirect()->route('modelos.index', $programaId)
+            return redirect()->route('programas.index')
                            ->with('success', 'Modelo creado exitosamente');
         } catch (\Exception $e) {
             return redirect()->back()
@@ -90,15 +90,11 @@ class ModeloController extends Controller
             
             $modelo->delete();
 
-            return response()->json([
-                'success' => true,
-                'message' => 'Modelo eliminado exitosamente'
-            ]);
+            return redirect()->route('programas.index')
+                           ->with('success', 'Modelo eliminado exitosamente');
         } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Error al eliminar el modelo: ' . $e->getMessage()
-            ], 500);
+            return redirect()->back()
+                           ->with('error', 'Error al eliminar el modelo: ' . $e->getMessage());
         }
     }
 
