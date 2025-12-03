@@ -167,7 +167,7 @@
         
       <div class="col-md-6">
     <label>Profesor</label>
-    <select name="profesor" class="form-control" required>
+    <select name="profesor" class="form-control" >
         <option value="">Seleccione...</option>
         @foreach ($profesores as $prof)
             <option value="{{ $prof->Id_profesores }}"
