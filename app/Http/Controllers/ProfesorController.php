@@ -143,7 +143,7 @@ class ProfesorController extends Controller
 
     public function detalleEstudiante($id)
     {
-        $estudiante = Estudiante::with(['persona', 'programa', 'horarios'])->findOrFail($id);
+        $estudiante = Estudiante::with(['persona', 'programa.modelos', 'horarios'])->findOrFail($id);
 
         return view('profesor.detalleEstudiante', compact('estudiante'));
     }
@@ -156,7 +156,7 @@ class ProfesorController extends Controller
 
     public function evaluarEstudiante($id)
     {
-        $estudiante = Estudiante::with(['persona', 'programa', 'modelo'])
+        $estudiante = Estudiante::with(['persona', 'programa'])
             ->findOrFail($id);
 
         return view('profesor.evaluarAlumno', compact('estudiante'));

@@ -492,6 +492,7 @@
                                         <th>Rango de Edad</th>
                                         <th>Duración</th>
                                         <th>Descripción</th>
+                                        <th class="text-center">Modelos</th>
                                         <th class="text-center pe-4">Acciones</th>
                                     </tr>
                                 </thead>
@@ -519,6 +520,16 @@
                                         </td>
                                         <td>
                                             <span class="text-muted">{{ Str::limit($programa->Descripcion, 50) }}</span>
+                                        </td>
+                                        <td class="text-center">
+                                            <button type="button" 
+                                                    class="btn btn-sm btn-outline-primary" 
+                                                    data-bs-toggle="modal"
+                                                    data-bs-target="#modelosModal{{ $programa->Id_programas }}" 
+                                                    title="Gestionar modelos">
+                                                <i class="fas fa-cubes me-1"></i>
+                                                <span class="badge bg-primary rounded-pill">{{ $programa->modelos_count ?? 0 }}</span>
+                                            </button>
                                         </td>
                                         <td class="text-center pe-4">
                                             <div class="btn-group" role="group">
@@ -798,6 +809,95 @@
                     </button>
                 </div>
             </form>
+        </div>
+    </div>
+</div>
+@endforeach
+
+{{-- Modales de Gestión de Modelos --}}
+@foreach ($programas as $programa)
+<div class="modal fade" id="modelosModal{{ $programa->Id_programas }}" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-cubes me-2"></i>Modelos de: {{ $programa->Nombre }}
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                {{-- Lista de modelos existentes --}}
+                <div class="mb-4">
+                    <h6 class="fw-bold mb-3">
+                        <i class="fas fa-list me-2"></i>Modelos Registrados
+                    </h6>
+                    
+                    @php
+                        $modelosPrograma = $programa->modelos;
+                    @endphp
+                    
+                    @if($modelosPrograma->isEmpty())
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle me-2"></i>No hay modelos registrados para este programa.
+                        </div>
+                    @else
+                        <div class="list-group">
+                            @foreach($modelosPrograma as $modelo)
+                            <div class="list-group-item d-flex justify-content-between align-items-center">
+                                <div>
+                                    <i class="fas fa-cube me-2 text-primary"></i>
+                                    <strong>{{ $modelo->Nombre_modelo }}</strong>
+                                </div>
+                                <form action="{{ route('modelos.destroy', [$programa->Id_programas, $modelo->Id_modelos]) }}" 
+                                      method="POST" 
+                                      style="display:inline;"
+                                      onsubmit="return confirm('¿Estás seguro de eliminar este modelo?')">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" 
+                                            class="btn btn-sm btn-outline-danger" 
+                                            title="Eliminar modelo">
+                                        <i class="bi bi-trash3-fill"></i>
+                                    </button>
+                                </form>
+                            </div>
+                            @endforeach
+                        </div>
+                    @endif
+                </div>
+
+                <hr>
+
+                {{-- Formulario para agregar nuevo modelo --}}
+                <div>
+                    <h6 class="fw-bold mb-3">
+                        <i class="fas fa-plus-circle me-2"></i>Agregar Nuevo Modelo
+                    </h6>
+                    <form action="{{ route('modelos.store', $programa->Id_programas) }}" method="POST">
+                        @csrf
+                        <div class="mb-3">
+                            <label class="form-label">
+                                <i class="fas fa-tag me-1"></i>Nombre del Modelo
+                            </label>
+                            <input type="text" 
+                                   class="form-control" 
+                                   name="nombre_modelo" 
+                                   placeholder="Ej: Modelo 1, Modelo Básico, etc."
+                                   required>
+                        </div>
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-1"></i>Guardar Modelo
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times me-1"></i>Cerrar
+                </button>
+            </div>
         </div>
     </div>
 </div>

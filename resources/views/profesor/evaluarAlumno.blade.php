@@ -16,7 +16,7 @@
     
     <form action="{{ route('profesor.guardar-evaluacion') }}" method="POST" id="evaluationForm">
         @csrf
-        <input type="hidden" name="estudiante_id" value="{{ $estudiante->id ?? '' }}">
+        <input type="hidden" name="estudiante_id" value="{{ $estudiante->Id_estudiantes ?? '' }}">
         
         <!-- Sección 1: Participa en clases -->
         <div class="evaluation-section">
