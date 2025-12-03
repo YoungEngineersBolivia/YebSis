@@ -1,154 +1,138 @@
 document.addEventListener('DOMContentLoaded', () => {
-// Usa values() para asegurar que el array sea plano y serializable correctamente
-const estudiantes = JSON.parse(document.getElementById('estudiantes-data').textContent);
-const csrfToken = '{{ csrf_token() }}';
-const buscarInput = document.getElementById('buscarEstudiante');
-const sugerenciasDiv = document.getElementById('sugerencias');
-const estudianteInfoDiv = document.getElementById('estudiante-info');
-const listaEstudiantesDiv = document.getElementById('lista-estudiantes');
+    const buscarInput = document.getElementById('buscarEstudiante');
+    const listaEstudiantesDiv = document.getElementById('lista-estudiantes');
+    const noResultadosDiv = document.getElementById('no-resultados');
+    const contadorResultados = document.getElementById('contador-resultados');
 
-buscarInput.addEventListener('input', function() {
-    const val = this.value.trim().toLowerCase();
-    sugerenciasDiv.innerHTML = '';
-    estudianteInfoDiv.style.display = 'none';
-    listaEstudiantesDiv.style.display = '';
+    // Filtros
+    const filterTodos = document.getElementById('filter-todos');
+    const filterPendientes = document.getElementById('filter-pendientes');
+    const filterCompletados = document.getElementById('filter-completados');
 
-    if (!val) return;
+    let filtroActual = 'todos';
 
-    const filtrados = estudiantes.filter(est => {
-        const nombreCompleto = `${est.persona.Nombre} ${est.persona.Apellido}`.toLowerCase();
-        return nombreCompleto.includes(val);
-    });
+    // Función para filtrar tarjetas
+    function filtrarTarjetas() {
+        const searchTerm = buscarInput.value.toLowerCase().trim();
+        const tarjetas = document.querySelectorAll('.estudiante-card');
+        let visibles = 0;
 
-    if (filtrados.length > 0) {
-        filtrados.forEach(est => {
-            const btn = document.createElement('button');
-            btn.type = 'button';
-            btn.className = 'list-group-item list-group-item-action';
-            btn.textContent = `${est.persona.Nombre} ${est.persona.Apellido}`;
-            btn.onclick = () => {
-                mostrarEstudiante(est);
-                buscarInput.value = btn.textContent;
-                sugerenciasDiv.innerHTML = '';
-            };
-            sugerenciasDiv.appendChild(btn);
+        tarjetas.forEach(tarjeta => {
+            const tutor = tarjeta.dataset.tutor || '';
+            const estudiante = tarjeta.dataset.estudiante || '';
+            const estado = tarjeta.dataset.estado || '';
+
+            // Verificar búsqueda
+            const coincideBusqueda = searchTerm === '' ||
+                tutor.includes(searchTerm) ||
+                estudiante.includes(searchTerm);
+
+            // Verificar filtro de estado
+            let coincideFiltro = true;
+            if (filtroActual === 'pendientes') {
+                coincideFiltro = estado === 'pendiente';
+            } else if (filtroActual === 'completados') {
+                coincideFiltro = estado === 'completado';
+            }
+
+            // Mostrar/ocultar tarjeta
+            if (coincideBusqueda && coincideFiltro) {
+                tarjeta.style.display = '';
+                visibles++;
+            } else {
+                tarjeta.style.display = 'none';
+            }
         });
-    } else {
-        const noData = document.createElement('div');
-        noData.className = 'list-group-item text-muted';
-        noData.textContent = 'Sin coincidencias';
-        sugerenciasDiv.appendChild(noData);
-    }
-});
 
-function mostrarEstudiante(est) {
-    console.log(est); // Depuración
-    let cuotas = [];
-    if (est.plan_pago && est.plan_pago.cuotas) {
-        cuotas = est.plan_pago.cuotas;
-    }
-    let html = `
-        <div class="card mb-3">
-            <div class="card-body">
-                <h5>${est.persona.Nombre ?? ''} ${est.persona.Apellido ?? ''}</h5>
-                <p>
-                    Padre: ${est.tutor && est.tutor.persona ? est.tutor.persona.Nombre + ' ' + est.tutor.persona.Apellido : 'Sin padre asignado'}
-                </p>
-                <h6>Cuotas:</h6>
-    `;
-    if (est.plan_pago) {
-        if (cuotas.length > 0) {
-            html += `
-                <table class="table table-bordered table-sm">
-                    <thead>
-                        <tr>
-                            <th>Nro_de_cuota</th>
-                            <th>Fecha_vencimiento</th>
-                            <th>Monto_cuota</th>
-                            <th>Monto_pagado</th>
-                            <th>Estado_cuota</th>
-                            <th>Acción</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-            `;
-            cuotas.forEach(cuota => {
-                html += `
-                    <tr>
-                        <td>${cuota.Nro_de_cuota}</td>
-                        <td>${cuota.Fecha_vencimiento}</td>
-                        <td>${cuota.Monto_cuota}</td>
-                        <td>${cuota.Monto_pagado ?? 'NULL'}</td>
-                        <td>${cuota.Estado_cuota}</td>
-                        <td>
-                            ${!cuota.pagado ? `
-                                <button type="button" 
-                                    class="btn btn-success btn-sm" 
-                                    data-bs-toggle="modal" 
-                                    data-bs-target="#modalRegistrarPago"
-                                    data-cuota-id="${cuota.Id_cuotas}"
-                                    data-monto="${cuota.Monto_cuota}"
-                                    data-plan-id="${cuota.Id_planes_pagos}">
-                                    Registrar Pago
-                                </button>
-                            ` : 'Pagado'}
-                        </td>
-                    </tr>
-                `;
-            });
-            html += `
-                    </tbody>
-                </table>
-            `;
+        // Actualizar contador y mensaje de no resultados
+        if (visibles === 0) {
+            noResultadosDiv.style.display = 'block';
+            contadorResultados.textContent = 'No se encontraron resultados';
         } else {
-            html += '<ul><li>El estudiante tiene un plan de pago (ID: ' + est.plan_pago.id + '), pero no tiene cuotas registradas.</li></ul>';
+            noResultadosDiv.style.display = 'none';
+            const plural = visibles === 1 ? 'estudiante' : 'estudiantes';
+            contadorResultados.textContent = `${visibles} ${plural}`;
         }
-    } else {
-        html += '<ul><li>El estudiante no tiene plan de pago asignado.</li></ul>';
     }
-    html += `
-            </div>
-        </div>
-    `;
-    estudianteInfoDiv.innerHTML = html;
-    estudianteInfoDiv.style.display = '';
-    listaEstudiantesDiv.style.display = 'none';
-}
 
-buscarInput.addEventListener('blur', () => {
-    setTimeout(() => sugerenciasDiv.innerHTML = '', 150);
-});
+    // Event listener para búsqueda
+    buscarInput.addEventListener('input', filtrarTarjetas);
 
-// Modal: pasar el id de la cuota al input oculto
-const modalRegistrarPago = document.getElementById('modalRegistrarPago');
-modalRegistrarPago.addEventListener('show.bs.modal', function (event) {
-    const button = event.relatedTarget;
-    
-    // Debug: Mostrar el botón completo
-    console.log('Botón:', button);
-    console.log('Atributos:', {
-        cuotaId: button.getAttribute('data-cuota-id'),
-        monto: button.getAttribute('data-monto'),
-        planId: button.getAttribute('data-plan-id')
+    // Event listeners para filtros
+    filterTodos.addEventListener('click', function () {
+        filtroActual = 'todos';
+        actualizarBotonesFiltro(this);
+        filtrarTarjetas();
     });
-    
-    // Obtener datos del botón
-    const cuotaId = button.getAttribute('data-cuota-id');
-    const monto = button.getAttribute('data-monto');
-    const planId = button.getAttribute('data-plan-id');
-    
-    // Verificar que tenemos los datos
-    if (!cuotaId || !monto || !planId) {
-        console.error('Faltan datos de la cuota:', { cuotaId, monto, planId });
-        return;
+
+    filterPendientes.addEventListener('click', function () {
+        filtroActual = 'pendientes';
+        actualizarBotonesFiltro(this);
+        filtrarTarjetas();
+    });
+
+    filterCompletados.addEventListener('click', function () {
+        filtroActual = 'completados';
+        actualizarBotonesFiltro(this);
+        filtrarTarjetas();
+    });
+
+    // Función para actualizar estado visual de botones de filtro
+    function actualizarBotonesFiltro(botonActivo) {
+        [filterTodos, filterPendientes, filterCompletados].forEach(btn => {
+            btn.classList.remove('active');
+        });
+        botonActivo.classList.add('active');
     }
 
-    // Llenar el formulario
-    document.getElementById('modal-cuota-id').value = cuotaId;
-    document.getElementById('modal-monto-pago').value = monto;
-    document.getElementById('modal-id-planes-pagos').value = planId;
-    document.getElementById('modal-fecha-pago').value = new Date().toISOString().split('T')[0];
-    document.getElementById('modal-descripcion').value = `Pago de cuota #${cuotaId}`;
-    document.getElementById('modal-comprobante').value = `COMP-${new Date().getTime()}-${cuotaId}`;
-});
+    // Modal: pasar el id de la cuota al input oculto
+    const modalRegistrarPago = document.getElementById('modalRegistrarPago');
+    if (modalRegistrarPago) {
+        modalRegistrarPago.addEventListener('show.bs.modal', function (event) {
+            const button = event.relatedTarget;
+
+            // Obtener datos del botón
+            const cuotaId = button.getAttribute('data-cuota-id');
+            const monto = button.getAttribute('data-monto');
+            const planId = button.getAttribute('data-plan-id');
+
+            // Verificar que tenemos los datos
+            if (!cuotaId || !monto || !planId) {
+                console.error('Faltan datos de la cuota:', { cuotaId, monto, planId });
+                return;
+            }
+
+            // Llenar el formulario
+            document.getElementById('modal-cuota-id').value = cuotaId;
+            document.getElementById('modal-monto-pago').value = monto;
+            document.getElementById('modal-id-planes-pagos').value = planId;
+            document.getElementById('modal-fecha-pago').value = new Date().toISOString().split('T')[0];
+            document.getElementById('modal-descripcion').value = `Pago de cuota #${cuotaId}`;
+            document.getElementById('modal-comprobante').value = `COMP-${new Date().getTime()}-${cuotaId}`;
+        });
+    }
+
+    // Función para pagar plan completo (todas las cuotas pendientes)
+    window.pagarPlanCompleto = function (planId, totalPendiente) {
+        if (confirm(`¿Está seguro de PAGAR TODAS LAS CUOTAS PENDIENTES del plan #${planId}?\n\nMonto total: Bs. ${totalPendiente.toFixed(2)}`)) {
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = pagarPlanCompletoUrl;
+
+            const csrfInput = document.createElement('input');
+            csrfInput.type = 'hidden';
+            csrfInput.name = '_token';
+            csrfInput.value = csrfToken;
+            form.appendChild(csrfInput);
+
+            const planIdInput = document.createElement('input');
+            planIdInput.type = 'hidden';
+            planIdInput.name = 'plan_id';
+            planIdInput.value = planId;
+            form.appendChild(planIdInput);
+
+            document.body.appendChild(form);
+            form.submit();
+        }
+    };
 });
