@@ -156,7 +156,7 @@
             <select name="sucursal" class="form-control" required>
                 <option value="">Seleccione...</option>
                 @forelse ($sucursales as $s)
-                    <option value="{{ $s->Id_Sucursales }}" {{ old('sucursal') == $s->Id_Sucursales ? 'selected' : '' }}>
+                    <option value="{{ $s->Id_sucursales }}" {{ old('sucursal') == $s->Id_sucursales ? 'selected' : '' }}>
                         {{ $s->Nombre }}
                     </option>
                 @empty

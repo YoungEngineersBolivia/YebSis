@@ -227,8 +227,8 @@
                                 <label class="form-label" for="sucursal{{ $estudiante->Id_estudiantes }}">Sucursal</label>
                                 <select class="form-select" id="sucursal{{ $estudiante->Id_estudiantes }}" name="sucursal" required>
                                     @foreach ($sucursales as $sucursal)
-                                        <option value="{{ $sucursal->Id_Sucursales }}" 
-                                            {{ $sucursal->Id_Sucursales == $estudiante->Id_sucursales ? 'selected' : '' }}>
+                                        <option value="{{ $sucursal->Id_sucursales }}" 
+                                            {{ $sucursal->Id_sucursales == $estudiante->Id_sucursales ? 'selected' : '' }}>
                                             {{ $sucursal->Nombre }}
                                         </option>
                                     @endforeach

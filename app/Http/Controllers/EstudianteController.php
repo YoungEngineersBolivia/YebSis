@@ -65,7 +65,7 @@ class EstudianteController extends Controller
             'direccion_domicilio' => 'required|string',
             'codigo_estudiante' => 'required|string|unique:estudiantes,Cod_estudiante',
             'programa' => 'required|exists:programas,Id_programas',
-            'sucursal' => 'required|exists:sucursales,Id_Sucursales',
+            'sucursal' => 'required|exists:sucursales,Id_sucursales',
             'tutor_estudiante' => 'required|exists:tutores,Id_tutores',
         ]);
 
@@ -136,7 +136,7 @@ class EstudianteController extends Controller
             'celular' => 'required|string',
             'direccion_domicilio' => 'required|string',
             'programa' => 'required|exists:programas,Id_programas',
-            'sucursal' => 'required|exists:sucursales,Id_Sucursales',
+            'sucursal' => 'required|exists:sucursales,Id_sucursales',
             'tutor_estudiante' => 'required|exists:tutores,Id_tutores',
         ]);
 

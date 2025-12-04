@@ -63,6 +63,8 @@ class RegistroCombinadoController extends Controller
     // Registrar tutor y estudiante
     public function registrar(Request $request)
     {
+        \Illuminate\Support\Facades\Log::info('Datos recibidos en registrar:', $request->all());
+        
         // Función helper para capitalizar nombres
         $capitalizarNombre = function($texto) {
             return ucwords(strtolower(trim($texto)));
@@ -194,10 +196,11 @@ class RegistroCombinadoController extends Controller
                 $estudiante = Estudiante::find($estudianteIdExistente);
                 
                 // Actualizar programa si es diferente
-                if ($estudiante->Id_programas != $request->programa) {
-                    $estudiante->Id_programas = $request->programa;
-                    $estudiante->save();
-                }
+                // Actualizar programa, sucursal y profesor
+                $estudiante->Id_programas = $request->programa;
+                $estudiante->Id_sucursales = $request->sucursal;
+                $estudiante->Id_profesores = $request->profesor;
+                $estudiante->save();
             } else {
                 // Crear nuevo estudiante
                 $personaEstudiante = Persona::create([
@@ -210,6 +213,8 @@ class RegistroCombinadoController extends Controller
                     'Celular' => $request->estudiante_celular,
                     'Id_roles' => $rolEstudiante->Id_roles,
                 ]);
+                
+                \Illuminate\Support\Facades\Log::info('Creando estudiante nuevo con sucursal:', ['sucursal' => $request->sucursal]);
 
                 $estudiante = Estudiante::create([
                     'Cod_estudiante' => $request->codigo_estudiante,

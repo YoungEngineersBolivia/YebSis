@@ -11,7 +11,7 @@ class Sucursal extends Model
 
     protected $table = 'sucursales';
 
-    protected $primaryKey = 'Id_Sucursales';
+    protected $primaryKey = 'Id_sucursales';
 
     public $incrementing = true;
     protected $keyType = 'int';
@@ -25,6 +25,6 @@ class Sucursal extends Model
 
     public function estudiantes()
     {
-        return $this->hasMany(Estudiante::class, 'Id_sucursales', 'Id_Sucursales');
+        return $this->hasMany(Estudiante::class, 'Id_sucursales', 'Id_sucursales');
     }
 }
