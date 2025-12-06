@@ -121,6 +121,7 @@ Route::delete('/usuarios/{id}', [UsuariosController::class, 'destroy'])->name('u
     Route::get('/estudiantes/{id}/planes-pago', [EstudianteController::class, 'planesPago'])->name('estudiantes.planesPago');
     Route::get('/estudiantes/{id}/evaluaciones', [EstudianteController::class, 'evaluaciones'])->name('estudiantes.evaluaciones');
     Route::get('/estudiantes/{id}/horarios', [EstudianteController::class, 'horarios'])->name('estudiantes.horarios');
+    Route::get('/estudiantes/exportar-pdf', [EstudianteController::class, 'exportarPDF'])->name('estudiantes.exportarPDF');
     Route::put('/cuotas/{id}/registrar-pago', [CuotaController::class, 'registrarPago'])->name('cuotas.registrarPago');
     
     // Estudiantes Activos

@@ -13,9 +13,14 @@
 
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h1 class="mb-0">Lista de Estudiantes</h1>
-        <a href="{{ route('registroCombinado.registrar') }}" class="btn btn-primary">
-            <i class="fas fa-plus me-2"></i>Registrar Estudiante
-        </a>
+        <div class="d-flex gap-2">
+            <a href="{{ route('estudiantes.exportarPDF') }}" class="btn btn-success">
+                <i class="fas fa-file-pdf me-2"></i>Exportar PDF
+            </a>
+            <a href="{{ route('registroCombinado.registrar') }}" class="btn btn-primary">
+                <i class="fas fa-plus me-2"></i>Registrar Estudiante
+            </a>
+        </div>
     </div>
 
     {{-- Mensajes de sesión --}}

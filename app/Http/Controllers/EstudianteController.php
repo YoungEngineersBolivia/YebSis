@@ -13,6 +13,7 @@ use App\Models\PlanesPago;
 use App\Models\Evaluacion;
 use App\Models\Horario;
 use App\Models\Profesor;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 
 class EstudianteController extends Controller
@@ -298,5 +299,25 @@ class EstudianteController extends Controller
             ->get();
 
         return view('administrador.horariosEstudiante', compact('estudiante', 'horarios'));
+    }
+
+    /**
+     * Exportar lista de estudiantes a PDF
+     */
+    public function exportarPDF()
+    {
+        // Obtener todos los estudiantes con sus relaciones
+        $estudiantes = Estudiante::with(['persona', 'programa', 'sucursal'])
+            ->orderBy('Cod_estudiante', 'asc')
+            ->get();
+
+        // Cargar la vista y generar el PDF
+        $pdf = Pdf::loadView('administrador.estudiantes_pdf', compact('estudiantes'));
+
+        // Configurar el PDF
+        $pdf->setPaper('letter', 'portrait');
+
+        // Descargar el PDF
+        return $pdf->download('estudiantes_lista_' . date('Y-m-d') . '.pdf');
     }
 }
