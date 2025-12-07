@@ -105,8 +105,10 @@ class ComponentesController extends Controller
      */
     public function salidaComponentes()
     {
+        // Solo motores disponibles en inventario
         $motores = Motor::where('Ubicacion_actual', 'Inventario')
             ->where('Estado', '!=', 'Funcionando')
+            ->whereDoesntHave('asignacionActiva') // No tiene asignación activa
             ->with('sucursal')
             ->get();
         
@@ -114,9 +116,14 @@ class ComponentesController extends Controller
             ->with('persona')
             ->get();
         
-        // Solicitudes pendientes de asignación
+        // Solicitudes pendientes: motores que NO tienen asignación activa
+        // Y que el motor esté en inventario (no asignado)
         $solicitudesPendientes = MotorMovimiento::where('Tipo_movimiento', 'Salida')
-            ->whereDoesntHave('asignacionActiva')
+            ->where('Nombre_tecnico', 'Solicitud Pendiente')
+            ->whereHas('motor', function($query) {
+                $query->where('Ubicacion_actual', 'Inventario')
+                      ->whereNull('Id_tecnico_actual');
+            })
             ->with(['motor', 'profesor.persona'])
             ->latest('Fecha_movimiento')
             ->get();
@@ -150,6 +157,17 @@ class ComponentesController extends Controller
                     ->with('error', 'El motor no tiene una sucursal asignada. Por favor, asigna una sucursal al motor primero.');
             }
             
+            // Verificar que el motor no tenga asignación activa
+            $asignacionExistente = MotorAsignacionActiva::where('Id_motores', $motor->Id_motores)
+                ->where('Estado_asignacion', 'Activa')
+                ->first();
+            
+            if ($asignacionExistente) {
+                DB::rollBack();
+                return redirect()->back()
+                    ->with('error', 'Este motor ya tiene una asignación activa.');
+            }
+            
             // Registrar movimiento de salida
             $movimiento = MotorMovimiento::create([
                 'Id_motores' => $motor->Id_motores,
@@ -181,6 +199,12 @@ class ComponentesController extends Controller
                 'Ubicacion_actual' => 'Con Tecnico',
                 'Id_tecnico_actual' => $profesor->Id_profesores
             ]);
+            
+            // Actualizar solicitudes pendientes relacionadas (marcarlas como procesadas)
+            MotorMovimiento::where('Id_motores', $motor->Id_motores)
+                ->where('Tipo_movimiento', 'Salida')
+                ->where('Nombre_tecnico', 'Solicitud Pendiente')
+                ->update(['Nombre_tecnico' => 'Procesada - ' . $profesor->persona->Nombre . ' ' . $profesor->persona->Apellido]);
             
             DB::commit();
             
