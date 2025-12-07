@@ -1,646 +1,387 @@
 @extends('profesor.baseProfesor')
 
-@section('styles')
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+@section('title', 'Inventario de Componentes')
+
+@section('content')
 <style>
-    * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
+    .mobile-container {
+        background: linear-gradient(135deg, #f5f7fa 0%, #e9ecef 100%);
+        min-height: 100vh;
     }
 
-    body {
-        background-color: #f5f5f5;
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        padding-bottom: 80px;
-    }
-
-    .container-mobile {
-        max-width: 100%;
-        padding: 15px;
-    }
-
-    .header-title {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
-        padding: 20px;
-        border-radius: 15px;
-        margin-bottom: 20px;
+    .mobile-header {
         box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-    }
-
-    .header-title h1 {
-        font-size: 22px;
-        margin: 0;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-    }
-
-    .search-container {
-        background: white;
-        padding: 15px;
-        border-radius: 12px;
-        margin-bottom: 20px;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.08);
-    }
-
-    .search-box {
-        position: relative;
-        width: 100%;
-    }
-
-    .search-box input {
-        width: 100%;
-        padding: 12px 45px 12px 45px;
-        border: 2px solid #e0e0e0;
-        border-radius: 25px;
-        font-size: 15px;
-        transition: all 0.3s;
-    }
-
-    .search-box input:focus {
-        outline: none;
-        border-color: #667eea;
-    }
-
-    .search-box .search-icon {
-        position: absolute;
-        left: 15px;
-        top: 50%;
-        transform: translateY(-50%);
-        color: #999;
-        font-size: 18px;
-    }
-
-    .search-box .clear-btn {
-        position: absolute;
-        right: 15px;
-        top: 50%;
-        transform: translateY(-50%);
-        background: none;
-        border: none;
-        color: #999;
-        font-size: 18px;
-        cursor: pointer;
-        display: none;
+        background: linear-gradient(135deg, #0d6efd 0%, #0b5ed7 100%);
     }
 
     .motor-card {
-        background: white;
-        border-radius: 15px;
-        padding: 18px;
-        margin-bottom: 15px;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-        transition: transform 0.2s, box-shadow 0.2s;
+        border-left: 4px solid #0d6efd;
+        transition: all 0.3s ease;
+        border-radius: 12px;
+        overflow: hidden;
     }
 
-    .motor-card:active {
-        transform: scale(0.98);
+    .motor-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 12px rgba(0,0,0,0.15);
     }
 
-    .motor-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 12px;
-        padding-bottom: 12px;
-        border-bottom: 1px solid #f0f0f0;
-    }
-
-    .motor-id {
-        font-size: 20px;
-        font-weight: bold;
-        color: #333;
-    }
-
-    .motor-estado {
-        padding: 6px 14px;
-        border-radius: 20px;
-        font-size: 13px;
+    .badge {
+        font-size: 0.75rem;
+        padding: 0.4em 0.75em;
         font-weight: 600;
     }
 
-    .estado-funcionando {
-        background-color: #d4edda;
-        color: #155724;
-    }
-
-    .estado-descompuesto {
-        background-color: #f8d7da;
-        color: #721c24;
-    }
-
-    .estado-proceso {
-        background-color: #fff3cd;
-        color: #856404;
-    }
-
-    .motor-info {
-        margin-bottom: 15px;
-    }
-
-    .info-row {
-        display: flex;
-        align-items: center;
-        padding: 8px 0;
-        font-size: 14px;
-        color: #666;
-    }
-
-    .info-row i {
-        width: 30px;
-        color: #667eea;
-        font-size: 16px;
-    }
-
-    .info-row strong {
-        color: #333;
-        margin-right: 5px;
-    }
-
-    .btn-solicitar {
-        width: 100%;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
-        border: none;
-        padding: 14px;
-        border-radius: 12px;
-        font-size: 16px;
+    .btn-lg {
+        padding: 0.75rem 1rem;
+        font-size: 1rem;
         font-weight: 600;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 10px;
-        cursor: pointer;
-        transition: transform 0.2s, box-shadow 0.2s;
-        box-shadow: 0 4px 6px rgba(102, 126, 234, 0.3);
+        border-radius: 8px;
     }
 
-    .btn-solicitar:active {
-        transform: translateY(2px);
-        box-shadow: 0 2px 4px rgba(102, 126, 234, 0.3);
+    .alert-light {
+        border-left: 3px solid #0d6efd;
     }
 
-    .btn-solicitar:disabled {
-        background: #ccc;
-        cursor: not-allowed;
-        box-shadow: none;
-    }
-
-    .empty-state {
-        text-align: center;
-        padding: 60px 20px;
-        color: #999;
-    }
-
-    .empty-state i {
-        font-size: 64px;
-        margin-bottom: 20px;
-        color: #ddd;
-    }
-
-    .empty-state p {
-        font-size: 16px;
-        margin: 0;
-    }
-
-    .alert-mobile {
-        position: fixed;
-        top: 15px;
-        left: 15px;
-        right: 15px;
-        padding: 15px 20px;
-        border-radius: 12px;
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        font-size: 14px;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-        z-index: 1000;
-        animation: slideDown 0.3s ease-out;
-    }
-
-    @keyframes slideDown {
+    @keyframes fadeInUp {
         from {
-            transform: translateY(-100%);
             opacity: 0;
+            transform: translateY(20px);
         }
         to {
-            transform: translateY(0);
             opacity: 1;
-        }
-    }
-
-    .alert-success {
-        background-color: #d4edda;
-        color: #155724;
-        border-left: 4px solid #28a745;
-    }
-
-    .alert-error {
-        background-color: #f8d7da;
-        color: #721c24;
-        border-left: 4px solid #dc3545;
-    }
-
-    .alert-close {
-        margin-left: auto;
-        background: none;
-        border: none;
-        font-size: 20px;
-        cursor: pointer;
-        color: inherit;
-        opacity: 0.7;
-    }
-
-    /* Modal Styles */
-    .modal-overlay {
-        display: none;
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background-color: rgba(0,0,0,0.5);
-        z-index: 9998;
-        animation: fadeIn 0.3s;
-    }
-
-    @keyframes fadeIn {
-        from { opacity: 0; }
-        to { opacity: 1; }
-    }
-
-    .modal-container {
-        display: none;
-        position: fixed;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        background: white;
-        border-radius: 25px 25px 0 0;
-        z-index: 9999;
-        animation: slideUp 0.3s ease-out;
-        max-height: 90vh;
-        overflow-y: auto;
-    }
-
-    @keyframes slideUp {
-        from {
-            transform: translateY(100%);
-        }
-        to {
             transform: translateY(0);
         }
     }
 
-    .modal-header {
-        padding: 20px;
-        border-bottom: 1px solid #f0f0f0;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        position: sticky;
-        top: 0;
-        background: white;
-        z-index: 1;
+    .motor-card {
+        animation: fadeInUp 0.5s ease;
     }
 
-    .modal-header h3 {
-        margin: 0;
-        font-size: 20px;
-        color: #333;
-    }
+    @media (max-width: 576px) {
+        .mobile-header h5 {
+            font-size: 1.1rem;
+        }
+        
+        .card-body {
+            padding: 0.75rem;
+        }
 
-    .modal-close {
-        background: none;
-        border: none;
-        font-size: 28px;
-        cursor: pointer;
-        color: #999;
-        width: 35px;
-        height: 35px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-
-    .modal-body {
-        padding: 20px;
-    }
-
-    .form-group {
-        margin-bottom: 20px;
-    }
-
-    .form-label {
-        display: block;
-        margin-bottom: 8px;
-        font-weight: 600;
-        color: #333;
-        font-size: 14px;
-    }
-
-    .form-control {
-        width: 100%;
-        padding: 12px 15px;
-        border: 2px solid #e0e0e0;
-        border-radius: 10px;
-        font-size: 15px;
-        transition: border-color 0.3s;
-    }
-
-    .form-control:focus {
-        outline: none;
-        border-color: #667eea;
-    }
-
-    textarea.form-control {
-        resize: vertical;
-        min-height: 100px;
-    }
-
-    .modal-footer {
-        padding: 20px;
-        border-top: 1px solid #f0f0f0;
-        display: flex;
-        gap: 10px;
-        position: sticky;
-        bottom: 0;
-        background: white;
-    }
-
-    .btn-cancel {
-        flex: 1;
-        padding: 14px;
-        background: #f0f0f0;
-        color: #666;
-        border: none;
-        border-radius: 10px;
-        font-size: 16px;
-        font-weight: 600;
-        cursor: pointer;
-    }
-
-    .btn-submit {
-        flex: 2;
-        padding: 14px;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
-        border: none;
-        border-radius: 10px;
-        font-size: 16px;
-        font-weight: 600;
-        cursor: pointer;
-    }
-
-    .loading {
-        display: none;
-        text-align: center;
-        padding: 20px;
-    }
-
-    .spinner {
-        border: 3px solid #f3f3f3;
-        border-top: 3px solid #667eea;
-        border-radius: 50%;
-        width: 40px;
-        height: 40px;
-        animation: spin 1s linear infinite;
-        margin: 0 auto 10px;
-    }
-
-    @keyframes spin {
-        0% { transform: rotate(0deg); }
-        100% { transform: rotate(360deg); }
+        .btn-lg {
+            font-size: 0.95rem;
+            padding: 0.65rem 0.9rem;
+        }
     }
 </style>
-@endsection
 
-@section('content')
-<div class="container-mobile">
-    <!-- Alertas -->
+<div class="mobile-container">
+    <!-- Header -->
+    <div class="mobile-header bg-primary text-white p-3 sticky-top">
+        <div class="d-flex align-items-center justify-content-between">
+            <div>
+                <h5 class="mb-0">
+                    <i class="bi bi-box-seam"></i> Inventario
+                </h5>
+                <small>{{ $profesor->persona->Nombre }}</small>
+            </div>
+            <div class="text-end">
+                <span class="badge bg-light text-primary">
+                    {{ $motores->count() }} Motores
+                </span>
+            </div>
+        </div>
+    </div>
+
     @if(session('success'))
-        <div class="alert-mobile alert-success" id="alertSuccess">
-            <i class="fas fa-check-circle"></i>
-            <span>{{ session('success') }}</span>
-            <button class="alert-close" onclick="closeAlert('alertSuccess')">×</button>
+        <div class="alert alert-success alert-dismissible fade show m-3">
+            <i class="bi bi-check-circle"></i> {{ session('success') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         </div>
     @endif
 
     @if(session('error'))
-        <div class="alert-mobile alert-error" id="alertError">
-            <i class="fas fa-exclamation-circle"></i>
-            <span>{{ session('error') }}</span>
-            <button class="alert-close" onclick="closeAlert('alertError')">×</button>
+        <div class="alert alert-danger alert-dismissible fade show m-3">
+            <i class="bi bi-exclamation-triangle"></i> {{ session('error') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         </div>
     @endif
 
-    <!-- Header -->
-    <div class="header-title">
-        <h1>
-            <i class="fas fa-cogs"></i>
-            Inventario de Motores
-        </h1>
-    </div>
-
-    <!-- Búsqueda -->
-    <div class="search-container">
-        <div class="search-box">
-            <i class="fas fa-search search-icon"></i>
-            <input type="text" 
-                   id="searchInput" 
-                   placeholder="Buscar por ID de motor..."
-                   onkeyup="filterMotors()">
-            <button class="clear-btn" id="clearBtn" onclick="clearSearch()">×</button>
+    <!-- Filtros -->
+    <div class="p-3 bg-light border-bottom">
+        <div class="input-group mb-2">
+            <span class="input-group-text bg-white">
+                <i class="bi bi-search"></i>
+            </span>
+            <input type="text" class="form-control" id="buscarMotor" 
+                   placeholder="Buscar por ID del motor...">
         </div>
+        <select class="form-select" id="filtroEstado">
+            <option value="">📋 Todos los estados</option>
+            <option value="Disponible">✅ Disponible</option>
+            <option value="Descompuesto">❌ Descompuesto</option>
+            <option value="Funcionando">✔️ Funcionando</option>
+        </select>
     </div>
 
     <!-- Lista de Motores -->
-    <div id="motorsContainer">
-        @forelse($motoresDisponibles as $motor)
-        <div class="motor-card" data-motor-id="{{ $motor->Id_motor }}">
-            <div class="motor-header">
-                <div class="motor-id">Motor {{ $motor->Id_motor }}</div>
-                <span class="motor-estado estado-{{ strtolower($motor->Estado) }}">
-                    {{ $motor->Estado }}
-                </span>
-            </div>
-            
-            <div class="motor-info">
-                <div class="info-row">
-                    <i class="fas fa-map-marker-alt"></i>
-                    <div>
-                        <strong>Sucursal:</strong> {{ $motor->Nombre_sucursal ?? 'No asignada' }}
+    <div class="p-3">
+        <div id="listaMotores">
+            @forelse($motores as $motor)
+            <div class="card mb-3 shadow-sm motor-card" 
+                 data-id="{{ $motor->Id_motor }}" 
+                 data-estado="{{ $motor->Estado }}">
+                <div class="card-body p-3">
+                    <!-- Cabecera del Motor -->
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <div>
+                            <h6 class="mb-1">
+                                <i class="bi bi-gear-fill text-primary"></i>
+                                <strong>{{ $motor->Id_motor }}</strong>
+                            </h6>
+                            <p class="text-muted small mb-0">
+                                <i class="bi bi-geo-alt-fill"></i>
+                                {{ $motor->sucursal->Nombre ?? 'Sin sucursal' }}
+                            </p>
+                        </div>
+                        <div>
+                            @php
+                                $badges = [
+                                    'Disponible' => ['class' => 'bg-success', 'icon' => '✓'],
+                                    'Descompuesto' => ['class' => 'bg-danger', 'icon' => '✗'],
+                                    'Funcionando' => ['class' => 'bg-primary', 'icon' => '⚙'],
+                                    'En Reparacion' => ['class' => 'bg-warning text-dark', 'icon' => '🔧']
+                                ];
+                                $badge = $badges[$motor->Estado] ?? ['class' => 'bg-secondary', 'icon' => '•'];
+                            @endphp
+                            <span class="badge {{ $badge['class'] }}">
+                                {{ $badge['icon'] }} {{ $motor->Estado }}
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- Observaciones -->
+                    @if($motor->Observacion)
+                    <div class="alert alert-light py-2 mb-3">
+                        <p class="small mb-0">
+                            <i class="bi bi-chat-left-text text-muted"></i>
+                            <strong>Observación:</strong><br>
+                            <span class="text-muted">{{ $motor->Observacion }}</span>
+                        </p>
+                    </div>
+                    @endif
+
+                    <!-- Botón de Acción -->
+                    <div class="d-grid">
+                        <button type="button" 
+                                class="btn btn-primary btn-lg btn-solicitar" 
+                                data-motor-id="{{ $motor->Id_motores }}"
+                                data-motor-display="{{ $motor->Id_motor }}"
+                                data-motor-estado="{{ $motor->Estado }}">
+                            <i class="bi bi-send-fill"></i>
+                            Solicitar Salida
+                        </button>
                     </div>
                 </div>
-                <div class="info-row">
-                    <i class="fas fa-info-circle"></i>
-                    <div>
-                        <strong>Estado:</strong> Disponible para solicitud
-                    </div>
-                </div>
             </div>
-
-            <button class="btn-solicitar" onclick="abrirModalSolicitud({{ $motor->Id_motores }}, '{{ $motor->Id_motor }}')">
-                <i class="fas fa-paper-plane"></i>
-                Solicitar Salida
-            </button>
+            @empty
+            <div class="text-center py-5">
+                <i class="bi bi-inbox display-1 text-muted"></i>
+                <h5 class="mt-3 text-muted">No hay motores en inventario</h5>
+                <p class="text-muted">No se encontraron motores disponibles</p>
+            </div>
+            @endforelse
         </div>
-        @empty
-        <div class="empty-state">
-            <i class="fas fa-box-open"></i>
-            <p>No hay motores disponibles</p>
-        </div>
-        @endforelse
-    </div>
 
-    <!-- Estado vacío cuando no hay resultados de búsqueda -->
-    <div class="empty-state" id="emptySearch" style="display: none;">
-        <i class="fas fa-search"></i>
-        <p>No se encontraron motores</p>
+        <!-- Mensaje cuando no hay resultados de búsqueda -->
+        <div id="noResults" class="text-center py-5 d-none">
+            <i class="bi bi-search display-1 text-muted"></i>
+            <h5 class="mt-3 text-muted">No se encontraron resultados</h5>
+            <p class="text-muted">Intenta con otro término de búsqueda</p>
+        </div>
     </div>
 </div>
 
 <!-- Modal Solicitar Salida -->
-<div class="modal-overlay" id="modalOverlay" onclick="cerrarModal()"></div>
-<div class="modal-container" id="modalSolicitud">
-    <div class="modal-header">
-        <h3><i class="fas fa-paper-plane"></i> Solicitar Salida</h3>
-        <button class="modal-close" onclick="cerrarModal()">×</button>
-    </div>
-    <form method="POST" action="{{ route('profesor.inventario.solicitar') }}" id="formSolicitud">
-        @csrf
-        <input type="hidden" name="Id_motores" id="motorIdInput">
-        
-        <div class="modal-body">
-            <div class="alert-mobile alert-success" style="position: relative; margin-bottom: 20px;">
-                <i class="fas fa-info-circle"></i>
-                <span>Motor: <strong id="motorIdText"></strong></span>
-            </div>
+<div class="modal fade" id="modalSolicitarSalida" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <form action="{{ route('profesor.componentes.solicitar-salida') }}" method="POST" id="formSolicitud">
+                @csrf
+                <input type="hidden" name="Id_motores" id="modal_motor_id">
+                
+                <div class="modal-header bg-primary text-white">
+                    <h6 class="modal-title">
+                        <i class="bi bi-send-fill"></i>
+                        Solicitar Salida de Motor
+                    </h6>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                
+                <div class="modal-body">
+                    <div class="alert alert-info">
+                        <div class="row">
+                            <div class="col-6">
+                                <strong>Motor:</strong><br>
+                                <span id="modal_motor_display" class="h5"></span>
+                            </div>
+                            <div class="col-6">
+                                <strong>Estado:</strong><br>
+                                <span id="modal_estado_display"></span>
+                            </div>
+                        </div>
+                    </div>
 
-            <div class="form-group">
-                <label class="form-label">Motivo de la Solicitud *</label>
-                <textarea class="form-control" 
-                          name="motivo" 
-                          placeholder="Describe por qué necesitas este motor..."
-                          required></textarea>
-            </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">
+                            <i class="bi bi-pencil-square"></i>
+                            Motivo de Salida *
+                        </label>
+                        <textarea class="form-control" 
+                                  name="Motivo_salida" 
+                                  id="motivoSalida"
+                                  rows="5" 
+                                  required
+                                  placeholder="Describe detalladamente el motivo por el cual el motor necesita salir del inventario...
 
-            <div class="form-group">
-                <label class="form-label">Observaciones Adicionales</label>
-                <textarea class="form-control" 
-                          name="observaciones" 
-                          placeholder="Información adicional (opcional)..."></textarea>
-            </div>
+Ejemplo:
+- Motor presenta fallas en el circuito principal
+- Se detectó sobrecalentamiento
+- Requiere mantenimiento preventivo"></textarea>
+                        <div class="form-text">
+                            <span id="charCount">0</span> / 500 caracteres
+                            <span id="charWarning" class="text-danger d-none">⚠️ Mínimo 10 caracteres</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="bi bi-x-circle"></i> Cancelar
+                    </button>
+                    <button type="submit" class="btn btn-primary" id="btnEnviar" disabled>
+                        <i class="bi bi-check2-circle"></i> Enviar Solicitud
+                    </button>
+                </div>
+            </form>
         </div>
-
-        <div class="modal-footer">
-            <button type="button" class="btn-cancel" onclick="cerrarModal()">
-                Cancelar
-            </button>
-            <button type="submit" class="btn-submit">
-                <i class="fas fa-check"></i> Enviar Solicitud
-            </button>
-        </div>
-    </form>
-
-    <div class="loading" id="loadingIndicator">
-        <div class="spinner"></div>
-        <p>Enviando solicitud...</p>
     </div>
 </div>
 
 <script>
-    // Cerrar alertas automáticamente después de 5 segundos
-    setTimeout(() => {
-        const alerts = document.querySelectorAll('.alert-mobile');
-        alerts.forEach(alert => {
-            if (alert) {
-                alert.style.animation = 'slideDown 0.3s ease-out reverse';
-                setTimeout(() => alert.remove(), 300);
-            }
-        });
-    }, 5000);
-
-    function closeAlert(id) {
-        const alert = document.getElementById(id);
-        if (alert) {
-            alert.style.animation = 'slideDown 0.3s ease-out reverse';
-            setTimeout(() => alert.remove(), 300);
-        }
-    }
-
-    function abrirModalSolicitud(motorId, motorIdText) {
-        document.getElementById('motorIdInput').value = motorId;
-        document.getElementById('motorIdText').textContent = motorIdText;
-        document.getElementById('modalOverlay').style.display = 'block';
-        document.getElementById('modalSolicitud').style.display = 'block';
-        document.body.style.overflow = 'hidden';
-    }
-
-    function cerrarModal() {
-        document.getElementById('modalOverlay').style.display = 'none';
-        document.getElementById('modalSolicitud').style.display = 'none';
-        document.body.style.overflow = 'auto';
-        document.getElementById('formSolicitud').reset();
-    }
-
-    function filterMotors() {
-        const searchValue = document.getElementById('searchInput').value.toLowerCase();
-        const clearBtn = document.getElementById('clearBtn');
-        const motorsContainer = document.getElementById('motorsContainer');
-        const emptySearch = document.getElementById('emptySearch');
-        const motorCards = document.querySelectorAll('.motor-card');
+    document.addEventListener('DOMContentLoaded', function() {
+        // Búsqueda y filtrado
+        const buscarMotor = document.getElementById('buscarMotor');
+        const filtroEstado = document.getElementById('filtroEstado');
         
-        // Mostrar/ocultar botón de limpiar
-        clearBtn.style.display = searchValue ? 'block' : 'none';
-        
-        let visibleCount = 0;
-        
-        motorCards.forEach(card => {
-            const motorId = card.getAttribute('data-motor-id').toLowerCase();
-            if (motorId.includes(searchValue)) {
-                card.style.display = 'block';
-                visibleCount++;
+        function filtrarMotores() {
+            const buscar = buscarMotor.value.toLowerCase().trim();
+            const estado = filtroEstado.value.toLowerCase();
+            
+            let visibleCount = 0;
+            const motorCards = document.querySelectorAll('.motor-card');
+
+            motorCards.forEach(function(card) {
+                const motorId = card.getAttribute('data-id').toLowerCase();
+                const motorEstado = card.getAttribute('data-estado').toLowerCase();
+
+                let mostrar = true;
+
+                if (buscar && !motorId.includes(buscar)) {
+                    mostrar = false;
+                }
+
+                if (estado && motorEstado !== estado) {
+                    mostrar = false;
+                }
+
+                if (mostrar) {
+                    card.style.display = '';
+                    visibleCount++;
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+
+            // Mostrar mensaje si no hay resultados
+            const noResults = document.getElementById('noResults');
+            if (visibleCount === 0) {
+                noResults.classList.remove('d-none');
             } else {
-                card.style.display = 'none';
+                noResults.classList.add('d-none');
+            }
+        }
+
+        buscarMotor.addEventListener('input', filtrarMotores);
+        filtroEstado.addEventListener('change', filtrarMotores);
+
+        // Botones de solicitar salida
+        const botonesSolicitar = document.querySelectorAll('.btn-solicitar');
+        const modalElement = document.getElementById('modalSolicitarSalida');
+        const modal = new bootstrap.Modal(modalElement);
+        
+        botonesSolicitar.forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                const motorId = this.getAttribute('data-motor-id');
+                const motorDisplay = this.getAttribute('data-motor-display');
+                const motorEstado = this.getAttribute('data-motor-estado');
+                
+                document.getElementById('modal_motor_id').value = motorId;
+                document.getElementById('modal_motor_display').textContent = motorDisplay;
+                
+                // Badge con color según estado
+                const badgeColors = {
+                    'Disponible': 'success',
+                    'Descompuesto': 'danger',
+                    'Funcionando': 'primary',
+                    'En Reparacion': 'warning text-dark'
+                };
+                const badgeClass = badgeColors[motorEstado] || 'secondary';
+                
+                document.getElementById('modal_estado_display').innerHTML = 
+                    '<span class="badge bg-' + badgeClass + '">' + motorEstado + '</span>';
+                
+                modal.show();
+                
+                // Focus en el textarea después de un delay
+                setTimeout(function() {
+                    document.getElementById('motivoSalida').focus();
+                }, 500);
+            });
+        });
+
+        // Contador de caracteres
+        const motivoSalida = document.getElementById('motivoSalida');
+        const charCount = document.getElementById('charCount');
+        const charWarning = document.getElementById('charWarning');
+        const btnEnviar = document.getElementById('btnEnviar');
+        
+        motivoSalida.addEventListener('input', function() {
+            const length = this.value.length;
+            
+            charCount.textContent = length;
+            
+            if (length < 10) {
+                btnEnviar.disabled = true;
+                charWarning.classList.remove('d-none');
+            } else {
+                btnEnviar.disabled = false;
+                charWarning.classList.add('d-none');
+            }
+
+            // Límite máximo
+            if (length > 500) {
+                this.value = this.value.substring(0, 500);
+                charCount.textContent = 500;
             }
         });
-        
-        // Mostrar mensaje si no hay resultados
-        if (visibleCount === 0 && searchValue) {
-            motorsContainer.style.display = 'none';
-            emptySearch.style.display = 'block';
-        } else {
-            motorsContainer.style.display = 'block';
-            emptySearch.style.display = 'none';
-        }
-    }
 
-    function clearSearch() {
-        document.getElementById('searchInput').value = '';
-        filterMotors();
-    }
-
-    // Prevenir cierre del modal al hacer click dentro
-    document.getElementById('modalSolicitud').addEventListener('click', function(e) {
-        e.stopPropagation();
-    });
-
-    // Mostrar loading al enviar formulario
-    document.getElementById('formSolicitud').addEventListener('submit', function() {
-        document.querySelector('.modal-body').style.display = 'none';
-        document.querySelector('.modal-footer').style.display = 'none';
-        document.getElementById('loadingIndicator').style.display = 'block';
-    });
-
-    // Cerrar modal con tecla ESC
-    document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape') {
-            cerrarModal();
-        }
+        // Resetear modal al cerrar
+        modalElement.addEventListener('hidden.bs.modal', function () {
+            document.getElementById('formSolicitud').reset();
+            charCount.textContent = 0;
+            charWarning.classList.add('d-none');
+            btnEnviar.disabled = true;
+        });
     });
 </script>
 @endsection
