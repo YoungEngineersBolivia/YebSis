@@ -8,90 +8,118 @@ return new class extends Migration
 {
     public function up(): void
     {
-        // Tabla para registrar los motores disponibles
+        // Tabla principal de motores (inventario)
         Schema::create('motores', function (Blueprint $table) {
             $table->id('Id_motores');
-            $table->string('Id_motor')->unique(); // 001, 002, 003, etc.
-            $table->string('Estado')->default('Funcionando'); // Funcionando, Descompuesto, En Proceso
+            $table->string('Id_motor')->unique(); // 001, 002, 003
+            $table->enum('Estado', ['Disponible', 'En Reparacion', 'Funcionando', 'Descompuesto'])->default('Disponible');
+            $table->enum('Ubicacion_actual', ['Inventario', 'Con Tecnico'])->default('Inventario');
             $table->text('Observacion')->nullable();
             $table->foreignId('Id_sucursales')
                   ->nullable()
                   ->constrained('sucursales', 'Id_Sucursales')
                   ->onDelete('set null');
+            $table->foreignId('Id_tecnico_actual') // Técnico que lo tiene actualmente
+                  ->nullable()
+                  ->constrained('profesores', 'Id_profesores')
+                  ->onDelete('set null');
             $table->timestamps();
         });
 
-        // Tabla para asignar motores a técnicos (profesores) para reparación
-        Schema::create('motores_asignados', function (Blueprint $table) {
-            $table->id('Id_motores_asignados');
+        // Tabla de movimientos (registra TODO: salidas E entradas)
+        Schema::create('motores_movimientos', function (Blueprint $table) {
+            $table->id('Id_movimientos');
+            $table->foreignId('Id_motores')
+                  ->constrained('motores', 'Id_motores')
+                  ->onDelete('cascade');
+            
+            // TIPO DE MOVIMIENTO
+            $table->enum('Tipo_movimiento', ['Salida', 'Entrada']);
+            
+            // DETALLES DEL MOVIMIENTO
+            $table->dateTime('Fecha_movimiento');
+            $table->foreignId('Id_sucursales')
+                  ->constrained('sucursales', 'Id_Sucursales')
+                  ->onDelete('cascade');
+            
+            // TÉCNICO INVOLUCRADO
+            $table->foreignId('Id_profesores')
+                  ->nullable()
+                  ->constrained('profesores', 'Id_profesores')
+                  ->onDelete('set null');
+            $table->string('Nombre_tecnico'); // Guardado para historial
+            
+            // ESTADOS
+            $table->string('Estado_salida')->nullable(); // Estado al salir del inventario
+            $table->string('Estado_entrada')->nullable(); // Estado al regresar al inventario
+            
+            // OBSERVACIONES
+            $table->text('Motivo_salida')->nullable(); // Por qué sale
+            $table->text('Trabajo_realizado')->nullable(); // Qué se hizo (solo en entrada)
+            $table->text('Observaciones')->nullable();
+            
+            // USUARIO QUE REGISTRA
+            $table->foreignId('Id_usuarios')
+                  ->nullable()
+                  ->constrained('usuarios', 'Id_usuarios')
+                  ->onDelete('set null');
+            
+            $table->timestamps();
+            
+            // Índices para búsquedas rápidas
+            $table->index('Tipo_movimiento');
+            $table->index('Fecha_movimiento');
+            $table->index('Id_profesores');
+        });
+
+        // Tabla de asignaciones activas (vista simplificada de motores en reparación)
+        Schema::create('motores_asignaciones_activas', function (Blueprint $table) {
+            $table->id('Id_asignacion');
             $table->foreignId('Id_motores')
                   ->constrained('motores', 'Id_motores')
                   ->onDelete('cascade');
             $table->foreignId('Id_profesores')
                   ->constrained('profesores', 'Id_profesores')
                   ->onDelete('cascade');
-            $table->string('Estado_asignacion')->default('En Proceso'); // En Proceso, Completado, Cancelado
-            $table->date('Fecha_asignacion');
-            $table->date('Fecha_entrega')->nullable();
-            $table->text('Observacion_inicial')->nullable(); // Observación al asignar
+            $table->foreignId('Id_movimiento_salida') // Referencia al movimiento de salida
+                  ->constrained('motores_movimientos', 'Id_movimientos')
+                  ->onDelete('cascade');
+            
+            $table->dateTime('Fecha_salida');
+            $table->string('Estado_motor_salida');
+            $table->text('Motivo_salida');
+            
+            $table->enum('Estado_asignacion', ['Activa', 'Finalizada'])->default('Activa');
+            
             $table->timestamps();
+            
+            // Solo puede haber UNA asignación activa por motor
+            $table->unique(['Id_motores', 'Estado_asignacion'], 'unique_active_assignment');
         });
 
-        // Tabla para registrar reportes de mantenimiento de motores
-        Schema::create('reportes_mantenimiento', function (Blueprint $table) {
-            $table->id('Id_reportes');
-            $table->foreignId('Id_motores_asignados')
-                  ->constrained('motores_asignados', 'Id_motores_asignados')
+        // Tabla de reportes de progreso (opcional, mientras está con el técnico)
+        Schema::create('reportes_progreso', function (Blueprint $table) {
+            $table->id('Id_reporte');
+            $table->foreignId('Id_asignacion')
+                  ->constrained('motores_asignaciones_activas', 'Id_asignacion')
                   ->onDelete('cascade');
-            $table->string('Estado_final'); // Descompuesto, En proceso, Funcionando
+            $table->dateTime('Fecha_reporte');
+            $table->enum('Estado_actual', ['En Diagnostico', 'En Reparacion', 'Reparado', 'Irreparable']);
+            $table->text('Descripcion_trabajo');
             $table->text('Observaciones')->nullable();
-            $table->date('Fecha_reporte');
-            $table->timestamps();
-        });
-
-        // Tabla para registrar entradas y salidas de motores (historial)
-        Schema::create('motores_movimientos', function (Blueprint $table) {
-            $table->id('Id_movimientos');
-            $table->foreignId('Id_motores')
-                  ->constrained('motores', 'Id_motores')
-                  ->onDelete('cascade');
-            $table->string('Tipo_movimiento'); // 'Entrada' o 'Salida'
-            $table->date('Fecha');
-            $table->foreignId('Id_sucursales')
-                  ->constrained('sucursales', 'Id_Sucursales')
-                  ->onDelete('cascade');
-            $table->string('Estado_ubicacion'); // Entrada, Salida, Andres, Saip, Nayeli, etc.
-            $table->string('Ultimo_tecnico')->nullable();
-            $table->text('Observacion')->nullable();
-            $table->foreignId('Id_usuarios')
-                  ->nullable()
-                  ->constrained('usuarios', 'Id_usuarios')
-                  ->onDelete('set null');
-            $table->timestamps();
-        });
-
-        // Tabla para solicitudes de salida de motores
-        Schema::create('solicitudes_salida', function (Blueprint $table) {
-            $table->id('Id_solicitudes');
-            $table->foreignId('Id_motores')
-                  ->constrained('motores', 'Id_motores')
-                  ->onDelete('cascade');
-            $table->foreignId('Id_usuarios')
-                  ->constrained('usuarios', 'Id_usuarios')
-                  ->onDelete('cascade');
-            $table->date('Fecha_solicitud');
-            $table->string('Estado_solicitud')->default('Pendiente'); // Pendiente, Aprobada, Rechazada
-            $table->text('Motivo')->nullable();
             $table->timestamps();
         });
     }
 
     public function down(): void
     {
-        Schema::dropIfExists('solicitudes_salida');
-        Schema::dropIfExists('motores_movimientos');
-        Schema::dropIfExists('reportes_mantenimiento');
-        Schema::dropIfExists('motores_asignados');
-        Schema::dropIfExists('motores');
+        Schema::disableForeignKeyConstraints();
+
+      Schema::dropIfExists('reportes_progreso');
+      Schema::dropIfExists('motores_asignaciones_activas');
+      Schema::dropIfExists('motores_movimientos');
+      Schema::dropIfExists('motores');
+
+      Schema::enableForeignKeyConstraints();
     }
 };

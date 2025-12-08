@@ -14,6 +14,6 @@ class RolSeeder extends Seeder
         Rol::create(['Nombre_rol'=>'Tutor']);
         Rol::create(['Nombre_rol'=>'Estudiante']);
         Rol::create(['Nombre_rol'=>'Prospecto']);
-
+        
     }
 }
