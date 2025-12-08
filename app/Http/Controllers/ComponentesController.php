@@ -11,6 +11,7 @@ use App\Models\Sucursal;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class ComponentesController extends Controller
 {
@@ -89,7 +90,11 @@ class ComponentesController extends Controller
         $motor = Motor::findOrFail($id);
         
         // Verificar si tiene asignaciones activas
-        if ($motor->asignacionActiva) {
+        $asignacionActiva = MotorAsignacionActiva::where('Id_motores', $motor->Id_motores)
+            ->whereIn('Estado_asignacion', ['Activa', 'Pendiente Entrada'])
+            ->first();
+        
+        if ($asignacionActiva) {
             return redirect()->back()
                 ->with('error', 'No se puede eliminar un motor con asignación activa');
         }
@@ -108,7 +113,7 @@ class ComponentesController extends Controller
         // Solo motores disponibles en inventario
         $motores = Motor::where('Ubicacion_actual', 'Inventario')
             ->where('Estado', '!=', 'Funcionando')
-            ->whereDoesntHave('asignacionActiva') // No tiene asignación activa
+            ->whereDoesntHave('asignacionActiva')
             ->with('sucursal')
             ->get();
         
@@ -116,8 +121,7 @@ class ComponentesController extends Controller
             ->with('persona')
             ->get();
         
-        // Solicitudes pendientes: motores que NO tienen asignación activa
-        // Y que el motor esté en inventario (no asignado)
+        // Solicitudes pendientes
         $solicitudesPendientes = MotorMovimiento::where('Tipo_movimiento', 'Salida')
             ->where('Nombre_tecnico', 'Solicitud Pendiente')
             ->whereHas('motor', function($query) {
@@ -159,7 +163,7 @@ class ComponentesController extends Controller
             
             // Verificar que el motor no tenga asignación activa
             $asignacionExistente = MotorAsignacionActiva::where('Id_motores', $motor->Id_motores)
-                ->where('Estado_asignacion', 'Activa')
+                ->whereIn('Estado_asignacion', ['Activa', 'Pendiente Entrada'])
                 ->first();
             
             if ($asignacionExistente) {
@@ -200,7 +204,7 @@ class ComponentesController extends Controller
                 'Id_tecnico_actual' => $profesor->Id_profesores
             ]);
             
-            // Actualizar solicitudes pendientes relacionadas (marcarlas como procesadas)
+            // Actualizar solicitudes pendientes relacionadas
             MotorMovimiento::where('Id_motores', $motor->Id_motores)
                 ->where('Tipo_movimiento', 'Salida')
                 ->where('Nombre_tecnico', 'Solicitud Pendiente')
@@ -213,6 +217,8 @@ class ComponentesController extends Controller
                 
         } catch (\Exception $e) {
             DB::rollBack();
+            Log::error('Error al registrar salida: ' . $e->getMessage());
+            Log::error('Trace: ' . $e->getTraceAsString());
             return redirect()->back()
                 ->with('error', 'Error al registrar salida: ' . $e->getMessage());
         }
@@ -223,24 +229,28 @@ class ComponentesController extends Controller
      */
     public function entradaComponentes()
     {
-        $asignacionesActivas = MotorAsignacionActiva::where('Estado_asignacion', 'Activa')
+        // Asignaciones activas que están listas para entrega
+        $asignacionesActivas = MotorAsignacionActiva::whereIn('Estado_asignacion', ['Activa', 'Pendiente Entrada'])
             ->with(['motor', 'profesor.persona', 'reportesProgreso' => function($query) {
                 $query->latest('Fecha_reporte');
             }])
+            ->orderByRaw("FIELD(Estado_asignacion, 'Pendiente Entrada', 'Activa')")
+            ->orderBy('Fecha_salida', 'asc')
             ->get();
         
         return view('componentes.entradaComponentes', compact('asignacionesActivas'));
     }
     
     /**
-     * Registrar entrada de motor
+     * Registrar entrada de motor (ADMINISTRADOR)
+     * Confirma la entrada después de que el técnico la propuso
      */
     public function registrarEntrada(Request $request)
     {
         $request->validate([
             'Id_asignacion' => 'required|exists:motores_asignaciones_activas,Id_asignacion',
             'Estado_entrada' => 'required|in:Disponible,Funcionando,Descompuesto',
-            'Trabajo_realizado' => 'required|string',
+            'Trabajo_realizado' => 'nullable|string',
             'Observaciones' => 'nullable|string'
         ]);
         
@@ -249,6 +259,29 @@ class ComponentesController extends Controller
         try {
             $asignacion = MotorAsignacionActiva::with(['motor', 'profesor.persona'])
                 ->findOrFail($request->Id_asignacion);
+            
+            // Verificar que esté pendiente de entrada o activa
+            if (!in_array($asignacion->Estado_asignacion, ['Activa', 'Pendiente Entrada'])) {
+                DB::rollBack();
+                return redirect()->back()
+                    ->with('error', 'Esta asignación ya ha sido procesada.');
+            }
+            
+            // Verificar que no exista otra asignación activa para el mismo motor
+            $otraAsignacionActiva = MotorAsignacionActiva::where('Id_motores', $asignacion->Id_motores)
+                ->whereIn('Estado_asignacion', ['Activa', 'Pendiente Entrada'])
+                ->where('Id_asignacion', '!=', $asignacion->Id_asignacion)
+                ->exists();
+            
+            if ($otraAsignacionActiva) {
+                DB::rollBack();
+                return redirect()->back()
+                    ->with('error', 'Este motor tiene otra asignación activa. No se puede procesar.');
+            }
+            
+            // Usar el trabajo realizado por el técnico si no se proporciona uno nuevo
+            $trabajoRealizado = $request->Trabajo_realizado ?: $asignacion->Trabajo_realizado;
+            $observaciones = $request->Observaciones ?: $asignacion->Observaciones_entrega;
             
             // Registrar movimiento de entrada
             $movimiento = MotorMovimiento::create([
@@ -259,29 +292,34 @@ class ComponentesController extends Controller
                 'Id_profesores' => $asignacion->Id_profesores,
                 'Nombre_tecnico' => $asignacion->profesor->persona->Nombre . ' ' . $asignacion->profesor->persona->Apellido,
                 'Estado_entrada' => $request->Estado_entrada,
-                'Trabajo_realizado' => $request->Trabajo_realizado,
-                'Observaciones' => $request->Observaciones,
+                'Trabajo_realizado' => $trabajoRealizado,
+                'Observaciones' => $observaciones,
                 'Id_usuarios' => Auth::id()
             ]);
             
-            // Actualizar motor
+            // Actualizar motor primero (liberar la relación)
             $asignacion->motor->update([
                 'Estado' => $request->Estado_entrada,
                 'Ubicacion_actual' => 'Inventario',
                 'Id_tecnico_actual' => null
             ]);
             
-            // Finalizar asignación - CORREGIDO
-            $asignacion->Estado_asignacion = 'Finalizada';
-            $asignacion->save();
+            // Finalizar asignación (usando update para mejor control)
+            $asignacion->update([
+                'Estado_asignacion' => 'Finalizada',
+                'Fecha_entrada_admin' => now(),
+                'Id_usuario_entrada' => Auth::id()
+            ]);
             
             DB::commit();
             
             return redirect()->route('admin.componentes.entrada')
-                ->with('success', 'Entrada registrada exitosamente');
+                ->with('success', 'Entrada registrada y confirmada exitosamente');
                 
         } catch (\Exception $e) {
             DB::rollBack();
+            Log::error('Error al registrar entrada: ' . $e->getMessage());
+            Log::error('Trace: ' . $e->getTraceAsString());
             return redirect()->back()
                 ->with('error', 'Error al registrar entrada: ' . $e->getMessage());
         }
@@ -333,7 +371,7 @@ class ComponentesController extends Controller
      */
     public function listaAsignaciones()
     {
-        $asignaciones = MotorAsignacionActiva::where('Estado_asignacion', 'Activa')
+        $asignaciones = MotorAsignacionActiva::whereIn('Estado_asignacion', ['Activa', 'Pendiente Entrada'])
             ->with(['motor', 'profesor.persona', 'reportesProgreso'])
             ->orderBy('Fecha_salida', 'desc')
             ->get();
@@ -404,8 +442,7 @@ class ComponentesController extends Controller
                 ->with('error', 'No se encontró información de profesor.');
         }
         
-        // Crear solicitud de salida (sin asignar técnico aún)
-        // El motor permanece en Inventario hasta que el admin lo asigne
+        // Crear solicitud de salida
         MotorMovimiento::create([
             'Id_motores' => $motor->Id_motores,
             'Tipo_movimiento' => 'Salida',
@@ -417,9 +454,6 @@ class ComponentesController extends Controller
             'Motivo_salida' => $request->Motivo_salida,
             'Id_usuarios' => Auth::id()
         ]);
-        
-        // NO actualizar el motor aquí, solo crear la solicitud
-        // El motor se actualiza cuando el admin asigna un técnico en registrarSalida()
         
         return redirect()->route('profesor.componentes.inventario')
             ->with('success', 'Solicitud enviada exitosamente. El administrador la revisará y asignará un técnico.');
@@ -451,7 +485,7 @@ class ComponentesController extends Controller
         }
         
         $asignaciones = MotorAsignacionActiva::where('Id_profesores', $profesor->Id_profesores)
-            ->where('Estado_asignacion', 'Activa')
+            ->whereIn('Estado_asignacion', ['Activa', 'Pendiente Entrada'])
             ->with(['motor.sucursal', 'reportesProgreso' => function($query) {
                 $query->latest('Fecha_reporte')->limit(1);
             }])
@@ -485,7 +519,8 @@ class ComponentesController extends Controller
     }
     
     /**
-     * Entregar motor reparado
+     * Entregar motor reparado (PROFESOR)
+     * El motor queda pendiente de aprobación del administrador
      */
     public function entregarMotor(Request $request)
     {
@@ -506,42 +541,27 @@ class ComponentesController extends Controller
             if ($asignacion->Estado_asignacion !== 'Activa') {
                 DB::rollBack();
                 return redirect()->back()
-                    ->with('error', 'Esta asignación ya ha sido finalizada.');
+                    ->with('error', 'Esta asignación ya ha sido procesada.');
             }
             
-            // Registrar movimiento de entrada
-            MotorMovimiento::create([
-                'Id_motores' => $asignacion->Id_motores,
-                'Tipo_movimiento' => 'Entrada',
-                'Fecha_movimiento' => now(),
-                'Id_sucursales' => $asignacion->motor->Id_sucursales,
-                'Id_profesores' => $asignacion->Id_profesores,
-                'Nombre_tecnico' => $asignacion->profesor->persona->Nombre . ' ' . $asignacion->profesor->persona->Apellido,
-                'Estado_entrada' => $request->Estado_final,
+            // Guardar información de entrega en la asignación
+            $asignacion->update([
+                'Estado_asignacion' => 'Pendiente Entrada',
+                'Estado_final_propuesto' => $request->Estado_final,
                 'Trabajo_realizado' => $request->Trabajo_realizado,
-                'Observaciones' => $request->Observaciones,
-                'Id_usuarios' => Auth::id()
+                'Observaciones_entrega' => $request->Observaciones,
+                'Fecha_entrega_tecnico' => now()
             ]);
-            
-            // Actualizar motor
-            $asignacion->motor->update([
-                'Estado' => $request->Estado_final,
-                'Ubicacion_actual' => 'Inventario',
-                'Id_tecnico_actual' => null
-            ]);
-            
-            // Finalizar asignación - CORREGIDO: usar save() en lugar de update()
-            $asignacion->Estado_asignacion = 'Finalizada';
-            $asignacion->save();
             
             DB::commit();
             
             return redirect()->route('profesor.componentes.motores-asignados')
-                ->with('success', 'Motor entregado exitosamente');
+                ->with('success', 'Motor marcado para entrega. El administrador revisará y confirmará la entrada al inventario.');
                 
         } catch (\Exception $e) {
             DB::rollBack();
-            \Log::error('Error al entregar motor: ' . $e->getMessage());
+            Log::error('Error al entregar motor: ' . $e->getMessage());
+            Log::error('Trace: ' . $e->getTraceAsString());
             return redirect()->back()
                 ->with('error', 'Error al entregar motor: ' . $e->getMessage());
         }

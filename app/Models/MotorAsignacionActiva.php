@@ -2,18 +2,17 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class MotorAsignacionActiva extends Model
 {
-    use HasFactory;
-
     protected $table = 'motores_asignaciones_activas';
     protected $primaryKey = 'Id_asignacion';
+    public $timestamps = true;
+    const CREATED_AT = 'created_at';
+    const UPDATED_AT = 'updated_at';
 
     protected $fillable = [
         'Id_motores',
@@ -22,11 +21,19 @@ class MotorAsignacionActiva extends Model
         'Fecha_salida',
         'Estado_motor_salida',
         'Motivo_salida',
-        'Estado_asignacion'
+        'Estado_asignacion',
+        'Estado_final_propuesto',
+        'Trabajo_realizado',
+        'Observaciones_entrega',
+        'Fecha_entrega_tecnico',
+        'Fecha_entrada_admin',
+        'Id_usuario_entrada'
     ];
 
     protected $casts = [
-        'Fecha_salida' => 'datetime'
+        'Fecha_salida' => 'datetime',
+        'Fecha_entrega_tecnico' => 'datetime',
+        'Fecha_entrada_admin' => 'datetime',
     ];
 
     /**
@@ -46,7 +53,7 @@ class MotorAsignacionActiva extends Model
     }
 
     /**
-     * Relación con Movimiento de Salida
+     * Relación con el movimiento de salida
      */
     public function movimientoSalida(): BelongsTo
     {
@@ -54,68 +61,26 @@ class MotorAsignacionActiva extends Model
     }
 
     /**
-     * Relación con Reportes de Progreso
+     * Relación con reportes de progreso
      */
     public function reportesProgreso(): HasMany
     {
-        return $this->hasMany(ReporteProgreso::class, 'Id_asignacion', 'Id_asignacion')
-            ->orderBy('Fecha_reporte', 'desc');
+        return $this->hasMany(ReporteProgreso::class, 'Id_asignacion', 'Id_asignacion');
     }
 
     /**
-     * Obtener el último reporte
-     */
-    public function ultimoReporte(): HasOne
-    {
-        return $this->hasOne(ReporteProgreso::class, 'Id_asignacion', 'Id_asignacion')
-            ->latest('Fecha_reporte');
-    }
-
-    /**
-     * Scope para asignaciones activas
+     * Scope para obtener solo asignaciones activas
      */
     public function scopeActivas($query)
     {
-        return $query->where('Estado_asignacion', 'Activa');
+        return $query->whereIn('Estado_asignacion', ['Activa', 'Pendiente Entrada']);
     }
 
     /**
-     * Scope para asignaciones finalizadas
+     * Scope para obtener solo asignaciones finalizadas
      */
     public function scopeFinalizadas($query)
     {
         return $query->where('Estado_asignacion', 'Finalizada');
-    }
-
-    /**
-     * Scope para asignaciones de un técnico
-     */
-    public function scopeDelTecnico($query, $idProfesor)
-    {
-        return $query->where('Id_profesores', $idProfesor);
-    }
-
-    /**
-     * Verificar si está activa
-     */
-    public function estaActiva(): bool
-    {
-        return $this->Estado_asignacion === 'Activa';
-    }
-
-    /**
-     * Verificar si está finalizada
-     */
-    public function estaFinalizada(): bool
-    {
-        return $this->Estado_asignacion === 'Finalizada';
-    }
-
-    /**
-     * Obtener días transcurridos desde la asignación
-     */
-    public function diasTranscurridos(): int
-    {
-        return $this->Fecha_salida->diffInDays(now());
     }
 }

@@ -29,7 +29,7 @@
     <div class="card mb-4">
         <div class="card-body">
             <div class="row">
-                <div class="col-md-3">
+                <div class="col-md-2">
                     <label><i class="bi bi-funnel"></i> Estado</label>
                     <select class="form-select" id="filtroEstado">
                         <option value="">Todos</option>
@@ -39,7 +39,7 @@
                         <option value="Descompuesto">Descompuesto</option>
                     </select>
                 </div>
-                <div class="col-md-3">
+                <div class="col-md-2">
                     <label><i class="bi bi-geo-alt"></i> Ubicación</label>
                     <select class="form-select" id="filtroUbicacion">
                         <option value="">Todas</option>
@@ -47,7 +47,7 @@
                         <option value="Con Tecnico">Con Técnico</option>
                     </select>
                 </div>
-                <div class="col-md-3">
+                <div class="col-md-2">
                     <label><i class="bi bi-building"></i> Sucursal</label>
                     <select class="form-select" id="filtroSucursal">
                         <option value="">Todas</option>
@@ -57,8 +57,12 @@
                     </select>
                 </div>
                 <div class="col-md-3">
-                    <label><i class="bi bi-search"></i> Buscar</label>
-                    <input type="text" class="form-control" id="buscarMotor" placeholder="ID Motor...">
+                    <label><i class="bi bi-person-gear"></i> Técnico</label>
+                    <input type="text" class="form-control" id="filtroTecnico" placeholder="Buscar técnico...">
+                </div>
+                <div class="col-md-3">
+                    <label><i class="bi bi-search"></i> ID Motor</label>
+                    <input type="text" class="form-control" id="buscarMotor" placeholder="Buscar ID...">
                 </div>
             </div>
         </div>
@@ -85,7 +89,8 @@
                         <tr data-estado="{{ $motor->Estado }}" 
                             data-ubicacion="{{ $motor->Ubicacion_actual }}" 
                             data-sucursal="{{ $motor->Id_sucursales }}" 
-                            data-id="{{ $motor->Id_motor }}">
+                            data-tecnico="{{ $motor->tecnicoActual ? strtolower($motor->tecnicoActual->persona->Nombre . ' ' . $motor->tecnicoActual->persona->Apellido) : '' }}"
+                            data-id="{{ strtolower($motor->Id_motor) }}">
                             <td><strong>{{ $motor->Id_motor }}</strong></td>
                             <td>
                                 @php
@@ -305,12 +310,14 @@
     document.getElementById('filtroEstado').addEventListener('change', filtrarTabla);
     document.getElementById('filtroUbicacion').addEventListener('change', filtrarTabla);
     document.getElementById('filtroSucursal').addEventListener('change', filtrarTabla);
+    document.getElementById('filtroTecnico').addEventListener('input', filtrarTabla);
     document.getElementById('buscarMotor').addEventListener('input', filtrarTabla);
 
     function filtrarTabla() {
         const estado = document.getElementById('filtroEstado').value.toLowerCase();
         const ubicacion = document.getElementById('filtroUbicacion').value.toLowerCase();
         const sucursal = document.getElementById('filtroSucursal').value;
+        const tecnico = document.getElementById('filtroTecnico').value.toLowerCase();
         const buscar = document.getElementById('buscarMotor').value.toLowerCase();
 
         const filas = document.querySelectorAll('#tablaMotores tbody tr');
@@ -319,13 +326,15 @@
             const rowEstado = fila.getAttribute('data-estado').toLowerCase();
             const rowUbicacion = fila.getAttribute('data-ubicacion').toLowerCase();
             const rowSucursal = fila.getAttribute('data-sucursal');
-            const rowId = fila.getAttribute('data-id').toLowerCase();
+            const rowTecnico = fila.getAttribute('data-tecnico');
+            const rowId = fila.getAttribute('data-id');
 
             let mostrar = true;
 
             if (estado && !rowEstado.includes(estado)) mostrar = false;
             if (ubicacion && !rowUbicacion.includes(ubicacion)) mostrar = false;
             if (sucursal && rowSucursal !== sucursal) mostrar = false;
+            if (tecnico && !rowTecnico.includes(tecnico)) mostrar = false;
             if (buscar && !rowId.includes(buscar)) mostrar = false;
 
             fila.style.display = mostrar ? '' : 'none';
