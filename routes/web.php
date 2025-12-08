@@ -125,6 +125,7 @@ Route::delete('/usuarios/{id}', [UsuariosController::class, 'destroy'])->name('u
     Route::get('/estudiantes/{id}/planes-pago', [EstudianteController::class, 'planesPago'])->name('estudiantes.planesPago');
     Route::get('/estudiantes/{id}/evaluaciones', [EstudianteController::class, 'evaluaciones'])->name('estudiantes.evaluaciones');
     Route::get('/estudiantes/{id}/horarios', [EstudianteController::class, 'horarios'])->name('estudiantes.horarios');
+    Route::get('/estudiantes/exportar-pdf', [EstudianteController::class, 'exportarPDF'])->name('estudiantes.exportarPDF');
     Route::put('/cuotas/{id}/registrar-pago', [CuotaController::class, 'registrarPago'])->name('cuotas.registrarPago');
     
     // Estudiantes Activos
@@ -161,10 +162,13 @@ Route::delete('/graduados/{id}', [GraduadoController::class, 'eliminarGraduado']
     Route::get('/pagosAdministrador', [PagosController::class, 'form'])->name('pagos.form');
     Route::get('/pagos', [PagosController::class, 'index'])->name('pagos.index');
     Route::post('/pagosAdministrador', [PagosController::class, 'registrarPago'])->name('pagos.registrar');
+    Route::post('/pagos/pagar-plan-completo', [PagosController::class, 'pagarPlanCompleto'])->name('pagos.pagarPlanCompleto');
     
     /* ----------------- GESTIÓN DE SUCURSALES ----------------- */
     Route::get('/sucursalesAdministrador', [SucursalController::class, 'index'])->name('sucursales.index');
     Route::post('/sucursalesAdministrador', [SucursalController::class, 'store'])->name('sucursales.store');
+    Route::put('/sucursalesAdministrador/{id}', [SucursalController::class, 'update'])->name('sucursales.update');
+    Route::delete('/sucursalesAdministrador/{id}', [SucursalController::class, 'destroy'])->name('sucursales.destroy');
     
     /* ----------------- GESTIÓN DE EGRESOS ----------------- */
     Route::get('/egresosAdministrador', [EgresosController::class, 'index'])->name('egresos.index');

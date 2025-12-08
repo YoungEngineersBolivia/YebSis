@@ -27,4 +27,25 @@ class SucursalController extends Controller
     return redirect()->route('sucursales.index')->with('success', 'Sucursal agregada correctamente');
 }
 
+    public function update(Request $request, $id)
+    {
+        $request->validate([
+            'Nombre' => 'required',
+            'Direccion' => 'required',
+        ]);
+
+        $sucursal = Sucursal::findOrFail($id);
+        $sucursal->update($request->all());
+
+        return redirect()->route('sucursales.index')->with('success', 'Sucursal actualizada correctamente');
+    }
+
+    public function destroy($id)
+    {
+        $sucursal = Sucursal::findOrFail($id);
+        $sucursal->delete();
+
+        return redirect()->route('sucursales.index')->with('success', 'Sucursal eliminada correctamente');
+    }
+
 }

@@ -49,8 +49,7 @@
 
                 @if($horario)
                     <div class="info-value">
-                        {{ $horario->Dia_clase_uno }}: {{ $horario->Horario_clase_uno }} <br>
-                        {{ $horario->Dia_clase_dos }}: {{ $horario->Horario_clase_dos }}
+                        {{ $horario->Dia }}: {{ $horario->Hora }}
                     </div>
                 @else
                     <div class="info-value">Sin horario asignado</div>
@@ -60,17 +59,22 @@
             <div class="model-select-wrapper">
                 <span class="model-label">Modelo</span>
                 <select name="modelo" class="model-select">
-                    <option value="1" {{ ($estudiante->modelo ?? '') == '1' ? 'selected' : '' }}>▼</option>
-                    <option value="2" {{ ($estudiante->modelo ?? '') == '2' ? 'selected' : '' }}>Modelo 2</option>
-                    <option value="3" {{ ($estudiante->modelo ?? '') == '3' ? 'selected' : '' }}>Modelo 3</option>
+                    <option value="">Seleccione...</option>
+                    @if($estudiante->programa && $estudiante->programa->modelos)
+                        @foreach($estudiante->programa->modelos as $modelo)
+                            <option value="{{ $modelo->Id_modelos }}" {{ ($estudiante->Id_modelo ?? '') == $modelo->Id_modelos ? 'selected' : '' }}>
+                                {{ $modelo->Nombre_modelo }}
+                            </option>
+                        @endforeach
+                    @endif
                 </select>
             </div>
             
             <div class="action-buttons">
-                <button class="btn-edit" onclick="window.location.href='{{ route('profesor.editar-estudiante', $estudiante->id ?? 1) }}'">
+                <button class="btn-edit" onclick="window.location.href='{{ route('profesor.editar-estudiante', $estudiante->Id_estudiantes) }}'">
                     Editar
                 </button>
-                <button class="btn-evaluate" onclick="window.location.href='{{ route('profesor.evaluar-estudiante', $estudiante->id ?? 1) }}'">
+                <button class="btn-evaluate" onclick="window.location.href='{{ route('profesor.evaluar-estudiante', $estudiante->Id_estudiantes) }}'">
                     Evaluar
                 </button>
             </div>

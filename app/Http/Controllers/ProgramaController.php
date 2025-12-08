@@ -12,7 +12,10 @@ class ProgramaController extends Controller
 {
     public function index()
     {
-        $programas = Programa::orderBy('Id_programas', 'desc')->paginate(10);
+        $programas = Programa::with('modelos')
+                            ->withCount('modelos')
+                            ->orderBy('Id_programas', 'desc')
+                            ->paginate(10);
         return view('administrador.programasAdministrador', compact('programas'));
     }
 

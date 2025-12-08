@@ -85,4 +85,9 @@ class Programa extends Model
     {
         return $this->hasMany(EstudianteTaller::class, 'Id_programas', 'Id_programas');
     }
+
+    public function modelos()
+    {
+        return $this->hasMany(Modelo::class, 'Id_programa', 'Id_programas');
+    }
 }
