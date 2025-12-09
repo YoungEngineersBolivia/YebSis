@@ -51,11 +51,12 @@ class Motor extends Model
 
     /**
      * Relación con Asignación Activa
+     * CORREGIDO: Incluye tanto 'Activa' como 'Pendiente Entrada'
      */
     public function asignacionActiva(): HasOne
     {
         return $this->hasOne(MotorAsignacionActiva::class, 'Id_motores', 'Id_motores')
-            ->where('Estado_asignacion', 'Activa');
+            ->whereIn('Estado_asignacion', ['Activa', 'Pendiente Entrada']);
     }
 
     /**

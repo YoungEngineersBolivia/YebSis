@@ -43,6 +43,7 @@ class MotorMovimiento extends Model
 
     /**
      * Relación con Profesor
+     * CORREGIDO: Maneja casos donde Id_profesores puede ser null
      */
     public function profesor(): BelongsTo
     {
@@ -59,15 +60,15 @@ class MotorMovimiento extends Model
 
     /**
      * Relación con Usuario
+     * CORREGIDO: Usa el modelo User de Laravel
      */
     public function usuario(): BelongsTo
     {
-        return $this->belongsTo(Usuario::class, 'Id_usuarios', 'Id_usuarios');
+        return $this->belongsTo(User::class, 'Id_usuarios', 'id');
     }
 
     /**
      * Relación con Asignación Activa
-     * Un movimiento de salida puede tener una asignación activa asociada
      */
     public function asignacionActiva(): HasOne
     {
@@ -88,6 +89,16 @@ class MotorMovimiento extends Model
     public function scopeEntradas($query)
     {
         return $query->where('Tipo_movimiento', 'Entrada');
+    }
+
+    /**
+     * Scope para solicitudes pendientes
+     * AGREGADO: Para filtrar solicitudes sin técnico asignado
+     */
+    public function scopeSolicitudesPendientes($query)
+    {
+        return $query->where('Tipo_movimiento', 'Salida')
+            ->where('Nombre_tecnico', 'Solicitud Pendiente');
     }
 
     /**
@@ -128,5 +139,13 @@ class MotorMovimiento extends Model
     public function tieneAsignacionActiva(): bool
     {
         return $this->asignacionActiva()->exists();
+    }
+
+    /**
+     * Verificar si es una solicitud pendiente
+     */
+    public function esSolicitudPendiente(): bool
+    {
+        return $this->Nombre_tecnico === 'Solicitud Pendiente';
     }
 }
