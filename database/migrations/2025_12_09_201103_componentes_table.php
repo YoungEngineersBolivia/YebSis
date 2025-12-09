@@ -72,31 +72,6 @@ return new class extends Migration
             $table->index('Id_profesores');
         });
 
-        // Tabla de asignaciones activas (vista simplificada de motores en reparación)
-        Schema::create('motores_asignaciones_activas', function (Blueprint $table) {
-            $table->id('Id_asignacion');
-            $table->foreignId('Id_motores')
-                  ->constrained('motores', 'Id_motores')
-                  ->onDelete('cascade');
-            $table->foreignId('Id_profesores')
-                  ->constrained('profesores', 'Id_profesores')
-                  ->onDelete('cascade');
-            $table->foreignId('Id_movimiento_salida') // Referencia al movimiento de salida
-                  ->constrained('motores_movimientos', 'Id_movimientos')
-                  ->onDelete('cascade');
-            
-            $table->dateTime('Fecha_salida');
-            $table->string('Estado_motor_salida');
-            $table->text('Motivo_salida');
-            
-            $table->enum('Estado_asignacion', ['Activa', 'Finalizada'])->default('Activa');
-            
-            $table->timestamps();
-            
-            // Solo puede haber UNA asignación activa por motor
-            $table->unique(['Id_motores', 'Estado_asignacion'], 'unique_active_assignment');
-        });
-
         // Tabla de reportes de progreso (opcional, mientras está con el técnico)
         Schema::create('reportes_progreso', function (Blueprint $table) {
             $table->id('Id_reporte');
@@ -116,7 +91,6 @@ return new class extends Migration
         Schema::disableForeignKeyConstraints();
 
       Schema::dropIfExists('reportes_progreso');
-      Schema::dropIfExists('motores_asignaciones_activas');
       Schema::dropIfExists('motores_movimientos');
       Schema::dropIfExists('motores');
 
