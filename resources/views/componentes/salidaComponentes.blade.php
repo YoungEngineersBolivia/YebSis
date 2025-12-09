@@ -13,11 +13,18 @@
         </div>
     @endif
 
+    @if(session('error'))
+        <div class="alert alert-danger alert-dismissible fade show">
+            {{ session('error') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    @endif
+
     <!-- Solicitudes Pendientes de Asignación -->
     @if($solicitudesPendientes->count() > 0)
     <div class="card mb-4 border-warning">
         <div class="card-header bg-warning text-dark">
-            <h5><i class="fas fa-exclamation-triangle"></i> Solicitudes Pendientes de Asignación</h5>
+            <h5><i class="fas fa-exclamation-triangle"></i> Solicitudes Pendientes de Asignación ({{ $solicitudesPendientes->count() }})</h5>
         </div>
         <div class="card-body">
             <div class="table-responsive">
@@ -28,7 +35,6 @@
                             <th>ID Motor</th>
                             <th>Estado Actual</th>
                             <th>Motivo</th>
-                            <th>Solicitado Por</th>
                             <th>Acción</th>
                         </tr>
                     </thead>
@@ -40,15 +46,8 @@
                             <td><span class="badge bg-secondary">{{ $solicitud->Estado_salida }}</span></td>
                             <td>{{ Str::limit($solicitud->Motivo_salida, 40) }}</td>
                             <td>
-                                @if($solicitud->profesor)
-                                    {{ $solicitud->profesor->persona->Nombre }} {{ $solicitud->profesor->persona->Apellido }}
-                                @else
-                                    {{ $solicitud->Nombre_tecnico }}
-                                @endif
-                            </td>
-                            <td>
                                 <button type="button" class="btn btn-sm btn-primary" 
-                                        onclick="asignarTecnico({{ $solicitud->Id_movimientos }}, {{ $solicitud->motor->Id_motores }})">
+                                        onclick="asignarTecnico({{ $solicitud->Id_movimientos }}, {{ $solicitud->motor->Id_motores }}, '{{ addslashes($solicitud->Motivo_salida) }}', '{{ $solicitud->Estado_salida }}', '{{ $solicitud->motor->Id_motor }}')">
                                     <i class="fas fa-user-plus"></i> Asignar Técnico
                                 </button>
                             </td>
@@ -72,47 +71,73 @@
                 <div class="row">
                     <div class="col-md-3">
                         <label class="form-label">Motor *</label>
-                        <select class="form-select" name="Id_motores" id="selectMotor" required>
+                        <select class="form-select @error('Id_motores') is-invalid @enderror" 
+                                name="Id_motores" id="selectMotor" required>
                             <option value="">Seleccionar...</option>
                             @foreach($motores as $motor)
                                 <option value="{{ $motor->Id_motores }}" 
                                         data-estado="{{ $motor->Estado }}" 
-                                        data-sucursal="{{ $motor->sucursal->Nombre ?? 'N/A' }}">
+                                        data-sucursal="{{ $motor->sucursal->Nombre ?? 'N/A' }}"
+                                        {{ old('Id_motores') == $motor->Id_motores ? 'selected' : '' }}>
                                     {{ $motor->Id_motor }} - {{ $motor->Estado }}
                                 </option>
                             @endforeach
                         </select>
+                        @error('Id_motores')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
                     </div>
                     <div class="col-md-3">
                         <label class="form-label">Técnico Asignado *</label>
-                        <select class="form-select" name="Id_profesores" required>
+                        <select class="form-select @error('Id_profesores') is-invalid @enderror" 
+                                name="Id_profesores" required>
                             <option value="">Seleccionar...</option>
                             @foreach($tecnicos as $tecnico)
-                                <option value="{{ $tecnico->Id_profesores }}">
+                                <option value="{{ $tecnico->Id_profesores }}"
+                                        {{ old('Id_profesores') == $tecnico->Id_profesores ? 'selected' : '' }}>
                                     {{ $tecnico->persona->Nombre }} {{ $tecnico->persona->Apellido }}
                                 </option>
                             @endforeach
                         </select>
+                        @error('Id_profesores')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
                     </div>
                     <div class="col-md-2">
                         <label class="form-label">Estado Salida *</label>
-                        <select class="form-select" name="Estado_salida" id="estadoSalida" required>
-                            <option value="Descompuesto">Descompuesto</option>
-                            <option value="En Reparacion">En Reparación</option>
-                            <option value="Disponible">Disponible</option>
+                        <select class="form-select @error('Estado_salida') is-invalid @enderror" 
+                                name="Estado_salida" id="estadoSalida" required>
+                            <option value="Descompuesto" {{ old('Estado_salida') == 'Descompuesto' ? 'selected' : '' }}>Descompuesto</option>
+                            <option value="En Reparacion" {{ old('Estado_salida') == 'En Reparacion' ? 'selected' : '' }}>En Reparación</option>
+                            <option value="Disponible" {{ old('Estado_salida') == 'Disponible' ? 'selected' : '' }}>Disponible</option>
                         </select>
+                        @error('Estado_salida')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
                     </div>
                     <div class="col-md-4">
                         <label class="form-label">Motivo de Salida *</label>
-                        <input type="text" class="form-control" name="Motivo_salida" 
-                               placeholder="Ej: Reparación de circuito" required>
+                        <input type="text" 
+                               class="form-control @error('Motivo_salida') is-invalid @enderror" 
+                               name="Motivo_salida" 
+                               placeholder="Ej: Reparación de circuito" 
+                               value="{{ old('Motivo_salida') }}"
+                               required>
+                        @error('Motivo_salida')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
                     </div>
                 </div>
                 <div class="row mt-3">
                     <div class="col-md-8">
                         <label class="form-label">Observaciones Adicionales</label>
-                        <textarea class="form-control" name="Observaciones" rows="2" 
-                                  placeholder="Detalles adicionales..."></textarea>
+                        <textarea class="form-control @error('Observaciones') is-invalid @enderror" 
+                                  name="Observaciones" 
+                                  rows="2" 
+                                  placeholder="Detalles adicionales...">{{ old('Observaciones') }}</textarea>
+                        @error('Observaciones')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
                     </div>
                     <div class="col-md-4 d-flex align-items-end">
                         <button type="submit" class="btn btn-success w-100">
@@ -127,7 +152,7 @@
     <!-- Motores Disponibles para Salida -->
     <div class="card">
         <div class="card-header">
-            <h5><i class="fas fa-list"></i> Motores Disponibles en Inventario</h5>
+            <h5><i class="fas fa-list"></i> Motores Disponibles en Inventario ({{ $motores->count() }})</h5>
         </div>
         <div class="card-body">
             <div class="table-responsive">
@@ -189,13 +214,14 @@
                 <input type="hidden" name="Estado_salida" id="modal_estado">
                 
                 <div class="modal-header">
-                    <h5 class="modal-title">Asignar Técnico</h5>
+                    <h5 class="modal-title">Asignar Técnico a Solicitud</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
                     <div class="alert alert-info">
-                        Motor: <strong id="modal_motor_display"></strong><br>
-                        Motivo: <span id="modal_motivo_display"></span>
+                        <strong>Motor:</strong> <span id="modal_motor_display"></span><br>
+                        <strong>Estado:</strong> <span id="modal_estado_display"></span><br>
+                        <strong>Motivo:</strong> <span id="modal_motivo_display"></span>
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Seleccionar Técnico *</label>
@@ -210,12 +236,15 @@
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Observaciones Adicionales</label>
-                        <textarea class="form-control" name="Observaciones" rows="2"></textarea>
+                        <textarea class="form-control" name="Observaciones" rows="2" 
+                                  placeholder="Observaciones adicionales sobre la asignación..."></textarea>
                     </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="submit" class="btn btn-primary">Asignar y Registrar</button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-check"></i> Asignar y Registrar
+                    </button>
                 </div>
             </form>
         </div>
@@ -238,15 +267,13 @@
     }
 
     // Asignar técnico a solicitud pendiente
-    function asignarTecnico(movimientoId, motorId) {
-        const solicitud = solicitudes.find(s => s.Id_movimientos == movimientoId);
-        if (!solicitud) return;
-
+    function asignarTecnico(movimientoId, motorId, motivo, estado, motorNombre) {
         $('#modal_motor_id').val(motorId);
-        $('#modal_motivo').val(solicitud.Motivo_salida);
-        $('#modal_estado').val(solicitud.Estado_salida);
-        $('#modal_motor_display').text(solicitud.motor.Id_motor);
-        $('#modal_motivo_display').text(solicitud.Motivo_salida);
+        $('#modal_motivo').val(motivo);
+        $('#modal_estado').val(estado);
+        $('#modal_motor_display').text(motorNombre);
+        $('#modal_estado_display').text(estado);
+        $('#modal_motivo_display').text(motivo);
         
         $('#modalAsignarTecnico').modal('show');
     }
