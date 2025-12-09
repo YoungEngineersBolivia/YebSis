@@ -121,14 +121,14 @@ class ComponentesController extends Controller
             ->with('persona')
             ->get();
         
-        // Solicitudes pendientes
+        // ✅ CORREGIDO: Solicitudes pendientes usando Nombre_tecnico
         $solicitudesPendientes = MotorMovimiento::where('Tipo_movimiento', 'Salida')
             ->where('Nombre_tecnico', 'Solicitud Pendiente')
             ->whereHas('motor', function($query) {
                 $query->where('Ubicacion_actual', 'Inventario')
                       ->whereNull('Id_tecnico_actual');
             })
-            ->with(['motor', 'profesor.persona'])
+            ->with(['motor'])
             ->latest('Fecha_movimiento')
             ->get();
         
@@ -172,6 +172,9 @@ class ComponentesController extends Controller
                     ->with('error', 'Este motor ya tiene una asignación activa.');
             }
             
+            // ✅ Construir nombre completo del técnico
+            $nombreTecnico = $profesor->persona->Nombre . ' ' . $profesor->persona->Apellido;
+            
             // Registrar movimiento de salida
             $movimiento = MotorMovimiento::create([
                 'Id_motores' => $motor->Id_motores,
@@ -179,7 +182,7 @@ class ComponentesController extends Controller
                 'Fecha_movimiento' => now(),
                 'Id_sucursales' => $motor->Id_sucursales,
                 'Id_profesores' => $profesor->Id_profesores,
-                'Nombre_tecnico' => $profesor->persona->Nombre . ' ' . $profesor->persona->Apellido,
+                'Nombre_tecnico' => $nombreTecnico, // ✅ AGREGADO
                 'Estado_salida' => $request->Estado_salida,
                 'Motivo_salida' => $request->Motivo_salida,
                 'Observaciones' => $request->Observaciones,
@@ -204,11 +207,14 @@ class ComponentesController extends Controller
                 'Id_tecnico_actual' => $profesor->Id_profesores
             ]);
             
-            // Actualizar solicitudes pendientes relacionadas
+            // ✅ Actualizar solicitudes pendientes
             MotorMovimiento::where('Id_motores', $motor->Id_motores)
                 ->where('Tipo_movimiento', 'Salida')
                 ->where('Nombre_tecnico', 'Solicitud Pendiente')
-                ->update(['Nombre_tecnico' => 'Procesada - ' . $profesor->persona->Nombre . ' ' . $profesor->persona->Apellido]);
+                ->update([
+                    'Id_profesores' => $profesor->Id_profesores,
+                    'Nombre_tecnico' => $nombreTecnico
+                ]);
             
             DB::commit();
             
@@ -283,6 +289,9 @@ class ComponentesController extends Controller
             $trabajoRealizado = $request->Trabajo_realizado ?: $asignacion->Trabajo_realizado;
             $observaciones = $request->Observaciones ?: $asignacion->Observaciones_entrega;
             
+            // ✅ Construir nombre completo del técnico
+            $nombreTecnico = $asignacion->profesor->persona->Nombre . ' ' . $asignacion->profesor->persona->Apellido;
+            
             // Registrar movimiento de entrada
             $movimiento = MotorMovimiento::create([
                 'Id_motores' => $asignacion->Id_motores,
@@ -290,7 +299,7 @@ class ComponentesController extends Controller
                 'Fecha_movimiento' => now(),
                 'Id_sucursales' => $asignacion->motor->Id_sucursales,
                 'Id_profesores' => $asignacion->Id_profesores,
-                'Nombre_tecnico' => $asignacion->profesor->persona->Nombre . ' ' . $asignacion->profesor->persona->Apellido,
+                'Nombre_tecnico' => $nombreTecnico, // ✅ AGREGADO
                 'Estado_entrada' => $request->Estado_entrada,
                 'Trabajo_realizado' => $trabajoRealizado,
                 'Observaciones' => $observaciones,
@@ -442,14 +451,14 @@ class ComponentesController extends Controller
                 ->with('error', 'No se encontró información de profesor.');
         }
         
-        // Crear solicitud de salida
+        // ✅ Crear solicitud sin técnico asignado
         MotorMovimiento::create([
             'Id_motores' => $motor->Id_motores,
             'Tipo_movimiento' => 'Salida',
             'Fecha_movimiento' => now(),
             'Id_sucursales' => $motor->Id_sucursales,
-            'Id_profesores' => $profesor->Id_profesores,
-            'Nombre_tecnico' => 'Solicitud Pendiente',
+            'Id_profesores' => null,
+            'Nombre_tecnico' => 'Solicitud Pendiente', // ✅ AGREGADO
             'Estado_salida' => $motor->Estado,
             'Motivo_salida' => $request->Motivo_salida,
             'Id_usuarios' => Auth::id()
