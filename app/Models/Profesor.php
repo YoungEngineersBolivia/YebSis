@@ -34,10 +34,11 @@ class Profesor extends Model
 
     /**
      * Relación con Usuario
+     * CORREGIDO: Usa Id_usuarios como clave primaria de usuarios
      */
     public function usuario(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'Id_usuarios', 'id');
+        return $this->belongsTo(Usuario::class, 'Id_usuarios', 'Id_usuarios');
     }
 
     /**
@@ -58,7 +59,6 @@ class Profesor extends Model
 
     /**
      * Relación con Motores asignados (como técnico)
-     * AGREGADO: Para el sistema de componentes
      */
     public function motoresAsignados(): HasMany
     {
@@ -67,7 +67,6 @@ class Profesor extends Model
 
     /**
      * Relación con Asignaciones Activas
-     * AGREGADO: Para el sistema de componentes
      */
     public function asignacionesActivas(): HasMany
     {
@@ -77,7 +76,6 @@ class Profesor extends Model
 
     /**
      * Relación con todas las asignaciones
-     * AGREGADO: Para el sistema de componentes
      */
     public function asignaciones(): HasMany
     {
@@ -86,7 +84,6 @@ class Profesor extends Model
 
     /**
      * Relación con Movimientos de motores
-     * AGREGADO: Para el sistema de componentes
      */
     public function movimientos(): HasMany
     {

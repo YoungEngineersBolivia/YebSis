@@ -64,7 +64,7 @@ class MotorMovimiento extends Model
      */
     public function usuario(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'Id_usuarios', 'id');
+        return $this->belongsTo(Usuario::class, 'Id_usuarios', 'Id_usuarios');
     }
 
     /**
