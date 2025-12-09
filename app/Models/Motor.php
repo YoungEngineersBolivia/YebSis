@@ -29,7 +29,7 @@ class Motor extends Model
      */
     public function sucursal(): BelongsTo
     {
-        return $this->belongsTo(Sucursal::class, 'Id_sucursales', 'Id_Sucursales');
+        return $this->belongsTo(Sucursal::class, 'Id_sucursales', 'Id_sucursales');
     }
 
     /**
