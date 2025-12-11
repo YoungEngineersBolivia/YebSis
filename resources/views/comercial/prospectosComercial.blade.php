@@ -13,13 +13,14 @@
                     Lista de Prospectos
                 </h2>
                 <div class="text-muted">
-                    Total: {{ count($prospectos) }} prospectos
+                    Total: {{ $prospectos->total() }} prospectos
                 </div>
             </div>
             <!-- Filtros de fecha bonitos -->
             <div class="row mb-4">
                 <div class="col-12 d-flex justify-content-center">
-                    <form method="GET" class="d-flex align-items-center gap-2 filtro-fecha-box p-2" id="filtroFechasForm" style="background: #fff; border-radius: 16px; box-shadow: 0 2px 12px rgba(0,0,0,0.08); min-width: 420px;">
+                    <form method="GET" class="d-flex align-items-center gap-2 filtro-fecha-box p-2" id="filtroFechasForm" style="background: #fff; border-radius: 16px; box-shadow: 0 2px 12px rgba(0,0,0,0.08); min-width: 420px; flex-wrap: wrap;">
+                        <input type="text" name="search" class="form-control form-control-sm" placeholder="Buscar..." value="{{ request('search') }}" style="max-width: 200px;">
                         <input type="date" name="desde" id="inputDesde" class="form-control form-control-sm" style="max-width: 160px; margin-left: 0;" value="{{ request('desde') }}">
                         <span class="mx-1">—</span>
                         <input type="date" name="hasta" id="inputHasta" class="form-control form-control-sm" style="max-width: 160px; margin-left: 0;" value="{{ request('hasta') }}">
@@ -130,6 +131,9 @@
                                 @endforeach
                             </tbody>
                         </table>
+                    </div>
+                    <div class="d-flex justify-content-center mt-3 mb-3">
+                        {{ $prospectos->appends(request()->query())->links('pagination::bootstrap-5') }}
                     </div>
                 </div>
             </div>
