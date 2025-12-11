@@ -52,7 +52,7 @@
                     <select class="form-select" id="filtroSucursal">
                         <option value="">Todas</option>
                         @foreach($sucursales as $sucursal)
-                            <option value="{{ $sucursal->Id_Sucursales }}">{{ $sucursal->Nombre }}</option>
+                            <option value="{{ $sucursal->Id_sucursales }}">{{ $sucursal->Nombre }}</option>
                         @endforeach
                     </select>
                 </div>
