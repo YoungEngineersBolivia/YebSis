@@ -4,21 +4,28 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Panel del Tutor</title>
-    <link rel="stylesheet" href="{{ asset('css/tutor/homeTutor.css') }}">
-  
+    <link rel="stylesheet" href="{{ auto_asset('css/tutor/homeTutor.css') }}">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
 </head>
 <body>
     <header>
         <div class="container">
             <div class="header-content">
                 <div class="logo">
-                    <img src="{{ Vite::asset('resources/img/ES_logo-02.webp') }}" alt="Logo YE Bolivia" width="250px">
+                    <img src="{{ auto_asset('img/ES_logo-02.webp') }}" alt="Logo YE Bolivia" width="250px">
                 </div>
                 <button class="navbar-toggle" onclick="toggleNavbar()">&#9776;</button>
                 <nav class="nav-links" id="mainNavLinks">
                     <span>RECONOCIDO POR:</span>
-                    <img src="{{ Vite::asset('resources/img/recognized_by.png') }}" alt="Reconocimiento" width="200px">
-                    <span>REDES SOCIALES</span>
+                    <img src="{{ auto_asset('img/recognized_by.png') }}" alt="Reconocimiento" width="200px">
+                    <div class="social-icons" style="margin-top: -10px;">
+                            <a href="https://www.facebook.com/youngengineerszonasurlapaz/" class="social-icon" target="_blank">
+                                  <img src="{{ asset('img/facebook.svg') }}" alt="Facebook" width="54" height="54">
+                            </a>
+                            <a href="https://www.tiktok.com/@youngengineersbolivia" class="social-icon" target="_blank">
+                                <img src="{{ asset('img/tiktok.svg') }}" alt="tiktok" width="45" height="45">
+                            </a>
+                    </div>
                     
                     <!-- Dropdown Usuario -->
                     <div class="user-dropdown">

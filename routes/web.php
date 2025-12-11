@@ -376,16 +376,15 @@ Route::middleware(['auth', 'role:profesor'])->prefix('profesor')->name('profesor
 
 Route::middleware(['auth', 'role:tutor'])->prefix('tutor')->name('tutor.')->group(function () {
     
-    // Home del tutor
+    // Home del tutor (una sola ruta)
     Route::get('/home', [TutorHomeController::class, 'index'])->name('home');
-    Route::get('/homeTutor', fn() => view('tutor.homeTutor'));
     
     // Información de estudiantes
-    Route::get('/estudiante/{id}', [TutorHomeController::class, 'getEstudianteDetails']);
-    Route::get('/evaluaciones/{id}', [TutorHomeController::class, 'getEvaluaciones']);
+    Route::get('/estudiante/{id}', [TutorHomeController::class, 'getEstudianteDetails'])->name('estudiante.detalle');
+    Route::get('/evaluaciones/{id}', [TutorHomeController::class, 'getEvaluaciones'])->name('estudiante.evaluaciones');
     
     // Agendar citas
-    Route::post('/agendar-cita', [TutorHomeController::class, 'agendarCita']);
+    Route::post('/agendar-cita', [TutorHomeController::class, 'agendarCita'])->name('agendar.cita');
 });
 
 
@@ -411,103 +410,3 @@ Route::get('forgot-password', [ForgotPasswordController::class, 'showLinkRequest
 Route::post('forgot-password', [ForgotPasswordController::class, 'sendResetLinkEmail'])->name('password.email');
 Route::get('password/reset/{token}', [ResetPasswordController::class, 'showResetForm'])->name('password.reset');
 Route::post('password/reset', [ResetPasswordController::class, 'reset'])->name('password.update');
-
-
-
-//PRUEBA
-Route::get('/test-salida', function() {
-    try {
-        echo "<h2>Diagnóstico de Salida de Componentes</h2>";
-        
-        // Test 1: Verificar Motor
-        echo "<h3>1. Probando Motor::first()</h3>";
-        $motor = \App\Models\Motor::first();
-        if ($motor) {
-            echo "✓ Motor encontrado: " . $motor->Id_motor . "<br>";
-        } else {
-            echo "⚠ No hay motores en la base de datos<br>";
-        }
-        
-        // Test 2: Verificar Motor con Sucursal
-        echo "<h3>2. Probando Motor con Sucursal</h3>";
-        $motorConSucursal = \App\Models\Motor::with('sucursal')->first();
-        if ($motorConSucursal) {
-            echo "✓ Motor con sucursal: " . ($motorConSucursal->sucursal->Nombre ?? 'Sin sucursal') . "<br>";
-        }
-        
-        // Test 3: Verificar Profesor con Persona
-        echo "<h3>3. Probando Profesor con Persona</h3>";
-        $profesor = \App\Models\Profesor::where('Rol_componentes', 'Tecnico')->with('persona')->first();
-        if ($profesor) {
-            echo "✓ Profesor encontrado: " . ($profesor->persona->Nombre ?? 'Sin nombre') . "<br>";
-        } else {
-            echo "⚠ No hay profesores con rol Tecnico<br>";
-        }
-        
-        // Test 4: Verificar MotorMovimiento
-        echo "<h3>4. Probando MotorMovimiento</h3>";
-        $movimiento = \App\Models\MotorMovimiento::first();
-        if ($movimiento) {
-            echo "✓ Movimiento encontrado: ID " . $movimiento->Id_movimientos . "<br>";
-        }
-        
-        // Test 5: Verificar MotorMovimiento con Motor
-        echo "<h3>5. Probando MotorMovimiento con Motor</h3>";
-        $movimientoConMotor = \App\Models\MotorMovimiento::with('motor')->first();
-        if ($movimientoConMotor && $movimientoConMotor->motor) {
-            echo "✓ Movimiento con motor: " . $movimientoConMotor->motor->Id_motor . "<br>";
-        }
-        
-        // Test 6: Verificar Solicitudes Pendientes
-        echo "<h3>6. Probando Solicitudes Pendientes</h3>";
-        $solicitudes = \App\Models\MotorMovimiento::where('Tipo_movimiento', 'Salida')
-            ->where('Nombre_tecnico', 'Solicitud Pendiente')
-            ->get();
-        echo "✓ Solicitudes pendientes: " . $solicitudes->count() . "<br>";
-        
-        // Test 7: Verificar Solicitudes con Motor
-        echo "<h3>7. Probando Solicitudes con Motor</h3>";
-        $solicitudesConMotor = \App\Models\MotorMovimiento::where('Tipo_movimiento', 'Salida')
-            ->where('Nombre_tecnico', 'Solicitud Pendiente')
-            ->with('motor')
-            ->get();
-        echo "✓ Solicitudes con motor cargado: " . $solicitudesConMotor->count() . "<br>";
-        
-        // Test 8: La consulta completa del controlador
-        echo "<h3>8. Probando consulta completa (SIN profesor.persona)</h3>";
-        $solicitudesPendientes = \App\Models\MotorMovimiento::where('Tipo_movimiento', 'Salida')
-            ->where('Nombre_tecnico', 'Solicitud Pendiente')
-            ->whereHas('motor', function($query) {
-                $query->where('Ubicacion_actual', 'Inventario')
-                      ->whereNull('Id_tecnico_actual');
-            })
-            ->with(['motor'])
-            ->latest('Fecha_movimiento')
-            ->get();
-        echo "✓ Solicitudes completas (sin profesor): " . $solicitudesPendientes->count() . "<br>";
-        
-        // Test 9: CON profesor.persona (esto puede fallar)
-        echo "<h3>9. Probando consulta CON profesor.persona</h3>";
-        try {
-            $solicitudesConProfesor = \App\Models\MotorMovimiento::where('Tipo_movimiento', 'Salida')
-                ->where('Nombre_tecnico', 'Solicitud Pendiente')
-                ->with(['motor', 'profesor.persona'])
-                ->first();
-            if ($solicitudesConProfesor) {
-                echo "✓ Solicitud con profesor cargada correctamente<br>";
-            } else {
-                echo "⚠ No hay solicitudes para probar<br>";
-            }
-        } catch (\Exception $e) {
-            echo "❌ ERROR al cargar profesor.persona: " . $e->getMessage() . "<br>";
-        }
-        
-        echo "<br><h2>✓✓✓ FIN DE DIAGNÓSTICO ✓✓✓</h2>";
-        
-    } catch (\Exception $e) {
-        echo "<h2 style='color:red'>❌ ERROR FATAL</h2>";
-        echo "<strong>Mensaje:</strong> " . $e->getMessage() . "<br>";
-        echo "<strong>Archivo:</strong> " . $e->getFile() . ":" . $e->getLine() . "<br>";
-        echo "<pre>" . $e->getTraceAsString() . "</pre>";
-    }
-});
