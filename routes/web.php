@@ -33,6 +33,10 @@ use App\Http\Controllers\ForgotPasswordController;
 use App\Http\Controllers\ResetPasswordController;
 use App\Http\Controllers\ModeloController;
 use App\Http\Controllers\CuotaController;
+use App\Http\Controllers\ProfesorInventarioController;
+use App\Http\Controllers\MotorMovimientosController;
+
+
 
 /* ============================================
    RUTAS PÚBLICAS (Sin autenticación)
@@ -184,16 +188,7 @@ Route::delete('/graduados/{id}', [GraduadoController::class, 'eliminarGraduado']
     Route::get('/tutorEstudianteAdministrador', [RegistroCombinadoController::class, 'mostrarFormulario'])->name('registroCombinado.form');
     Route::post('/tutorEstudianteAdministrador', [RegistroCombinadoController::class, 'registrar'])->name('registroCombinado.registrar');
     
-    /* ----------------- COMPONENTES/MOTORES ----------------- */
-    Route::prefix('componentes')->name('componentes.')->group(function () {
-        Route::get('/', [ComponentesController::class, 'index'])->name('index');
-        Route::post('/nuevo', [ComponentesController::class, 'store'])->name('store');
-        Route::post('/entrada', [ComponentesController::class, 'registrarEntrada'])->name('registrarEntrada');
-        Route::post('/salida', [ComponentesController::class, 'registrarSalida'])->name('registrarSalida');
-        Route::get('/{id}/historial', [ComponentesController::class, 'historial'])->name('historial');
-        Route::put('/{id}', [ComponentesController::class, 'update'])->name('update');
-        Route::delete('/{motor}', [ComponentesController::class, 'destroy'])->name('destroy');
-    });
+    
     
  Route::prefix('profesores')->name('profesores.')->group(function () {
     Route::get('/', [ProfesorController::class, 'index'])->name('index');
@@ -207,37 +202,44 @@ Route::delete('/graduados/{id}', [GraduadoController::class, 'eliminarGraduado']
 });
 
     
-    /* ----------------- MOTORES ASIGNADOS ----------------- */
-    // Rutas para Gestión de Componentes (Inventario)
-    Route::prefix('componentes')->name('componentes.')->group(function () {
-        Route::get('/', [ComponentesController::class, 'index'])->name('index');
-        Route::post('/nuevo', [ComponentesController::class, 'store'])->name('store');
-        Route::post('/entrada', [ComponentesController::class, 'registrarEntrada'])->name('registrarEntrada');
-        Route::post('/salida', [ComponentesController::class, 'registrarSalida'])->name('registrarSalida');
-        Route::get('/{id}/historial', [ComponentesController::class, 'historial'])->name('historial');
-        Route::put('/{id}', [ComponentesController::class, 'update'])->name('update');
-        Route::delete('/{motor}', [ComponentesController::class, 'destroy'])->name('destroy');
-    });
-
-    // Rutas para Motores Asignados a Técnicos
-    Route::prefix('motores')->name('motores.')->group(function () {
-        // Lista de motores asignados (solo en proceso)
-        Route::get('/asignaciones', [MotoresAsignadosController::class, 'index'])->name('asignaciones.index');
+    /* ----------------- COMPONENTES/MOTORES ----------------- */
+    Route::prefix('componentes')->name('admin.componentes.')->group(function () {
         
-        // Formulario para asignar motor a técnico
-        Route::get('/asignar', [MotoresAsignadosController::class, 'create'])->name('asignar.create');
+        // Inventario - Vista principal
+        Route::get('/inventario', [ComponentesController::class, 'inventario'])
+            ->name('inventario');
         
-        // Guardar asignación de motor
-        Route::post('/asignar', [MotoresAsignadosController::class, 'store'])->name('asignar.store');
+        // CRUD de Motores
+        Route::post('/store', [ComponentesController::class, 'storeMotor'])
+            ->name('store');
+        Route::put('/{id}/update', [ComponentesController::class, 'updateMotor'])
+            ->name('update');
+        Route::delete('/{id}/delete', [ComponentesController::class, 'deleteMotor'])
+            ->name('delete');
         
-        // Registrar entrada del motor (devolución al inventario)
-        Route::post('/registrar-entrada/{id}', [MotoresAsignadosController::class, 'registrarEntrada'])->name('registrar.entrada');
+        // Salida de Componentes
+        Route::get('/salida', [ComponentesController::class, 'salidaComponentes'])
+            ->name('salida');
+        Route::post('/registrar-salida', [ComponentesController::class, 'registrarSalida'])
+            ->name('registrar-salida');
         
-        // Guardar reporte de mantenimiento
-        Route::post('/reporte/{id}', [MotoresAsignadosController::class, 'storeReporte'])->name('reporte.store');
+        // Entrada de Componentes
+        Route::get('/entrada', [ComponentesController::class, 'entradaComponentes'])
+            ->name('entrada');
+        Route::post('/registrar-entrada', [ComponentesController::class, 'registrarEntrada'])
+            ->name('registrar-entrada');
         
-        // Historial de asignaciones completadas (opcional)
-        Route::get('/historial', [MotoresAsignadosController::class, 'historial'])->name('historial');
+        // Historial y Reportes
+        Route::get('/{id}/historial', [ComponentesController::class, 'historialMovimientos'])
+            ->name('historial');
+        Route::get('/historial-salidas', [ComponentesController::class, 'historialSalidas'])
+            ->name('historial-salidas');
+        Route::get('/historial-entradas', [ComponentesController::class, 'historialEntradas'])
+            ->name('historial-entradas');
+        
+        // Lista de Asignaciones
+        Route::get('/asignaciones', [ComponentesController::class, 'listaAsignaciones'])
+            ->name('asignaciones');
     });
     
     /* ----------------- REPORTES DE TALLERES ----------------- */
@@ -345,7 +347,27 @@ Route::middleware(['auth', 'role:profesor'])->prefix('profesor')->name('profesor
     Route::get('/estudiante/{id}/evaluar', [ProfesorController::class, 'evaluarEstudiante'])->name('evaluar-estudiante');
     Route::post('/evaluacion/guardar', [ProfesorController::class, 'guardarEvaluacion'])->name('guardar-evaluacion');
     Route::put('/evaluacion/{id}/actualizar', [ProfesorController::class, 'actualizarEvaluacion'])->name('actualizar-evaluacion');
+
+    /* ----------------- COMPONENTES - PROFESOR ----------------- */
+    Route::prefix('componentes')->name('componentes.')->group(function () {
+        
+        // PROFESOR CON ROL "Inventario"
+        Route::get('/inventario', [ComponentesController::class, 'inventarioProfesor'])
+            ->name('inventario');
+        Route::post('/solicitar-salida', [ComponentesController::class, 'solicitarSalida'])
+            ->name('solicitar-salida');
+        
+        // PROFESOR CON ROL "Tecnico"
+        Route::get('/motores-asignados', [ComponentesController::class, 'motoresAsignados'])
+            ->name('motores-asignados');
+        Route::post('/actualizar-estado', [ComponentesController::class, 'actualizarEstadoReparacion'])
+            ->name('actualizar-estado');
+        Route::post('/entregar-motor', [ComponentesController::class, 'entregarMotor'])
+            ->name('entregar-motor');
+    });
+
 });
+    
 
 
 /* ============================================
@@ -390,3 +412,102 @@ Route::post('forgot-password', [ForgotPasswordController::class, 'sendResetLinkE
 Route::get('password/reset/{token}', [ResetPasswordController::class, 'showResetForm'])->name('password.reset');
 Route::post('password/reset', [ResetPasswordController::class, 'reset'])->name('password.update');
 
+
+
+//PRUEBA
+Route::get('/test-salida', function() {
+    try {
+        echo "<h2>Diagnóstico de Salida de Componentes</h2>";
+        
+        // Test 1: Verificar Motor
+        echo "<h3>1. Probando Motor::first()</h3>";
+        $motor = \App\Models\Motor::first();
+        if ($motor) {
+            echo "✓ Motor encontrado: " . $motor->Id_motor . "<br>";
+        } else {
+            echo "⚠ No hay motores en la base de datos<br>";
+        }
+        
+        // Test 2: Verificar Motor con Sucursal
+        echo "<h3>2. Probando Motor con Sucursal</h3>";
+        $motorConSucursal = \App\Models\Motor::with('sucursal')->first();
+        if ($motorConSucursal) {
+            echo "✓ Motor con sucursal: " . ($motorConSucursal->sucursal->Nombre ?? 'Sin sucursal') . "<br>";
+        }
+        
+        // Test 3: Verificar Profesor con Persona
+        echo "<h3>3. Probando Profesor con Persona</h3>";
+        $profesor = \App\Models\Profesor::where('Rol_componentes', 'Tecnico')->with('persona')->first();
+        if ($profesor) {
+            echo "✓ Profesor encontrado: " . ($profesor->persona->Nombre ?? 'Sin nombre') . "<br>";
+        } else {
+            echo "⚠ No hay profesores con rol Tecnico<br>";
+        }
+        
+        // Test 4: Verificar MotorMovimiento
+        echo "<h3>4. Probando MotorMovimiento</h3>";
+        $movimiento = \App\Models\MotorMovimiento::first();
+        if ($movimiento) {
+            echo "✓ Movimiento encontrado: ID " . $movimiento->Id_movimientos . "<br>";
+        }
+        
+        // Test 5: Verificar MotorMovimiento con Motor
+        echo "<h3>5. Probando MotorMovimiento con Motor</h3>";
+        $movimientoConMotor = \App\Models\MotorMovimiento::with('motor')->first();
+        if ($movimientoConMotor && $movimientoConMotor->motor) {
+            echo "✓ Movimiento con motor: " . $movimientoConMotor->motor->Id_motor . "<br>";
+        }
+        
+        // Test 6: Verificar Solicitudes Pendientes
+        echo "<h3>6. Probando Solicitudes Pendientes</h3>";
+        $solicitudes = \App\Models\MotorMovimiento::where('Tipo_movimiento', 'Salida')
+            ->where('Nombre_tecnico', 'Solicitud Pendiente')
+            ->get();
+        echo "✓ Solicitudes pendientes: " . $solicitudes->count() . "<br>";
+        
+        // Test 7: Verificar Solicitudes con Motor
+        echo "<h3>7. Probando Solicitudes con Motor</h3>";
+        $solicitudesConMotor = \App\Models\MotorMovimiento::where('Tipo_movimiento', 'Salida')
+            ->where('Nombre_tecnico', 'Solicitud Pendiente')
+            ->with('motor')
+            ->get();
+        echo "✓ Solicitudes con motor cargado: " . $solicitudesConMotor->count() . "<br>";
+        
+        // Test 8: La consulta completa del controlador
+        echo "<h3>8. Probando consulta completa (SIN profesor.persona)</h3>";
+        $solicitudesPendientes = \App\Models\MotorMovimiento::where('Tipo_movimiento', 'Salida')
+            ->where('Nombre_tecnico', 'Solicitud Pendiente')
+            ->whereHas('motor', function($query) {
+                $query->where('Ubicacion_actual', 'Inventario')
+                      ->whereNull('Id_tecnico_actual');
+            })
+            ->with(['motor'])
+            ->latest('Fecha_movimiento')
+            ->get();
+        echo "✓ Solicitudes completas (sin profesor): " . $solicitudesPendientes->count() . "<br>";
+        
+        // Test 9: CON profesor.persona (esto puede fallar)
+        echo "<h3>9. Probando consulta CON profesor.persona</h3>";
+        try {
+            $solicitudesConProfesor = \App\Models\MotorMovimiento::where('Tipo_movimiento', 'Salida')
+                ->where('Nombre_tecnico', 'Solicitud Pendiente')
+                ->with(['motor', 'profesor.persona'])
+                ->first();
+            if ($solicitudesConProfesor) {
+                echo "✓ Solicitud con profesor cargada correctamente<br>";
+            } else {
+                echo "⚠ No hay solicitudes para probar<br>";
+            }
+        } catch (\Exception $e) {
+            echo "❌ ERROR al cargar profesor.persona: " . $e->getMessage() . "<br>";
+        }
+        
+        echo "<br><h2>✓✓✓ FIN DE DIAGNÓSTICO ✓✓✓</h2>";
+        
+    } catch (\Exception $e) {
+        echo "<h2 style='color:red'>❌ ERROR FATAL</h2>";
+        echo "<strong>Mensaje:</strong> " . $e->getMessage() . "<br>";
+        echo "<strong>Archivo:</strong> " . $e->getFile() . ":" . $e->getLine() . "<br>";
+        echo "<pre>" . $e->getTraceAsString() . "</pre>";
+    }
+});

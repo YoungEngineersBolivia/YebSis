@@ -189,7 +189,6 @@
                             <li><a class="nav-link link-dark submenu-item" href="{{ route('estudiantesActivos') }}">Estudiantes Activos</a></li>
                             <li><a class="nav-link link-dark submenu-item" href="{{ route('estudiantesNoActivos') }}">Estudiantes Inactivos</a></li>
                             <li><a class="nav-link link-dark submenu-item" href="{{ route('graduados.mostrar') }}">Graduados</a></li>
-
                         </ul>
                     </div>
                 </li>
@@ -242,7 +241,7 @@
                 <!-- Sección: Operaciones -->
                 <div class="nav-section-title">OPERACIONES</div>
 
-                <!-- Inventario -->
+                <!-- Inventario de Componentes/Motores -->
                 <li>
                     <a class="nav-link link-dark sidebar-link d-flex align-items-center gap-2" data-bs-toggle="collapse" href="#submenuInventario" role="button" aria-expanded="false">
                         <i class="bi bi-box-seam"></i>
@@ -251,10 +250,21 @@
                     </a>
                     <div class="collapse" id="submenuInventario">
                         <ul class="nav flex-column">
-                            <li><a class="nav-link link-dark submenu-item" href="{{ route('componentes.index') }}">Componentes/Motores</a></li>
-                            <li><a class="nav-link link-dark submenu-item" href="{{ route('motores.asignaciones.index') }}">Asignaciones</a></li>
-                            <li><a class="nav-link link-dark submenu-item" href="{{ route('motores.asignar.create') }}">Asignar Motor</a></li>
-                            <li><a class="nav-link link-dark submenu-item" href="{{ route('motores.historial') }}">Historial de Asignaciones</a></li>
+                            <li>
+                                <a class="nav-link link-dark submenu-item" href="{{ route('admin.componentes.inventario') }}">
+                                    <i class="bi bi-list-ul"></i> Ver Inventario
+                                </a>
+                            </li>
+                            <li>
+                                <a class="nav-link link-dark submenu-item" href="{{ route('admin.componentes.salida') }}">
+                                    <i class="bi bi-box-arrow-right"></i> Salida de Componentes
+                                </a>
+                            </li>
+                            <li>
+                                <a class="nav-link link-dark submenu-item" href="{{ route('admin.componentes.entrada') }}">
+                                    <i class="bi bi-box-arrow-in-left"></i> Entrada de Componentes
+                                </a>
+                            </li>
                         </ul>
                     </div>
                 </li>
@@ -357,10 +367,6 @@
             }
         });
     });
-    
-    
-    
-
 </script>
 @yield('scripts')
 @stack('scripts')
