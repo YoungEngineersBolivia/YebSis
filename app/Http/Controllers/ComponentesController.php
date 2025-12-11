@@ -41,7 +41,7 @@ class ComponentesController extends Controller
         $request->validate([
             'Id_motor' => 'required|unique:motores,Id_motor',
             'Estado' => 'required|in:Disponible,En Reparacion,Funcionando,Descompuesto',
-            'Id_sucursales' => 'nullable|exists:sucursales,Id_Sucursales',
+            'Id_sucursales' => 'nullable|exists:sucursales,Id_sucursales',
             'Observacion' => 'nullable|string'
         ]);
         
@@ -67,7 +67,7 @@ class ComponentesController extends Controller
         $request->validate([
             'Id_motor' => 'required|unique:motores,Id_motor,' . $id . ',Id_motores',
             'Estado' => 'required|in:Disponible,En Reparacion,Funcionando,Descompuesto',
-            'Id_sucursales' => 'nullable|exists:sucursales,Id_Sucursales',
+            'Id_sucursales' => 'nullable|exists:sucursales,Id_sucursales',
             'Observacion' => 'nullable|string'
         ]);
         

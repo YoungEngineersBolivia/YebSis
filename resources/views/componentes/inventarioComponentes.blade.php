@@ -52,7 +52,7 @@
                     <select class="form-select" id="filtroSucursal">
                         <option value="">Todas</option>
                         @foreach($sucursales as $sucursal)
-                            <option value="{{ $sucursal->Id_Sucursales }}">{{ $sucursal->Nombre }}</option>
+                            <option value="{{ $sucursal->Id_sucursales }}">{{ $sucursal->Nombre }}</option>
                         @endforeach
                     </select>
                 </div>
@@ -122,11 +122,11 @@
                             </td>
                             <td>{{ Str::limit($motor->Observacion, 50) ?? '---' }}</td>
                             <td>
-                                <button type="button" class="btn btn-sm btn-info" 
+                                <!--<button type="button" class="btn btn-sm btn-info" 
                                         onclick="verHistorial({{ $motor->Id_motores }})" 
                                         title="Ver Historial">
                                     <i class="bi bi-clock-history"></i>
-                                </button>
+                                </button>-->
                                 <button type="button" class="btn btn-sm btn-warning" 
                                         onclick='editarMotor(@json($motor))' 
                                         title="Editar">
@@ -177,7 +177,7 @@
                         <select class="form-select" name="Id_sucursales">
                             <option value="">Sin asignar</option>
                             @foreach($sucursales as $sucursal)
-                                <option value="{{ $sucursal->Id_Sucursales }}">{{ $sucursal->Nombre }}</option>
+                                <option value="{{ $sucursal->Id_sucursales }}">{{ $sucursal->Nombre }}</option>
                             @endforeach
                         </select>
                     </div>
@@ -230,7 +230,7 @@
                         <select class="form-select" id="edit_Id_sucursales" name="Id_sucursales">
                             <option value="">Sin asignar</option>
                             @foreach($sucursales as $sucursal)
-                                <option value="{{ $sucursal->Id_Sucursales }}">{{ $sucursal->Nombre }}</option>
+                                <option value="{{ $sucursal->Id_sucursales }}">{{ $sucursal->Nombre }}</option>
                             @endforeach
                         </select>
                     </div>

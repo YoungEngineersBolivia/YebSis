@@ -61,7 +61,7 @@ class CustomLoginController extends Controller
             return redirect()->route('profesor.home'); 
 
         } elseif ($rol == 3) { 
-            return redirect()->route('home.tutor');
+            return redirect()->route('tutor.home');
         } else {
             return redirect('/');
         }
