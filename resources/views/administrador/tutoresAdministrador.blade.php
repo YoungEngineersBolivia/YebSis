@@ -42,34 +42,40 @@
     {{-- Buscador --}}
     <div class="row mb-3">
         <div class="col-md-6">
-            <form action="{{ route('tutores.index') }}" method="GET" class="w-100">
+            <form id="formBuscador" action="{{ route('tutores.index') }}" method="GET" class="w-100">
+
+
                 <div class="input-group">
                     <span class="input-group-text"><i class="fas fa-search"></i></span>
-                    <input type="text" class="form-control" name="search" placeholder="Buscar Tutor" value="{{ $search ?? '' }}">
+                  <input type="text" id="searchTutor" class="form-control" name="search"
+       placeholder="Buscar Tutor" value="{{ $search ?? '' }}">
+
+
+
                     <button type="submit" class="btn btn-primary">Buscar</button>
                 </div>
             </form>
         </div>
     </div>
 
-    @if($tutores->isEmpty())
-        <div class="alert alert-warning">No hay tutores registrados.</div>
-    @else
-        <div class="table-responsive">
-            <table class="table table-hover">
-                <thead class="table-light">
-                    <tr>
-                        <th>Nombre</th>
-                        <th>Apellido</th>
-                        <th>Celular</th>
-                        <th>Dirección</th>
-                        <th>Correo</th>
-                        <th>Parentesco</th>
-                        <th style="min-width:140px;">Acciones</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach ($tutores as $tutor)
+  @if($tutores->isEmpty())
+    <div class="alert alert-warning">No hay tutores registrados.</div>
+@else
+    <div class="table-responsive">
+        <table class="table table-hover">
+            <thead class="table-light">
+                <tr>
+                    <th>Nombre</th>
+                    <th>Apellido</th>
+                    <th>Celular</th>
+                    <th>Dirección</th>
+                    <th>Correo</th>
+                    <th>Parentesco</th>
+                    <th style="min-width:140px;">Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach ($tutores as $tutor)
                         <tr>
                             <td>{{ $tutor->persona->Nombre ?? '—' }}</td>
                             <td>{{ $tutor->persona->Apellido ?? '—' }}</td>
@@ -162,9 +168,9 @@
         </div>
 
         {{-- Paginación --}}
-        <div class="d-flex justify-content-center mt-4">
-            {{ $tutores->links('pagination::bootstrap-5') }}
-        </div>
+      <div class="d-flex justify-content-center mt-4">
+        {{ $tutores->links('pagination::bootstrap-5') }}
+    </div>
     @endif
 
 </div>
@@ -172,14 +178,33 @@
 
 @section('scripts')
 <script>
-(function () {
-    // Autocierre de alertas después de 5 segundos
-    document.querySelectorAll('.alert').forEach(alertEl => {
-        setTimeout(() => {
-            const bsAlert = bootstrap.Alert.getOrCreateInstance(alertEl);
-            bsAlert.close();
-        }, 5000);
-    });
-})();
+let timer;
+let lastValue = "{{ $search ?? '' }}";
+
+
+window.onload = function() {
+    const input = document.getElementById('searchTutor');
+    if (input) {
+        input.focus();
+        input.setSelectionRange(input.value.length, input.value.length);
+    }
+};
+
+document.getElementById('searchTutor').addEventListener('input', function () {
+    const value = this.value;
+
+  
+    if (value === lastValue) return;
+
+    clearTimeout(timer);
+
+    
+    timer = setTimeout(() => {
+        lastValue = value;
+        document.getElementById('formBuscador').submit();
+    }, 900); 
+});
 </script>
+
+
 @endsection
