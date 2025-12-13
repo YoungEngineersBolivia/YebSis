@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Young Engineers La Paz - STEM para Niños</title>
     <link href="{{ auto_asset('css/paginaWeb/home.css') }}" rel="stylesheet">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
 </head>
 
 <body>
