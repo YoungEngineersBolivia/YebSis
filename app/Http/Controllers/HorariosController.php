@@ -17,11 +17,11 @@ class HorariosController extends Controller
             ->orderBy('Hora')
             ->paginate(10);
 
-        $estudiantes = Estudiante::with('persona')->get();
+        // Necesitamos estudiantes y profesores para las vistas
+        $estudiantes = Estudiante::with(['persona', 'profesor.persona', 'programa'])->get();
         $profesores = Profesor::with('persona')->get();
-        $programas  = Programa::all();
 
-        return view('administrador.horariosAdministrador', compact('horarios', 'estudiantes', 'profesores', 'programas'));
+        return view('administrador.horariosAdministrador', compact('horarios', 'estudiantes', 'profesores'));
     }
 
     public function store(Request $request)
@@ -29,12 +29,34 @@ class HorariosController extends Controller
         $request->validate([
             'Id_estudiantes' => 'required|exists:estudiantes,Id_estudiantes',
             'Id_profesores'  => 'required|exists:profesores,Id_profesores',
-            'Id_programas'   => 'required|exists:programas,Id_programas',
             'Dia'            => 'required|string',
             'Hora'           => 'required'
         ]);
 
-        Horario::create($request->all());
+        // Obtener el estudiante para extraer su programa
+        $estudiante = Estudiante::findOrFail($request->Id_estudiantes);
+
+        // Validar que el estudiante tenga programa asignado
+        if (!$estudiante->Id_programas) {
+            return redirect()->back()
+                ->withErrors(['error' => 'El estudiante seleccionado no tiene un programa asignado.'])
+                ->withInput();
+        }
+
+        // Si el estudiante no tiene profesor asignado, asignárselo
+        if (!$estudiante->Id_profesores) {
+            $estudiante->Id_profesores = $request->Id_profesores;
+            $estudiante->save();
+        }
+
+        // Crear el horario con los datos del estudiante
+        Horario::create([
+            'Id_estudiantes' => $request->Id_estudiantes,
+            'Id_profesores'  => $request->Id_profesores,
+            'Id_programas'   => $estudiante->Id_programas,
+            'Dia'            => $request->Dia,
+            'Hora'           => $request->Hora
+        ]);
 
         return redirect()->route('horarios.index')->with('success', 'Horario registrado correctamente.');
     }
@@ -44,13 +66,34 @@ class HorariosController extends Controller
         $request->validate([
             'Id_estudiantes' => 'required|exists:estudiantes,Id_estudiantes',
             'Id_profesores'  => 'required|exists:profesores,Id_profesores',
-            'Id_programas'   => 'required|exists:programas,Id_programas',
             'Dia'            => 'required|string',
             'Hora'           => 'required'
         ]);
 
+        // Obtener el estudiante para extraer su programa
+        $estudiante = Estudiante::findOrFail($request->Id_estudiantes);
+
+        // Validar que el estudiante tenga programa asignado
+        if (!$estudiante->Id_programas) {
+            return redirect()->back()
+                ->withErrors(['error' => 'El estudiante seleccionado no tiene un programa asignado.'])
+                ->withInput();
+        }
+
+        // Si el estudiante no tiene profesor asignado, asignárselo
+        if (!$estudiante->Id_profesores) {
+            $estudiante->Id_profesores = $request->Id_profesores;
+            $estudiante->save();
+        }
+
         $horario = Horario::findOrFail($id);
-        $horario->update($request->all());
+        $horario->update([
+            'Id_estudiantes' => $request->Id_estudiantes,
+            'Id_profesores'  => $request->Id_profesores,
+            'Id_programas'   => $estudiante->Id_programas,
+            'Dia'            => $request->Dia,
+            'Hora'           => $request->Hora
+        ]);
 
         return redirect()->route('horarios.index')->with('success', 'Horario actualizado correctamente.');
     }
@@ -62,19 +105,23 @@ class HorariosController extends Controller
 
         return redirect()->route('horarios.index')->with('success', 'Horario eliminado correctamente.');
     }
-     public function buscarProfesor($idEstudiante)
-{
-    $estudiante = Estudiante::find($idEstudiante);
 
-    if (!$estudiante) {
-        return response()->json([]);
+    // Endpoint para obtener datos del estudiante via AJAX (opcional)
+    public function buscarEstudiante($idEstudiante)
+    {
+        $estudiante = Estudiante::with(['profesor.persona', 'programa'])->find($idEstudiante);
+
+        if (!$estudiante) {
+            return response()->json(['error' => 'Estudiante no encontrado'], 404);
+        }
+
+        return response()->json([
+            'Id_profesores' => $estudiante->Id_profesores,
+            'Id_programas'  => $estudiante->Id_programas,
+            'profesor_nombre' => $estudiante->profesor ? 
+                $estudiante->profesor->persona->Nombre . ' ' . $estudiante->profesor->persona->Apellido : 
+                'Sin profesor',
+            'programa_nombre' => $estudiante->programa ? $estudiante->programa->Nombre : 'Sin programa'
+        ]);
     }
-
-    $profesor = $estudiante->profesor; // o la relación correcta que tengas
-
-    return response()->json([
-        'Id_profesores' => $profesor?->Id_profesores
-    ]);
-}
-
 }
