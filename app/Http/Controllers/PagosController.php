@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Estudiante;
 use App\Models\Cuota;
 use App\Models\Pago;
+use App\Models\PlanesPago;
 use Illuminate\Http\Request;
 
 class PagosController extends Controller
@@ -65,18 +66,11 @@ class PagosController extends Controller
             // Obtener el plan
             $plan = PlanesPago::with('pagos')->findOrFail($request->plan_id);
             
-            // Calcular total pagado hasta ahora
+            // Calcular total pagado
             $totalPagado = $plan->pagos->sum('Monto_pago');
             $montoPago = (float) $request->monto_pago;
-            
-            // Validar que el nuevo pago no exceda el monto total del plan
-            if (($totalPagado + $montoPago) > $plan->Monto_total) {
-                $restante = $plan->Monto_total - $totalPagado;
-                return back()->with('error', 
-                    "El monto del pago excede el saldo restante. Máximo permitido: Bs. " . number_format($restante, 2));
-            }
 
-            // Crear el pago directamente (sin cuotas)
+            // Crear el pago directamente (sin restricción de monto)
             Pago::create([
                 'Descripcion' => $request->descripcion,
                 'Comprobante' => $request->comprobante,

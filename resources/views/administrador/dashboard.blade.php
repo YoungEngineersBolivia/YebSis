@@ -2,8 +2,6 @@
 
 @section('title', 'Dashboard')
 @section('styles')
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <link href="{{ auto_asset('css/administrador/dashboard.css') }}" rel="stylesheet">
 @endsection
@@ -198,15 +196,15 @@
                 <i class="fas fa-users"></i> Alumnos por programa en {{ $sucursal->Nombre }}
             </div>
             <div class="card-body p-0">
-                <table class="table table-striped mb-0">
-                    <thead>
+                <table class="table table-striped table-hover align-middle mb-0">
+                    <thead class="bg-primary text-white">
                         <tr>
                             <th>Programa</th>
                             <th>Total de Alumnos</th>
                         </tr>
                     </thead>
                     <tbody>
-                        @forelse($alumnosPorSucursal[$sucursal->Id_Sucursales] as $row)
+                        @forelse($alumnosPorSucursal[$sucursal->Id_sucursales] as $row)
                             <tr>
                                 <td>{{ $row->programa }}</td>
                                 <td><strong>{{ $row->total }}</strong></td>
@@ -224,8 +222,6 @@
 
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
     window.ingresosPorDia = @json($ingresosPorDia->pluck('total'));
     window.fechasPorDia = @json($ingresosPorDia->pluck('fecha'));
@@ -233,5 +229,4 @@
     window.mesesPorMes = @json($ingresosPorMes->pluck('mes_nombre'));
 </script>
 <script src="{{ auto_asset('js/administrador/dashboard.js') }}"></script>
-
 @endsection

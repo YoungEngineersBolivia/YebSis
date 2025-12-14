@@ -123,6 +123,10 @@ class RegistroCombinadoController extends Controller
             'codigo_estudiante.unique' => 'Este código de estudiante ya está registrado. Intente con otro.',
             'programa.required' => 'Debe seleccionar un programa.',
             'sucursal.required' => 'Debe seleccionar una sucursal.',
+            'tutor_fecha_nacimiento.after' => 'La fecha de nacimiento del tutor no es válida (muy antigua).',
+            'tutor_fecha_nacimiento.before' => 'La fecha de nacimiento del tutor no es válida (futura).',
+            'estudiante_fecha_nacimiento.after' => 'La fecha de nacimiento del estudiante no es válida (muy antigua).',
+            'estudiante_fecha_nacimiento.before' => 'La fecha de nacimiento del estudiante no es válida (futura).',
         ];
         
         $request->validate($validationRules, $customMessages);
@@ -133,7 +137,7 @@ class RegistroCombinadoController extends Controller
             $rolTutor = Rol::where('Nombre_rol', 'Tutor')->first();
 
             if (!$rolEstudiante || !$rolTutor) {
-                return back()->withErrors(['error' => 'Roles no encontrados en el sistema.']);
+                return back()->withErrors(['error' => 'Roles no encontrados en el sistema.'])->withInput();
             }
 
             // ---------------------------
@@ -147,7 +151,7 @@ class RegistroCombinadoController extends Controller
             } else {
                 // Validar correo tutor
                 if (Usuario::where('Correo', $request->tutor_email)->exists()) {
-                    return back()->withErrors(['tutor_email' => 'El correo del tutor ya está en uso.']);
+                    return back()->withErrors(['tutor_email' => 'El correo del tutor ya está en uso.'])->withInput();
                 }
 
                 // Crear persona y usuario tutor
@@ -248,6 +252,7 @@ class RegistroCombinadoController extends Controller
                     'Descripcion' => $request->Descripcion,
                     'Monto_pago' => $request->Monto_pago,
                     'Fecha_pago' => $request->Fecha_pago,
+                    'Comprobante' => $request->Comprobante,
                     'Id_planes_pagos' => $planPago->Id_planes_pagos,
                 ]);
             }

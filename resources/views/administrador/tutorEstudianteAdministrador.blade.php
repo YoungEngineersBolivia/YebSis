@@ -1,4 +1,4 @@
-@extends('/administrador/baseAdministrador')
+@extends('administrador.baseAdministrador')
 
 @section('title', 'Registro Estudiante y Tutor')
 
@@ -6,8 +6,10 @@
 <div class="row mb-3">
     <div class="col-md-12">
         <label><b>Buscar Tutor</b></label>
-        <input type="text" id="buscarTutor" class="form-control" placeholder="Escriba el nombre del tutor">
-        <ul id="listaTutor" class="list-group position-absolute" style="z-index:1000;"></ul>
+        <div style="position: relative;">
+            <input type="text" id="buscarTutor" class="form-control" placeholder="Escriba el nombre del tutor">
+            <ul id="listaTutor" class="list-group" style="position:absolute; z-index:1000; width:100%;"></ul>
+        </div>
     </div>
 </div>
 
@@ -43,7 +45,7 @@
             <div class="col-md-6">
                 <label>Nombre</label>
                 <input type="text" name="tutor_nombre" class="form-control" value="{{ old('tutor_nombre') }}" placeholder="Ej: Juan" required>
-                <input type="hidden" name="tutor_id_existente" id="tutor_id_existente" value="">
+                <input type="hidden" name="tutor_id_existente" id="tutor_id_existente" value="{{ old('tutor_id_existente') }}">
             </div>
             <div class="col-md-6">
                 <label>Apellido</label>
@@ -96,6 +98,10 @@
                 <label>Correo</label>
                 <input type="email" name="tutor_email" class="form-control" value="{{ old('tutor_email') }}" placeholder="Ej: juan.perez@gmail.com" required>
             </div>
+             <div class="col-md-6">
+                <label>Descuento Especial (%)</label>
+                <input type="number" step="0.01" name="tutor_descuento" id="tutor_descuento" class="form-control" value="{{ old('tutor_descuento') }}" placeholder="0 - 100">
+            </div>
 
         </div>
 
@@ -105,7 +111,7 @@
         {{-- ================= ESTUDIANTE ================= --}}
         <h4>Datos del Estudiante</h4>
         
-        <input type="hidden" name="estudiante_id_existente" id="estudiante_id_existente" value="">
+        <input type="hidden" name="estudiante_id_existente" id="estudiante_id_existente" value="{{ old('estudiante_id_existente') }}">
         
         <div class="row" id="form-estudiante">
             <div class="col-md-6">
@@ -140,123 +146,132 @@
                 <label>Código de Estudiante</label>
                 <input type="text" name="codigo_estudiante" class="form-control" value="{{ old('codigo_estudiante') }}" placeholder="Ej: EST-2024-001" required>
             </div>
-            <div class="col-md-6">
+             <div class="col-md-6">
                 <label>Programa</label>
-                <select name="programa" class="form-control" required>
-                    <option value="">Seleccione...</option>
-                    @foreach ($programas as $p)
-                        <option value="{{ $p->Id_programas }}" {{ old('programa')==$p->Id_programas?'selected':'' }}>
-                            {{ $p->Nombre }}
+                <select name="programa" id="programa" class="form-control" required>
+                     <option value="" disabled selected>Seleccione un programa</option>
+                     @foreach($programas as $prog)
+                        <option value="{{ $prog->Id_programas }}" 
+                            data-precio="{{ $prog->Costo }}"
+                            {{ old('programa') == $prog->Id_programas ? 'selected' : '' }}>
+                            {{ $prog->Nombre }}
                         </option>
                     @endforeach
                 </select>
             </div>
-        <div class="col-md-6">
-            <label>Sucursal</label>
-            <select name="sucursal" class="form-control" required>
-                <option value="">Seleccione...</option>
-                @forelse ($sucursales as $s)
-                    <option value="{{ $s->Id_sucursales }}" {{ old('sucursal') == $s->Id_sucursales ? 'selected' : '' }}>
-                        {{ $s->Nombre }}
-                    </option>
-                @empty
-                    <option value="">No hay sucursales registradas</option>
-                @endforelse
-            </select>
-        </div>
-        
-      <div class="col-md-6">
-    <label>Profesor</label>
-    <select name="profesor" class="form-control" >
-        <option value="">Seleccione...</option>
-        @foreach ($profesores as $prof)
-            <option value="{{ $prof->Id_profesores }}"
-                {{ old('profesor') == $prof->Id_profesores ? 'selected' : '' }}>
-                {{ $prof->persona->Nombre }} {{ $prof->persona->Apellido }}
-            </option>
-        @endforeach
-    </select>
-</div>
-
-
-        <hr>
-        {{-- ================= PLAN DE PAGOS ================= --}}
-        <h4>Plan de Pagos</h4>
-        <div class="row">
-            <div class="col-md-4">
-                <label>Matrícula (Bs)</label>
-                <input type="number" step="0.01" name="Monto_matricula" id="Monto_matricula" class="form-control" value="{{ old('Monto_matricula') }}" placeholder="Ej: 500">
-            </div>
-            <div class="col-md-4">
-                <label>Matrícula en cuántas partes</label>
-                <select name="Partes_matricula" class="form-control">
-                    <option value="1" {{ old('Partes_matricula') == '1' ? 'selected' : '' }}>1</option>
-                    <option value="2" {{ old('Partes_matricula') == '2' ? 'selected' : '' }}>2</option>
-                    <option value="3" {{ old('Partes_matricula') == '3' ? 'selected' : '' }}>3</option>
+            <div class="col-md-6">
+                <label>Sucursal</label>
+                <select name="sucursal" class="form-control" required>
+                    <option value="">Seleccione...</option>
+                    @forelse ($sucursales as $s)
+                        <option value="{{ $s->Id_sucursales }}" {{ old('sucursal') == $s->Id_sucursales ? 'selected' : '' }}>
+                            {{ $s->Nombre }}
+                        </option>
+                    @empty
+                        <option value="">No hay sucursales registradas</option>
+                    @endforelse
                 </select>
             </div>
-            <div class="col-md-4">
-                <label>Precio del Programa (Bs)</label>
-                <input type="number" step="0.01" id="Precio_programa" class="form-control" >
-            </div>
-            <div class="col-md-4">
-                <label>Nro de cuotas</label>
-                <input type="number" name="Nro_cuotas" id="nro_cuotas" class="form-control" value="{{ old('Nro_cuotas') }}" placeholder="Ej: 10" required>
-            </div>
-            <div class="col-md-4">
-                <label>Monto total</label>
-                <input type="number" step="0.01" name="Monto_total" id="Monto_total" class="form-control" value="{{ old('Monto_total') }}" placeholder="Ej: 5000" required>
-            </div>
-            <div class="col-md-4">
-                <label>Descuento (%)</label>
-                <input type="number" step="0.01" name="tutor_descuento" id="tutor_descuento" class="form-control" value="{{ old('tutor_descuento') }}" placeholder="Ej: 10">
-            </div>
-            <div class="col-md-4">
-                <label>Descuento aplicado (Bs)</label>
-                <input type="number" step="0.01" id="Descuento_aplicado" class="form-control"
-                    value=""
-                    readonly>
-            </div>
-            <div class="col-md-4">
-                <label>Total con descuento aplicado (Bs)</label>
-                <input type="number" step="0.01" id="Total_con_descuento" class="form-control"
-                    value=""
-                    readonly>
-            </div>
-            <div class="col-md-4">
-                <label>Fecha plan de pagos</label>
-                <input type="date" name="fecha_plan_pagos" class="form-control" 
-                    value="{{ old('fecha_plan_pagos', \Carbon\Carbon::now()->format('Y-m-d')) }}" required>
-            </div>
-        </div>
-        <div class="row mt-3">
-            {{-- <div class="col-md-4">
-                <label>Estado del plan</label>
-                <input type="text" name="Estado_plan" class="form-control" value="{{ old('Estado_plan', 'Pendiente') }}" required>
-            </div> --}}
-            <input type="hidden" name="Estado_plan" value="Pendiente">
-        </div>
-        <input type="hidden" name="Id_programas" value="{{ old('programa') }}">
+            
+          <div class="col-md-6">
+        <label>Profesor</label>
+        <select name="profesor" class="form-control" >
+            <option value="">Seleccione...</option>
+            @foreach ($profesores as $prof)
+                <option value="{{ $prof->Id_profesores }}"
+                    {{ old('profesor') == $prof->Id_profesores ? 'selected' : '' }}>
+                    {{ $prof->persona->Nombre }} {{ $prof->persona->Apellido }}
+                </option>
+            @endforeach
+        </select>
+    </div>
+    </div>
+
         <hr>
-        {{-- ========== CUOTAS GENERADAS AUTOMÁTICAMENTE ========== --}}
-        <h5>Cuotas generadas automáticamente</h5>
-        <div class="table-responsive">
-            <table class="table table-bordered" id="tabla-cuotas-auto">
-                <thead>
-                    <tr>
-                        <th>Nro de cuota</th>
-                        <th>Fecha vencimiento</th>
-                        <th>Monto cuota</th>
-                        <th>Estado cuota</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {{-- Las filas se llenan por JS --}}
-                </tbody>
-            </table>
+        {{-- ================= PAGO ================= --}}
+        <h4>Pago</h4>
+        <div class="row">
+            {{-- Campos ocultos para compatibilidad con el controlador --}}
+            <input type="hidden" name="Nro_cuotas" value="1">
+            <input type="hidden" name="Estado_plan" value="Completado">
+            {{-- El Monto_total será igual al Monto_pago --}}
+            <input type="hidden" name="Monto_total" id="hidden_monto_total">
+            
+            <div class="col-md-6">
+                <label>Descripción</label>
+                <input type="text" name="Descripcion" class="form-control" placeholder="Ej: Pago de Matrícula" value="{{ old('Descripcion', 'Pago del Curso') }}">
+            </div>
+            <div class="col-md-6">
+                <label>Comprobante</label>
+                <div class="input-group">
+                    <input type="text" name="Comprobante" id="input_comprobante" class="form-control" placeholder="Se llena con Nombre Factura" value="{{ old('Comprobante') }}">
+                    <button class="btn btn-outline-secondary" type="button" id="btn-copy-factura">
+                        <i class="fas fa-sync"></i>
+                    </button>
+                </div>
+                <small class="text-muted">Se llena automáticamente con el Nombre de Factura</small>
+            </div>
+            <div class="col-md-6 mt-3">
+                <label>Monto (Bs)</label>
+                <input type="number" step="0.01" name="Monto_pago" id="input_monto_pago" class="form-control" required placeholder="0.00" value="{{ old('Monto_pago') }}">
+            </div>
+            <div class="col-md-6 mt-3">
+                <label>Fecha</label>
+                <input type="date" name="Fecha_pago" class="form-control" value="{{ old('Fecha_pago', \Carbon\Carbon::now()->format('Y-m-d')) }}" required>
+            </div>
         </div>
-        <!-- Agrega este div oculto para los inputs de cuotas generadas -->
-        <div id="cuotas-auto-hidden-inputs"></div>
+        
+        {{-- ========== SECCIÓN OCULTA DEL PLAN DE PAGOS ========== --}}
+        <div class="d-none">
+            <h4>Plan de Pagos (Oculto)</h4>
+             <div class="row">
+                <div class="col-md-4">
+                    <label>Matrícula (Bs)</label>
+                    <input type="number" step="0.01" name="Monto_matricula" id="Monto_matricula" class="form-control" value="{{ old('Monto_matricula') }}">
+                </div>
+                <div class="col-md-4">
+                    <label>Matrícula en cuántas partes</label>
+                    <select name="Partes_matricula" class="form-control">
+                        <option value="1" {{ old('Partes_matricula') == 1 ? 'selected' : '' }}>1</option>
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label>Precio del Programa (Bs)</label>
+                    <input type="number" step="0.01" id="Precio_programa" class="form-control" >
+                </div>
+                <div class="col-md-4">
+                    <label>Nro de cuotas</label>
+                    <input type="number" id="nro_cuotas_dummy" class="form-control">
+                </div>
+                <div class="col-md-4">
+                    <label>Monto total</label>
+                    <input type="number" step="0.01" id="Monto_total_dummy" class="form-control">
+                </div>
+                <div class="col-md-4">
+                    <label>Descuento (%)</label>
+                    <input type="number" step="0.01" name="tutor_descuento_hidden" id="tutor_descuento_hidden" class="form-control">
+                </div>
+                 <div class="col-md-4">
+                    <label>Descuento aplicado (Bs)</label>
+                    <input type="number" step="0.01" id="Descuento_aplicado" class="form-control" readonly>
+                </div>
+                <div class="col-md-4">
+                    <label>Total con descuento aplicado (Bs)</label>
+                    <input type="number" step="0.01" id="Total_con_descuento" class="form-control" readonly>
+                </div>
+                <div class="col-md-4">
+                    <label>Fecha plan de pagos</label>
+                    <input type="date" name="fecha_plan_pagos" class="form-control" value="{{ old('fecha_plan_pagos', \Carbon\Carbon::now()->format('Y-m-d')) }}">
+                </div>
+            </div>
+             <div class="table-responsive mt-3">
+                <table class="table table-bordered" id="tabla-cuotas-auto">
+                    <thead><tr><th>Nro</th><th>Fecha</th><th>Monto</th><th>Estado</th></tr></thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+            <div id="cuotas-auto-hidden-inputs"></div>
+        </div>
         <hr>
 
         <button type="submit" class="btn btn-primary mt-4" id="btnRegistrar">
@@ -264,6 +279,38 @@
             <span id="btnSpinner" class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
         </button>
     </form>
+</div>
+
+{{-- Modal para seleccionar Hijos Existentes (si el tutor tiene hijos) --}}
+<div class="modal fade" id="modalEstudiantesExistentes" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Hijos Registrados del Tutor</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Seleccione uno de los hijos registrados para inscribirlo en un nuevo programa.</p>
+                <div class="table-responsive">
+                    <table class="table table-hover" id="tablaHijos">
+                        <thead>
+                            <tr>
+                                <th>Nombre</th>
+                                <th>Apellido</th>
+                                <th>Acción</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Se llena dinámicamente -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
 </div>
 
 {{-- Modal para seleccionar hijo existente --}}
@@ -483,6 +530,41 @@
             this.programaSelect.addEventListener('change', () => this.actualizarPrecio());
         }
         
+        // --- NUEVO: Sincronización para vista simplificada de Pago ---
+        const inputMontoPago = document.getElementById('input_monto_pago');
+        const hiddenMontoTotal = document.getElementById('hidden_monto_total');
+        const inputComprobante = document.getElementById('input_comprobante');
+        const btnCopyFactura = document.getElementById('btn-copy-factura');
+        const inputNombreFactura = document.querySelector('input[name="tutor_nombre_factura"]');
+
+        if (inputMontoPago) {
+            inputMontoPago.addEventListener('input', () => {
+                // Sincronizar Monto Total oculto con Monto Pago
+                if (hiddenMontoTotal) {
+                    hiddenMontoTotal.value = inputMontoPago.value;
+                }
+            });
+        }
+
+        // Función para copiar nombre de factura
+        const copiarNombreFactura = () => {
+            if (inputNombreFactura && inputComprobante) {
+                inputComprobante.value = inputNombreFactura.value;
+            }
+        };
+
+        // Escuchar cambios en nombre factura
+        if (inputNombreFactura) {
+             inputNombreFactura.addEventListener('input', copiarNombreFactura);
+             inputNombreFactura.addEventListener('change', copiarNombreFactura);
+        }
+
+        if (btnCopyFactura) {
+            btnCopyFactura.addEventListener('click', copiarNombreFactura);
+        }
+
+        // --- MANEJO DE PLAN DE PAGOS (AUNQUE ESTÉ OCULTO) ---
+        // Mantener listeners antiguos para evitar errores si existen elementos
         if (this.matriculaInput) {
             this.matriculaInput.addEventListener('input', () => this.actualizarMontoTotal());
         }

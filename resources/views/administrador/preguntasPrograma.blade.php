@@ -7,126 +7,29 @@
 <style>
     :root {
         --primary-color: #6366f1;
-        --primary-dark: #4f46e5;
+        --secondary-color: #8b5cf6;
         --success-color: #10b981;
+        --warning-color: #f59e0b;
         --danger-color: #ef4444;
-        --light-bg: #f9fafb;
-    }
-
-    body {
-        background-color: var(--light-bg);
-    }
-
-    .page-header {
-        background: white;
-        pad padding: 32px;
-        border-radius: 16px;
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-        margin-bottom: 24px;
-    }
-
-    .page-header h1 {
-        font-size: 2rem;
-        font-weight: 700;
-        color: #1f2937;
-        margin-bottom: 4px;
-    }
-
-    .page-header p {
-        color: #6b7280;
-        font-size: 1rem;
-    }
-
-    .btn {
-        border-radius: 10px;
-        padding: 10px 20px;
-        font-weight: 600;
-        transition: all 0.2s ease;
-        border: none;
-    }
-
-    .btn-primary {
-        background-color: var(--primary-color);
-    }
-
-    .btn-primary:hover {
-        background-color: var(--primary-dark);
-        transform: translateY(-2px);
-    }
-
-    .btn-secondary {
-        background-color: #6b7280;
-    }
-
-    .btn-outline-warning {
-        border: 2px solid #f59e0b;
-        color: #f59e0b;
-    }
-
-    .btn-outline-danger {
-        border: 2px solid var(--danger-color);
-        color: var(--danger-color);
-    }
-
-    .card {
-        border-radius: 16px;
-        border: none;
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-    }
-
-    .table thead th {
-        background-color: #f9fafb;
-        color: #1f2937;
-        font-weight: 700;
-        padding: 16px;
-    }
-
-    .table tbody td {
-        padding: 16px;
-        vertical-align: middle;
-    }
-
-    .alert {
-        border-radius: 12px;
-        padding: 16px 20px;
-    }
-
-    .modal-content {
-        border-radius: 16px;
-    }
-
-    .modal-header {
-        background-color: var(--primary-color);
-        color: white;
-        border-radius: 16px 16px 0 0;
+        --dark-color: #1f2937;
     }
 </style>
 @endsection
 
 @section('content')
-<div class="container-fluid py-4">
-    {{-- Header --}}
-    <div class="row mb-4">
-        <div class="col-12">
-            <div class="page-header">
-                <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
-                    <div>
-                        <h1>
-                            <i class="fas fa-question-circle me-2" style="color: var(--primary-color);"></i>
-                            Preguntas de {{ $programa->Nombre }}
-                        </h1>
-                        <p class="mb-0">Gestiona las preguntas de evaluación para este programa</p>
-                    </div>
-                    <div class="d-flex gap-2">
-                        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#nuevaPreguntaModal">
-                            <i class="fas fa-plus me-2"></i>Nueva Pregunta
-                        </button>
-                        <a href="{{ route('programas.index') }}" class="btn btn-secondary">
-                            <i class="fas fa-arrow-left me-2"></i>Volver a Programas
-                        </a>
-                    </div>
-                </div>
-            </div>
+<div class="container-fluid mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="mb-0 fw-bold"><i class="fas fa-question-circle me-2"></i>Preguntas de {{ $programa->Nombre }}</h2>
+            <p class="text-muted mb-0">Gestiona las preguntas de evaluación para este programa</p>
+        </div>
+        <div>
+            <a href="{{ route('programas.index') }}" class="btn btn-outline-secondary me-2">
+                <i class="fas fa-arrow-left me-2"></i>Volver
+            </a>
+            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#nuevaPreguntaModal">
+                <i class="fas fa-plus me-2"></i>Nueva Pregunta
+            </button>
         </div>
     </div>
 
@@ -165,73 +68,71 @@
         </div>
     @endif
 
-    {{-- Tabla de Preguntas --}}
-    <div class="row">
-        <div class="col-12">
-            <div class="card">
-                <div class="card-body p-0">
-                    @if($preguntas->isEmpty())
-                        <div class="p-5 text-center">
-                            <i class="fas fa-question-circle fa-4x text-muted mb-3"></i>
-                            <h5 class="text-muted">No hay preguntas registradas</h5>
-                            <p class="text-muted">Comienza agregando la primera pregunta para este programa</p>
-                            <button type="button" class="btn btn-primary mt-2" data-bs-toggle="modal" data-bs-target="#nuevaPreguntaModal">
-                                <i class="fas fa-plus me-2"></i>Agregar Primera Pregunta
-                            </button>
-                        </div>
-                    @else
-                        <div class="table-responsive">
-                            <table class="table table-hover mb-0">
-                                <thead>
-                                    <tr>
-                                        <th style="width: 60px;">#</th>
-                                        <th>Pregunta</th>
-                                        <th style="width: 150px;">Fecha Creación</th>
-                                        <th class="text-center" style="width: 150px;">Acciones</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach($preguntas as $index => $pregunta)
-                                    <tr>
-                                        <td class="text-muted">{{ $index + 1 }}</td>
-                                        <td class="fw-semibold">{{ $pregunta->Pregunta }}</td>
-                                        <td class="text-muted">
-                                            <i class="far fa-calendar me-1"></i>
-                                            {{ $pregunta->created_at->format('d/m/Y') }}
-                                        </td>
-                                        <td class="text-center">
-                                            <div class="btn-group" role="group">
-                                                <button type="button" 
-                                                        class="btn btn-sm btn-outline-warning"
-                                                        data-bs-toggle="modal" 
-                                                        data-bs-target="#editarPreguntaModal{{ $pregunta->Id_preguntas }}"
-                                                        title="Editar">
-                                                    <i class="fas fa-edit"></i>
-                                                </button>
-                                                <form action="{{ route('admin.preguntas.destroy', [$programa->Id_programas, $pregunta->Id_preguntas]) }}" 
-                                                      method="POST" 
-                                                      style="display:inline;"
-                                                      onsubmit="return confirm('¿Estás seguro de eliminar esta pregunta? Esta acción no se puede deshacer.')">
-                                                    @csrf
-                                                    @method('DELETE')
-                                                    <button type="submit" 
-                                                            class="btn btn-sm btn-outline-danger"
-                                                            title="Eliminar">
-                                                        <i class="fas fa-trash"></i>
-                                                    </button>
-                                                </form>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
-                        </div>
-                    @endif
+    {{-- Datos --}}
+    @if($preguntas->isEmpty())
+        <div class="card shadow-sm border-0">
+            <div class="card-body text-center py-5">
+                <i class="fas fa-question-circle text-muted mb-3" style="font-size: 3rem;"></i>
+                <h5 class="text-muted">No hay preguntas registradas</h5>
+                <p class="text-muted">Comienza agregando la primera pregunta para este programa</p>
+                <button type="button" class="btn btn-primary mt-2" data-bs-toggle="modal" data-bs-target="#nuevaPreguntaModal">
+                    <i class="fas fa-plus me-2"></i>Agregar Primera Pregunta
+                </button>
+            </div>
+        </div>
+    @else
+        <div class="card shadow-sm border-0 overflow-hidden">
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover align-middle mb-0">
+                        <thead class="bg-primary text-white">
+                            <tr>
+                                <th class="ps-3 py-3" style="width: 60px;">#</th>
+                                <th class="py-3">Pregunta</th>
+                                <th class="py-3" style="width: 150px;">Fecha Creación</th>
+                                <th class="pe-3 py-3 text-end" style="width: 150px;">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($preguntas as $index => $pregunta)
+                            <tr>
+                                <td class="ps-3 text-muted fw-bold">{{ $index + 1 }}</td>
+                                <td class="fw-semibold">{{ $pregunta->Pregunta }}</td>
+                                <td class="text-muted">
+                                    <i class="far fa-calendar me-1"></i>
+                                    {{ $pregunta->created_at->format('d/m/Y') }}
+                                </td>
+                                <td class="pe-3 text-end">
+                                    <div class="d-flex justify-content-end gap-2">
+                                        <button type="button" 
+                                                class="btn btn-sm btn-outline-primary"
+                                                data-bs-toggle="modal" 
+                                                data-bs-target="#editarPreguntaModal{{ $pregunta->Id_preguntas }}"
+                                                title="Editar">
+                                            <i class="fas fa-pencil-alt"></i>
+                                        </button>
+                                        <form action="{{ route('admin.preguntas.destroy', [$programa->Id_programas, $pregunta->Id_preguntas]) }}" 
+                                                method="POST" 
+                                                style="display:inline;"
+                                                onsubmit="return confirm('¿Estás seguro de eliminar esta pregunta? Esta acción no se puede deshacer.')">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" 
+                                                    class="btn btn-sm btn-outline-danger"
+                                                    title="Eliminar">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
-    </div>
+    @endif
 </div>
 
 {{-- Modal Nueva Pregunta --}}

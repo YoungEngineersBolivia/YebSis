@@ -10,11 +10,11 @@
 @section('content')
 <div class="container-fluid mt-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1 class="mb-0">Horarios Asignados</h1>
+        <h2 class="mb-0 fw-bold"><i class="bi bi-calendar-week me-2"></i>Horarios Asignados</h2>
 
         {{-- Botón que abre el modal de creación --}}
         <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalCrear">
-            <i class="fas fa-plus me-2"></i> Asignar nuevo horario
+            <i class="bi bi-plus-lg me-2"></i>Asignar nuevo horario
         </button>
     </div>
 
@@ -39,67 +39,76 @@
 
     {{-- Tabla de horarios --}}
     @if($horarios->isEmpty())
-        <div class="alert alert-warning">No hay horarios asignados aún.</div>
+        <div class="card shadow-sm border-0">
+            <div class="card-body text-center py-5">
+                <i class="bi bi-calendar-x text-muted mb-3" style="font-size: 3rem;"></i>
+                <h5 class="text-muted">No hay horarios asignados aún.</h5>
+            </div>
+        </div>
     @else
-        <div class="table-responsive">
-            <table class="table table-hover align-middle">
-                <thead class="table-light">
-                    <tr>
-                        <th>Nombre</th>
-                        <th>Apellido</th>
-                        <th>Programa</th>
-                        <th>Día</th>
-                        <th>Hora</th>
-                        <th>Profesor Asignado</th>
-                        <th class="text-center">Acciones</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach($horarios as $horario)
-                        <tr>
-                            <td>{{ $horario->estudiante?->persona?->Nombre ?? '—' }}</td>
-                            <td>{{ $horario->estudiante?->persona?->Apellido ?? '—' }}</td>
-                            <td>{{ $horario->programa?->Nombre ?? '—' }}</td>
-                            <td>{{ $horario->Dia ?? '—' }}</td>
-                            <td>{{ $horario->Hora ?? '—' }}</td>
-                            <td>
-                                @php $pp = $horario->profesor?->persona; @endphp
-                                {{ ($pp?->Nombre && $pp?->Apellido) ? ($pp->Nombre.' '.$pp->Apellido) : 'Sin profesor' }}
-                            </td>
-                            <td class="text-center">
-                                <div class="d-flex justify-content-center gap-2">
-                                    {{-- Abrir modal de edición --}}
-                                    <button type="button"
-                                            class="btn btn-sm btn-outline-success btn-editar"
-                                            title="Editar horario"
-                                            data-bs-toggle="modal"
-                                            data-bs-target="#modalEditar"
-                                            data-id="{{ $horario->Id_horarios }}"
-                                            data-estudiante="{{ $horario->Id_estudiantes }}"
-                                            data-profesor="{{ $horario->Id_profesores }}"
-                                            data-dia="{{ $horario->Dia }}"
-                                            data-hora="{{ $horario->Hora }}">
-                                        <i class="bi bi-pencil-square"></i>
-                                    </button>
+        <div class="card shadow-sm border-0 overflow-hidden">
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover align-middle mb-0">
+                        <thead class="bg-primary text-white">
+                            <tr>
+                                <th class="ps-3 py-3">Nombre</th>
+                                <th class="py-3">Apellido</th>
+                                <th class="py-3">Programa</th>
+                                <th class="py-3">Día</th>
+                                <th class="py-3">Hora</th>
+                                <th class="py-3">Profesor Asignado</th>
+                                <th class="pe-3 py-3 text-end">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($horarios as $horario)
+                                <tr>
+                                    <td class="ps-3 fw-semibold">{{ $horario->estudiante?->persona?->Nombre ?? '—' }}</td>
+                                    <td>{{ $horario->estudiante?->persona?->Apellido ?? '—' }}</td>
+                                    <td>{{ $horario->programa?->Nombre ?? '—' }}</td>
+                                    <td><span class="badge bg-light text-dark border">{{ $horario->Dia ?? '—' }}</span></td>
+                                    <td>{{ $horario->Hora ?? '—' }}</td>
+                                    <td>
+                                        @php $pp = $horario->profesor?->persona; @endphp
+                                        {{ ($pp?->Nombre && $pp?->Apellido) ? ($pp->Nombre.' '.$pp->Apellido) : 'Sin profesor' }}
+                                    </td>
+                                    <td class="pe-3 text-end">
+                                        <div class="d-flex justify-content-end gap-2">
+                                            {{-- Abrir modal de edición --}}
+                                            <button type="button"
+                                                    class="btn btn-sm btn-outline-primary"
+                                                    title="Editar horario"
+                                                    data-bs-toggle="modal"
+                                                    data-bs-target="#modalEditar"
+                                                    data-id="{{ $horario->Id_horarios }}"
+                                                    data-estudiante="{{ $horario->Id_estudiantes }}"
+                                                    data-profesor="{{ $horario->Id_profesores }}"
+                                                    data-dia="{{ $horario->Dia }}"
+                                                    data-hora="{{ $horario->Hora }}">
+                                                <i class="bi bi-pencil-square"></i>
+                                            </button>
 
-                                    {{-- Eliminar --}}
-                                    <form action="{{ route('horarios.destroy', $horario->Id_horarios) }}" method="POST" onsubmit="return confirm('¿Eliminar este horario?');">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button class="btn btn-sm btn-outline-danger" title="Eliminar">
-                                            <i class="bi bi-trash3-fill"></i>
-                                        </button>
-                                    </form>
-                                </div>
-                            </td>
-                        </tr>
-                    @endforeach
-                </tbody>
-            </table>
+                                            {{-- Eliminar --}}
+                                            <form action="{{ route('horarios.destroy', $horario->Id_horarios) }}" method="POST" onsubmit="return confirm('¿Eliminar este horario?');">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button class="btn btn-sm btn-outline-danger" title="Eliminar">
+                                                    <i class="bi bi-trash3-fill"></i>
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
 
         {{-- Paginación --}}
-        <div class="d-flex justify-content-center mt-4">
+        <div class="d-flex justify-content-center mt-4 mb-4">
             {{ $horarios->links('pagination::bootstrap-5') }}
         </div>
     @endif
@@ -111,9 +120,9 @@
     <div class="modal-content">
       <form method="POST" action="{{ route('horarios.store') }}">
         @csrf
-        <div class="modal-header">
-          <h5 class="modal-title" id="modalCrearLabel">Asignar nuevo horario</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+        <div class="modal-header bg-primary text-white">
+          <h5 class="modal-title" id="modalCrearLabel"><i class="bi bi-calendar-plus me-2"></i>Asignar nuevo horario</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
         </div>
 
         <div class="modal-body">
@@ -192,9 +201,9 @@
       <form method="POST" id="formEditar">
         @csrf
         @method('PUT')
-        <div class="modal-header">
-          <h5 class="modal-title" id="modalEditarLabel">Editar horario</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+        <div class="modal-header bg-primary text-white">
+          <h5 class="modal-title" id="modalEditarLabel"><i class="bi bi-pencil-square me-2"></i>Editar horario</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
         </div>
 
         <div class="modal-body">

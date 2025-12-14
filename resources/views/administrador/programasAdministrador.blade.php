@@ -282,14 +282,14 @@
     }
 
     .table thead th {
-        background-color: #f9fafb;
-        color: var(--dark-color);
+        background-color: var(--primary-color);
+        color: white;
         font-weight: 700;
         text-transform: uppercase;
-        font-size: 0.75rem;
+        font-size: 0.85rem;
         letter-spacing: 0.05em;
         padding: 16px;
-        border-bottom: 2px solid #e5e7eb;
+        border-bottom: none;
     }
 
     .table tbody td {

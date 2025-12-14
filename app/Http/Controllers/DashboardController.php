@@ -19,17 +19,17 @@ class DashboardController extends Controller
         // Alumnos por programa por sucursal
         $alumnosPorSucursal = [];
         foreach ($sucursales as $sucursal) {
-            $alumnosPorSucursal[$sucursal->Id_Sucursales] = DB::table('estudiantes')
+            $alumnosPorSucursal[$sucursal->Id_sucursales] = DB::table('estudiantes')
                 ->join('programas', 'estudiantes.Id_programas', '=', 'programas.Id_programas')
                 ->select('programas.Nombre as programa', DB::raw('COUNT(*) as total'))
-                ->where('estudiantes.Id_sucursales', $sucursal->Id_Sucursales)
+                ->where('estudiantes.Id_sucursales', $sucursal->Id_sucursales)
                 ->groupBy('programas.Nombre')
                 ->get();
         }
 
         // Totales de alumnos por sucursal
         $totalAlumnosPorSucursal = DB::table('estudiantes')
-            ->join('sucursales', 'estudiantes.Id_sucursales', '=', 'sucursales.Id_Sucursales')
+            ->join('sucursales', 'estudiantes.Id_sucursales', '=', 'sucursales.Id_sucursales')
             ->select('sucursales.Nombre', DB::raw('COUNT(*) as total'))
             ->groupBy('sucursales.Nombre')
             ->get();

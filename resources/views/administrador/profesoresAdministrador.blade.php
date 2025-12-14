@@ -12,9 +12,9 @@
 <div class="container-fluid mt-4">
 
     <div class="d-flex flex-wrap gap-2 justify-content-between align-items-center mb-4">
-        <h1 class="mb-0">Lista de Profesores</h1>
+        <h2 class="mb-0 fw-bold"><i class="bi bi-person-workspace me-2"></i>Lista de Profesores</h2>
         <a href="{{ route('administrador.formProfesor') }}" class="btn btn-primary">
-            Registrar Profesor
+            <i class="bi bi-plus-lg me-2"></i>Registrar Profesor
         </a>
     </div>
 
@@ -43,160 +43,191 @@
     @endif
 
     {{-- Buscador --}}
-    <div class="row mb-3 g-2">
-        <div class="col-12 col-sm-8 col-lg-6">
+    <div class="card shadow-sm mb-4 border-0">
+        <div class="card-body">
             <form action="{{ route('profesores.index') }}" method="GET" class="w-100">
-                <label for="searchInput" class="form-label mb-1">Buscar</label>
-                <div class="input-group">
-                    <span class="input-group-text"><i class="fas fa-search"></i></span>
-                    <input id="searchInput" type="text" class="form-control" placeholder="Filtrar por nombre, apellido o correo" name="search" value="{{ request()->search }}">
+                <div class="row align-items-center">
+                    <div class="col-12 col-sm-8 col-lg-6">
+                        <label for="searchInput" class="form-label mb-1 fw-semibold text-muted">Buscar Profesor</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light border-end-0"><i class="fas fa-search text-muted"></i></span>
+                            <input id="searchInput" type="text" class="form-control border-start-0 ps-0" placeholder="Filtrar por nombre, apellido o correo..." name="search" value="{{ request()->search }}" data-table-filter="teachersTable">
+                        </div>
+                    </div>
                 </div>
             </form>
         </div>
     </div>
 
     @if ($profesores->isEmpty())
-        <div class="card">
+        <div class="card shadow-sm border-0">
             <div class="card-body text-center py-5">
-                <p class="mb-2">No hay profesores registrados.</p>
-                <a href="{{ route('registroCombinado.registrar') }}" class="btn btn-outline-primary">
+                <div class="mb-3">
+                    <i class="bi bi-person-slash text-muted" style="font-size: 3rem;"></i>
+                </div>
+                <h5 class="text-muted">No hay profesores registrados.</h5>
+                <a href="{{ route('administrador.formProfesor') }}" class="btn btn-primary mt-3">
                     <i class="fas fa-user-plus me-2"></i>Registrar el primero
                 </a>
             </div>
         </div>
     @else
-        <div class="table-responsive">
-            <table class="table table-hover align-middle responsive-table" id="teachersTable">
-                <thead class="table-light">
-                    <tr>
-                        <th>Nombre</th>
-                        <th>Apellido</th>
-                        <th>Teléfono</th>
-                        <th>Profesión</th>
-                        <th>Correo</th>
-                        <th>Rol componentes</th>
-                        <th>Acciones</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach ($profesores as $profesor)
-                    <tr>
-                        <td>{{ $profesor->persona->Nombre ?? '' }}</td>
-                        <td>{{ $profesor->persona->Apellido ?? '' }}</td>
-                        <td>{{ $profesor->persona->Celular ?? '' }}</td>
-                        <td>{{ $profesor->Profesion ?? '' }}</td>
-                        <td>{{ $profesor->usuario->Correo ?? '' }}</td>
-                        <td>{{ $profesor->Rol_componentes ?? '' }}</td>
-                        <td>
-                            <div class="d-flex gap-2">
-                                <!-- Ver -->
-                                <button type="button" class="btn btn-sm btn-outline-dark" data-bs-toggle="modal" data-bs-target="#verProfesorModal{{ $profesor->Id_profesores }}">
-                                    <i class="bi bi-person-fill"></i>
-                                </button>
+        <div class="card shadow-sm border-0 overflow-hidden">
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover align-middle mb-0" id="teachersTable">
+                        <thead class="bg-primary text-white">
+                            <tr>
+                                <th class="ps-3 py-3">Nombre</th>
+                                <th class="py-3">Apellido</th>
+                                <th class="py-3">Teléfono</th>
+                                <th class="py-3">Profesión</th>
+                                <th class="py-3">Correo</th>
+                                <th class="py-3">Rol componentes</th>
+                                <th class="pe-3 py-3 text-end" style="min-width: 150px;">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach ($profesores as $profesor)
+                            <tr>
+                                <td class="ps-3 fw-semibold">{{ $profesor->persona->Nombre ?? '' }}</td>
+                                <td>{{ $profesor->persona->Apellido ?? '' }}</td>
+                                <td>{{ $profesor->persona->Celular ?? '' }}</td>
+                                <td>{{ $profesor->Profesion ?? '' }}</td>
+                                <td>{{ $profesor->usuario->Correo ?? '' }}</td>
+                                <td><span class="badge bg-light text-dark border">{{ $profesor->Rol_componentes ?? 'Ninguno' }}</span></td>
+                                <td class="pe-3 text-end">
+                                    <div class="d-flex gap-2 justify-content-end">
+                                        <!-- Ver -->
+                                        <button type="button" class="btn btn-sm btn-outline-info" data-bs-toggle="modal" data-bs-target="#verProfesorModal{{ $profesor->Id_profesores }}" title="Ver detalles">
+                                            <i class="bi bi-eye-fill"></i>
+                                        </button>
 
-                                <!-- Editar -->
-                                <button type="button" class="btn btn-sm btn-outline-warning" data-bs-toggle="modal" data-bs-target="#editarProfesorModal{{ $profesor->Id_profesores }}">
-                                    <i class="bi bi-pencil-square"></i>
-                                </button>
+                                        <!-- Editar -->
+                                        <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#editarProfesorModal{{ $profesor->Id_profesores }}" title="Editar">
+                                            <i class="bi bi-pencil-square"></i>
+                                        </button>
 
-                                <!-- Eliminar -->
-                                <form action="{{ route('profesores.destroy', $profesor->Id_profesores) }}" method="POST" onsubmit="return confirm('¿Seguro que deseas eliminar este profesor?')">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="btn btn-sm btn-outline-danger">
-                                        <i class="bi bi-trash3-fill"></i>
-                                    </button>
-                                </form>
-                            </div>
-                        </td>
-                    </tr>
+                                        <!-- Eliminar -->
+                                        <form action="{{ route('profesores.destroy', $profesor->Id_profesores) }}" method="POST" onsubmit="return confirm('¿Seguro que deseas eliminar este profesor?')">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="btn btn-sm btn-outline-danger" title="Eliminar">
+                                                <i class="bi bi-trash3-fill"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
 
-                    <!-- Modal Ver Profesor -->
-                    <div class="modal fade" id="verProfesorModal{{ $profesor->Id_profesores }}" tabindex="-1" aria-hidden="true">
-                        <div class="modal-dialog modal-lg">
-                            <div class="modal-content">
-                                <div class="modal-header bg-dark bg-opacity-25">
-                                    <h5 class="modal-title">Detalles del Profesor</h5>
-                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                                </div>
-                                <div class="modal-body">
-                                    <p><strong>Nombre:</strong> {{ $profesor->persona->Nombre ?? '' }}</p>
-                                    <p><strong>Apellido:</strong> {{ $profesor->persona->Apellido ?? '' }}</p>
-                                    <p><strong>Celular:</strong> {{ $profesor->persona->Celular ?? '' }}</p>
-                                    <p><strong>Correo:</strong> {{ $profesor->usuario->Correo ?? '' }}</p>
-                                    <p><strong>Profesión:</strong> {{ $profesor->Profesion ?? '' }}</p>
-                                    <p><strong>Rol Componentes:</strong> {{ $profesor->Rol_componentes ?? '' }}</p>
-                                </div>
-                                <div class="modal-footer">
-                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Modal Editar Profesor -->
-                    <div class="modal fade" id="editarProfesorModal{{ $profesor->Id_profesores }}" tabindex="-1" aria-hidden="true">
-                        <div class="modal-dialog modal-lg">
-                            <div class="modal-content">
-                                <div class="modal-header bg-warning bg-opacity-25">
-                                    <h5 class="modal-title">Editar Profesor</h5>
-                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                                </div>
-                                <form action="{{ route('profesores.update', $profesor->Id_profesores) }}" method="POST">
-                                    @csrf
-                                    @method('PUT')
-                                    <div class="modal-body">
-                                        <div class="row g-3">
-                                            <div class="col-md-6">
-                                                <label class="form-label">Nombre</label>
-                                                <input type="text" name="nombre" class="form-control" value="{{ $profesor->persona->Nombre ?? '' }}" required>
-                                            </div>
-                                            <div class="col-md-6">
-                                                <label class="form-label">Apellido</label>
-                                                <input type="text" name="apellido" class="form-control" value="{{ $profesor->persona->Apellido ?? '' }}" required>
-                                            </div>
-                                            <div class="col-md-6">
-                                                <label class="form-label">Celular</label>
-                                                <input type="text" name="celular" class="form-control" value="{{ $profesor->persona->Celular ?? '' }}">
-                                            </div>
-                                            <div class="col-md-6">
-                                                <label class="form-label">Correo electrónico</label>
-                                                <input type="email" name="correo" class="form-control" value="{{ $profesor->usuario->Correo ?? '' }}" required>
-                                            </div>
-                                            <div class="col-md-6">
-                                                <label class="form-label">Nueva contraseña (opcional)</label>
-                                                <input type="password" name="contrasenia" class="form-control" placeholder="••••••••">
-                                            </div>
-                                            <div class="col-md-6">
-                                                <label class="form-label">Profesión</label>
-                                                <input type="text" name="profesion" class="form-control" value="{{ $profesor->Profesion ?? '' }}">
-                                            </div>
-                                            <div class="col-md-6">
-                                                <label class="form-label">Rol en Componentes</label>
-                                                <select name="rol_componentes" class="form-select">
-                                                    <option value="Ninguno" {{ $profesor->Rol_componentes == 'Ninguno' ? 'selected' : '' }}>Ninguno</option>
-                                                    <option value="Tecnico" {{ $profesor->Rol_componentes == 'Tecnico' ? 'selected' : '' }}>Técnico</option>
-                                                    <option value="Inventario" {{ $profesor->Rol_componentes == 'Inventario' ? 'selected' : '' }}>Inventario</option>
-                                                </select>
+                            <!-- Modal Ver Profesor -->
+                            <div class="modal fade" id="verProfesorModal{{ $profesor->Id_profesores }}" tabindex="-1" aria-hidden="true">
+                                <div class="modal-dialog modal-lg">
+                                    <div class="modal-content">
+                                        <div class="modal-header bg-info text-white">
+                                            <h5 class="modal-title"><i class="bi bi-person-lines-fill me-2"></i>Detalles del Profesor</h5>
+                                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <div class="row g-3">
+                                                <div class="col-md-6">
+                                                    <label class="fw-bold text-muted small">Nombre</label>
+                                                    <div class="fs-5">{{ $profesor->persona->Nombre ?? '' }}</div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <label class="fw-bold text-muted small">Apellido</label>
+                                                    <div class="fs-5">{{ $profesor->persona->Apellido ?? '' }}</div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <label class="fw-bold text-muted small">Celular</label>
+                                                    <div class="fs-5">{{ $profesor->persona->Celular ?? '' }}</div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <label class="fw-bold text-muted small">Correo</label>
+                                                    <div class="fs-5">{{ $profesor->usuario->Correo ?? '' }}</div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <label class="fw-bold text-muted small">Profesión</label>
+                                                    <div class="fs-5">{{ $profesor->Profesion ?? '' }}</div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <label class="fw-bold text-muted small">Rol Componentes</label>
+                                                    <div class="fs-5">{{ $profesor->Rol_componentes ?? '' }}</div>
+                                                </div>
                                             </div>
                                         </div>
+                                        <div class="modal-footer bg-light">
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                                        </div>
                                     </div>
-                                    <div class="modal-footer">
-                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                                        <button type="submit" class="btn btn-primary">Guardar cambios</button>
-                                    </div>
-                                </form>
+                                </div>
                             </div>
-                        </div>
-                    </div>
 
-                    @endforeach
-                </tbody>
-            </table>
+                            <!-- Modal Editar Profesor -->
+                            <div class="modal fade" id="editarProfesorModal{{ $profesor->Id_profesores }}" tabindex="-1" aria-hidden="true">
+                                <div class="modal-dialog modal-lg">
+                                    <div class="modal-content">
+                                        <div class="modal-header bg-primary text-white">
+                                            <h5 class="modal-title"><i class="bi bi-pencil-square me-2"></i>Editar Profesor</h5>
+                                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                                        </div>
+                                        <form action="{{ route('profesores.update', $profesor->Id_profesores) }}" method="POST">
+                                            @csrf
+                                            @method('PUT')
+                                            <div class="modal-body">
+                                                <div class="row g-3">
+                                                    <div class="col-md-6">
+                                                        <label class="form-label fw-bold">Nombre</label>
+                                                        <input type="text" name="nombre" class="form-control" value="{{ $profesor->persona->Nombre ?? '' }}" required>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <label class="form-label fw-bold">Apellido</label>
+                                                        <input type="text" name="apellido" class="form-control" value="{{ $profesor->persona->Apellido ?? '' }}" required>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <label class="form-label fw-bold">Celular</label>
+                                                        <input type="text" name="celular" class="form-control" value="{{ $profesor->persona->Celular ?? '' }}">
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <label class="form-label fw-bold">Correo electrónico</label>
+                                                        <input type="email" name="correo" class="form-control" value="{{ $profesor->usuario->Correo ?? '' }}" required>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <label class="form-label fw-bold">Nueva contraseña (opcional)</label>
+                                                        <input type="password" name="contrasenia" class="form-control" placeholder="••••••••">
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <label class="form-label fw-bold">Profesión</label>
+                                                        <input type="text" name="profesion" class="form-control" value="{{ $profesor->Profesion ?? '' }}">
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <label class="form-label fw-bold">Rol en Componentes</label>
+                                                        <select name="rol_componentes" class="form-select">
+                                                            <option value="Ninguno" {{ $profesor->Rol_componentes == 'Ninguno' ? 'selected' : '' }}>Ninguno</option>
+                                                            <option value="Tecnico" {{ $profesor->Rol_componentes == 'Tecnico' ? 'selected' : '' }}>Técnico</option>
+                                                            <option value="Inventario" {{ $profesor->Rol_componentes == 'Inventario' ? 'selected' : '' }}>Inventario</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="modal-footer bg-light">
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                                <button type="submit" class="btn btn-primary">Guardar cambios</button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
     @endif
 
-    <div class="d-flex justify-content-center mt-4">
+    <div class="d-flex justify-content-center mt-4 mb-4">
         {{ $profesores->links('pagination::bootstrap-5') }}
     </div>
 </div>
@@ -204,6 +235,8 @@
 
 @section('scripts')
 <script>
+/* MIGRADO A baseAdministrador.blade.php */
+/*
 document.addEventListener('DOMContentLoaded', () => {
     const input = document.querySelector('#searchInput');
     const table = document.querySelector('#teachersTable');
@@ -219,5 +252,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 });
+*/
 </script>
 @endsection

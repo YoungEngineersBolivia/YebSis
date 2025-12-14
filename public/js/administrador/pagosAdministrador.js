@@ -4,14 +4,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const noResultadosDiv = document.getElementById('no-resultados');
     const contadorResultados = document.getElementById('contador-resultados');
 
-    // Filtros
-    const filterTodos = document.getElementById('filter-todos');
-    const filterPendientes = document.getElementById('filter-pendientes');
-    const filterCompletados = document.getElementById('filter-completados');
-
-    let filtroActual = 'todos';
-
-    // Función para filtrar tarjetas
+    // Función para filtrar tarjetas (solo búsqueda)
     function filtrarTarjetas() {
         const searchTerm = buscarInput.value.toLowerCase().trim();
         const tarjetas = document.querySelectorAll('.estudiante-card');
@@ -20,23 +13,14 @@ document.addEventListener('DOMContentLoaded', () => {
         tarjetas.forEach(tarjeta => {
             const tutor = tarjeta.dataset.tutor || '';
             const estudiante = tarjeta.dataset.estudiante || '';
-            const estado = tarjeta.dataset.estado || '';
 
             // Verificar búsqueda
             const coincideBusqueda = searchTerm === '' ||
                 tutor.includes(searchTerm) ||
                 estudiante.includes(searchTerm);
 
-            // Verificar filtro de estado
-            let coincideFiltro = true;
-            if (filtroActual === 'pendientes') {
-                coincideFiltro = estado === 'pendiente';
-            } else if (filtroActual === 'completados') {
-                coincideFiltro = estado === 'completado';
-            }
-
             // Mostrar/ocultar tarjeta
-            if (coincideBusqueda && coincideFiltro) {
+            if (coincideBusqueda) {
                 tarjeta.style.display = '';
                 visibles++;
             } else {
@@ -57,33 +41,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Event listener para búsqueda
     buscarInput.addEventListener('input', filtrarTarjetas);
-
-    // Event listeners para filtros
-    filterTodos.addEventListener('click', function () {
-        filtroActual = 'todos';
-        actualizarBotonesFiltro(this);
-        filtrarTarjetas();
-    });
-
-    filterPendientes.addEventListener('click', function () {
-        filtroActual = 'pendientes';
-        actualizarBotonesFiltro(this);
-        filtrarTarjetas();
-    });
-
-    filterCompletados.addEventListener('click', function () {
-        filtroActual = 'completados';
-        actualizarBotonesFiltro(this);
-        filtrarTarjetas();
-    });
-
-    // Función para actualizar estado visual de botones de filtro
-    function actualizarBotonesFiltro(botonActivo) {
-        [filterTodos, filterPendientes, filterCompletados].forEach(btn => {
-            btn.classList.remove('active');
-        });
-        botonActivo.classList.add('active');
-    }
 
     // Modal "Agregar Pago" - Nuevo sistema
     const modalAgregarPago = document.getElementById('modalAgregarPago');
@@ -109,20 +66,16 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('modal-programa-nombre').textContent = programaNombre;
             document.getElementById('modal-monto-total-display').textContent = montoTotal.toFixed(2);
             document.getElementById('modal-restante-display').textContent = restante.toFixed(2);
-            document.getElementById('modal-max-monto').textContent = restante.toFixed(2);
+            // document.getElementById('modal-max-monto').textContent = restante.toFixed(2); // Ya no se usa
 
-            // Configurar validación del input de monto
+            // Configurar input de monto
             const montoInput = document.getElementById('modal-monto-input');
-            montoInput.max = restante;
+            montoInput.removeAttribute('max'); // Remover límite máximo
             montoInput.value = '';
 
-            // Validación en tiempo real
+            // Validación en tiempo real (solo negativos)
             montoInput.addEventListener('input', function () {
-                const valor = parseFloat(this.value) || 0;
-                if (valor > restante) {
-                    this.value = restante.toFixed(2);
-                    alert(`El monto no puede exceder el saldo restante de Bs. ${restante.toFixed(2)}`);
-                }
+                // Ya no validamos máximo, solo que sea positivo
             });
         });
     }
@@ -132,8 +85,6 @@ document.addEventListener('DOMContentLoaded', () => {
     if (formAgregarPago) {
         formAgregarPago.addEventListener('submit', function (e) {
             const montoInput = document.getElementById('modal-monto-input');
-            const restanteDisplay = document.getElementById('modal-restante-display');
-            const restante = parseFloat(restanteDisplay.textContent);
             const monto = parseFloat(montoInput.value) || 0;
 
             if (monto <= 0) {
@@ -142,12 +93,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 return false;
             }
 
-            if (monto > restante) {
-                e.preventDefault();
-                alert(`El monto no puede exceder el saldo restante de Bs. ${restante.toFixed(2)}`);
-                return false;
-            }
-
+            // Ya no validamos el restante
             return true;
         });
     }
