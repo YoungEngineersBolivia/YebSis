@@ -77,7 +77,6 @@
                                             data-id="{{ $horario->Id_horarios }}"
                                             data-estudiante="{{ $horario->Id_estudiantes }}"
                                             data-profesor="{{ $horario->Id_profesores }}"
-                                            data-programa="{{ $horario->Id_programas }}"
                                             data-dia="{{ $horario->Dia }}"
                                             data-hora="{{ $horario->Hora }}">
                                         <i class="bi bi-pencil-square"></i>
@@ -124,7 +123,11 @@
             <select class="form-select" id="Id_estudiantes_crear" name="Id_estudiantes" required>
               <option value="" disabled selected>Seleccione un estudiante</option>
               @foreach($estudiantes as $e)
-                <option value="{{ $e->Id_estudiantes }}" data-profesor="{{ $e->Id_profesores }}">
+                <option value="{{ $e->Id_estudiantes }}" 
+                        data-profesor="{{ $e->Id_profesores }}"
+                        data-programa="{{ $e->Id_programas }}"
+                        data-profesor-nombre="{{ $e->profesor ? $e->profesor->persona->Nombre . ' ' . $e->profesor->persona->Apellido : 'Sin profesor' }}"
+                        data-programa-nombre="{{ $e->programa ? $e->programa->Nombre : 'Sin programa' }}">
                   {{ $e->persona?->Nombre }} {{ $e->persona?->Apellido }}
                 </option>
               @endforeach
@@ -132,27 +135,27 @@
           </div>
 
           {{-- Profesor --}}
-          <div class="mb-3">
+          <div class="mb-3" id="div_profesor_crear">
             <label for="Id_profesores_crear" class="form-label">Profesor</label>
             <select class="form-select" id="Id_profesores_crear" name="Id_profesores" required>
-              <option value="" disabled selected>Seleccione un profesor</option>
+              <option value="" disabled selected>Seleccione un estudiante primero</option>
               @foreach($profesores as $p)
                 <option value="{{ $p->Id_profesores }}">
                   {{ $p->persona?->Nombre }} {{ $p->persona?->Apellido }}
                 </option>
               @endforeach
             </select>
+            <small class="form-text text-muted" id="profesor_help_crear">
+              El profesor se asignará automáticamente si el estudiante ya tiene uno
+            </small>
           </div>
 
-          {{-- Programa --}}
+          {{-- Programa (Solo lectura) --}}
           <div class="mb-3">
-            <label for="Id_programas_crear" class="form-label">Programa</label>
-            <select class="form-select" id="Id_programas_crear" name="Id_programas" required>
-              <option value="" disabled selected>Seleccione un programa</option>
-              @foreach($programas as $prog)
-                <option value="{{ $prog->Id_programas }}">{{ $prog->Nombre }}</option>
-              @endforeach
-            </select>
+            <label for="programa_info_crear" class="form-label">Programa Inscrito</label>
+            <input type="text" class="form-control" id="programa_info_crear" readonly 
+                   placeholder="Seleccione un estudiante primero">
+            <small class="form-text text-muted">El programa se obtiene automáticamente del estudiante</small>
           </div>
 
           {{-- Día --}}
@@ -200,7 +203,11 @@
             <label for="Id_estudiantes_editar" class="form-label">Estudiante</label>
             <select class="form-select" id="Id_estudiantes_editar" name="Id_estudiantes" required>
               @foreach($estudiantes as $e)
-                <option value="{{ $e->Id_estudiantes }}">
+                <option value="{{ $e->Id_estudiantes }}"
+                        data-profesor="{{ $e->Id_profesores }}"
+                        data-programa="{{ $e->Id_programas }}"
+                        data-profesor-nombre="{{ $e->profesor ? $e->profesor->persona->Nombre . ' ' . $e->profesor->persona->Apellido : 'Sin profesor' }}"
+                        data-programa-nombre="{{ $e->programa ? $e->programa->Nombre : 'Sin programa' }}">
                   {{ $e->persona?->Nombre }} {{ $e->persona?->Apellido }}
                 </option>
               @endforeach
@@ -208,7 +215,7 @@
           </div>
 
           {{-- Profesor --}}
-          <div class="mb-3">
+          <div class="mb-3" id="div_profesor_editar">
             <label for="Id_profesores_editar" class="form-label">Profesor</label>
             <select class="form-select" id="Id_profesores_editar" name="Id_profesores" required>
               @foreach($profesores as $p)
@@ -217,16 +224,16 @@
                 </option>
               @endforeach
             </select>
+            <small class="form-text text-muted" id="profesor_help_editar">
+              El profesor se asignará automáticamente si el estudiante ya tiene uno
+            </small>
           </div>
 
-          {{-- Programa --}}
+          {{-- Programa (Solo lectura) --}}
           <div class="mb-3">
-            <label for="Id_programas_editar" class="form-label">Programa</label>
-            <select class="form-select" id="Id_programas_editar" name="Id_programas" required>
-              @foreach($programas as $prog)
-                <option value="{{ $prog->Id_programas }}">{{ $prog->Nombre }}</option>
-              @endforeach
-            </select>
+            <label for="programa_info_editar" class="form-label">Programa Inscrito</label>
+            <input type="text" class="form-control" id="programa_info_editar" readonly>
+            <small class="form-text text-muted">El programa se obtiene automáticamente del estudiante</small>
           </div>
 
           {{-- Día --}}
@@ -255,18 +262,80 @@
   </div>
 </div>
 
-{{-- Script para asignar profesor automáticamente y pasar datos al modal de edición --}}
+{{-- Script para mostrar información automática del estudiante --}}
 <script>
 document.addEventListener('DOMContentLoaded', function () {
+    // Función para actualizar información del estudiante
+    function actualizarInfoEstudiante(selectElement, profesorSelect, programaInput, helpText) {
+        const option = selectElement.selectedOptions[0];
+        if (option && option.value) {
+            const profesorId = option.getAttribute('data-profesor');
+            const programaNombre = option.getAttribute('data-programa-nombre') || 'Sin programa asignado';
+            const profesorNombre = option.getAttribute('data-profesor-nombre') || '';
+            
+            // Actualizar programa
+            programaInput.value = programaNombre;
+
+            // Validar programa
+            if (programaNombre === 'Sin programa asignado') {
+                programaInput.classList.add('is-invalid');
+            } else {
+                programaInput.classList.remove('is-invalid');
+            }
+
+            // Manejar selector de profesor
+            if (profesorId && profesorId !== 'null' && profesorId !== '') {
+                // El estudiante YA tiene profesor asignado
+                profesorSelect.value = profesorId;
+                profesorSelect.disabled = true;
+                profesorSelect.classList.add('bg-light');
+                helpText.textContent = `Profesor ya asignado: ${profesorNombre}`;
+                helpText.classList.remove('text-muted');
+                helpText.classList.add('text-success');
+            } else {
+                // El estudiante NO tiene profesor, permitir selección
+                profesorSelect.value = '';
+                profesorSelect.disabled = false;
+                profesorSelect.classList.remove('bg-light');
+                helpText.textContent = 'Seleccione un profesor para asignar al estudiante';
+                helpText.classList.remove('text-success');
+                helpText.classList.add('text-warning');
+            }
+        } else {
+            programaInput.value = '';
+            profesorSelect.value = '';
+            profesorSelect.disabled = true;
+            helpText.textContent = 'Seleccione un estudiante primero';
+            helpText.classList.remove('text-success', 'text-warning');
+            helpText.classList.add('text-muted');
+        }
+    }
+
+    // Modal de creación
+    const estudianteCrear = document.getElementById('Id_estudiantes_crear');
+    const profesorCrear = document.getElementById('Id_profesores_crear');
+    const programaCrear = document.getElementById('programa_info_crear');
+    const helpCrear = document.getElementById('profesor_help_crear');
+
+    if (estudianteCrear && profesorCrear && programaCrear) {
+        estudianteCrear.addEventListener('change', function () {
+            actualizarInfoEstudiante(this, profesorCrear, programaCrear, helpCrear);
+        });
+    }
+
     // Modal de edición
     const modalEditar = document.getElementById('modalEditar');
+    const estudianteEditar = document.getElementById('Id_estudiantes_editar');
+    const profesorEditar = document.getElementById('Id_profesores_editar');
+    const programaEditar = document.getElementById('programa_info_editar');
+    const helpEditar = document.getElementById('profesor_help_editar');
+
     if (modalEditar) {
         modalEditar.addEventListener('show.bs.modal', function (event) {
             const button = event.relatedTarget;
             const id = button.getAttribute('data-id');
             const estudiante = button.getAttribute('data-estudiante');
             const profesor = button.getAttribute('data-profesor');
-            const programa = button.getAttribute('data-programa');
             const dia = button.getAttribute('data-dia');
             const hora = button.getAttribute('data-hora');
 
@@ -275,22 +344,19 @@ document.addEventListener('DOMContentLoaded', function () {
 
             document.getElementById('Id_estudiantes_editar').value = estudiante;
             document.getElementById('Id_profesores_editar').value = profesor;
-            document.getElementById('Id_programas_editar').value = programa;
             document.getElementById('Dia_editar').value = dia;
             document.getElementById('Hora_editar').value = hora;
-        });
-    }
 
-    // Asignar profesor automáticamente al seleccionar estudiante (crear)
-    const estudianteCrear = document.getElementById('Id_estudiantes_crear');
-    const profesorCrear = document.getElementById('Id_profesores_crear');
-
-    if (estudianteCrear && profesorCrear) {
-        estudianteCrear.addEventListener('change', function () {
-            const selectedOption = estudianteCrear.selectedOptions[0];
-            const profesorId = selectedOption.getAttribute('data-profesor') || '';
-            profesorCrear.value = profesorId;
+            // Actualizar información del estudiante seleccionado
+            actualizarInfoEstudiante(estudianteEditar, profesorEditar, programaEditar, helpEditar);
         });
+
+        // Actualizar cuando cambie el estudiante en edición
+        if (estudianteEditar && profesorEditar && programaEditar) {
+            estudianteEditar.addEventListener('change', function () {
+                actualizarInfoEstudiante(this, profesorEditar, programaEditar, helpEditar);
+            });
+        }
     }
 });
 </script>
