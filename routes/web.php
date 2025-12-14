@@ -35,6 +35,8 @@ use App\Http\Controllers\ModeloController;
 use App\Http\Controllers\CuotaController;
 use App\Http\Controllers\ProfesorInventarioController;
 use App\Http\Controllers\MotorMovimientosController;
+use App\Http\Controllers\PreguntasController;
+
 
 
 
@@ -279,6 +281,14 @@ Route::delete('/graduados/{id}', [GraduadoController::class, 'eliminarGraduado']
         Route::get('/{modeloId}/edit', [ModeloController::class, 'edit'])->name('modelos.edit');
         Route::put('/{modeloId}', [ModeloController::class, 'update'])->name('modelos.update');
         Route::delete('/{modeloId}', [ModeloController::class, 'destroy'])->name('modelos.destroy');
+    });
+
+    // Rutas de preguntas por programa
+    Route::prefix('programas/{programaId}/preguntas')->name('admin.preguntas.')->group(function () {
+        Route::get('/', [PreguntasController::class, 'index'])->name('index');
+        Route::post('/', [PreguntasController::class, 'store'])->name('store');
+        Route::put('/{id}', [PreguntasController::class, 'update'])->name('update');
+        Route::delete('/{id}', [PreguntasController::class, 'destroy'])->name('destroy');
     });
     
     /* ----------------- PLANES DE PAGO ----------------- */

@@ -85,54 +85,70 @@ document.addEventListener('DOMContentLoaded', () => {
         botonActivo.classList.add('active');
     }
 
-    // Modal: pasar el id de la cuota al input oculto
-    const modalRegistrarPago = document.getElementById('modalRegistrarPago');
-    if (modalRegistrarPago) {
-        modalRegistrarPago.addEventListener('show.bs.modal', function (event) {
+    // Modal "Agregar Pago" - Nuevo sistema
+    const modalAgregarPago = document.getElementById('modalAgregarPago');
+    if (modalAgregarPago) {
+        modalAgregarPago.addEventListener('show.bs.modal', function (event) {
             const button = event.relatedTarget;
 
             // Obtener datos del botón
-            const cuotaId = button.getAttribute('data-cuota-id');
-            const monto = button.getAttribute('data-monto');
             const planId = button.getAttribute('data-plan-id');
+            const montoTotal = parseFloat(button.getAttribute('data-monto-total'));
+            const montoPagado = parseFloat(button.getAttribute('data-monto-pagado'));
+            const restante = parseFloat(button.getAttribute('data-restante'));
+            const programaNombre = button.getAttribute('data-programa');
 
             // Verificar que tenemos los datos
-            if (!cuotaId || !monto || !planId) {
-                console.error('Faltan datos de la cuota:', { cuotaId, monto, planId });
+            if (!planId || isNaN(montoTotal) || isNaN(restante)) {
+                console.error('Faltan datos del plan:', { planId, montoTotal, montoPagado, restante });
                 return;
             }
 
-            // Llenar el formulario
-            document.getElementById('modal-cuota-id').value = cuotaId;
-            document.getElementById('modal-monto-pago').value = monto;
-            document.getElementById('modal-id-planes-pagos').value = planId;
-            document.getElementById('modal-fecha-pago').value = new Date().toISOString().split('T')[0];
-            document.getElementById('modal-descripcion').value = `Pago de cuota #${cuotaId}`;
-            document.getElementById('modal-comprobante').value = `COMP-${new Date().getTime()}-${cuotaId}`;
+            // Llenar información del modal
+            document.getElementById('modal-plan-id').value = planId;
+            document.getElementById('modal-programa-nombre').textContent = programaNombre;
+            document.getElementById('modal-monto-total-display').textContent = montoTotal.toFixed(2);
+            document.getElementById('modal-restante-display').textContent = restante.toFixed(2);
+            document.getElementById('modal-max-monto').textContent = restante.toFixed(2);
+
+            // Configurar validación del input de monto
+            const montoInput = document.getElementById('modal-monto-input');
+            montoInput.max = restante;
+            montoInput.value = '';
+
+            // Validación en tiempo real
+            montoInput.addEventListener('input', function () {
+                const valor = parseFloat(this.value) || 0;
+                if (valor > restante) {
+                    this.value = restante.toFixed(2);
+                    alert(`El monto no puede exceder el saldo restante de Bs. ${restante.toFixed(2)}`);
+                }
+            });
         });
     }
 
-    // Función para pagar plan completo (todas las cuotas pendientes)
-    window.pagarPlanCompleto = function (planId, totalPendiente) {
-        if (confirm(`¿Está seguro de PAGAR TODAS LAS CUOTAS PENDIENTES del plan #${planId}?\n\nMonto total: Bs. ${totalPendiente.toFixed(2)}`)) {
-            const form = document.createElement('form');
-            form.method = 'POST';
-            form.action = pagarPlanCompletoUrl;
+    // Validación del formulario antes de enviar
+    const formAgregarPago = document.getElementById('formAgregarPago');
+    if (formAgregarPago) {
+        formAgregarPago.addEventListener('submit', function (e) {
+            const montoInput = document.getElementById('modal-monto-input');
+            const restanteDisplay = document.getElementById('modal-restante-display');
+            const restante = parseFloat(restanteDisplay.textContent);
+            const monto = parseFloat(montoInput.value) || 0;
 
-            const csrfInput = document.createElement('input');
-            csrfInput.type = 'hidden';
-            csrfInput.name = '_token';
-            csrfInput.value = csrfToken;
-            form.appendChild(csrfInput);
+            if (monto <= 0) {
+                e.preventDefault();
+                alert('El monto debe ser mayor a 0');
+                return false;
+            }
 
-            const planIdInput = document.createElement('input');
-            planIdInput.type = 'hidden';
-            planIdInput.name = 'plan_id';
-            planIdInput.value = planId;
-            form.appendChild(planIdInput);
+            if (monto > restante) {
+                e.preventDefault();
+                alert(`El monto no puede exceder el saldo restante de Bs. ${restante.toFixed(2)}`);
+                return false;
+            }
 
-            document.body.appendChild(form);
-            form.submit();
-        }
-    };
+            return true;
+        });
+    }
 });

@@ -145,7 +145,11 @@ class ProfesorController extends Controller
     {
         $estudiante = Estudiante::with(['persona', 'programa.modelos', 'horarios'])->findOrFail($id);
 
-        return view('profesor.detalleEstudiante', compact('estudiante'));
+        // Verificar si el estudiante ya fue evaluado
+        $yaEvaluado = \App\Models\Evaluacion::where('Id_estudiantes', $estudiante->Id_estudiantes)
+            ->exists();
+
+        return view('profesor.detalleEstudiante', compact('estudiante', 'yaEvaluado'));
     }
 
     public function editarEstudiante($id)
@@ -156,23 +160,101 @@ class ProfesorController extends Controller
 
     public function evaluarEstudiante($id)
     {
-        $estudiante = Estudiante::with(['persona', 'programa'])
+        $estudiante = Estudiante::with(['persona', 'programa.modelos'])
             ->findOrFail($id);
 
-        return view('profesor.evaluarAlumno', compact('estudiante'));
+        // Obtener preguntas del programa
+        $preguntas = \App\Models\Pregunta::porPrograma($estudiante->Id_programas)
+            ->ordenadas()
+            ->get();
+
+        // Obtener opciones de respuesta (Sí, No, En proceso)
+        $respuestas = \App\Models\Respuesta::all();
+
+        // Obtener modelos del programa
+        $modelos = $estudiante->programa->modelos;
+
+        // Cargar evaluaciones existentes (para editar)
+        $evaluacionesExistentes = \App\Models\Evaluacion::where('Id_estudiantes', $estudiante->Id_estudiantes)
+            ->with(['pregunta', 'respuesta', 'modelo'])
+            ->get()
+            ->keyBy('Id_preguntas'); // Indexar por pregunta para fácil acceso
+
+        // Modelo seleccionado previamente (si existe evaluación)
+        $modeloSeleccionado = $evaluacionesExistentes->first()->Id_modelos ?? null;
+
+        return view('profesor.evaluarAlumno', compact('estudiante', 'preguntas', 'respuestas', 'modelos', 'evaluacionesExistentes', 'modeloSeleccionado'));
     }
 
     public function guardarEvaluacion(Request $request)
     {
+        // Validar datos básicos
         $request->validate([
-            'estudiante_id' => 'required|exists:estudiantes,id',
-            'participa' => 'required|in:si,no,en_proceso',
-            'secuenciada' => 'required|in:si,no,en_proceso',
-            'paciente' => 'required|in:si,no,en_proceso',
+            'estudiante_id' => 'required|exists:estudiantes,Id_estudiantes',
+            'modelo_id' => 'required|exists:modelos,Id_modelos',
+            'respuestas' => 'required|array|min:1',
+            'respuestas.*' => 'required|exists:respuestas,Id_respuestas',
+        ], [
+            'estudiante_id.required' => 'El estudiante es obligatorio',
+            'modelo_id.required' => 'Debes seleccionar un modelo',
+            'respuestas.required' => 'Debes responder al menos una pregunta',
+            'respuestas.*.required' => 'Todas las preguntas deben ser respondidas',
         ]);
 
-        return redirect()
-            ->route('profesor.detalle-estudiante', $request->estudiante_id)
-            ->with('success', 'Evaluación guardada correctamente');
+        try {
+            \DB::beginTransaction();
+
+            $estudiante = \App\Models\Estudiante::findOrFail($request->estudiante_id);
+            $profesorId = auth()->user()->persona->profesor->Id_profesores;
+
+            // Verificar si ya existen evaluaciones para este estudiante
+            $evaluacionesExistentes = \App\Models\Evaluacion::where('Id_estudiantes', $estudiante->Id_estudiantes)->get();
+
+            if ($evaluacionesExistentes->count() > 0) {
+                // MODO EDICIÓN: Actualizar evaluaciones existentes
+                foreach ($request->respuestas as $preguntaId => $respuestaId) {
+                    \App\Models\Evaluacion::updateOrCreate(
+                        [
+                            'Id_estudiantes' => $estudiante->Id_estudiantes,
+                            'Id_preguntas' => $preguntaId,
+                        ],
+                        [
+                            'fecha_evaluacion' => now(),
+                            'Id_respuestas' => $respuestaId,
+                            'Id_modelos' => $request->modelo_id,
+                            'Id_profesores' => $profesorId,
+                            'Id_programas' => $estudiante->Id_programas,
+                        ]
+                    );
+                }
+                $mensaje = 'Evaluación actualizada correctamente';
+            } else {
+                // MODO CREACIÓN: Crear nuevas evaluaciones
+                foreach ($request->respuestas as $preguntaId => $respuestaId) {
+                    \App\Models\Evaluacion::create([
+                        'fecha_evaluacion' => now(),
+                        'Id_estudiantes' => $estudiante->Id_estudiantes,
+                        'Id_preguntas' => $preguntaId,
+                        'Id_respuestas' => $respuestaId,
+                        'Id_modelos' => $request->modelo_id,
+                        'Id_profesores' => $profesorId,
+                        'Id_programas' => $estudiante->Id_programas,
+                    ]);
+                }
+                $mensaje = 'Evaluación guardada correctamente';
+            }
+
+            \DB::commit();
+
+            return redirect()
+                ->route('profesor.detalle-estudiante', $request->estudiante_id)
+                ->with('success', $mensaje);
+
+        } catch (\Exception $e) {
+            \DB::rollBack();
+            return back()
+                ->with('error', 'Error al guardar la evaluación: ' . $e->getMessage())
+                ->withInput();
+        }
     }
 }

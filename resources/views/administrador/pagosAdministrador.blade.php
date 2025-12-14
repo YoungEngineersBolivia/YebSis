@@ -26,7 +26,7 @@
             <h2 class="fw-bold text-primary mb-1">
                 <i class="fas fa-money-bill-wave me-2"></i>Gestión de Pagos
             </h2>
-            <p class="text-muted mb-0">Administra los planes de pago de los estudiantes</p>
+            <p class="text-muted mb-0">Administra los pagos de los estudiantes</p>
         </div>
         <div class="col-lg-5">
             <div class="input-group input-group-lg shadow-sm">
@@ -52,7 +52,7 @@
                     <i class="fas fa-list me-2"></i>Todos
                 </button>
                 <button type="button" class="btn btn-outline-warning" data-filter="pendientes" id="filter-pendientes">
-                    <i class="fas fa-clock me-2"></i>Pendientes
+                    <i class="fas fa-clock me-2"></i>Con Saldo
                 </button>
                 <button type="button" class="btn btn-outline-success" data-filter="completados" id="filter-completados">
                     <i class="fas fa-check-circle me-2"></i>Completados
@@ -66,23 +66,22 @@
         @foreach($estudiantes as $estudiante)
             @php
                 $planes = $estudiante->planesPago;
-                $tienePendientes = false;
+                $tieneSaldo = false;
                 $todosCompletados = true;
                 
                 if($planes && $planes->count() > 0) {
                     foreach($planes as $plan) {
-                        if($plan->cuotas && $plan->cuotas->count() > 0) {
-                            foreach($plan->cuotas as $cuota) {
-                                if($cuota->Estado_cuota !== 'Pagado') {
-                                    $tienePendientes = true;
-                                    $todosCompletados = false;
-                                }
-                            }
+                        $totalPagado = $plan->pagos->sum('Monto_pago');
+                        if($totalPagado < $plan->Monto_total) {
+                            $tieneSaldo = true;
+                            $todosCompletados = false;
                         }
                     }
+                } else {
+                    $todosCompletados = false;
                 }
                 
-                $estadoClase = $todosCompletados && !$tienePendientes ? 'completado' : 'pendiente';
+                $estadoClase = $todosCompletados ? 'completado' : ($tieneSaldo ? 'pendiente' : 'pendiente');
             @endphp
             
             <div class="col-12 estudiante-card" data-estado="{{ $estadoClase }}" 
@@ -104,9 +103,9 @@
                                     {{ $estudiante->persona->Apellido ?? '' }}
                                 </p>
                             </div>
-                            @if($tienePendientes)
+                            @if($tieneSaldo)
                                 <span class="badge rounded-pill bg-warning text-dark border border-warning">
-                                    Pendiente
+                                    Con Saldo
                                 </span>
                             @else
                                 <span class="badge rounded-pill bg-success border border-success">
@@ -120,100 +119,121 @@
                         @if($planes && $planes->count() > 0)
                             @foreach($planes as $plan)
                                 @php
-                                    $cuotasPendientes = $plan->cuotas->where('Estado_cuota', '!=', 'Pagado');
-                                    $totalPendiente = $cuotasPendientes->sum(function($cuota) {
-                                        return $cuota->Monto_cuota - ($cuota->Monto_pagado ?? 0);
-                                    });
+                                    $totalPagado = $plan->pagos->sum('Monto_pago');
+                                    $restante = $plan->Monto_total - $totalPagado;
+                                    $porcentaje = $plan->Monto_total > 0 ? ($totalPagado / $plan->Monto_total) * 100 : 0;
                                 @endphp
                                 
-                                <div class="plan-container mb-4">
-                                    <div class="d-flex gap-2 mb-3">
-                                        <button class="btn btn-outline-primary flex-grow-1" type="button" 
+                                <div class="plan-card mb-3 p-4 bg-light rounded-3">
+                                    <!-- Header del plan -->
+                                    <div class="d-flex justify-content-between align-items-center mb-3">
+                                        <div>
+                                            <h6 class="mb-1 fw-bold">
+                                                <i class="fas fa-file-invoice me-2 text-primary"></i>
+                                                {{ $plan->programa->Nombre ?? 'Programa' }}
+                                            </h6>
+                                            <small class="text-muted">
+                                                Monto Total: Bs. {{ number_format($plan->Monto_total, 2) }}
+                                            </small>
+                                        </div>
+                                        <button class="btn btn-sm btn-outline-primary" type="button" 
                                                 data-bs-toggle="collapse" 
-                                                data-bs-target="#collapsePlan-{{ $plan->Id_planes_pagos }}" 
-                                                aria-expanded="false">
-                                            <i class="fas fa-eye me-2"></i>Ver Plan
+                                                data-bs-target="#collapsePlan-{{ $plan->Id_planes_pagos }}">
+                                            <i class="fas fa-eye me-1"></i>Ver Pagos
                                         </button>
-                                        
-                                        @if($cuotasPendientes->count() > 0)
-                                            <button type="button" class="btn btn-success px-4" 
-                                                    onclick="pagarPlanCompleto({{ $plan->Id_planes_pagos }}, {{ $totalPendiente }})"
-                                                    title="Pagar todas las cuotas pendientes">
-                                                <i class="fas fa-check-double me-2"></i>Pago Completo
-                                            </button>
-                                        @endif
                                     </div>
 
+                                    <!-- Barra de progreso -->
+                                    <div class="mb-3">
+                                        <div class="d-flex justify-content-between mb-1">
+                                            <small class="text-muted">Pagado</small>
+                                            <small class="fw-bold text-success">{{ number_format($porcentaje, 1) }}%</small>
+                                        </div>
+                                        <div class="progress" style="height: 10px;">
+                                            <div class="progress-bar bg-success" role="progressbar" 
+                                                 style="width: {{ $porcentaje }}%" 
+                                                 aria-valuenow="{{ $porcentaje }}" 
+                                                 aria-valuemin="0" 
+                                                 aria-valuemax="100">
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Resumen financiero -->
+                                    <div class="row g-2 mb-3 text-center">
+                                        <div class="col-4">
+                                            <div class="bg-white p-2 rounded">
+                                                <small class="text-muted d-block">Pagado</small>
+                                                <strong class="text-success">Bs. {{ number_format($totalPagado, 2) }}</strong>
+                                            </div>
+                                        </div>
+                                        <div class="col-4">
+                                            <div class="bg-white p-2 rounded">
+                                                <small class="text-muted d-block">Restante</small>
+                                                <strong class="text-danger">Bs. {{ number_format($restante, 2) }}</strong>
+                                            </div>
+                                        </div>
+                                        <div class="col-4">
+                                            <div class="bg-white p-2 rounded">
+                                                <small class="text-muted d-block">Pagos</small>
+                                                <strong class="text-primary">{{ $plan->pagos->count() }}</strong>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Lista de pagos (colapsable) -->
                                     <div class="collapse" id="collapsePlan-{{ $plan->Id_planes_pagos }}">
-                                        @if($plan->cuotas && $plan->cuotas->count() > 0)
-                                            <div class="cuotas-container">
-                                                @foreach($plan->cuotas as $cuota)
-                                            <div class="cuota-card mb-3 p-3 bg-white shadow-sm rounded-3 border-start border-4 
-                                                @if($cuota->Estado_cuota === 'Pagado') border-success
-                                                @elseif($cuota->Estado_cuota === 'Parcial') border-warning
-                                                @else border-danger
-                                                @endif">
+                                        @if($plan->pagos && $plan->pagos->count() > 0)
+                                            <div class="pagos-list">
+                                                <h6 class="fw-bold mb-3"><i class="fas fa-list me-2"></i>Historial de Pagos</h6>
+                                                @foreach($plan->pagos->sortByDesc('Fecha_pago') as $index => $pago)
+                                                    <div class="pago-item p-3 mb-2 bg-white rounded border-start border-4 border-success">
                                                         <div class="row align-items-center">
+                                                            <div class="col-md-2">
+                                                                <span class="badge bg-dark">Pago #{{ $plan->pagos->count() - $index }}</span>
+                                                            </div>
                                                             <div class="col-md-3">
-                                                                <h5 class="mb-1">
-                                                                    <span class="badge bg-dark">Cuota #{{ $cuota->Nro_de_cuota }}</span>
-                                                                </h5>
+                                                                <strong class="text-success">Bs. {{ number_format($pago->Monto_pago, 2) }}</strong>
+                                                            </div>
+                                                            <div class="col-md-3">
                                                                 <small class="text-muted">
                                                                     <i class="fas fa-calendar me-1"></i>
-                                                                    {{ \Carbon\Carbon::parse($cuota->Fecha_vencimiento)->format('d/m/Y') }}
+                                                                    {{ \Carbon\Carbon::parse($pago->Fecha_pago)->format('d/m/Y') }}
                                                                 </small>
                                                             </div>
                                                             <div class="col-md-4">
-                                                                <div class="mb-1">
-                                                                    <strong>Monto:</strong> Bs. {{ number_format($cuota->Monto_cuota, 2) }}
-                                                                </div>
-                                                                <div>
-                                                                    <strong>Pagado:</strong> Bs. {{ number_format($cuota->Monto_pagado ?? 0, 2) }}
-                                                                </div>
-                                                            </div>
-                                                            <div class="col-md-2 text-center">
-                                                                @if($cuota->Estado_cuota === 'Pagado')
-                                                                    <span class="text-success fw-bold">
-                                                                        <i class="fas fa-check-circle me-1"></i>Pagado
-                                                                    </span>
-                                                                @elseif($cuota->Estado_cuota === 'Parcial')
-                                                                    <span class="text-warning fw-bold">
-                                                                        <i class="fas fa-clock me-1"></i>Parcial
-                                                                    </span>
-                                                                @else
-                                                                    <span class="text-danger fw-bold">
-                                                                        <i class="fas fa-times-circle me-1"></i>Pendiente
-                                                                    </span>
-                                                                @endif
-                                                            </div>
-                                                            <div class="col-md-3 text-end">
-                                                                @if($cuota->Estado_cuota !== 'Pagado')
-                                                                    <button type="button" class="btn btn-outline-primary btn-sm w-100"
-                                                                        data-bs-toggle="modal"
-                                                                        data-bs-target="#modalRegistrarPago"
-                                                                        data-cuota-id="{{ $cuota->Id_cuotas }}"
-                                                                        data-monto="{{ $cuota->Monto_cuota }}"
-                                                                        data-plan-id="{{ $plan->Id_planes_pagos }}"
-                                                                        title="Registrar pago parcial">
-                                                                        Pagar
-                                                                    </button>
-                                                                @else
-                                                                    <div class="text-success fs-4">
-                                                                        <i class="fas fa-check-circle"></i>
-                                                                    </div>
-                                                                @endif
+                                                                <small class="text-muted">{{ $pago->Descripcion }}</small>
                                                             </div>
                                                         </div>
                                                     </div>
                                                 @endforeach
                                             </div>
                                         @else
-                                            <div class="alert alert-info">
+                                            <div class="alert alert-info mb-0">
                                                 <i class="fas fa-info-circle me-2"></i>
-                                                Este plan no tiene cuotas registradas.
+                                                No se han registrado pagos aún
                                             </div>
                                         @endif
                                     </div>
+
+                                    <!-- Botón agregar pago -->
+                                    @if($restante > 0)
+                                        <button type="button" class="btn btn-success w-100 mt-3"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#modalAgregarPago"
+                                                data-plan-id="{{ $plan->Id_planes_pagos }}"
+                                                data-monto-total="{{ $plan->Monto_total }}"
+                                                data-monto-pagado="{{ $totalPagado }}"
+                                                data-restante="{{ $restante }}"
+                                                data-programa="{{ $plan->programa->Nombre ?? 'Programa' }}">
+                                            <i class="fas fa-plus me-2"></i>Agregar Pago
+                                        </button>
+                                    @else
+                                        <div class="alert alert-success mb-0 mt-3">
+                                            <i class="fas fa-check-circle me-2"></i>
+                                            <strong>Plan completado</strong> - Todos los pagos realizados
+                                        </div>
+                                    @endif
                                 </div>
                             @endforeach
                         @else
@@ -236,44 +256,59 @@
     </div>
 </div>
 
-<!-- Modal para registrar pago -->
-<div class="modal fade" id="modalRegistrarPago" tabindex="-1" aria-labelledby="modalRegistrarPagoLabel" aria-hidden="true">
+<!-- Modal para agregar pago -->
+<div class="modal fade" id="modalAgregarPago" tabindex="-1" aria-labelledby="modalAgregarPagoLabel" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered modal-lg">
-    <form method="POST" action="{{ route('pagos.registrar') }}">
+    <form method="POST" action="{{ route('pagos.registrar') }}" id="formAgregarPago">
         @csrf
-        <input type="hidden" name="cuota_id" id="modal-cuota-id">
+        <input type="hidden" name="plan_id" id="modal-plan-id">
         <div class="modal-content">
-            <div class="modal-header bg-primary text-white">
-                <h4 class="modal-title" id="modalRegistrarPagoLabel">
-                    <i class="fas fa-money-bill-wave me-2"></i>Registrar Pago Parcial
+            <div class="modal-header bg-success text-white">
+                <h4 class="modal-title" id="modalAgregarPagoLabel">
+                    <i class="fas fa-plus-circle me-2"></i>Agregar Pago
                 </h4>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
             </div>
 
             <div class="modal-body p-4">
-                <div class="mb-3">
-                    <label class="form-label fw-bold fs-5">Descripción</label>
-                    <input type="text" class="form-control form-control-lg" name="descripcion" id="modal-descripcion" required>
+                <!-- Info del plan -->
+                <div class="alert alert-info mb-4">
+                    <h6 class="mb-2"><strong id="modal-programa-nombre"></strong></h6>
+                    <div class="row">
+                        <div class="col-6">
+                            <small>Monto Total: <strong>Bs. <span id="modal-monto-total-display">0.00</span></strong></small>
+                        </div>
+                        <div class="col-6">
+                            <small>Restante: <strong class="text-danger">Bs. <span id="modal-restante-display">0.00</span></strong></small>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="mb-3">
-                    <label class="form-label fw-bold fs-5">Comprobante</label>
-                    <input type="text" class="form-control form-control-lg" name="comprobante" id="modal-comprobante" required>
+                    <label class="form-label fw-bold">Descripción del Pago</label>
+                    <input type="text" class="form-control form-control-lg" name="descripcion" 
+                           placeholder="Ej: Pago mensualidad Diciembre" required>
                 </div>
 
                 <div class="mb-3">
-                    <label class="form-label fw-bold fs-5">Monto Pago (Bs.)</label>
-                    <input type="number" step="0.01" class="form-control form-control-lg" name="monto_pago" id="modal-monto-pago" required>
+                    <label class="form-label fw-bold">Monto (Bs.)</label>
+                    <input type="number" step="0.01" class="form-control form-control-lg" 
+                           name="monto_pago" id="modal-monto-input" 
+                           placeholder="0.00" required min="0.01">
+                    <small class="text-muted">Máximo: Bs. <span id="modal-max-monto">0.00</span></small>
                 </div>
 
-                <div class="mb-3">
-                    <label class="form-label fw-bold fs-5">Fecha Pago</label>
-                    <input type="date" class="form-control form-control-lg" name="fecha_pago" id="modal-fecha-pago" required>
-                </div>
-
-                <div class="mb-3">
-                    <label class="form-label fw-bold fs-5">ID Planes Pagos</label>
-                    <input type="number" class="form-control form-control-lg" name="id_planes_pagos" id="modal-id-planes-pagos" required readonly>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label fw-bold">Fecha de Pago</label>
+                        <input type="date" class="form-control form-control-lg" 
+                               name="fecha_pago" required value="{{ date('Y-m-d') }}">
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label fw-bold">Comprobante/Referencia</label>
+                        <input type="text" class="form-control form-control-lg" 
+                               name="comprobante" placeholder="Ej: TRANS-12345" required>
+                    </div>
                 </div>
             </div>
 
@@ -281,7 +316,7 @@
                 <button type="button" class="btn btn-secondary btn-lg px-4" data-bs-dismiss="modal">
                     <i class="fas fa-times me-2"></i>Cancelar
                 </button>
-                <button type="submit" class="btn btn-primary btn-lg px-4">
+                <button type="submit" class="btn btn-success btn-lg px-4">
                     <i class="fas fa-save me-2"></i>Registrar Pago
                 </button>
             </div>
@@ -291,8 +326,6 @@
 </div>
 
 <style>
-/* Estilos removidos - usando colores sólidos de Bootstrap */
-
 .hover-shadow {
     transition: all 0.3s ease;
 }
@@ -310,45 +343,32 @@
     border-bottom: none;
 }
 
-.plan-container {
+.plan-card {
     background: #f8f9fa;
-    padding: 1.5rem;
-    border-radius: 0.5rem;
-}
-
-.cuota-card {
-    background: white;
     transition: all 0.3s ease;
-    border: 2px solid #dee2e6 !important;
 }
 
-.cuota-card:hover {
-    box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.1);
+.pago-item {
+    transition: all 0.2s ease;
+}
+
+.pago-item:hover {
     transform: translateX(5px);
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
 }
 
-.bg-light-success {
-    background-color: #d1e7dd !important;
-    border-color: #198754 !important;
+.progress {
+    border-radius: 10px;
+    overflow: hidden;
 }
 
-.bg-light-warning {
-    background-color: #fff3cd !important;
-    border-color: #ffc107 !important;
-}
-
-.bg-light-danger {
-    background-color: #f8d7da !important;
-    border-color: #dc3545 !important;
+.progress-bar {
+    transition: width 0.6s ease;
 }
 
 .btn-lg {
     padding: 0.75rem 1.5rem;
     font-size: 1.1rem;
-}
-
-.collapse {
-    transition: height 0.35s ease;
 }
 </style>
 
@@ -363,7 +383,6 @@
 <script>
     const estudiantes = JSON.parse(document.getElementById('estudiantes-data').textContent);
     const registrarPagoUrl = "{{ route('pagos.registrar') }}";
-    const pagarPlanCompletoUrl = "{{ route('pagos.pagarPlanCompleto') }}";
     const csrfToken = "{{ csrf_token() }}";
 </script>
 

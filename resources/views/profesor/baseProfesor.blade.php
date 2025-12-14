@@ -34,6 +34,27 @@
                 <div class="menu-line"></div>
                 <div class="menu-line"></div>
             </div>
+
+            <!-- Menú desplegable -->
+            <div class="menu-dropdown" id="menuDropdown">
+                <a href="{{ route('profesor.listado-alumnos', 'evaluar') }}" class="menu-item">
+                    <i class="bi bi-clipboard-check"></i> Evaluar Estudiantes
+                </a>
+                <a href="{{ route('profesor.listado-alumnos', 'asignados') }}" class="menu-item">
+                    <i class="bi bi-people-fill"></i> Alumnos Asignados
+                </a>
+                <a href="{{ route('profesor.listado-alumnos', 'recuperatoria') }}" class="menu-item">
+                    <i class="bi bi-calendar-event"></i> Clase Recuperatoria
+                </a>
+                <a href="{{ route('logout') }}" class="menu-item menu-item-logout"
+                   onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                    <i class="bi bi-box-arrow-right"></i> Cerrar Sesión
+                </a>
+            </div>
+
+            <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
+                @csrf
+            </form>
         </header>
 
         <main>
@@ -44,11 +65,24 @@
 
     {{-- Bootstrap JS --}}
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    {{-- FontAwesome --}}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     {{-- Scripts base --}}
     <script>
         function toggleMenu() {
-            alert("Aquí puedes abrir el menú lateral o desplegable.");
+            const dropdown = document.getElementById('menuDropdown');
+            dropdown.classList.toggle('show');
+        }
+
+        // Cerrar el menú si se hace clic fuera de él
+        window.onclick = function(event) {
+            if (!event.target.matches('.menu-icon') && !event.target.matches('.menu-line')) {
+                const dropdown = document.getElementById('menuDropdown');
+                if (dropdown.classList.contains('show')) {
+                    dropdown.classList.remove('show');
+                }
+            }
         }
     </script>
 

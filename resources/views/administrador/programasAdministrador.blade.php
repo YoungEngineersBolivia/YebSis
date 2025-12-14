@@ -493,6 +493,7 @@
                                         <th>Duración</th>
                                         <th>Descripción</th>
                                         <th class="text-center">Modelos</th>
+                                        <th class="text-center">Preguntas</th>
                                         <th class="text-center pe-4">Acciones</th>
                                     </tr>
                                 </thead>
@@ -530,6 +531,13 @@
                                                 <i class="fas fa-cubes me-1"></i>
                                                 <span class="badge bg-primary rounded-pill">{{ $programa->modelos_count ?? 0 }}</span>
                                             </button>
+                                        </td>
+                                        <td class="text-center">
+                                            <a href="{{ route('admin.preguntas.index', $programa->Id_programas) }}" 
+                                               class="btn btn-sm btn-outline-success" 
+                                               title="Gestionar preguntas">
+                                                <i class="fas fa-question-circle me-1"></i>Preguntas
+                                            </a>
                                         </td>
                                         <td class="text-center pe-4">
                                             <div class="btn-group" role="group">

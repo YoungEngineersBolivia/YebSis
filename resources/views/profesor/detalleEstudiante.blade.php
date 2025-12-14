@@ -71,12 +71,15 @@
             </div>
             
             <div class="action-buttons">
-                <button class="btn-edit" onclick="window.location.href='{{ route('profesor.editar-estudiante', $estudiante->Id_estudiantes) }}'">
-                    Editar
-                </button>
-                <button class="btn-evaluate" onclick="window.location.href='{{ route('profesor.evaluar-estudiante', $estudiante->Id_estudiantes) }}'">
-                    Evaluar
-                </button>
+                @if($yaEvaluado)
+                    <button class="btn-evaluate" onclick="window.location.href='{{ route('profesor.evaluar-estudiante', $estudiante->Id_estudiantes) }}'">
+                        <i class="fas fa-edit me-1"></i>Editar Evaluación
+                    </button>
+                @else
+                    <button class="btn-evaluate" onclick="window.location.href='{{ route('profesor.evaluar-estudiante', $estudiante->Id_estudiantes) }}'">
+                        <i class="fas fa-clipboard-check me-1"></i>Evaluar
+                    </button>
+                @endif
             </div>
         </div>
     </div>
