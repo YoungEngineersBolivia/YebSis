@@ -173,7 +173,6 @@
                                                                     id="estado_final{{ $asignacion->Id_motores_asignados }}" 
                                                                     name="estado_final" required>
                                                                 <option value="">Seleccione el estado</option>
-                                                                <option value="Funcionando">Funcionando</option>
                                                                 <option value="Descompuesto">Descompuesto</option>
                                                                 <option value="En Proceso">En Proceso</option>
                                                             </select>

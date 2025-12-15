@@ -35,8 +35,6 @@
                         <option value="">Todos</option>
                         <option value="Disponible">Disponible</option>
                         <option value="En Reparacion">En Reparación</option>
-                        <option value="Funcionando">Funcionando</option>
-                        <option value="Descompuesto">Descompuesto</option>
                     </select>
                 </div>
                 <div class="col-md-2">
@@ -97,8 +95,6 @@
                                     $badgeClass = [
                                         'Disponible' => 'bg-success',
                                         'En Reparacion' => 'bg-warning text-dark',
-                                        'Funcionando' => 'bg-primary',
-                                        'Descompuesto' => 'bg-danger'
                                     ][$motor->Estado] ?? 'bg-secondary';
                                 @endphp
                                 <span class="badge {{ $badgeClass }}">
@@ -168,7 +164,6 @@
                         <label class="form-label"><i class="bi bi-circle-fill"></i> Estado *</label>
                         <select class="form-select" name="Estado" required>
                             <option value="Disponible">Disponible</option>
-                            <option value="Funcionando">Funcionando</option>
                             <option value="Descompuesto">Descompuesto</option>
                         </select>
                     </div>
@@ -221,8 +216,6 @@
                         <select class="form-select" id="edit_Estado" name="Estado" required>
                             <option value="Disponible">Disponible</option>
                             <option value="En Reparacion">En Reparación</option>
-                            <option value="Funcionando">Funcionando</option>
-                            <option value="Descompuesto">Descompuesto</option>
                         </select>
                     </div>
                     <div class="mb-3">

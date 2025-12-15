@@ -161,7 +161,6 @@
                                 <select class="form-select" name="Estado_entrada" required>
                                     <option value="">Seleccionar...</option>
                                     <option value="Disponible">Disponible (Reparado y Listo)</option>
-                                    <option value="Funcionando">Funcionando (Sin problemas)</option>
                                     <option value="Descompuesto">Descompuesto (Irreparable)</option>
                                 </select>
                                 <small class="text-muted">Estado en el que regresa el motor</small>
