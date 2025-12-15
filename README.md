@@ -80,18 +80,21 @@ php artisan migrate
 ### 6. Ejecutar Seeders (Datos de Prueba)
 Es crucial ejecutar los seeders para tener los roles y el usuario administrador inicial cargados.
 
-**Opción A: Ejecutar todo (si DatabaseSeeder está configurado)**
+### 6. Ejecutar Seeders (Datos de Prueba)
+Es crucial ejecutar los seeders para tener los roles, el usuario administrador y los datos base cargados.
+
+**Opción A: Ejecutar todo (Recomendado)**
+Este comando ejecutará automáticamente `RolSeeder`, `AdminSeeder` y `RespuestasSeeder` en el orden correcto.
 ```bash
 php artisan db:seed
 ```
 
-**Opción B: Ejecutar seeders específicos (Recomendado la primera vez)**
+**Opción B: Ejecutar seeders específicos (Manual)**
+Si prefieres tener control granular:
 ```bash
-# 1. Crear Roles y Permisos
 php artisan db:seed --class=RolSeeder
-
-# 2. Crear Usuario Administrador por defecto
 php artisan db:seed --class=AdminSeeder
+php artisan db:seed --class=RespuestasSeeder
 ```
 
 ### 7. Iniciar el Servidor

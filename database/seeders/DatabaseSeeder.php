@@ -13,8 +13,11 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // User::factory(10)->create();
-
-        $this->call(RolSeeder::class);
+        // Orden de ejecución importante
+        $this->call([
+            RolSeeder::class,        // 1. Roles y Permisos (Base)
+            AdminSeeder::class,      // 2. Usuario Administrador (Depende de Roles)
+            RespuestasSeeder::class, // 3. Respuestas Predefinidas (Datos paramétricos)
+        ]);
     }
 }
