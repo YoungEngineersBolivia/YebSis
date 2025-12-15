@@ -83,4 +83,50 @@ class EvaluacionesEstudianteController extends Controller
     {
         return $this->show($estudianteId);
     }
+
+    /**
+ * Obtener evaluaciones de un estudiante en formato JSON (para AJAX)
+ */
+public function getEvaluacionesJson($id)
+{
+    try {
+        $evaluaciones = Evaluacion::with([
+            'pregunta',
+            'respuesta',
+            'modelo',
+            'profesor.persona',
+            'programa'
+        ])
+        ->where('Id_estudiantes', $id)
+        ->orderBy('fecha_evaluacion', 'desc')
+        ->get()
+        ->map(function($evaluacion) {
+            return [
+                'Id_evaluaciones' => $evaluacion->Id_evaluaciones,
+                'Id_modelos' => $evaluacion->Id_modelos ?? null,
+                'Nombre_modelo' => optional($evaluacion->modelo)->Nombre_modelo ?? 'Sin modelo',
+                'Pregunta' => optional($evaluacion->pregunta)->Pregunta ?? 'N/A',
+                'Respuesta' => optional($evaluacion->respuesta)->Respuesta ?? 'N/A',
+                'fecha_evaluacion' => $evaluacion->fecha_evaluacion,
+                'programa_nombre' => optional($evaluacion->programa)->Nombre ?? 'Sin programa',
+                'profesor_nombre' => optional($evaluacion->profesor)->persona->Nombre ?? '',
+                'profesor_apellido' => optional($evaluacion->profesor)->persona->Apellido ?? '',
+            ];
+        });
+
+        return response()->json([
+            'success' => true,
+            'evaluaciones' => $evaluaciones
+        ]);
+
+    } catch (\Exception $e) {
+        \Log::error('Error en getEvaluacionesJson: ' . $e->getMessage());
+        \Log::error($e->getTraceAsString());
+        
+        return response()->json([
+            'success' => false,
+            'error' => 'Error al obtener las evaluaciones: ' . $e->getMessage()
+        ], 500);
+    }
+}
 }
