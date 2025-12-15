@@ -6,27 +6,91 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
     <style>
-        .evaluacion-card {
-            border-left: 4px solid #0d6efd;
+        .modelo-card {
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 20px;
+            background: white;
             transition: all 0.3s ease;
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
         }
-        .evaluacion-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        .modelo-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 6px 16px rgba(0,0,0,0.12);
+            border-color: #0d6efd;
+        }
+        .modelo-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+        .modelo-name {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #000;
+        }
+        .evaluaciones-count {
+            background: #0d6efd;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+        .modelo-info {
+            color: #6c757d;
+            font-size: 0.9rem;
+        }
+        .fecha-texto {
+            background: white;
+            color: #000;
+            border: 1px solid #dee2e6;
+            padding: 4px 12px;
+            border-radius: 4px;
+            font-size: 0.85rem;
+        }
+        .evaluacion-item {
+            border-bottom: 1px solid #e9ecef;
+            padding: 15px 0;
+        }
+        .evaluacion-item:last-child {
+            border-bottom: none;
+        }
+        .pregunta-respuesta-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-top: 10px;
+        }
+        .pregunta-box, .respuesta-box {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 6px;
+            border-left: 3px solid #0d6efd;
+        }
+        .respuesta-box {
+            border-left-color: #198754;
+        }
+        .label-texto {
+            font-weight: 600;
+            color: #495057;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+        .contenido-texto {
+            color: #212529;
+            line-height: 1.6;
         }
         .programa-badge {
             background-color: #e7f1ff;
             color: #0d6efd;
             font-weight: 500;
-        }
-        .fecha-badge {
-            background-color: #f8f9fa;
-            border: 1px solid #dee2e6;
-            font-size: 0.85rem;
-        }
-        .table-responsive {
-            max-height: 600px;
-            overflow-y: auto;
+            padding: 6px 12px;
+            border-radius: 4px;
+            display: inline-block;
         }
     </style>
 <?php $__env->stopSection(); ?>
@@ -34,7 +98,6 @@
 <?php $__env->startSection('content'); ?>
 
 <?php if(isset($estudiante) && $estudiante): ?>
-    
     <?php
         $evaluaciones = $estudiante->evaluaciones;
     ?>
@@ -166,207 +229,128 @@
             </div>
         </div>
     <?php else: ?>
-        <div class="card shadow-sm border-0 overflow-hidden">
-            <div class="card-body p-0">
-                <div class="table-responsive">
-                    <table class="table table-striped table-hover align-middle mb-0">
-                        <thead class="bg-primary text-white">
-                            <tr>
-                                <?php if(!isset($estudiante)): ?>
-                                    <th class="ps-3 py-3" style="min-width:120px;">Estudiante</th>
-                                <?php endif; ?>
-                                <th class="py-3" style="min-width:200px;">Programa</th>
-                                <th class="py-3" style="min-width:180px;">Pregunta</th>
-                                <th class="py-3" style="min-width:180px;">Respuesta</th>
-                                <th class="py-3" style="min-width:150px;">Modelo</th>
-                                <th class="py-3" style="min-width:150px;">Profesor</th>
-                                <th class="py-3" style="min-width:120px;">Fecha</th>
-                                <th class="pe-3 py-3 text-end" style="min-width:100px;">Acciones</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php $__currentLoopData = $evaluaciones; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $evaluacion): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                                <?php
-                                    $estudianteEval = $evaluacion->estudiante ?? null;
-                                    $personaEval = $estudianteEval->persona ?? null;
-                                    $nombreEstudiante = $personaEval ? trim($personaEval->Nombre . ' ' . $personaEval->Apellido) : 'Estudiante no disponible';
+        <?php
+            $evaluacionesPorModelo = $evaluaciones->groupBy(function($evaluacion) {
+                return $evaluacion->modelo->Id_modelos ?? 'sin_modelo';
+            });
+        ?>
+
+        <div class="row g-4">
+            <?php $__currentLoopData = $evaluacionesPorModelo; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $modeloId => $evaluacionesModelo): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                <?php
+                    $primerEvaluacion = $evaluacionesModelo->first();
+                    $modelo = $primerEvaluacion->modelo ?? null;
+                    $nombreModelo = $modelo ? $modelo->Nombre_modelo : 'Sin modelo';
+                ?>
+                
+                <div class="col-md-6 col-lg-4">
+                    <div class="modelo-card" data-bs-toggle="modal" data-bs-target="#modalModelo<?php echo e($modeloId); ?>">
+                        <div class="modelo-header">
+                            <div class="modelo-name">
+                                <i class="bi bi-box me-2"></i><?php echo e($nombreModelo); ?>
+
+                            </div>
+                            <div class="evaluaciones-count">
+                                <?php echo e($evaluacionesModelo->count()); ?>
+
+                            </div>
+                        </div>
+                        <div class="modelo-info">
+                            <i class="bi bi-clipboard-check me-1"></i>
+                            <?php echo e($evaluacionesModelo->count()); ?> <?php echo e($evaluacionesModelo->count() == 1 ? 'evaluación' : 'evaluaciones'); ?>
+
+                        </div>
+                    </div>
+                </div>
+
+                
+                <div class="modal fade" id="modalModelo<?php echo e($modeloId); ?>" tabindex="-1" aria-hidden="true">
+                    <div class="modal-dialog modal-xl modal-dialog-scrollable">
+                        <div class="modal-content">
+                            <div class="modal-header bg-primary text-white">
+                                <h5 class="modal-title">
+                                    <i class="bi bi-box me-2"></i>Evaluaciones - <?php echo e($nombreModelo); ?>
+
+                                </h5>
+                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                            </div>
+                            <div class="modal-body">
+                                <?php $__currentLoopData = $evaluacionesModelo; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $evaluacion): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                    <?php
+                                        $estudianteEval = $evaluacion->estudiante ?? null;
+                                        $personaEval = $estudianteEval->persona ?? null;
+                                        $nombreEstudiante = $personaEval ? trim($personaEval->Nombre . ' ' . $personaEval->Apellido) : 'Estudiante no disponible';
+                                        
+                                        $profesor = $evaluacion->profesor ?? null;
+                                        $personaProf = $profesor->persona ?? null;
+                                        $nombreProfesor = $personaProf ? trim($personaProf->Nombre . ' ' . $personaProf->Apellido) : 'Profesor no asignado';
+                                    ?>
                                     
-                                    $profesor = $evaluacion->profesor ?? null;
-                                    $personaProf = $profesor->persona ?? null;
-                                    $nombreProfesor = $personaProf ? trim($personaProf->Nombre . ' ' . $personaProf->Apellido) : 'Profesor no asignado';
-                                ?>
-                                <tr>
-                                    <?php if(!isset($estudiante)): ?>
-                                        <td class="ps-3">
-                                            <div class="d-flex flex-column">
-                                                <span class="fw-bold text-primary"><?php echo e($estudianteEval->Cod_estudiante ?? 'Sin código'); ?></span>
-                                                <small class="text-muted"><?php echo e($nombreEstudiante); ?></small>
+                                    <div class="evaluacion-item">
+                                        
+                                        <div class="d-flex justify-content-between align-items-start mb-3">
+                                            <div>
+                                                <?php if(!isset($estudiante)): ?>
+                                                    <div class="mb-2">
+                                                        <strong class="text-primary"><?php echo e($estudianteEval->Cod_estudiante ?? 'Sin código'); ?></strong>
+                                                        <span class="text-muted ms-2"><?php echo e($nombreEstudiante); ?></span>
+                                                    </div>
+                                                <?php endif; ?>
+                                                <span class="programa-badge">
+                                                    <?php echo e($evaluacion->programa->Nombre ?? 'Sin programa'); ?>
+
+                                                </span>
                                             </div>
-                                        </td>
-                                    <?php endif; ?>
-                                    <td>
-                                        <span class="badge programa-badge px-3 py-2">
-                                            <?php echo e($evaluacion->programa->Nombre ?? 'Sin programa'); ?>
+                                            <div class="text-end">
+                                                <div class="mb-2">
+                                                    <span class="fecha-texto">
+                                                        <i class="bi bi-calendar3 me-1"></i>
+                                                        <?php if($evaluacion->fecha_evaluacion): ?>
+                                                            <?php echo e(\Carbon\Carbon::parse($evaluacion->fecha_evaluacion)->format('d/m/Y')); ?>
 
-                                        </span>
-                                    </td>
-                                    <td>
-                                        <span class="fw-semibold"><?php echo e($evaluacion->pregunta->Pregunta ?? 'Pregunta no disponible'); ?></span>
-                                    </td>
-                                    <td>
-                                        <span class="text-dark"><?php echo e($evaluacion->respuesta->Respuesta ?? 'Sin respuesta'); ?></span>
-                                    </td>
-                                    <td>
-                                        <span class="badge bg-light text-dark border px-3 py-2">
-                                            <?php echo e($evaluacion->modelo->Nombre_modelo ?? 'Sin modelo'); ?>
+                                                        <?php else: ?>
+                                                            Sin fecha
+                                                        <?php endif; ?>
+                                                    </span>
+                                                </div>
+                                                <div class="text-muted small">
+                                                    <i class="bi bi-person-circle me-1"></i><?php echo e($nombreProfesor); ?>
 
-                                        </span>
-                                    </td>
-                                    <td>
-                                        <div class="d-flex flex-column">
-                                            <span class="fw-semibold"><?php echo e($nombreProfesor); ?></span>
-                                            <small class="text-muted"><?php echo e($profesor->Profesion ?? ''); ?></small>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <span class="badge fecha-badge px-3 py-2">
-                                            <?php if($evaluacion->fecha_evaluacion): ?>
-                                                <?php echo e(\Carbon\Carbon::parse($evaluacion->fecha_evaluacion)->format('d/m/Y')); ?>
-
-                                            <?php else: ?>
-                                                Sin fecha
-                                            <?php endif; ?>
-                                        </span>
-                                    </td>
-                                    <td class="pe-3 text-end">
-                                        <div class="d-flex gap-2 justify-content-end">
-                                            
-                                            <button type="button" 
-                                                    class="btn btn-sm btn-outline-info" 
-                                                    data-bs-toggle="modal" 
-                                                    data-bs-target="#detalleModal<?php echo e($evaluacion->Id_evaluaciones); ?>"
-                                                    data-bs-toggle="tooltip" 
-                                                    title="Ver detalles">
-                                                <i class="bi bi-eye-fill"></i>
-                                            </button>
-
-                                            
-                                            <?php if(!isset($estudiante) && $estudianteEval): ?>
-                                                <a href="<?php echo e(route('estudiantes.ver', $estudianteEval->Id_estudiantes)); ?>" 
-                                                   class="btn btn-sm btn-outline-primary" 
-                                                   data-bs-toggle="tooltip"
-                                                   title="Ver estudiante">
-                                                    <i class="bi bi-person-circle"></i>
-                                                </a>
-                                            <?php endif; ?>
-                                        </div>
-                                    </td>
-                                </tr>
-
-                                
-                                <div class="modal fade" id="detalleModal<?php echo e($evaluacion->Id_evaluaciones); ?>" tabindex="-1" aria-hidden="true">
-                                    <div class="modal-dialog modal-lg">
-                                        <div class="modal-content">
-                                            <div class="modal-header bg-primary text-white">
-                                                <h5 class="modal-title">
-                                                    <i class="bi bi-clipboard-data me-2"></i>Detalles de Evaluación
-                                                </h5>
-                                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-                                            </div>
-                                            <div class="modal-body">
-                                                <div class="row g-3">
-                                                    <?php if(!isset($estudiante)): ?>
-                                                    <div class="col-md-12">
-                                                        <div class="card bg-light mb-3">
-                                                            <div class="card-body">
-                                                                <h6 class="card-title fw-bold">Información del Estudiante</h6>
-                                                                <div class="row">
-                                                                    <div class="col-md-6">
-                                                                        <p class="mb-1"><strong>Nombre:</strong> <?php echo e($nombreEstudiante); ?></p>
-                                                                        <p class="mb-0"><strong>Código:</strong> <?php echo e($estudianteEval->Cod_estudiante ?? 'Sin código'); ?></p>
-                                                                    </div>
-                                                                    <div class="col-md-6">
-                                                                        <p class="mb-1"><strong>Estado:</strong> 
-                                                                            <?php if($estudianteEval): ?>
-                                                                                <?php $estadoLower = Str::lower($estudianteEval->Estado ?? ''); ?>
-                                                                                <?php if($estadoLower === 'activo'): ?>
-                                                                                    <span class="badge bg-success">Activo</span>
-                                                                                <?php elseif($estadoLower === 'inactivo'): ?>
-                                                                                    <span class="badge bg-secondary">Inactivo</span>
-                                                                                <?php else: ?>
-                                                                                    <span class="badge bg-light text-dark"><?php echo e($estudianteEval->Estado); ?></span>
-                                                                                <?php endif; ?>
-                                                                            <?php else: ?>
-                                                                                <span class="badge bg-light text-dark">No disponible</span>
-                                                                            <?php endif; ?>
-                                                                        </p>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <?php endif; ?>
-                                                    
-                                                    <div class="col-md-6">
-                                                        <label class="form-label fw-bold text-muted">Programa</label>
-                                                        <p class="form-control bg-light"><?php echo e($evaluacion->programa->Nombre ?? 'Sin programa'); ?></p>
-                                                    </div>
-                                                    
-                                                    <div class="col-md-6">
-                                                        <label class="form-label fw-bold text-muted">Fecha de Evaluación</label>
-                                                        <p class="form-control bg-light">
-                                                            <?php if($evaluacion->fecha_evaluacion): ?>
-                                                                <?php echo e(\Carbon\Carbon::parse($evaluacion->fecha_evaluacion)->format('d/m/Y')); ?>
-
-                                                            <?php else: ?>
-                                                                No especificada
-                                                            <?php endif; ?>
-                                                        </p>
-                                                    </div>
-                                                    
-                                                    <div class="col-md-12">
-                                                        <label class="form-label fw-bold text-muted">Pregunta Evaluada</label>
-                                                        <textarea class="form-control bg-light" rows="3" readonly><?php echo e($evaluacion->pregunta->Pregunta ?? 'Pregunta no disponible'); ?></textarea>
-                                                    </div>
-                                                    
-                                                    <div class="col-md-12">
-                                                        <label class="form-label fw-bold text-muted">Respuesta del Estudiante</label>
-                                                        <textarea class="form-control bg-light" rows="3" readonly><?php echo e($evaluacion->respuesta->Respuesta ?? 'Sin respuesta'); ?></textarea>
-                                                    </div>
-                                                    
-                                                    <div class="col-md-6">
-                                                        <label class="form-label fw-bold text-muted">Modelo Utilizado</label>
-                                                        <p class="form-control bg-light"><?php echo e($evaluacion->modelo->Nombre_modelo ?? 'Sin modelo'); ?></p>
-                                                    </div>
-                                                    
-                                                    <div class="col-md-6">
-                                                        <label class="form-label fw-bold text-muted">Profesor Evaluador</label>
-                                                        <div class="d-flex align-items-center">
-                                                            <i class="bi bi-person-circle me-2 text-primary"></i>
-                                                            <p class="form-control bg-light mb-0"><?php echo e($nombreProfesor); ?></p>
-                                                        </div>
-                                                    </div>
-                                                    
-                                                    <div class="col-md-12">
-                                                        <label class="form-label fw-bold text-muted">Fecha de Registro</label>
-                                                        <p class="form-control bg-light">
-                                                            <?php echo e($evaluacion->created_at->format('d/m/Y H:i:s')); ?>
-
-                                                        </p>
-                                                    </div>
                                                 </div>
                                             </div>
-                                            <div class="modal-footer bg-light">
-                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                                        </div>
+
+                                        
+                                        <div class="pregunta-respuesta-row">
+                                            <div class="pregunta-box">
+                                                <div class="label-texto">
+                                                    <i class="bi bi-question-circle me-1"></i>Pregunta
+                                                </div>
+                                                <div class="contenido-texto">
+                                                    <?php echo e($evaluacion->pregunta->Pregunta ?? 'Pregunta no disponible'); ?>
+
+                                                </div>
+                                            </div>
+                                            <div class="respuesta-box">
+                                                <div class="label-texto">
+                                                    <i class="bi bi-check-circle me-1"></i>Respuesta
+                                                </div>
+                                                <div class="contenido-texto">
+                                                    <?php echo e($evaluacion->respuesta->Respuesta ?? 'Sin respuesta'); ?>
+
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
-                                </div>
-                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-                        </tbody>
-                    </table>
+                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                            </div>
+                            <div class="modal-footer bg-light">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-            </div>
+            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
         </div>
     <?php endif; ?>
 
@@ -383,8 +367,8 @@
 
 <?php $__env->startSection('scripts'); ?>
 <script>
-    // Auto-cerrar alertas después de 5 segundos
     document.addEventListener('DOMContentLoaded', function() {
+        // Auto-cerrar alertas después de 5 segundos
         const alerts = document.querySelectorAll('.alert');
         alerts.forEach(alert => {
             setTimeout(() => {
