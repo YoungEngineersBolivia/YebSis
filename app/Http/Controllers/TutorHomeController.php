@@ -44,22 +44,18 @@ class TutorHomeController extends Controller
                 'profesor.persona'
             ])
             ->where('Id_tutores', $tutor->Id_tutores)
-            ->orderByRaw("CASE WHEN LOWER(TRIM(Estado)) = 'activo' THEN 0 ELSE 1 END") // Activos primero
+            ->orderByRaw("CASE WHEN LOWER(TRIM(Estado)) = 'activo' THEN 0 ELSE 1 END")
             ->orderBy('created_at', 'desc')
             ->get();
 
-            // DEBUG: Verificar los estados de los estudiantes
-            Log::info('Estados de estudiantes cargados:');
+            // Normalizar estados
             foreach ($estudiantes as $estudiante) {
-                Log::info("Estudiante {$estudiante->Id_estudiantes}: Estado = '{$estudiante->Estado}' (tipo: " . gettype($estudiante->Estado) . ")");
-                
-                // Normalizar el estado si es necesario
                 if ($estudiante->Estado) {
                     $estudiante->Estado = strtolower(trim($estudiante->Estado));
                 }
             }
 
-            // Contar estudiantes por estado
+            // Estadísticas
             $estadisticas = [
                 'total' => $estudiantes->count(),
                 'activos' => $estudiantes->filter(function($e) {
@@ -69,8 +65,6 @@ class TutorHomeController extends Controller
                     return strtolower(trim($e->Estado ?? '')) !== 'activo';
                 })->count()
             ];
-
-            Log::info('Estadísticas:', $estadisticas);
 
             return view('tutor.homeTutor', compact('tutor', 'estudiantes', 'estadisticas'));
             
@@ -83,43 +77,71 @@ class TutorHomeController extends Controller
     }
 
     /**
-     * Ver detalles de un estudiante específico
+     * Ver evaluaciones de un estudiante
      */
-    public function verEstudiante($id)
+    public function verEvaluaciones($id)
     {
         try {
             $usuario = Auth::user();
             $tutor = Tutores::where('Id_usuarios', $usuario->Id_usuarios)->first();
 
             if (!$tutor) {
-                return response()->json(['error' => 'Tutor no encontrado'], 404);
+                return response()->json([
+                    'success' => false,
+                    'error' => 'Tutor no encontrado'
+                ], 404);
             }
 
             // Verificar que el estudiante pertenece al tutor
-            $estudiante = Estudiante::with([
-                'persona',
-                'programa',
-                'sucursal',
-                'profesor.persona',
-                'planesPagos.cuotas',
-                'horarios'
-            ])
-            ->where('Id_estudiantes', $id)
-            ->where('Id_tutores', $tutor->Id_tutores)
-            ->first();
+            $estudiante = Estudiante::with('persona')
+                ->where('Id_estudiantes', $id)
+                ->where('Id_tutores', $tutor->Id_tutores)
+                ->first();
 
             if (!$estudiante) {
-                return response()->json(['error' => 'Estudiante no encontrado'], 404);
+                return response()->json([
+                    'success' => false,
+                    'error' => 'No tiene permiso para ver las evaluaciones de este estudiante'
+                ], 403);
             }
+
+            // Obtener evaluaciones del estudiante con sus relaciones
+            $evaluaciones = DB::table('evaluaciones')
+                ->join('modelos', 'evaluaciones.Id_modelos', '=', 'modelos.Id_modelos')
+                ->join('preguntas', 'evaluaciones.Id_preguntas', '=', 'preguntas.Id_preguntas')
+                ->join('respuestas', 'evaluaciones.Id_respuestas', '=', 'respuestas.Id_respuestas')
+                ->join('profesores', 'evaluaciones.Id_profesores', '=', 'profesores.Id_profesores')
+                ->join('personas', 'profesores.Id_personas', '=', 'personas.Id_personas')
+                ->where('evaluaciones.Id_estudiantes', $id)
+                ->select(
+                    'evaluaciones.Id_evaluaciones',
+                    'evaluaciones.fecha_evaluacion',
+                    'modelos.Nombre_modelo',
+                    'preguntas.Pregunta',
+                    'respuestas.Respuesta',
+                    'personas.Nombre as profesor_nombre',
+                    'personas.Apellido as profesor_apellido'
+                )
+                ->orderBy('evaluaciones.fecha_evaluacion', 'desc')
+                ->get();
 
             return response()->json([
                 'success' => true,
-                'estudiante' => $estudiante
+                'evaluaciones' => $evaluaciones,
+                'estudiante' => [
+                    'id' => $estudiante->Id_estudiantes,
+                    'nombre' => $estudiante->persona->Nombre . ' ' . $estudiante->persona->Apellido
+                ]
             ]);
 
         } catch (\Exception $e) {
-            Log::error('Error en verEstudiante: ' . $e->getMessage());
-            return response()->json(['error' => 'Error al cargar los detalles'], 500);
+            Log::error('Error al obtener evaluaciones: ' . $e->getMessage());
+            Log::error('Stack trace: ' . $e->getTraceAsString());
+            
+            return response()->json([
+                'success' => false,
+                'error' => 'Error al cargar las evaluaciones'
+            ], 500);
         }
     }
 
@@ -138,14 +160,19 @@ class TutorHomeController extends Controller
             ], [
                 'fecha.after_or_equal' => 'La fecha debe ser hoy o posterior',
                 'estudiante_id.exists' => 'El estudiante no existe',
-                'hora.date_format' => 'El formato de hora no es válido'
+                'hora.date_format' => 'El formato de hora no es válido',
+                'fecha.required' => 'La fecha es obligatoria',
+                'hora.required' => 'La hora es obligatoria'
             ]);
 
             $usuario = Auth::user();
             $tutor = Tutores::where('Id_usuarios', $usuario->Id_usuarios)->first();
 
             if (!$tutor) {
-                return response()->json(['error' => 'Tutor no encontrado'], 404);
+                return response()->json([
+                    'success' => false,
+                    'error' => 'Tutor no encontrado'
+                ], 404);
             }
 
             // Verificar que el estudiante pertenece al tutor
@@ -154,10 +181,13 @@ class TutorHomeController extends Controller
                 ->first();
 
             if (!$estudiante) {
-                return response()->json(['error' => 'No tiene permiso para agendar cita con este estudiante'], 403);
+                return response()->json([
+                    'success' => false,
+                    'error' => 'No tiene permiso para agendar cita con este estudiante'
+                ], 403);
             }
 
-            // Verificar que no haya otra cita en la misma fecha y hora
+            // Verificar que no haya otra cita en la misma fecha y hora para este tutor
             $citaExistente = Citas::where('Id_tutores', $tutor->Id_tutores)
                 ->where('Fecha', $validated['fecha'])
                 ->where('Hora', $validated['hora'])
@@ -165,6 +195,7 @@ class TutorHomeController extends Controller
 
             if ($citaExistente) {
                 return response()->json([
+                    'success' => false,
                     'error' => 'Ya tiene una cita agendada en esta fecha y hora'
                 ], 422);
             }
@@ -176,79 +207,77 @@ class TutorHomeController extends Controller
                 'Id_tutores' => $tutor->Id_tutores,
                 'Id_estudiantes' => $validated['estudiante_id'],
                 'motivo' => $validated['motivo'] ?? null,
-                'estado' => 'pendiente',
-                'Id_evaluaciones' => null
+                'estado' => 'pendiente'
+            ]);
+
+            Log::info('Cita creada exitosamente', [
+                'cita_id' => $cita->Id_citas,
+                'tutor_id' => $tutor->Id_tutores,
+                'estudiante_id' => $validated['estudiante_id']
             ]);
 
             return response()->json([
                 'success' => true,
                 'message' => 'Cita agendada exitosamente',
-                'cita' => $cita
+                'cita' => [
+                    'id' => $cita->Id_citas,
+                    'fecha' => $cita->Fecha,
+                    'hora' => $cita->Hora,
+                    'motivo' => $cita->motivo
+                ]
             ]);
 
         } catch (\Illuminate\Validation\ValidationException $e) {
             return response()->json([
+                'success' => false,
                 'error' => 'Datos inválidos',
                 'errores' => $e->errors()
             ], 422);
         } catch (\Exception $e) {
             Log::error('Error al agendar cita: ' . $e->getMessage());
+            Log::error('Stack trace: ' . $e->getTraceAsString());
+            
             return response()->json([
+                'success' => false,
                 'error' => 'Error al agendar la cita. Por favor, intente nuevamente.'
             ], 500);
         }
     }
 
     /**
-     * Ver evaluaciones de un estudiante
+     * Listar las citas del tutor
      */
-    public function verEvaluaciones($id)
+    public function listarCitas()
     {
         try {
             $usuario = Auth::user();
             $tutor = Tutores::where('Id_usuarios', $usuario->Id_usuarios)->first();
 
             if (!$tutor) {
-                return response()->json(['error' => 'Tutor no encontrado'], 404);
+                return response()->json([
+                    'success' => false,
+                    'error' => 'Tutor no encontrado'
+                ], 404);
             }
 
-            // Verificar que el estudiante pertenece al tutor
-            $estudiante = Estudiante::where('Id_estudiantes', $id)
+            $citas = Citas::with(['estudiante.persona'])
                 ->where('Id_tutores', $tutor->Id_tutores)
-                ->first();
-
-            if (!$estudiante) {
-                return response()->json(['error' => 'No autorizado'], 403);
-            }
-
-            // Obtener evaluaciones del estudiante
-            $evaluaciones = DB::table('evaluaciones')
-                ->join('modelos', 'evaluaciones.Id_modelos', '=', 'modelos.Id_modelos')
-                ->join('preguntas', 'evaluaciones.Id_preguntas', '=', 'preguntas.Id_preguntas')
-                ->join('respuestas', 'evaluaciones.Id_respuestas', '=', 'respuestas.Id_respuestas')
-                ->join('profesores', 'evaluaciones.Id_profesores', '=', 'profesores.Id_profesores')
-                ->join('personas', 'profesores.Id_personas', '=', 'personas.Id_personas')
-                ->where('evaluaciones.Id_estudiantes', $id)
-                ->select(
-                    'evaluaciones.*',
-                    'modelos.Nombre_modelo',
-                    'preguntas.Pregunta',
-                    'respuestas.Respuesta',
-                    'personas.Nombre as profesor_nombre',
-                    'personas.Apellido as profesor_apellido'
-                )
-                ->orderBy('evaluaciones.fecha_evaluacion', 'desc')
+                ->orderBy('Fecha', 'desc')
+                ->orderBy('Hora', 'desc')
                 ->get();
 
             return response()->json([
                 'success' => true,
-                'evaluaciones' => $evaluaciones,
-                'estudiante' => $estudiante
+                'citas' => $citas
             ]);
 
         } catch (\Exception $e) {
-            Log::error('Error al obtener evaluaciones: ' . $e->getMessage());
-            return response()->json(['error' => 'Error al cargar las evaluaciones'], 500);
+            Log::error('Error al listar citas: ' . $e->getMessage());
+            
+            return response()->json([
+                'success' => false,
+                'error' => 'Error al cargar las citas'
+            ], 500);
         }
     }
 }

@@ -278,8 +278,6 @@
         </div>
     </div>
     @endforeach
-    @endif
-
     <!-- Paginación -->
     <div class="d-flex justify-content-center mt-4 mb-4">
         {{ $estudiantes->links('pagination::bootstrap-5') }}

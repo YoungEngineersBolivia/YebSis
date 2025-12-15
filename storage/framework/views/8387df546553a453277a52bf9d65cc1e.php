@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Panel del Tutor</title>
-    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <meta name="csrf-token" content="<?php echo e(csrf_token()); ?>">
     <style>
         * {
             margin: 0;
@@ -702,24 +702,24 @@
     <header>
         <div class="header-content">
             <div class="logo">
-                <img src="{{ asset('img/ES_logo-02.webp') }}" alt="Logo YE Bolivia">
+                <img src="<?php echo e(asset('img/ES_logo-02.webp')); ?>" alt="Logo YE Bolivia">
             </div>
             <button class="navbar-toggle" onclick="toggleNavbar()">☰</button>
             <nav class="nav-links" id="mainNavLinks">
                 <span>RECONOCIDO POR:</span>
-                <img src="{{ asset('img/recognized_by.png') }}" alt="Reconocimiento" style="max-width: 150px; height: auto;">
+                <img src="<?php echo e(asset('img/recognized_by.png')); ?>" alt="Reconocimiento" style="max-width: 150px; height: auto;">
                 <div class="social-icons">
                     <a href="https://www.facebook.com/youngengineerszonasurlapaz/" class="social-icon" target="_blank">
-                        <img src="{{ asset('img/facebook.svg') }}" alt="Facebook" width="40" height="40">
+                        <img src="<?php echo e(asset('img/facebook.svg')); ?>" alt="Facebook" width="40" height="40">
                     </a>
                     <a href="https://www.tiktok.com/@youngengineersbolivia" class="social-icon" target="_blank">
-                        <img src="{{ asset('img/tiktok.svg') }}" alt="tiktok" width="35" height="35">
+                        <img src="<?php echo e(asset('img/tiktok.svg')); ?>" alt="tiktok" width="35" height="35">
                     </a>
                 </div>
                 
                 <div class="user-dropdown">
                     <button class="user-button" onclick="toggleDropdown()">
-                        <span>{{ $tutor->persona->Nombre ?? 'Usuario' }}</span>
+                        <span><?php echo e($tutor->persona->Nombre ?? 'Usuario'); ?></span>
                         <div class="dropdown-icon" id="dropdownIcon"></div>
                     </button>
                     <div class="dropdown-menu" id="dropdownMenu">
@@ -738,90 +738,93 @@
     <div class="main-content">
         <!-- Información del Tutor -->
         <div class="tutor-card">
-            <h1>Bienvenido, {{ $tutor->persona->Nombre }} {{ $tutor->persona->Apellido }}</h1>
+            <h1>Bienvenido, <?php echo e($tutor->persona->Nombre); ?> <?php echo e($tutor->persona->Apellido); ?></h1>
             <div class="info-grid">
                 <div>
-                    <p><strong>Celular:</strong> {{ $tutor->persona->Celular ?? 'No registrado' }}</p>
-                    <p><strong>Dirección:</strong> {{ $tutor->persona->Direccion_domicilio ?? 'No registrada' }}</p>
-                    <p><strong>Parentesco:</strong> {{ $tutor->Parentesco ?? 'No especificado' }}</p>
+                    <p><strong>Celular:</strong> <?php echo e($tutor->persona->Celular ?? 'No registrado'); ?></p>
+                    <p><strong>Dirección:</strong> <?php echo e($tutor->persona->Direccion_domicilio ?? 'No registrada'); ?></p>
+                    <p><strong>Parentesco:</strong> <?php echo e($tutor->Parentesco ?? 'No especificado'); ?></p>
                 </div>
                 <div>
-                    <p><strong>NIT:</strong> {{ $tutor->Nit ?? 'No registrado' }}</p>
-                    <p><strong>Nombre para Factura:</strong> {{ $tutor->Nombre_factura ?? 'No registrado' }}</p>
-                    @if($tutor->Descuento)
-                        <p style="color: var(--success-color);"><strong>Descuento:</strong> {{ $tutor->Descuento }}</p>
-                    @endif
+                    <p><strong>NIT:</strong> <?php echo e($tutor->Nit ?? 'No registrado'); ?></p>
+                    <p><strong>Nombre para Factura:</strong> <?php echo e($tutor->Nombre_factura ?? 'No registrado'); ?></p>
+                    <?php if($tutor->Descuento): ?>
+                        <p style="color: var(--success-color);"><strong>Descuento:</strong> <?php echo e($tutor->Descuento); ?></p>
+                    <?php endif; ?>
                 </div>
             </div>
         </div>
 
         <!-- Lista de Estudiantes -->
         <div class="tutor-card">
-            <h2>Mis Estudiantes ({{ $estudiantes->count() }})</h2>
+            <h2>Mis Estudiantes (<?php echo e($estudiantes->count()); ?>)</h2>
 
-            @if($estudiantes->isEmpty())
+            <?php if($estudiantes->isEmpty()): ?>
                 <div class="empty-state">
                     <div class="empty-state-icon">📚</div>
                     <p>No hay estudiantes registrados</p>
                 </div>
-            @else
+            <?php else: ?>
                 <div class="students-container">
-                    @foreach($estudiantes as $estudiante)
+                    <?php $__currentLoopData = $estudiantes; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $estudiante): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                         <div class="student-card">
                             <div class="student-header">
                                 <div class="student-avatar">
-                                    {{ substr($estudiante->persona->Nombre, 0, 1) }}
+                                    <?php echo e(substr($estudiante->persona->Nombre, 0, 1)); ?>
+
                                 </div>
                                 <div class="student-header-info">
-                                    <h3>{{ $estudiante->persona->Nombre }} {{ $estudiante->persona->Apellido }}</h3>
+                                    <h3><?php echo e($estudiante->persona->Nombre); ?> <?php echo e($estudiante->persona->Apellido); ?></h3>
                                     <div class="student-code">
-                                        <strong>Código:</strong> {{ $estudiante->Cod_estudiante }}
+                                        <strong>Código:</strong> <?php echo e($estudiante->Cod_estudiante); ?>
+
                                     </div>
                                 </div>
-                                @if(strtolower(trim($estudiante->Estado ?? '')) === 'activo')
+                                <?php if(strtolower(trim($estudiante->Estado ?? '')) === 'activo'): ?>
                                     <span class="badge badge-active">Activo</span>
-                                @else
+                                <?php else: ?>
                                     <span class="badge badge-inactive">Inactivo</span>
-                                @endif
+                                <?php endif; ?>
                             </div>
 
                             <div class="student-body">
                                 <div class="info-row">
                                     <span class="info-label">Programa:</span>
-                                    <span class="info-value">{{ $estudiante->programa->Nombre ?? 'No asignado' }}</span>
+                                    <span class="info-value"><?php echo e($estudiante->programa->Nombre ?? 'No asignado'); ?></span>
                                 </div>
                                 <div class="info-row">
                                     <span class="info-label">Celular:</span>
-                                    <span class="info-value">{{ $estudiante->persona->Celular ?? 'Sin celular' }}</span>
+                                    <span class="info-value"><?php echo e($estudiante->persona->Celular ?? 'Sin celular'); ?></span>
                                 </div>
                                 <div class="info-row">
                                     <span class="info-label">Sucursal:</span>
-                                    <span class="info-value">{{ $estudiante->sucursal->Nombre ?? 'No asignada' }}</span>
+                                    <span class="info-value"><?php echo e($estudiante->sucursal->Nombre ?? 'No asignada'); ?></span>
                                 </div>
                                 <div class="info-row">
                                     <span class="info-label">Profesor:</span>
                                     <span class="info-value">
-                                        @if($estudiante->profesor)
-                                            {{ $estudiante->profesor->persona->Nombre }} {{ $estudiante->profesor->persona->Apellido }}
-                                        @else
+                                        <?php if($estudiante->profesor): ?>
+                                            <?php echo e($estudiante->profesor->persona->Nombre); ?> <?php echo e($estudiante->profesor->persona->Apellido); ?>
+
+                                        <?php else: ?>
                                             Sin asignar
-                                        @endif
+                                        <?php endif; ?>
                                     </span>
                                 </div>
                             </div>
 
                             <div class="student-actions">
-                                <button class="btn btn-blue" onclick="verEvaluaciones({{ $estudiante->Id_estudiantes }}, '{{ $estudiante->persona->Nombre }} {{ $estudiante->persona->Apellido }}')">
+                                <button class="btn btn-blue" onclick="verEvaluaciones(<?php echo e($estudiante->Id_estudiantes); ?>, '<?php echo e($estudiante->persona->Nombre); ?> <?php echo e($estudiante->persona->Apellido); ?>')">
                                     📊 Ver Evaluaciones
                                 </button>
-                                <button class="btn btn-yellow" onclick="abrirModalCita({{ $estudiante->Id_estudiantes }}, '{{ $estudiante->persona->Nombre }} {{ $estudiante->persona->Apellido }}')">
+                                <button class="btn btn-yellow" onclick="abrirModalCita(<?php echo e($estudiante->Id_estudiantes); ?>, '<?php echo e($estudiante->persona->Nombre); ?> <?php echo e($estudiante->persona->Apellido); ?>')">
                                     📅 Agendar Cita
                                 </button>
                             </div>
                         </div>
-                    @endforeach
+                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                 </div>
-            @endif
+            <?php endif; ?>
         </div>
     </div>
 
@@ -1110,4 +1113,4 @@
         });
     </script>
 </body>
-</html>
+</html><?php /**PATH C:\Users\danil\Desktop\Laravel\Yebolivia\resources\views/tutor/homeTutor.blade.php ENDPATH**/ ?>

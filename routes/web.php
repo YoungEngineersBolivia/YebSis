@@ -36,6 +36,7 @@ use App\Http\Controllers\CuotaController;
 use App\Http\Controllers\ProfesorInventarioController;
 use App\Http\Controllers\MotorMovimientosController;
 use App\Http\Controllers\PreguntasController;
+use App\Http\Controllers\CitasController;
 
 
 
@@ -268,6 +269,28 @@ Route::delete('/graduados/{id}', [GraduadoController::class, 'eliminarGraduado']
     Route::get('/estudiantes/{id}', [EstudianteController::class, 'ver'])->name('estudiantes.ver');
     Route::put('/estudiantes/{id}/cambiar-estado', [EstudianteController::class, 'cambiarEstado'])->name('estudiantes.cambiarEstado');
     
+
+    /*-------------EVALUACIONES------------ */
+    // Ruta para ver TODAS las evaluaciones (con buscador)
+    Route::get('/evaluaciones', [EvaluacionesEstudianteController::class, 'index'])
+        ->name('evaluaciones.index');
+
+    // Ruta para ver evaluaciones de UN estudiante específico
+    Route::get('/evaluaciones/estudiante/{id}', [EvaluacionesEstudianteController::class, 'show'])
+        ->name('evaluaciones.estudiante.show');
+
+    // Cambiar estado del estudiante
+    Route::put('/estudiantes/{id}/cambiar-estado', [EstudianteController::class, 'cambiarEstado'])
+        ->name('estudiantes.cambiarEstado');
+
+    /*------CITAS------- */
+    Route::get('/citas', [CitasController::class, 'index'])->name('citas.index');
+    Route::post('/citas', [CitasController::class, 'store'])->name('citas.store');
+    Route::get('/citas/{id}/editar', [CitasController::class, 'editar'])->name('citas.editar');
+    Route::put('/citas/{id}/actualizar', [CitasController::class, 'actualizar'])->name('citas.actualizar');
+    Route::put('/citas/{id}/completar', [CitasController::class, 'completar'])->name('citas.completar');
+    Route::put('/citas/{id}/cancelar', [CitasController::class, 'cancelar'])->name('citas.cancelar');
+    Route::post('/citas/filtrar', [CitasController::class, 'filtrar'])->name('citas.filtrar');
     /* ----------------- PROGRAMAS ----------------- */
     
     Route::prefix('programa')->group(function () {
@@ -405,14 +428,20 @@ Route::middleware(['auth', 'role:profesor'])->prefix('profesor')->name('profesor
 Route::middleware(['auth', 'role:tutor'])->prefix('tutor')->name('tutor.')->group(function () {
     
     // Home del tutor (una sola ruta)
-    Route::get('/home', [TutorHomeController::class, 'index'])->name('home');
+    Route::get('/home', [TutorHomeController::class, 'index'])
+        ->name('tutor.home');
     
-    // Información de estudiantes
-    Route::get('/estudiante/{id}', [TutorHomeController::class, 'getEstudianteDetails'])->name('estudiante.detalle');
-    Route::get('/evaluaciones/{id}', [TutorHomeController::class, 'getEvaluaciones'])->name('estudiante.evaluaciones');
+    // Ver evaluaciones de un estudiante
+    Route::get('/estudiantes/{id}/evaluaciones', [TutorHomeController::class, 'verEvaluaciones'])
+        ->name('tutor.estudiantes.evaluaciones');
     
-    // Agendar citas
-    Route::post('/agendar-cita', [TutorHomeController::class, 'agendarCita'])->name('agendar.cita');
+    // Agendar una cita
+    Route::post('/citas/agendar', [TutorHomeController::class, 'agendarCita'])
+        ->name('tutor.citas.agendar');
+    
+    // Listar citas del tutor (opcional)
+    Route::get('/citas', [TutorHomeController::class, 'listarCitas'])
+        ->name('tutor.citas.listar');
 });
 
 

@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jóvenes Ingenieros - Restablecer Contraseña</title>
+    <link href="<?php echo e(asset('css/paginaWeb/login.css')); ?>" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <div class="left-section">
+            <div class="grid-pattern"></div>
+            <div class="logo-section">
+                <img src="<?php echo e(auto_asset('img/ES_logo-grande.png')); ?>" alt="Logo YE Bolivia" width="500px" class="me-2">
+            </div>
+        </div>
+        <div class="right-section">
+            <div class="login-header">
+                <img src="<?php echo e(auto_asset('img/ES_logo-02.webp')); ?>" alt="Logo YE Bolivia" width="150px" class="me-2">
+            </div>
+            <p class="welcome-text">
+                <b>Ingresa tu nueva contraseña</b>
+            </p>
+
+            <?php if($errors->any()): ?>
+                <div class="alert alert-danger">
+                    <ul>
+                        <?php $__currentLoopData = $errors->all(); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $error): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                            <li><?php echo e($error); ?></li>
+                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                    </ul>
+                </div>
+            <?php endif; ?>
+
+            <form method="POST" action="<?php echo e(route('password.update')); ?>">
+                <?php echo csrf_field(); ?>
+                <input type="hidden" name="token" value="<?php echo e($token); ?>">
+                
+                <div class="form-group">
+                    <label class="form-label" for="Correo">Correo electrónico</label>
+                    <input type="email" name="Correo" id="Correo" class="form-input" placeholder="Ejemplo@gmail.com" required autofocus value="<?php echo e(old('Correo', request()->Correo)); ?>">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="password">Nueva Contraseña</label>
+                    <input type="password" name="password" id="password" class="form-input" placeholder="Ingresa tu nueva contraseña" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="password_confirmation">Confirmar Contraseña</label>
+                    <input type="password" name="password_confirmation" id="password_confirmation" class="form-input" placeholder="Confirma tu nueva contraseña" required>
+                </div>
+
+                <button type="submit" class="login-button">Restablecer Contraseña</button>
+            </form>
+
+            <div class="back-to-login">
+                <a href="<?php echo e(route('login')); ?>">Volver al inicio de sesión</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html><?php /**PATH C:\Users\danil\Desktop\Laravel\Yebolivia\resources\views/paginaWeb/resetPassword.blade.php ENDPATH**/ ?>
