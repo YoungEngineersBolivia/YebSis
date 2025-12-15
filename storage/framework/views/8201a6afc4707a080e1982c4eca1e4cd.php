@@ -443,4 +443,7 @@ function toggleNavbar() {
     <script src="<?php echo e(asset('js/paginaWeb/home.js')); ?>"></script>
 
 </body>
-</html><?php /**PATH C:\Users\DANTE\Desktop\Laravel\YebSis\resources\views/paginaWeb/home.blade.php ENDPATH**/ ?>
+</html>
+
+
+<?php /**PATH C:\Users\DANTE\Desktop\Laravel\YebSis\resources\views/paginaWeb/home.blade.php ENDPATH**/ ?>

@@ -176,9 +176,11 @@ class ProfesorController extends Controller
     {
         $estudiante = Estudiante::with(['persona', 'programa.modelos', 'horarios'])->findOrFail($id);
         
-        // Verificar si el estudiante ya fue evaluado
-        $yaEvaluado = \App\Models\Evaluacion::where('Id_estudiantes', $estudiante->Id_estudiantes)
-            ->exists();
+        // Obtener IDs de modelos ya evaluados
+        $modelosEvaluados = \App\Models\Evaluacion::where('Id_estudiantes', $estudiante->Id_estudiantes)
+            ->pluck('Id_modelos')
+            ->unique()
+            ->toArray();
 
         // Verificar si el estudiante tiene una clase reprogramada (Recuperatoria)
         $esRecuperatoria = false;
@@ -191,7 +193,7 @@ class ProfesorController extends Controller
                 ->exists();
         }
 
-        return view('profesor.detalleEstudiante', compact('estudiante', 'yaEvaluado', 'esRecuperatoria'));
+        return view('profesor.detalleEstudiante', compact('estudiante', 'modelosEvaluados', 'esRecuperatoria'));
     }
 
     public function editarEstudiante($id)
@@ -216,14 +218,22 @@ class ProfesorController extends Controller
         // Obtener modelos del programa
         $modelos = $estudiante->programa->modelos;
 
-        // Cargar evaluaciones existentes (para editar)
-        $evaluacionesExistentes = \App\Models\Evaluacion::where('Id_estudiantes', $estudiante->Id_estudiantes)
-            ->with(['pregunta', 'respuesta', 'modelo'])
-            ->get()
-            ->keyBy('Id_preguntas'); // Indexar por pregunta para fácil acceso
+        // Modelo solicitado en la URL (si viene de detalleEstudiante)
+        $modeloSolicitado = request('modelo_id');
 
-        // Modelo seleccionado previamente (si existe evaluación)
-        $modeloSeleccionado = $evaluacionesExistentes->first()->Id_modelos ?? null;
+        // Cargar evaluaciones existentes (filtrando por modelo si se especificó, o todas)
+        $evaluacionesQuery = \App\Models\Evaluacion::where('Id_estudiantes', $estudiante->Id_estudiantes)
+            ->with(['pregunta', 'respuesta', 'modelo']);
+            
+        if ($modeloSolicitado) {
+            $evaluacionesQuery->where('Id_modelos', $modeloSolicitado);
+        }
+
+        $evaluacionesExistentes = $evaluacionesQuery->get()->keyBy('Id_preguntas');
+
+        // Modelo seleccionado: Usar el solicitado, o el de la primera evaluación encontrada (si existe), o null
+        $modeloSeleccionado = $modeloSolicitado 
+            ?? ($evaluacionesExistentes->first()->Id_modelos ?? null);
 
         return view('profesor.evaluarAlumno', compact('estudiante', 'preguntas', 'respuestas', 'modelos', 'evaluacionesExistentes', 'modeloSeleccionado'));
     }
@@ -249,8 +259,10 @@ class ProfesorController extends Controller
             $estudiante = \App\Models\Estudiante::findOrFail($request->estudiante_id);
             $profesorId = auth()->user()->persona->profesor->Id_profesores;
 
-            // Verificar si ya existen evaluaciones para este estudiante
-            $evaluacionesExistentes = \App\Models\Evaluacion::where('Id_estudiantes', $estudiante->Id_estudiantes)->get();
+            // Verificar si ya existen evaluaciones para este estudiante Y este modelo
+            $evaluacionesExistentes = \App\Models\Evaluacion::where('Id_estudiantes', $estudiante->Id_estudiantes)
+                ->where('Id_modelos', $request->modelo_id)
+                ->get();
 
             if ($evaluacionesExistentes->count() > 0) {
                 // MODO EDICIÓN: Actualizar evaluaciones existentes
@@ -259,11 +271,11 @@ class ProfesorController extends Controller
                         [
                             'Id_estudiantes' => $estudiante->Id_estudiantes,
                             'Id_preguntas' => $preguntaId,
+                            'Id_modelos' => $request->modelo_id, // IMPORTANTE: Incluir modelo en la clave única
                         ],
                         [
                             'fecha_evaluacion' => now(),
                             'Id_respuestas' => $respuestaId,
-                            'Id_modelos' => $request->modelo_id,
                             'Id_profesores' => $profesorId,
                             'Id_programas' => $estudiante->Id_programas,
                         ]
@@ -295,8 +307,9 @@ class ProfesorController extends Controller
 
             \DB::commit();
 
+            // Redirigir agregando el modelo para que la vista de detalle sepa qué pasó, si es necesario
             return redirect()
-                ->route('profesor.detalle-estudiante', $request->estudiante_id)
+                ->route('profesor.detalle-estudiante', ['id' => $request->estudiante_id])
                 ->with('success', $mensaje);
 
         } catch (\Exception $e) {

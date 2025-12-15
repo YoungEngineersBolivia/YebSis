@@ -78,20 +78,72 @@
             
             <div class="action-buttons">
                 @if(isset($esRecuperatoria) && $esRecuperatoria)
-                    <button class="btn-evaluate" onclick="window.location.href='{{ route('profesor.evaluar-estudiante', $estudiante->Id_estudiantes) }}'">
+                    <button class="btn-evaluate" onclick="window.location.href='{{ route('profesor.evaluar-estudiante', $estudiante->Id_estudiantes) }}?modelo_id=' + document.querySelector('.model-select').value">
                         <i class="bi bi-clipboard-check me-1"></i>Evaluar y Finalizar
                     </button>
-                @elseif(isset($yaEvaluado) && $yaEvaluado)
-                    <button class="btn-evaluate" style="background-color: #f39c12;" onclick="window.location.href='{{ route('profesor.evaluar-estudiante', $estudiante->Id_estudiantes) }}'">
-                        <i class="bi bi-pencil-square me-1"></i>Editar Evaluación
-                    </button>
                 @else
-                    <button class="btn-evaluate" onclick="window.location.href='{{ route('profesor.evaluar-estudiante', $estudiante->Id_estudiantes) }}'">
-                        <i class="bi bi-clipboard-plus me-1"></i>Evaluar Estudiante
-                    </button>
+                    <a id="btn-evaluar-accion" href="#" class="btn-evaluate">
+                        <i class="bi bi-clipboard-plus me-1"></i><span id="txt-evaluar-accion">Evaluar Estudiante</span>
+                    </a>
                 @endif
             </div>
         </div>
     </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const modelSelect = document.querySelector('.model-select');
+    const actionBtn = document.getElementById('btn-evaluar-accion');
+    const actionTxt = document.getElementById('txt-evaluar-accion');
+    const actionIcon = actionBtn ? actionBtn.querySelector('i') : null;
+    
+    // Lista de modelos ya evaluados pasados desde el controlador
+    const modelosEvaluados = @json($modelosEvaluados ?? []);
+    const baseEvalUrl = "{{ route('profesor.evaluar-estudiante', $estudiante->Id_estudiantes) }}";
+
+    function updateActionButton() {
+        if (!actionBtn) return; // Si estamos en modo recuperatorio, el botón es diferente
+
+        const selectedModel = modelSelect.value;
+        const isEvaluated = modelosEvaluados.includes(parseInt(selectedModel));
+
+        // Actualizar URL
+        actionBtn.href = `${baseEvalUrl}?modelo_id=${selectedModel}`;
+
+        if (isEvaluated) {
+            // Modo Editar
+            actionBtn.style.backgroundColor = '#f39c12'; // Orange
+            actionTxt.textContent = "Editar Evaluación";
+            if(actionIcon) {
+                actionIcon.className = 'bi bi-pencil-square me-1';
+            }
+        } else {
+            // Modo Evaluar (Crear)
+            actionBtn.style.backgroundColor = ''; // Default (usually generic blue/green from CSS)
+            actionTxt.textContent = "Evaluar Estudiante";
+            if(actionIcon) {
+                actionIcon.className = 'bi bi-clipboard-plus me-1';
+            }
+        }
+        
+        // Validación opcional: Deshabilitar si no hay modelo seleccionado
+        if (!selectedModel) {
+            actionBtn.classList.add('disabled');
+            actionBtn.style.pointerEvents = 'none';
+            actionBtn.style.opacity = '0.6';
+        } else {
+            actionBtn.classList.remove('disabled');
+            actionBtn.style.pointerEvents = 'auto';
+            actionBtn.style.opacity = '1';
+        }
+    }
+
+    if (modelSelect) {
+        modelSelect.addEventListener('change', updateActionButton);
+        // Ejecutar al inicio para establecer estado correcto
+        updateActionButton();
+    }
+});
+</script>
 @endsection

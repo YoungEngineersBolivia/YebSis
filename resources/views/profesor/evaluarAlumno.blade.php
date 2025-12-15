@@ -167,6 +167,20 @@ document.addEventListener('DOMContentLoaded', () => {
     const btnConfirmar = document.getElementById('btnConfirmarGuardar');
     const previewModal = new bootstrap.Modal(document.getElementById('previewModal'));
     const form = document.getElementById('evaluationForm');
+    const modeloSelect = document.getElementById('modelo_select');
+
+    // Recargar página al cambiar modelo para cargar la evaluación correspondiente (o vacía)
+    if (modeloSelect) {
+        modeloSelect.addEventListener('change', function() {
+            const val = this.value;
+            if (val) {
+                const currentUrl = new URL(window.location.href);
+                currentUrl.searchParams.set('modelo_id', val);
+                // Mostrar spinner o indicador de carga si se desea
+                window.location.href = currentUrl.toString();
+            }
+        });
+    }
 
     // Datos de preguntas y respuestas
     const preguntas = @json($preguntas);

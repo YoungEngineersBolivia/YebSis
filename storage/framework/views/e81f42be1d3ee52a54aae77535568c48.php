@@ -718,4 +718,4 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="<?php echo e(auto_asset('js/administrador/baseAdministrador.js')); ?>"></script>
 </body>
-</html><?php /**PATH C:\Users\DANTE\Desktop\Laravel\YebSis\resources\views/administrador/baseAdministrador.blade.php ENDPATH**/ ?>
+</html><?php /**PATH C:\Users\DANTE\Desktop\Laravel\YebSis\resources\views//administrador/baseAdministrador.blade.php ENDPATH**/ ?>
