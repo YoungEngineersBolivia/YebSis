@@ -10,7 +10,7 @@
 Este proyecto está construido con herramientas modernas y robustas:
 
 ### Backend
-*   **Laravel 11.x** (Framework PHP)
+*   **Laravel 12.x** (Framework PHP)
 *   **PHP 8.2+**
 *   **MySQL** (Base de datos)
 
