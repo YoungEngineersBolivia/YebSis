@@ -9,7 +9,7 @@
 @section('content')
 <div class="student-detail-container">
     <div class="d-flex align-items-center gap-3 mb-3">
-        <a href="javascript:history.back()" class="btn btn-outline-secondary">
+        <a href="{{ route('profesor.listado-alumnos', ['tipo' => request('source', 'asignados')]) }}" class="btn btn-outline-secondary">
             <i class="bi bi-arrow-left me-2"></i>Volver
         </a>
     </div>
@@ -77,9 +77,19 @@
             </div>
             
             <div class="action-buttons">
-                <button class="btn-evaluate" onclick="window.location.href='{{ route('profesor.asistencia.index') }}'">
-                    <i class="bi bi-calendar-check me-1"></i>Registrar Asistencia
-                </button>
+                @if(isset($esRecuperatoria) && $esRecuperatoria)
+                    <button class="btn-evaluate" onclick="window.location.href='{{ route('profesor.evaluar-estudiante', $estudiante->Id_estudiantes) }}'">
+                        <i class="bi bi-clipboard-check me-1"></i>Evaluar y Finalizar
+                    </button>
+                @elseif(isset($yaEvaluado) && $yaEvaluado)
+                    <button class="btn-evaluate" style="background-color: #f39c12;" onclick="window.location.href='{{ route('profesor.evaluar-estudiante', $estudiante->Id_estudiantes) }}'">
+                        <i class="bi bi-pencil-square me-1"></i>Editar Evaluación
+                    </button>
+                @else
+                    <button class="btn-evaluate" onclick="window.location.href='{{ route('profesor.evaluar-estudiante', $estudiante->Id_estudiantes) }}'">
+                        <i class="bi bi-clipboard-plus me-1"></i>Evaluar Estudiante
+                    </button>
+                @endif
             </div>
         </div>
     </div>

@@ -175,12 +175,23 @@ class ProfesorController extends Controller
     public function detalleEstudiante($id)
     {
         $estudiante = Estudiante::with(['persona', 'programa.modelos', 'horarios'])->findOrFail($id);
-
+        
         // Verificar si el estudiante ya fue evaluado
         $yaEvaluado = \App\Models\Evaluacion::where('Id_estudiantes', $estudiante->Id_estudiantes)
             ->exists();
 
-        return view('profesor.detalleEstudiante', compact('estudiante', 'yaEvaluado'));
+        // Verificar si el estudiante tiene una clase reprogramada (Recuperatoria)
+        $esRecuperatoria = false;
+        $profesorId = auth()->user()->persona->profesor->Id_profesores ?? null;
+        
+        if ($profesorId) {
+            $esRecuperatoria = \App\Models\Asistencia::where('Id_estudiantes', $estudiante->Id_estudiantes)
+                ->where('Id_profesores', $profesorId)
+                ->where('Estado', 'Reprogramado')
+                ->exists();
+        }
+
+        return view('profesor.detalleEstudiante', compact('estudiante', 'yaEvaluado', 'esRecuperatoria'));
     }
 
     public function editarEstudiante($id)
@@ -272,7 +283,14 @@ class ProfesorController extends Controller
                         'Id_programas' => $estudiante->Id_programas,
                     ]);
                 }
-                $mensaje = 'Evaluación guardada correctamente';
+                
+                // Si el estudiante tenía una clase REPROGRAMADA, la marcamos como ASISTIÓ y FINALIZADA
+                \App\Models\Asistencia::where('Id_estudiantes', $estudiante->Id_estudiantes)
+                    ->where('Id_profesores', $profesorId)
+                    ->where('Estado', 'Reprogramado')
+                    ->update(['Estado' => 'Asistio', 'Observacion' => 'Clase recuperatoria completada mediante evaluación']);
+
+                $mensaje = 'Evaluación guardada y clase recuperatoria completada correctamente';
             }
 
             \DB::commit();

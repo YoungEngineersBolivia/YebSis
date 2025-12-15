@@ -131,7 +131,7 @@ function toggleNavbar() {
                 <?php $__currentLoopData = $programas; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $programa): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                     <?php if($programa->Tipo === 'programa'): ?>
                         <?php $bgColor = $colors[$i % 4]; $i++; ?>
-                        <div class="program-card" style="background: <?php echo e($bgColor); ?>20; border-radius: 18px; box-shadow: 0 2px 12px rgba(0,0,0,0.08); border-top: 6px solid <?php echo e($bgColor); ?>;">
+                        <div class="program-card" style="background: #ffffff; border-radius: 18px; box-shadow: 0 2px 12px rgba(0,0,0,0.08); border-top: 6px solid <?php echo e($bgColor); ?>;">
                             <div class="program-icon" style="text-align:center; margin-bottom:10px;">
                                 <?php if($programa->Imagen): ?>
                                     <img src="<?php echo e(auto_asset('storage/' . $programa->Imagen)); ?>" 
@@ -164,7 +164,7 @@ function toggleNavbar() {
                     <?php $__currentLoopData = $programas; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $programa): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                         <?php if($programa->Tipo === 'taller'): ?>
                             <?php $bgColor = $colors[$j % count($colors)]; $j++; ?>
-                            <div class="program-card" style="background: <?php echo e($bgColor); ?>20; border-radius: 18px; box-shadow: 0 2px 12px rgba(0,0,0,0.08); border-top: 6px solid <?php echo e($bgColor); ?>;">
+                            <div class="program-card" style="background: #ffffff; border-radius: 18px; box-shadow: 0 2px 12px rgba(0,0,0,0.08); border-top: 6px solid <?php echo e($bgColor); ?>;">
                                 <div class="program-icon" style="text-align:center; margin-bottom:10px;">
                                     <?php if($programa->Imagen): ?>
                                         <img src="<?php echo e(auto_asset('storage/' . $programa->Imagen)); ?>" 

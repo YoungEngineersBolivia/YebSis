@@ -47,8 +47,8 @@
                 <a href="<?php echo e(route('profesor.listado-alumnos', 'recuperatoria')); ?>" class="menu-item">
                     <i class="bi bi-calendar-event"></i> Clase Recuperatoria
                 </a>
-                <a href="<?php echo e(route('logout')); ?>" class="menu-item menu-item-logout"
-                   onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                <a href="#" class="menu-item menu-item-logout"
+                   onclick="document.getElementById('logout-form').submit(); return false;">
                     <i class="bi bi-box-arrow-right"></i> Cerrar Sesión
                 </a>
             </div>

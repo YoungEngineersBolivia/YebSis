@@ -19,7 +19,7 @@
 
     <div class="card shadow-sm border-0">
         <div class="card-body p-0">
-            <div class="table-responsive">
+            <div class="table-responsive d-none d-lg-block">
                 <table class="table table-hover align-middle mb-0">
                     <thead class="bg-light">
                         <tr>
@@ -54,7 +54,7 @@
                             </td>
                             <td style="width: 35%;">
                                 <div class="input-group input-group-sm">
-                                    <input type="text" class="form-control" id="comentario_<?php echo e($clase->Id_clasePrueba); ?>" value="<?php echo e($clase->Comentarios); ?>" placeholder="Nombre estudiante (opcional) / Observación">
+                                    <input type="text" class="form-control" id="comentario_<?php echo e($clase->Id_clasePrueba); ?>" value="<?php echo e($clase->Comentarios); ?>" placeholder="Observación">
                                     <button class="btn btn-outline-primary" type="button" onclick="updateComment(<?php echo e($clase->Id_clasePrueba); ?>)">
                                         <i class="bi bi-save"></i>
                                     </button>
@@ -81,6 +81,71 @@
                     </tbody>
                 </table>
             </div>
+
+            
+            <div class="d-lg-none bg-light p-3">
+                <?php $__empty_1 = true; $__currentLoopData = $clases; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $clase): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
+                <div class="card mb-3 shadow-sm border-0">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <div>
+                                <h5 class="card-title fw-bold mb-1"><?php echo e($clase->Nombre_Estudiante); ?></h5>
+                                <p class="card-subtitle text-muted small">
+                                    Prospecto: <?php echo e($clase->prospecto->Nombre); ?> <?php echo e($clase->prospecto->Apellido); ?>
+
+                                </p>
+                            </div>
+                            <?php if($clase->Asistencia === 'pendiente'): ?>
+                                <span class="badge bg-warning text-dark">Pendiente</span>
+                            <?php elseif($clase->Asistencia === 'asistio'): ?>
+                                <span class="badge bg-success">Completada</span>
+                            <?php else: ?>
+                                <span class="badge bg-danger">Inasistencia</span>
+                            <?php endif; ?>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <span class="badge bg-light text-dark border">
+                                <i class="bi bi-calendar-event me-1"></i>
+                                <?php echo e(\Carbon\Carbon::parse($clase->Fecha_clase)->format('d/m/Y')); ?>
+
+                            </span>
+                            <span class="badge bg-light text-dark border ms-1">
+                                <i class="bi bi-clock me-1"></i>
+                                <?php echo e(\Carbon\Carbon::parse($clase->Hora_clase)->format('H:i')); ?>
+
+                            </span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold text-muted">Asistencia:</label>
+                            <div class="btn-group w-100" role="group">
+                                <input type="radio" class="btn-check" name="mobile_asistencia_<?php echo e($clase->Id_clasePrueba); ?>" id="mobile_btnradio1_<?php echo e($clase->Id_clasePrueba); ?>" autocomplete="off" <?php echo e($clase->Asistencia === 'asistio' ? 'checked' : ''); ?> onclick="updateAttendance(<?php echo e($clase->Id_clasePrueba); ?>, 'asistio')">
+                                <label class="btn btn-outline-success" for="mobile_btnradio1_<?php echo e($clase->Id_clasePrueba); ?>">Asistió</label>
+
+                                <input type="radio" class="btn-check" name="mobile_asistencia_<?php echo e($clase->Id_clasePrueba); ?>" id="mobile_btnradio2_<?php echo e($clase->Id_clasePrueba); ?>" autocomplete="off" <?php echo e($clase->Asistencia === 'no_asistio' ? 'checked' : ''); ?> onclick="updateAttendance(<?php echo e($clase->Id_clasePrueba); ?>, 'no_asistio')">
+                                <label class="btn btn-outline-danger" for="mobile_btnradio2_<?php echo e($clase->Id_clasePrueba); ?>">Falta</label>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="form-label small fw-bold text-muted">Comentarios:</label>
+                            <div class="input-group">
+                                <input type="text" class="form-control" id="mobile_comentario_<?php echo e($clase->Id_clasePrueba); ?>" value="<?php echo e($clase->Comentarios); ?>" placeholder="Observación">
+                                <button class="btn btn-primary" type="button" onclick="updateComment(<?php echo e($clase->Id_clasePrueba); ?>, true)">
+                                    <i class="bi bi-save"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
+                <div class="text-center py-5 text-muted">
+                    <i class="bi bi-calendar-x display-4 d-block mb-3"></i>
+                    No tienes clases de prueba asignadas.
+                </div>
+                <?php endif; ?>
+            </div>
         </div>
         <div class="card-footer bg-white border-0 py-3">
             <?php echo e($clases->links('pagination::bootstrap-5')); ?>
@@ -93,15 +158,18 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
     function updateAttendance(id, status) {
-        // Prevenir el cambio visual del radio button hasta confirmar
-        const radio = document.querySelector(`input[name="asistencia_${id}"][onclick*="'${status}'"]`);
-        // Deshacer el check visual temporalmente (necesitamos saber cuál estaba antes, pero asumimos pendiente si es click inicial)
-        // Mejor enfoque: SweetAlert intercepta antes. Como es onclick, ya cambió.
-        // Lo dejamos así y si cancela, revertimos? Es complicado revertir radio.
-        // Aceptamos que marque visualmente, si cancela recargamos página o revertimos manual.
+        // Intentar obtener el input de comentario desktop y mobile
+        const commentInputDesktop = document.getElementById(`comentario_${id}`);
+        const commentInputMobile = document.getElementById(`mobile_comentario_${id}`);
         
-        const commentInput = document.getElementById(`comentario_${id}`);
-        const comentario = commentInput.value.trim();
+        // Usar el valor del que tenga contenido o del que esté visible
+        let comentario = '';
+        if (commentInputMobile && commentInputMobile.offsetParent !== null) {
+             comentario = commentInputMobile.value.trim();
+        } else if (commentInputDesktop) {
+             comentario = commentInputDesktop.value.trim();
+        }
+
         const textoAccion = status === 'asistio' ? 'marcar como ASISTIÓ' : 'marcar como FALTA';
 
         let confirmOptions = {
@@ -126,7 +194,7 @@
                 fetch(`/profesor/clases-prueba/${id}/comentarios`, {
                     method: 'PUT',
                     headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '<?php echo e(csrf_token()); ?>' },
-                    body: JSON.stringify({ comentarios: commentInput.value })
+                    body: JSON.stringify({ comentarios: comentario })
                 })
                 .then(() => {
                     return fetch(`/profesor/clases-prueba/${id}/asistencia`, {
@@ -138,46 +206,58 @@
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'Actualizado',
-                            text: 'Asistencia registrada correctamente',
-                            timer: 1500,
-                            showConfirmButton: false
-                        }).then(() => location.reload());
+                        Swal.fire('¡Éxito!', 'Asistencia registrada correctamente.', 'success').then(() => {
+                            location.reload();
+                        });
+                    } else {
+                        Swal.fire('Error', data.message || 'Hubo un error al registrar.', 'error');
                     }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    Swal.fire('Error', 'Error de conexión.', 'error');
                 });
             } else {
-                // Si cancela, recargamos para revertir el radio button seleccionado visualmente
-                location.reload(); 
+                // Si cancela, recargar para resetear radio buttons (opcional pero limpio)
+                location.reload();
             }
         });
     }
 
-    function updateComment(id) {
-        const comment = document.getElementById(`comentario_${id}`).value;
+    function updateComment(id, isMobile = false) {
+        const inputId = isMobile ? `mobile_comentario_${id}` : `comentario_${id}`;
+        const input = document.getElementById(inputId);
+        const comentario = input.value.trim();
+
+        if (comentario === '') {
+            Swal.fire('Atención', 'El campo de comentarios está vacío.', 'warning');
+            return;
+        }
+
         fetch(`/profesor/clases-prueba/${id}/comentarios`, {
             method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': '<?php echo e(csrf_token()); ?>'
-            },
-            body: JSON.stringify({ comentarios: comment })
+            headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '<?php echo e(csrf_token()); ?>' },
+            body: JSON.stringify({ comentarios: comentario })
         })
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                const toast = Swal.mixin({
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Guardado',
+                    text: 'Comentario actualizado',
                     toast: true,
                     position: 'top-end',
                     showConfirmButton: false,
                     timer: 3000
                 });
-                toast.fire({
-                    icon: 'success',
-                    title: 'Comentario guardado'
-                });
+            } else {
+                Swal.fire('Error', 'No se pudo guardar el comentario.', 'error');
             }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            Swal.fire('Error', 'Error de conexión.', 'error');
         });
     }
 </script>
