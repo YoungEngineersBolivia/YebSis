@@ -68,7 +68,7 @@ return new class extends Migration
       });
   
         Schema::create('sucursales', function (Blueprint $table) {
-            $table->id('Id_Sucursales');
+            $table->id('Id_sucursales');
             $table->string('Nombre')->nullable();
             $table->string('Direccion')->nullable();
             $table->timestamps();

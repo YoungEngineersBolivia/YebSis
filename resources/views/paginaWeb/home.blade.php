@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Young Engineers La Paz - STEM para Niños</title>
     <link href="{{ auto_asset('css/paginaWeb/home.css') }}" rel="stylesheet">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
 </head>
 
 <body>
@@ -129,7 +130,7 @@ function toggleNavbar() {
                 @foreach($programas as $programa)
                     @if($programa->Tipo === 'programa')
                         @php $bgColor = $colors[$i % 4]; $i++; @endphp
-                        <div class="program-card" style="background: {{ $bgColor }}20; border-radius: 18px; box-shadow: 0 2px 12px rgba(0,0,0,0.08); border-top: 6px solid {{ $bgColor }};">
+                        <div class="program-card" style="background: #ffffff; border-radius: 18px; box-shadow: 0 2px 12px rgba(0,0,0,0.08); border-top: 6px solid {{ $bgColor }};">
                             <div class="program-icon" style="text-align:center; margin-bottom:10px;">
                                 @if($programa->Imagen)
                                     <img src="{{ auto_asset('storage/' . $programa->Imagen) }}" 
@@ -162,7 +163,7 @@ function toggleNavbar() {
                     @foreach($programas as $programa)
                         @if($programa->Tipo === 'taller')
                             @php $bgColor = $colors[$j % count($colors)]; $j++; @endphp
-                            <div class="program-card" style="background: {{ $bgColor }}20; border-radius: 18px; box-shadow: 0 2px 12px rgba(0,0,0,0.08); border-top: 6px solid {{ $bgColor }};">
+                            <div class="program-card" style="background: #ffffff; border-radius: 18px; box-shadow: 0 2px 12px rgba(0,0,0,0.08); border-top: 6px solid {{ $bgColor }};">
                                 <div class="program-icon" style="text-align:center; margin-bottom:10px;">
                                     @if($programa->Imagen)
                                         <img src="{{ auto_asset('storage/' . $programa->Imagen) }}" 
@@ -441,3 +442,5 @@ function toggleNavbar() {
 
 </body>
 </html>
+
+

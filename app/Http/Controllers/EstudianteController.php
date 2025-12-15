@@ -13,6 +13,7 @@ use App\Models\PlanesPago;
 use App\Models\Evaluacion;
 use App\Models\Horario;
 use App\Models\Profesor;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 
 class EstudianteController extends Controller
@@ -65,7 +66,7 @@ class EstudianteController extends Controller
             'direccion_domicilio' => 'required|string',
             'codigo_estudiante' => 'required|string|unique:estudiantes,Cod_estudiante',
             'programa' => 'required|exists:programas,Id_programas',
-            'sucursal' => 'required|exists:sucursales,Id_Sucursales',
+            'sucursal' => 'required|exists:sucursales,Id_sucursales',
             'tutor_estudiante' => 'required|exists:tutores,Id_tutores',
         ]);
 
@@ -136,7 +137,7 @@ class EstudianteController extends Controller
             'celular' => 'required|string',
             'direccion_domicilio' => 'required|string',
             'programa' => 'required|exists:programas,Id_programas',
-            'sucursal' => 'required|exists:sucursales,Id_Sucursales',
+            'sucursal' => 'required|exists:sucursales,Id_sucursales',
             'tutor_estudiante' => 'required|exists:tutores,Id_tutores',
         ]);
 
@@ -298,5 +299,25 @@ class EstudianteController extends Controller
             ->get();
 
         return view('administrador.horariosEstudiante', compact('estudiante', 'horarios'));
+    }
+
+    /**
+     * Exportar lista de estudiantes a PDF
+     */
+    public function exportarPDF()
+    {
+        // Obtener todos los estudiantes con sus relaciones
+        $estudiantes = Estudiante::with(['persona', 'programa', 'sucursal'])
+            ->orderBy('Cod_estudiante', 'asc')
+            ->get();
+
+        // Cargar la vista y generar el PDF
+        $pdf = Pdf::loadView('administrador.estudiantes_pdf', compact('estudiantes'));
+
+        // Configurar el PDF
+        $pdf->setPaper('letter', 'portrait');
+
+        // Descargar el PDF
+        return $pdf->download('estudiantes_lista_' . date('Y-m-d') . '.pdf');
     }
 }

@@ -26,4 +26,12 @@ class Prospecto extends Model
 
     public $incrementing = True;
     // public $timestamps = false;
+
+    /**
+     * Relación con Clases de Prueba
+     */
+    public function clasesPrueba()
+    {
+        return $this->hasMany(ClasePrueba::class, 'Id_prospectos', 'Id_prospectos');
+    }
 }

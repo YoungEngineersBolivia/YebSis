@@ -78,6 +78,11 @@ class Estudiante extends Model
         return $this->belongsTo(Modelo::class, 'Id_modelo', 'Id_modelo');
     }
 
+    public function asistencias()
+    {
+        return $this->hasMany(Asistencia::class, 'Id_estudiantes', 'Id_estudiantes');
+    }
+
     // --- RELACIONES POR DEFECTO (Eager Loading) ---
     protected $with = [
         'persona',

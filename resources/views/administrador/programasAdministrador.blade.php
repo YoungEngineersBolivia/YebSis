@@ -282,14 +282,14 @@
     }
 
     .table thead th {
-        background-color: #f9fafb;
-        color: var(--dark-color);
+        background-color: var(--primary-color);
+        color: white;
         font-weight: 700;
         text-transform: uppercase;
-        font-size: 0.75rem;
+        font-size: 0.85rem;
         letter-spacing: 0.05em;
         padding: 16px;
-        border-bottom: 2px solid #e5e7eb;
+        border-bottom: none;
     }
 
     .table tbody td {
@@ -493,6 +493,7 @@
                                         <th>Duración</th>
                                         <th>Descripción</th>
                                         <th class="text-center">Modelos</th>
+                                        <th class="text-center">Preguntas</th>
                                         <th class="text-center pe-4">Acciones</th>
                                     </tr>
                                 </thead>
@@ -530,6 +531,13 @@
                                                 <i class="fas fa-cubes me-1"></i>
                                                 <span class="badge bg-primary rounded-pill">{{ $programa->modelos_count ?? 0 }}</span>
                                             </button>
+                                        </td>
+                                        <td class="text-center">
+                                            <a href="{{ route('admin.preguntas.index', $programa->Id_programas) }}" 
+                                               class="btn btn-sm btn-outline-success" 
+                                               title="Gestionar preguntas">
+                                                <i class="fas fa-question-circle me-1"></i>Preguntas
+                                            </a>
                                         </td>
                                         <td class="text-center pe-4">
                                             <div class="btn-group" role="group">

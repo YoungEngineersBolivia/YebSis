@@ -12,7 +12,9 @@ class PubNot extends Controller
     {
         $publicaciones = Publicacion::orderBy('created_at', 'desc')->get();
         $notificaciones = Notificacion::orderBy('Fecha', 'desc')->limit(10)->get();
-        $tutores = \App\Models\Tutores::with('persona')->orderBy('Id_tutores', 'desc')->get();
+        $tutores = \App\Models\Tutores::with(['persona', 'estudiantes' => function($query) {
+            $query->where('Estado', 'Activo');
+        }])->orderBy('Id_tutores', 'desc')->get();
 
         return view('administrador.pubnotAdministrador', compact('publicaciones', 'notificaciones', 'tutores'));
     }
@@ -20,63 +22,65 @@ class PubNot extends Controller
     // Guardar nueva publicación
     public function store(Request $request)
     {
-        // Si viene tutores[] es notificación, si viene imagen es publicación
-        if ($request->has('tutores')) {
-            // Validar notificación
-            $request->validate([
-                'nombre' => 'required|string|max:255',
-                'descripcion' => 'required|string',
-                'tutores' => 'required|array|min:1',
-                'imagen' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:2048',
-            ]);
-            $imagenPath = null;
-            if ($request->hasFile('imagen')) {
-                $imagenPath = $request->file('imagen')->store('notificaciones', 'public');
-            }
-            $tutores = $request->input('tutores');
-            foreach ($tutores as $idTutor) {
-              Notificacion::create([
-                    'Nombre' => $request->nombre,
-                    'Descripcion' => $request->descripcion,
-                    'Imagen' => $imagenPath ? str_replace('public/', '', $imagenPath) : null,
-                    'Fecha' => now()->toDateString(),
-                    'Hora' => now()->toTimeString(),
-                    'Estado' => true,
-                    'Id_tutores' => $idTutor,
-                ]);
-            }
-            return redirect()->route('publicaciones.index')->with('success', 'Notificación enviada correctamente.');
-        } else {
-            // Validar publicación
-            $request->validate([
-                'nombre' => 'required|string|max:255',
-                'descripcion' => 'required|string',
-                'imagen' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:5120',
-            ]);
-            $imagenPath = null;
-            if ($request->hasFile('imagen')) {
-                    $file = $request->file('imagen'); // <-- asigna la variable aquí
+        // Validar publicación
+        $request->validate([
+            'nombre' => 'required|string|max:255',
+            'descripcion' => 'required|string',
+            'imagen' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:5120',
+        ]);
 
-                    $nombreOriginal = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
-                    $extension = $file->getClientOriginalExtension();
-                    $nombreArchivo = $nombreOriginal . '_' . time() . '.' . $extension;
+        $imagenPath = null;
+        if ($request->hasFile('imagen')) {
+            $file = $request->file('imagen');
+            $nombreOriginal = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
+            $extension = $file->getClientOriginalExtension();
+            $nombreArchivo = $nombreOriginal . '_' . time() . '.' . $extension;
+            $imagenPath = $file->storeAs('publicaciones', $nombreArchivo, 'public');
+        }
 
-                    $imagenPath = $file->storeAs('publicaciones', $nombreArchivo, 'public');
-                } else {
-                    $imagenPath = null;
-                }
-            
-            Publicacion::create([
+        Publicacion::create([
+            'Nombre' => $request->nombre,
+            'Descripcion' => $request->descripcion,
+            'Imagen' => $imagenPath ? str_replace('public/', '', $imagenPath) : null,
+            'Fecha' => now()->toDateString(),
+            'Hora' => now()->toTimeString(),
+            'Estado' => true,
+            'Id_personas' => auth()->user()->Id_personas,
+        ]);
+
+        return redirect()->route('publicaciones.index')->with('success', 'Publicación creada correctamente.');
+    }
+
+    // Guardar nueva notificación (para tutores)
+    public function storeNotificacion(Request $request)
+    {
+        // Validar notificación
+        $request->validate([
+            'nombre' => 'required|string|max:255',
+            'descripcion' => 'required|string',
+            'tutores' => 'required|array|min:1',
+            'imagen' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:2048',
+        ]);
+
+        $imagenPath = null;
+        if ($request->hasFile('imagen')) {
+            $imagenPath = $request->file('imagen')->store('notificaciones', 'public');
+        }
+
+        $tutores = $request->input('tutores');
+        foreach ($tutores as $idTutor) {
+            Notificacion::create([
                 'Nombre' => $request->nombre,
                 'Descripcion' => $request->descripcion,
                 'Imagen' => $imagenPath ? str_replace('public/', '', $imagenPath) : null,
                 'Fecha' => now()->toDateString(),
                 'Hora' => now()->toTimeString(),
                 'Estado' => true,
-                'Id_personas' => auth()->user()->Id_personas, // Ajusta según tu autenticación
+                'Id_tutores' => $idTutor,
             ]);
-            return redirect()->route('publicaciones.index')->with('success', 'Publicación creada correctamente.');
         }
+
+        return redirect()->route('publicaciones.index')->with('success', 'Notificación enviada correctamente.');
     }
 
     // Eliminar publicación

@@ -14,12 +14,12 @@ class TutoresController extends Controller
             ->when($search !== '', function ($q) use ($search) {
                 $q->where(function ($sub) use ($search) {
                     $sub->whereHas('persona', function ($p) use ($search) {
-                        $p->where('Nombre', 'ilike', "%{$search}%")
-                          ->orWhere('Apellido', 'ilike', "%{$search}%")
-                          ->orWhere('Celular', 'ilike', "%{$search}%")
-                          ->orWhere('Direccion_domicilio', 'ilike', "%{$search}%");
+                        $p->where('Nombre', 'like', "%{$search}%")
+                          ->orWhere('Apellido', 'like', "%{$search}%")
+                          ->orWhere('Celular', 'like', "%{$search}%")
+                          ->orWhere('Direccion_domicilio', 'like', "%{$search}%");
                     })->orWhereHas('usuario', function ($u) use ($search) {
-                        $u->where('Correo', 'ilike', "%{$search}%");
+                        $u->where('Correo', 'like', "%{$search}%");
                     });
                 });
             })

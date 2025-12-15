@@ -12,6 +12,16 @@ class ProspectoController extends Controller
 {
     $query = Prospecto::query();
 
+    // Búsqueda general
+    if ($request->filled('search')) {
+        $search = $request->search;
+        $query->where(function($q) use ($search) {
+            $q->where('Nombre', 'like', "%{$search}%")
+              ->orWhere('Apellido', 'like', "%{$search}%")
+              ->orWhere('Celular', 'like', "%{$search}%");
+        });
+    }
+
     // Filtro rápido
     if ($request->filled('filtro_rapido')) {
         switch ($request->filtro_rapido) {
@@ -45,9 +55,10 @@ class ProspectoController extends Controller
         $query->whereDate('created_at', '<=', $request->hasta);
     }
 
-    $prospectos = $query->orderBy('created_at', 'desc')->get();
-    $clasesPrueba = ClasePrueba::all();
-    return view('comercial.prospectosComercial', compact('prospectos', 'clasesPrueba'));
+    $prospectos = $query->orderBy('created_at', 'desc')->paginate(6);
+    $clasesPrueba = ClasePrueba::with(['profesor.persona', 'prospecto'])->get();
+    $profesores = \App\Models\Profesor::with('persona')->get();
+    return view('comercial.prospectosComercial', compact('prospectos', 'clasesPrueba', 'profesores'));
 }
 
     public function store(Request $request)
@@ -74,7 +85,7 @@ class ProspectoController extends Controller
     public function updateEstado(Request $request, $id)
     {
         $request->validate([
-            'Estado_prospecto' => 'required|in:nuevo,contactado,clase de prueba',
+            'Estado_prospecto' => 'required|in:nuevo,contactado,clase de prueba,para inscripcion,no asistio',
         ]);
 
         $prospecto = Prospecto::findOrFail($id);

@@ -33,6 +33,13 @@ use App\Http\Controllers\ForgotPasswordController;
 use App\Http\Controllers\ResetPasswordController;
 use App\Http\Controllers\ModeloController;
 use App\Http\Controllers\CuotaController;
+use App\Http\Controllers\ProfesorInventarioController;
+use App\Http\Controllers\MotorMovimientosController;
+use App\Http\Controllers\PreguntasController;
+use App\Http\Controllers\CitasController;
+
+
+
 
 /* ============================================
    RUTAS PÚBLICAS (Sin autenticación)
@@ -58,6 +65,10 @@ Route::middleware(['auth', 'role:administrador'])->prefix('administrador')->grou
     
     // Dashboard
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('admin.dashboard');
+
+    // Rutas para marcar asistencia desde el Dashboard (Admin)
+    Route::put('/clases-prueba/{id}/asistencia', [App\Http\Controllers\ProfesorTrialClassController::class, 'updateAttendance'])->name('admin.clases-prueba.asistencia');
+    Route::put('/clases-prueba/{id}/comentarios', [App\Http\Controllers\ProfesorTrialClassController::class, 'updateComments'])->name('admin.clases-prueba.comentarios');
     
     // Vistas base
     Route::get('/inicioAdministrador', fn() => view('/administrador/inicioAdministrador'));
@@ -121,6 +132,7 @@ Route::delete('/usuarios/{id}', [UsuariosController::class, 'destroy'])->name('u
     Route::get('/estudiantes/{id}/planes-pago', [EstudianteController::class, 'planesPago'])->name('estudiantes.planesPago');
     Route::get('/estudiantes/{id}/evaluaciones', [EstudianteController::class, 'evaluaciones'])->name('estudiantes.evaluaciones');
     Route::get('/estudiantes/{id}/horarios', [EstudianteController::class, 'horarios'])->name('estudiantes.horarios');
+    Route::get('/estudiantes/exportar-pdf', [EstudianteController::class, 'exportarPDF'])->name('estudiantes.exportarPDF');
     Route::put('/cuotas/{id}/registrar-pago', [CuotaController::class, 'registrarPago'])->name('cuotas.registrarPago');
     
     // Estudiantes Activos
@@ -162,6 +174,8 @@ Route::delete('/graduados/{id}', [GraduadoController::class, 'eliminarGraduado']
     /* ----------------- GESTIÓN DE SUCURSALES ----------------- */
     Route::get('/sucursalesAdministrador', [SucursalController::class, 'index'])->name('sucursales.index');
     Route::post('/sucursalesAdministrador', [SucursalController::class, 'store'])->name('sucursales.store');
+    Route::put('/sucursalesAdministrador/{id}', [SucursalController::class, 'update'])->name('sucursales.update');
+    Route::delete('/sucursalesAdministrador/{id}', [SucursalController::class, 'destroy'])->name('sucursales.destroy');
     
     /* ----------------- GESTIÓN DE EGRESOS ----------------- */
     Route::get('/egresosAdministrador', [EgresosController::class, 'index'])->name('egresos.index');
@@ -181,16 +195,7 @@ Route::delete('/graduados/{id}', [GraduadoController::class, 'eliminarGraduado']
     Route::get('/tutorEstudianteAdministrador', [RegistroCombinadoController::class, 'mostrarFormulario'])->name('registroCombinado.form');
     Route::post('/tutorEstudianteAdministrador', [RegistroCombinadoController::class, 'registrar'])->name('registroCombinado.registrar');
     
-    /* ----------------- COMPONENTES/MOTORES ----------------- */
-    Route::prefix('componentes')->name('componentes.')->group(function () {
-        Route::get('/', [ComponentesController::class, 'index'])->name('index');
-        Route::post('/nuevo', [ComponentesController::class, 'store'])->name('store');
-        Route::post('/entrada', [ComponentesController::class, 'registrarEntrada'])->name('registrarEntrada');
-        Route::post('/salida', [ComponentesController::class, 'registrarSalida'])->name('registrarSalida');
-        Route::get('/{id}/historial', [ComponentesController::class, 'historial'])->name('historial');
-        Route::put('/{id}', [ComponentesController::class, 'update'])->name('update');
-        Route::delete('/{motor}', [ComponentesController::class, 'destroy'])->name('destroy');
-    });
+    
     
  Route::prefix('profesores')->name('profesores.')->group(function () {
     Route::get('/', [ProfesorController::class, 'index'])->name('index');
@@ -204,37 +209,44 @@ Route::delete('/graduados/{id}', [GraduadoController::class, 'eliminarGraduado']
 });
 
     
-    /* ----------------- MOTORES ASIGNADOS ----------------- */
-    // Rutas para Gestión de Componentes (Inventario)
-    Route::prefix('componentes')->name('componentes.')->group(function () {
-        Route::get('/', [ComponentesController::class, 'index'])->name('index');
-        Route::post('/nuevo', [ComponentesController::class, 'store'])->name('store');
-        Route::post('/entrada', [ComponentesController::class, 'registrarEntrada'])->name('registrarEntrada');
-        Route::post('/salida', [ComponentesController::class, 'registrarSalida'])->name('registrarSalida');
-        Route::get('/{id}/historial', [ComponentesController::class, 'historial'])->name('historial');
-        Route::put('/{id}', [ComponentesController::class, 'update'])->name('update');
-        Route::delete('/{motor}', [ComponentesController::class, 'destroy'])->name('destroy');
-    });
-
-    // Rutas para Motores Asignados a Técnicos
-    Route::prefix('motores')->name('motores.')->group(function () {
-        // Lista de motores asignados (solo en proceso)
-        Route::get('/asignaciones', [MotoresAsignadosController::class, 'index'])->name('asignaciones.index');
+    /* ----------------- COMPONENTES/MOTORES ----------------- */
+    Route::prefix('componentes')->name('admin.componentes.')->group(function () {
         
-        // Formulario para asignar motor a técnico
-        Route::get('/asignar', [MotoresAsignadosController::class, 'create'])->name('asignar.create');
+        // Inventario - Vista principal
+        Route::get('/inventario', [ComponentesController::class, 'inventario'])
+            ->name('inventario');
         
-        // Guardar asignación de motor
-        Route::post('/asignar', [MotoresAsignadosController::class, 'store'])->name('asignar.store');
+        // CRUD de Motores
+        Route::post('/store', [ComponentesController::class, 'storeMotor'])
+            ->name('store');
+        Route::put('/{id}/update', [ComponentesController::class, 'updateMotor'])
+            ->name('update');
+        Route::delete('/{id}/delete', [ComponentesController::class, 'deleteMotor'])
+            ->name('delete');
         
-        // Registrar entrada del motor (devolución al inventario)
-        Route::post('/registrar-entrada/{id}', [MotoresAsignadosController::class, 'registrarEntrada'])->name('registrar.entrada');
+        // Salida de Componentes
+        Route::get('/salida', [ComponentesController::class, 'salidaComponentes'])
+            ->name('salida');
+        Route::post('/registrar-salida', [ComponentesController::class, 'registrarSalida'])
+            ->name('registrar-salida');
         
-        // Guardar reporte de mantenimiento
-        Route::post('/reporte/{id}', [MotoresAsignadosController::class, 'storeReporte'])->name('reporte.store');
+        // Entrada de Componentes
+        Route::get('/entrada', [ComponentesController::class, 'entradaComponentes'])
+            ->name('entrada');
+        Route::post('/registrar-entrada', [ComponentesController::class, 'registrarEntrada'])
+            ->name('registrar-entrada');
         
-        // Historial de asignaciones completadas (opcional)
-        Route::get('/historial', [MotoresAsignadosController::class, 'historial'])->name('historial');
+        // Historial y Reportes
+        Route::get('/{id}/historial', [ComponentesController::class, 'historialMovimientos'])
+            ->name('historial');
+        Route::get('/historial-salidas', [ComponentesController::class, 'historialSalidas'])
+            ->name('historial-salidas');
+        Route::get('/historial-entradas', [ComponentesController::class, 'historialEntradas'])
+            ->name('historial-entradas');
+        
+        // Lista de Asignaciones
+        Route::get('/asignaciones', [ComponentesController::class, 'listaAsignaciones'])
+            ->name('asignaciones');
     });
     
     /* ----------------- REPORTES DE TALLERES ----------------- */
@@ -249,6 +261,7 @@ Route::delete('/graduados/{id}', [GraduadoController::class, 'eliminarGraduado']
     /* ----------------- CLASES DE PRUEBA ----------------- */
     Route::post('/claseprueba/store', [ClasePruebaController::class, 'store'])->name('claseprueba.store');
     
+    
     /* ----------------- ESTUDIANTES CRUD (compartido) ----------------- */
     Route::get('/estudiantes', [EstudianteController::class, 'index'])->name('estudiantes.index');
     Route::put('/estudiantes/editar/{id}', [EstudianteController::class, 'editar'])->name('estudiantes.editar');
@@ -256,6 +269,28 @@ Route::delete('/graduados/{id}', [GraduadoController::class, 'eliminarGraduado']
     Route::get('/estudiantes/{id}', [EstudianteController::class, 'ver'])->name('estudiantes.ver');
     Route::put('/estudiantes/{id}/cambiar-estado', [EstudianteController::class, 'cambiarEstado'])->name('estudiantes.cambiarEstado');
     
+
+    /*-------------EVALUACIONES------------ */
+    // Ruta para ver TODAS las evaluaciones (con buscador)
+    Route::get('/evaluaciones', [EvaluacionesEstudianteController::class, 'index'])
+        ->name('evaluaciones.index');
+
+    // Ruta para ver evaluaciones de UN estudiante específico
+    Route::get('/evaluaciones/estudiante/{id}', [EvaluacionesEstudianteController::class, 'show'])
+        ->name('evaluaciones.estudiante.show');
+
+    // Cambiar estado del estudiante
+    Route::put('/estudiantes/{id}/cambiar-estado', [EstudianteController::class, 'cambiarEstado'])
+        ->name('estudiantes.cambiarEstado');
+
+    /*------CITAS------- */
+    Route::get('/citas', [CitasController::class, 'index'])->name('citas.index');
+    Route::post('/citas', [CitasController::class, 'store'])->name('citas.store');
+    Route::get('/citas/{id}/editar', [CitasController::class, 'editar'])->name('citas.editar');
+    Route::put('/citas/{id}/actualizar', [CitasController::class, 'actualizar'])->name('citas.actualizar');
+    Route::put('/citas/{id}/completar', [CitasController::class, 'completar'])->name('citas.completar');
+    Route::put('/citas/{id}/cancelar', [CitasController::class, 'cancelar'])->name('citas.cancelar');
+    Route::post('/citas/filtrar', [CitasController::class, 'filtrar'])->name('citas.filtrar');
     /* ----------------- PROGRAMAS ----------------- */
     
     Route::prefix('programa')->group(function () {
@@ -275,9 +310,21 @@ Route::delete('/graduados/{id}', [GraduadoController::class, 'eliminarGraduado']
         Route::put('/{modeloId}', [ModeloController::class, 'update'])->name('modelos.update');
         Route::delete('/{modeloId}', [ModeloController::class, 'destroy'])->name('modelos.destroy');
     });
+
+    // Rutas de preguntas por programa
+    Route::prefix('programas/{programaId}/preguntas')->name('admin.preguntas.')->group(function () {
+        Route::get('/', [PreguntasController::class, 'index'])->name('index');
+        Route::post('/', [PreguntasController::class, 'store'])->name('store');
+        Route::put('/{id}', [PreguntasController::class, 'update'])->name('update');
+        Route::delete('/{id}', [PreguntasController::class, 'destroy'])->name('destroy');
+    });
     
     /* ----------------- PLANES DE PAGO ----------------- */
     Route::post('/planes-pago/registrar', [App\Http\Controllers\PlanesPagoController::class, 'registrar'])->name('planes-pago.registrar');
+    /* ----------------- ASISTENCIA - ADMINISTRADOR ----------------- */
+    Route::get('/asistenciaAdministrador', [\App\Http\Controllers\AsistenciaAdminController::class, 'index'])->name('asistencia.admin.index');
+    Route::get('/asistencia/exportar-pdf', [\App\Http\Controllers\AsistenciaAdminController::class, 'exportarPDF'])->name('asistencia.admin.pdf');
+    Route::get('/asistencia/exportar-excel', [\App\Http\Controllers\AsistenciaAdminController::class, 'exportarExcel'])->name('asistencia.admin.excel');
 });
 
 
@@ -308,6 +355,7 @@ Route::middleware(['auth', 'role:administrador'])->prefix('comercial')->group(fu
     
     /* ----------------- CLASES DE PRUEBA ----------------- */
     Route::post('/claseprueba/store', [ClasePruebaController::class, 'store'])->name('claseprueba.store');
+    Route::put('/claseprueba/{id}', [ClasePruebaController::class, 'update'])->name('claseprueba.update');
 });
 
 
@@ -318,9 +366,8 @@ Route::middleware(['auth', 'role:administrador'])->prefix('comercial')->group(fu
 Route::middleware(['auth', 'role:profesor'])->prefix('profesor')->name('profesor.')->group(function () {
     
     // Home del profesor
-    Route::get('/homeProfesor', function () {
-        return view('profesor.homeProfesor', ['usuario' => auth()->user()]);
-    })->name('home');
+    // Home del profesor
+    Route::get('/homeProfesor', [ProfesorController::class, 'home'])->name('home');
     
     // Menú de alumnos (3 botones principales)
     Route::get('/menu-alumnos', [ProfesorController::class, 'menuAlumnosProfesor'])->name('menu-alumnos');
@@ -329,7 +376,7 @@ Route::middleware(['auth', 'role:profesor'])->prefix('profesor')->name('profesor
     // Listado de alumnos según tipo
     Route::get('/listado-alumnos/{tipo}', [ProfesorController::class, 'listadoAlumnos'])
         ->name('listado-alumnos')
-        ->where('tipo', 'evaluar|asignados|recuperatoria');
+        ->where('tipo', 'asignados|recuperatoria');
     
     // Detalle de estudiante
     Route::get('/estudiante/{id}', [ProfesorController::class, 'detalleEstudiante'])->name('detalle-estudiante');
@@ -342,7 +389,36 @@ Route::middleware(['auth', 'role:profesor'])->prefix('profesor')->name('profesor
     Route::get('/estudiante/{id}/evaluar', [ProfesorController::class, 'evaluarEstudiante'])->name('evaluar-estudiante');
     Route::post('/evaluacion/guardar', [ProfesorController::class, 'guardarEvaluacion'])->name('guardar-evaluacion');
     Route::put('/evaluacion/{id}/actualizar', [ProfesorController::class, 'actualizarEvaluacion'])->name('actualizar-evaluacion');
+
+    /* ----------------- COMPONENTES - PROFESOR ----------------- */
+    Route::prefix('componentes')->name('componentes.')->group(function () {
+        
+        // PROFESOR CON ROL "Inventario"
+        Route::get('/inventario', [ComponentesController::class, 'inventarioProfesor'])
+            ->name('inventario');
+        Route::post('/solicitar-salida', [ComponentesController::class, 'solicitarSalida'])
+            ->name('solicitar-salida');
+        
+        // PROFESOR CON ROL "Tecnico"
+        Route::get('/motores-asignados', [ComponentesController::class, 'motoresAsignados'])
+            ->name('motores-asignados');
+        Route::post('/actualizar-estado', [ComponentesController::class, 'actualizarEstadoReparacion'])
+            ->name('actualizar-estado');
+        Route::post('/entregar-motor', [ComponentesController::class, 'entregarMotor'])
+            ->name('entregar-motor');
+    });
+
+    /* ----------------- ASISTENCIA - PROFESOR ----------------- */
+    Route::get('/asistencia', [\App\Http\Controllers\AsistenciaProfesorController::class, 'index'])->name('asistencia.index');
+    Route::post('/asistencia', [\App\Http\Controllers\AsistenciaProfesorController::class, 'store'])->name('asistencia.store');
+
+    /* ----------------- CLASES DE PRUEBA - PROFESOR ----------------- */
+    Route::get('/clases-prueba', [\App\Http\Controllers\ProfesorTrialClassController::class, 'index'])->name('clases-prueba.index');
+    Route::put('/clases-prueba/{id}/asistencia', [\App\Http\Controllers\ProfesorTrialClassController::class, 'updateAttendance'])->name('clases-prueba.asistencia');
+    Route::put('/clases-prueba/{id}/comentarios', [\App\Http\Controllers\ProfesorTrialClassController::class, 'updateComments'])->name('clases-prueba.comentarios');
+
 });
+    
 
 
 /* ============================================
@@ -351,16 +427,21 @@ Route::middleware(['auth', 'role:profesor'])->prefix('profesor')->name('profesor
 
 Route::middleware(['auth', 'role:tutor'])->prefix('tutor')->name('tutor.')->group(function () {
     
-    // Home del tutor
-    Route::get('/home', [TutorHomeController::class, 'index'])->name('home');
-    Route::get('/homeTutor', fn() => view('tutor.homeTutor'));
+    // Home del tutor (una sola ruta)
+    Route::get('/home', [TutorHomeController::class, 'index'])
+        ->name('tutor.home');
     
-    // Información de estudiantes
-    Route::get('/estudiante/{id}', [TutorHomeController::class, 'getEstudianteDetails']);
-    Route::get('/evaluaciones/{id}', [TutorHomeController::class, 'getEvaluaciones']);
+    // Ver evaluaciones de un estudiante
+    Route::get('/estudiantes/{id}/evaluaciones', [TutorHomeController::class, 'verEvaluaciones'])
+        ->name('tutor.estudiantes.evaluaciones');
     
-    // Agendar citas
-    Route::post('/agendar-cita', [TutorHomeController::class, 'agendarCita']);
+    // Agendar una cita
+    Route::post('/citas/agendar', [TutorHomeController::class, 'agendarCita'])
+        ->name('tutor.citas.agendar');
+    
+    // Listar citas del tutor (opcional)
+    Route::get('/citas', [TutorHomeController::class, 'listarCitas'])
+        ->name('tutor.citas.listar');
 });
 
 
@@ -386,4 +467,3 @@ Route::get('forgot-password', [ForgotPasswordController::class, 'showLinkRequest
 Route::post('forgot-password', [ForgotPasswordController::class, 'sendResetLinkEmail'])->name('password.email');
 Route::get('password/reset/{token}', [ResetPasswordController::class, 'showResetForm'])->name('password.reset');
 Route::post('password/reset', [ResetPasswordController::class, 'reset'])->name('password.update');
-

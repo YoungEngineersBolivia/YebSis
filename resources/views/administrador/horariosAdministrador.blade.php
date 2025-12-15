@@ -10,12 +10,33 @@
 @section('content')
 <div class="container-fluid mt-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1 class="mb-0">Horarios Asignados</h1>
+        <h2 class="mb-0 fw-bold"><i class="bi bi-calendar-week me-2"></i>Horarios Asignados</h2>
 
         {{-- Botón que abre el modal de creación --}}
         <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalCrear">
-            <i class="fas fa-plus me-2"></i> Asignar nuevo horario
+            <i class="bi bi-plus-lg me-2"></i>Asignar nuevo horario
         </button>
+    </div>
+
+    {{-- Buscador Dinámico --}}
+    <div class="card shadow-sm border-0 mb-3">
+        <div class="card-body">
+            <div class="row g-3">
+                <div class="col-12">
+                    <div class="input-group">
+                        <span class="input-group-text bg-white"><i class="bi bi-search"></i></span>
+                        <input type="text" 
+                               class="form-control" 
+                               id="searchInput"
+                               placeholder="Buscar por nombre del estudiante..." 
+                               autocomplete="off">
+                    </div>
+                    <small class="text-muted mt-2 d-block">
+                        <span id="resultCount"></span>
+                    </small>
+                </div>
+            </div>
+        </div>
     </div>
 
     {{-- Mensajes de éxito / error --}}
@@ -39,68 +60,76 @@
 
     {{-- Tabla de horarios --}}
     @if($horarios->isEmpty())
-        <div class="alert alert-warning">No hay horarios asignados aún.</div>
+        <div class="card shadow-sm border-0">
+            <div class="card-body text-center py-5">
+                <i class="bi bi-calendar-x text-muted mb-3" style="font-size: 3rem;"></i>
+                <h5 class="text-muted">No hay horarios asignados aún.</h5>
+            </div>
+        </div>
     @else
-        <div class="table-responsive">
-            <table class="table table-hover align-middle">
-                <thead class="table-light">
-                    <tr>
-                        <th>Nombre</th>
-                        <th>Apellido</th>
-                        <th>Programa</th>
-                        <th>Día</th>
-                        <th>Hora</th>
-                        <th>Profesor Asignado</th>
-                        <th class="text-center">Acciones</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach($horarios as $horario)
-                        <tr>
-                            <td>{{ $horario->estudiante?->persona?->Nombre ?? '—' }}</td>
-                            <td>{{ $horario->estudiante?->persona?->Apellido ?? '—' }}</td>
-                            <td>{{ $horario->programa?->Nombre ?? '—' }}</td>
-                            <td>{{ $horario->Dia ?? '—' }}</td>
-                            <td>{{ $horario->Hora ?? '—' }}</td>
-                            <td>
-                                @php $pp = $horario->profesor?->persona; @endphp
-                                {{ ($pp?->Nombre && $pp?->Apellido) ? ($pp->Nombre.' '.$pp->Apellido) : 'Sin profesor' }}
-                            </td>
-                            <td class="text-center">
-                                <div class="d-flex justify-content-center gap-2">
-                                    {{-- Abrir modal de edición --}}
-                                    <button type="button"
-                                            class="btn btn-sm btn-outline-success btn-editar"
-                                            title="Editar horario"
-                                            data-bs-toggle="modal"
-                                            data-bs-target="#modalEditar"
-                                            data-id="{{ $horario->Id_horarios }}"
-                                            data-estudiante="{{ $horario->Id_estudiantes }}"
-                                            data-profesor="{{ $horario->Id_profesores }}"
-                                            data-programa="{{ $horario->Id_programas }}"
-                                            data-dia="{{ $horario->Dia }}"
-                                            data-hora="{{ $horario->Hora }}">
-                                        <i class="bi bi-pencil-square"></i>
-                                    </button>
+        <div class="card shadow-sm border-0 overflow-hidden">
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover align-middle mb-0">
+                        <thead class="bg-primary text-white">
+                            <tr>
+                                <th class="ps-3 py-3">Nombre</th>
+                                <th class="py-3">Apellido</th>
+                                <th class="py-3">Programa</th>
+                                <th class="py-3">Día</th>
+                                <th class="py-3">Hora</th>
+                                <th class="py-3">Profesor Asignado</th>
+                                <th class="pe-3 py-3 text-end">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($horarios as $horario)
+                                <tr>
+                                    <td class="ps-3 fw-semibold">{{ $horario->estudiante?->persona?->Nombre ?? '—' }}</td>
+                                    <td>{{ $horario->estudiante?->persona?->Apellido ?? '—' }}</td>
+                                    <td>{{ $horario->programa?->Nombre ?? '—' }}</td>
+                                    <td><span class="badge bg-light text-dark border">{{ $horario->Dia ?? '—' }}</span></td>
+                                    <td>{{ $horario->Hora ?? '—' }}</td>
+                                    <td>
+                                        @php $pp = $horario->profesor?->persona; @endphp
+                                        {{ ($pp?->Nombre && $pp?->Apellido) ? ($pp->Nombre.' '.$pp->Apellido) : 'Sin profesor' }}
+                                    </td>
+                                    <td class="pe-3 text-end">
+                                        <div class="d-flex justify-content-end gap-2">
+                                            {{-- Abrir modal de edición --}}
+                                            <button type="button"
+                                                    class="btn btn-sm btn-outline-primary"
+                                                    title="Editar horario"
+                                                    data-bs-toggle="modal"
+                                                    data-bs-target="#modalEditar"
+                                                    data-id="{{ $horario->Id_horarios }}"
+                                                    data-estudiante="{{ $horario->Id_estudiantes }}"
+                                                    data-profesor="{{ $horario->Id_profesores }}"
+                                                    data-dia="{{ $horario->Dia }}"
+                                                    data-hora="{{ $horario->Hora }}">
+                                                <i class="bi bi-pencil-square"></i>
+                                            </button>
 
-                                    {{-- Eliminar --}}
-                                    <form action="{{ route('horarios.destroy', $horario->Id_horarios) }}" method="POST" onsubmit="return confirm('¿Eliminar este horario?');">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button class="btn btn-sm btn-outline-danger" title="Eliminar">
-                                            <i class="bi bi-trash3-fill"></i>
-                                        </button>
-                                    </form>
-                                </div>
-                            </td>
-                        </tr>
-                    @endforeach
-                </tbody>
-            </table>
+                                            {{-- Eliminar --}}
+                                            <form action="{{ route('horarios.destroy', $horario->Id_horarios) }}" method="POST" onsubmit="return confirm('¿Eliminar este horario?');">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button class="btn btn-sm btn-outline-danger" title="Eliminar">
+                                                    <i class="bi bi-trash3-fill"></i>
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
 
         {{-- Paginación --}}
-        <div class="d-flex justify-content-center mt-4">
+        <div class="d-flex justify-content-center mt-4 mb-4">
             {{ $horarios->links('pagination::bootstrap-5') }}
         </div>
     @endif
@@ -112,9 +141,9 @@
     <div class="modal-content">
       <form method="POST" action="{{ route('horarios.store') }}">
         @csrf
-        <div class="modal-header">
-          <h5 class="modal-title" id="modalCrearLabel">Asignar nuevo horario</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+        <div class="modal-header bg-primary text-white">
+          <h5 class="modal-title" id="modalCrearLabel"><i class="bi bi-calendar-plus me-2"></i>Asignar nuevo horario</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
         </div>
 
         <div class="modal-body">
@@ -124,7 +153,11 @@
             <select class="form-select" id="Id_estudiantes_crear" name="Id_estudiantes" required>
               <option value="" disabled selected>Seleccione un estudiante</option>
               @foreach($estudiantes as $e)
-                <option value="{{ $e->Id_estudiantes }}" data-profesor="{{ $e->Id_profesores }}">
+                <option value="{{ $e->Id_estudiantes }}" 
+                        data-profesor="{{ $e->Id_profesores }}"
+                        data-programa="{{ $e->Id_programas }}"
+                        data-profesor-nombre="{{ $e->profesor ? $e->profesor->persona->Nombre . ' ' . $e->profesor->persona->Apellido : 'Sin profesor' }}"
+                        data-programa-nombre="{{ $e->programa ? $e->programa->Nombre : 'Sin programa' }}">
                   {{ $e->persona?->Nombre }} {{ $e->persona?->Apellido }}
                 </option>
               @endforeach
@@ -132,44 +165,60 @@
           </div>
 
           {{-- Profesor --}}
-          <div class="mb-3">
+          <div class="mb-3" id="div_profesor_crear">
             <label for="Id_profesores_crear" class="form-label">Profesor</label>
             <select class="form-select" id="Id_profesores_crear" name="Id_profesores" required>
-              <option value="" disabled selected>Seleccione un profesor</option>
+              <option value="" disabled selected>Seleccione un estudiante primero</option>
               @foreach($profesores as $p)
                 <option value="{{ $p->Id_profesores }}">
                   {{ $p->persona?->Nombre }} {{ $p->persona?->Apellido }}
                 </option>
               @endforeach
             </select>
+            <small class="form-text text-muted" id="profesor_help_crear">
+              El profesor se asignará automáticamente si el estudiante ya tiene uno
+            </small>
           </div>
 
-          {{-- Programa --}}
+          {{-- Programa (Solo lectura) --}}
           <div class="mb-3">
-            <label for="Id_programas_crear" class="form-label">Programa</label>
-            <select class="form-select" id="Id_programas_crear" name="Id_programas" required>
-              <option value="" disabled selected>Seleccione un programa</option>
-              @foreach($programas as $prog)
-                <option value="{{ $prog->Id_programas }}">{{ $prog->Nombre }}</option>
-              @endforeach
-            </select>
+            <label for="programa_info_crear" class="form-label">Programa Inscrito</label>
+            <input type="text" class="form-control" id="programa_info_crear" readonly 
+                   placeholder="Seleccione un estudiante primero">
+            <small class="form-text text-muted">El programa se obtiene automáticamente del estudiante</small>
           </div>
 
-          {{-- Día --}}
+          {{-- Horarios (Dinámicos) --}}
           <div class="mb-3">
-            <label for="Dia_crear" class="form-label">Día</label>
-            <select class="form-select" id="Dia_crear" name="Dia" required>
-              <option value="" disabled selected>Seleccione</option>
-              @foreach(['LUNES','MARTES','MIERCOLES','JUEVES','VIERNES','SABADO'] as $dia)
-                <option value="{{ $dia }}">{{ $dia }}</option>
-              @endforeach
-            </select>
-          </div>
-
-          {{-- Hora --}}
-          <div class="mb-3">
-            <label for="Hora_crear" class="form-label">Hora</label>
-            <input type="time" class="form-control" id="Hora_crear" name="Hora" required>
+            <label class="form-label fw-bold">Horarios de la semana</label>
+            <div id="horarios-container">
+              {{-- Primer horario (siempre visible) --}}
+              <div class="horario-item border rounded p-3 mb-2 bg-light">
+                <div class="row g-2">
+                  <div class="col-md-5">
+                    <label class="form-label small">Día</label>
+                    <select class="form-select" name="horarios[0][dia]" required>
+                      <option value="" disabled selected>Seleccione</option>
+                      @foreach(['LUNES','MARTES','MIERCOLES','JUEVES','VIERNES','SABADO'] as $dia)
+                        <option value="{{ $dia }}">{{ $dia }}</option>
+                      @endforeach
+                    </select>
+                  </div>
+                  <div class="col-md-5">
+                    <label class="form-label small">Hora</label>
+                    <input type="time" class="form-control" name="horarios[0][hora]" required>
+                  </div>
+                  <div class="col-md-2 d-flex align-items-end">
+                    <button type="button" class="btn btn-success w-100" id="btn-agregar-horario">
+                      <i class="bi bi-plus-lg"></i>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <small class="form-text text-muted">
+              <i class="bi bi-info-circle me-1"></i>Agregue todos los horarios que el estudiante tendrá durante la semana
+            </small>
           </div>
         </div>
 
@@ -189,9 +238,9 @@
       <form method="POST" id="formEditar">
         @csrf
         @method('PUT')
-        <div class="modal-header">
-          <h5 class="modal-title" id="modalEditarLabel">Editar horario</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+        <div class="modal-header bg-primary text-white">
+          <h5 class="modal-title" id="modalEditarLabel"><i class="bi bi-pencil-square me-2"></i>Editar horario</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
         </div>
 
         <div class="modal-body">
@@ -200,7 +249,11 @@
             <label for="Id_estudiantes_editar" class="form-label">Estudiante</label>
             <select class="form-select" id="Id_estudiantes_editar" name="Id_estudiantes" required>
               @foreach($estudiantes as $e)
-                <option value="{{ $e->Id_estudiantes }}">
+                <option value="{{ $e->Id_estudiantes }}"
+                        data-profesor="{{ $e->Id_profesores }}"
+                        data-programa="{{ $e->Id_programas }}"
+                        data-profesor-nombre="{{ $e->profesor ? $e->profesor->persona->Nombre . ' ' . $e->profesor->persona->Apellido : 'Sin profesor' }}"
+                        data-programa-nombre="{{ $e->programa ? $e->programa->Nombre : 'Sin programa' }}">
                   {{ $e->persona?->Nombre }} {{ $e->persona?->Apellido }}
                 </option>
               @endforeach
@@ -208,7 +261,7 @@
           </div>
 
           {{-- Profesor --}}
-          <div class="mb-3">
+          <div class="mb-3" id="div_profesor_editar">
             <label for="Id_profesores_editar" class="form-label">Profesor</label>
             <select class="form-select" id="Id_profesores_editar" name="Id_profesores" required>
               @foreach($profesores as $p)
@@ -217,16 +270,16 @@
                 </option>
               @endforeach
             </select>
+            <small class="form-text text-muted" id="profesor_help_editar">
+              El profesor se asignará automáticamente si el estudiante ya tiene uno
+            </small>
           </div>
 
-          {{-- Programa --}}
+          {{-- Programa (Solo lectura) --}}
           <div class="mb-3">
-            <label for="Id_programas_editar" class="form-label">Programa</label>
-            <select class="form-select" id="Id_programas_editar" name="Id_programas" required>
-              @foreach($programas as $prog)
-                <option value="{{ $prog->Id_programas }}">{{ $prog->Nombre }}</option>
-              @endforeach
-            </select>
+            <label for="programa_info_editar" class="form-label">Programa Inscrito</label>
+            <input type="text" class="form-control" id="programa_info_editar" readonly>
+            <small class="form-text text-muted">El programa se obtiene automáticamente del estudiante</small>
           </div>
 
           {{-- Día --}}
@@ -255,18 +308,123 @@
   </div>
 </div>
 
-{{-- Script para asignar profesor automáticamente y pasar datos al modal de edición --}}
+{{-- Script para mostrar información automática del estudiante --}}
 <script>
 document.addEventListener('DOMContentLoaded', function () {
+    // ========== GESTIÓN DE HORARIOS DINÁMICOS ==========
+    let contadorHorarios = 1; // Comienza en 1 porque ya existe el horario [0]
+
+    // Botón para agregar nuevo horario
+    document.getElementById('btn-agregar-horario').addEventListener('click', function() {
+        const container = document.getElementById('horarios-container');
+        const nuevoHorario = document.createElement('div');
+        nuevoHorario.className = 'horario-item border rounded p-3 mb-2 bg-light';
+        nuevoHorario.innerHTML = `
+            <div class="row g-2">
+                <div class="col-md-5">
+                    <label class="form-label small">Día</label>
+                    <select class="form-select" name="horarios[${contadorHorarios}][dia]" required>
+                        <option value="" disabled selected>Seleccione</option>
+                        <option value="LUNES">LUNES</option>
+                        <option value="MARTES">MARTES</option>
+                        <option value="MIERCOLES">MIERCOLES</option>
+                        <option value="JUEVES">JUEVES</option>
+                        <option value="VIERNES">VIERNES</option>
+                        <option value="SABADO">SABADO</option>
+                    </select>
+                </div>
+                <div class="col-md-5">
+                    <label class="form-label small">Hora</label>
+                    <input type="time" class="form-control" name="horarios[${contadorHorarios}][hora]" required>
+                </div>
+                <div class="col-md-2 d-flex align-items-end">
+                    <button type="button" class="btn btn-danger w-100 btn-eliminar-horario">
+                        <i class="bi bi-trash3"></i>
+                    </button>
+                </div>
+            </div>
+        `;
+        container.appendChild(nuevoHorario);
+        contadorHorarios++;
+
+        // Agregar event listener al botón de eliminación
+        nuevoHorario.querySelector('.btn-eliminar-horario').addEventListener('click', function() {
+            nuevoHorario.remove();
+        });
+    });
+
+    // ========== GESTIÓN DE INFORMACIÓN DEL ESTUDIANTE ==========
+    // Función para actualizar información del estudiante
+    function actualizarInfoEstudiante(selectElement, profesorSelect, programaInput, helpText) {
+        const option = selectElement.selectedOptions[0];
+        if (option && option.value) {
+            const profesorId = option.getAttribute('data-profesor');
+            const programaNombre = option.getAttribute('data-programa-nombre') || 'Sin programa asignado';
+            const profesorNombre = option.getAttribute('data-profesor-nombre') || '';
+            
+            // Actualizar programa
+            programaInput.value = programaNombre;
+
+            // Validar programa
+            if (programaNombre === 'Sin programa asignado') {
+                programaInput.classList.add('is-invalid');
+            } else {
+                programaInput.classList.remove('is-invalid');
+            }
+
+            // Manejar selector de profesor
+            if (profesorId && profesorId !== 'null' && profesorId !== '') {
+                // El estudiante YA tiene profesor asignado - preseleccionarlo pero permitir cambio
+                profesorSelect.value = profesorId;
+                profesorSelect.disabled = false; // PERMITIR cambio
+                profesorSelect.classList.remove('bg-light');
+                helpText.innerHTML = `<i class="bi bi-info-circle me-1"></i>Profesor actual: <strong>${profesorNombre}</strong> (puede cambiarlo si lo desea)`;
+                helpText.classList.remove('text-muted', 'text-warning');
+                helpText.classList.add('text-info');
+            } else {
+                // El estudiante NO tiene profesor, permitir selección
+                profesorSelect.value = '';
+                profesorSelect.disabled = false;
+                profesorSelect.classList.remove('bg-light');
+                helpText.innerHTML = '<i class="bi bi-exclamation-triangle me-1"></i>Este estudiante no tiene profesor asignado. Por favor, seleccione uno.';
+                helpText.classList.remove('text-success', 'text-info');
+                helpText.classList.add('text-warning');
+            }
+        } else {
+            programaInput.value = '';
+            profesorSelect.value = '';
+            profesorSelect.disabled = true;
+            helpText.textContent = 'Seleccione un estudiante primero';
+            helpText.classList.remove('text-success', 'text-warning');
+            helpText.classList.add('text-muted');
+        }
+    }
+
+    // Modal de creación
+    const estudianteCrear = document.getElementById('Id_estudiantes_crear');
+    const profesorCrear = document.getElementById('Id_profesores_crear');
+    const programaCrear = document.getElementById('programa_info_crear');
+    const helpCrear = document.getElementById('profesor_help_crear');
+
+    if (estudianteCrear && profesorCrear && programaCrear) {
+        estudianteCrear.addEventListener('change', function () {
+            actualizarInfoEstudiante(this, profesorCrear, programaCrear, helpCrear);
+        });
+    }
+
     // Modal de edición
     const modalEditar = document.getElementById('modalEditar');
+    const estudianteEditar = document.getElementById('Id_estudiantes_editar');
+    const profesorEditar = document.getElementById('Id_profesores_editar');
+    const programaEditar = document.getElementById('programa_info_editar');
+    const helpEditar = document.getElementById('profesor_help_editar');
+
     if (modalEditar) {
         modalEditar.addEventListener('show.bs.modal', function (event) {
             const button = event.relatedTarget;
             const id = button.getAttribute('data-id');
             const estudiante = button.getAttribute('data-estudiante');
             const profesor = button.getAttribute('data-profesor');
-            const programa = button.getAttribute('data-programa');
             const dia = button.getAttribute('data-dia');
             const hora = button.getAttribute('data-hora');
 
@@ -275,24 +433,74 @@ document.addEventListener('DOMContentLoaded', function () {
 
             document.getElementById('Id_estudiantes_editar').value = estudiante;
             document.getElementById('Id_profesores_editar').value = profesor;
-            document.getElementById('Id_programas_editar').value = programa;
             document.getElementById('Dia_editar').value = dia;
             document.getElementById('Hora_editar').value = hora;
-        });
-    }
 
-    // Asignar profesor automáticamente al seleccionar estudiante (crear)
-    const estudianteCrear = document.getElementById('Id_estudiantes_crear');
-    const profesorCrear = document.getElementById('Id_profesores_crear');
-
-    if (estudianteCrear && profesorCrear) {
-        estudianteCrear.addEventListener('change', function () {
-            const selectedOption = estudianteCrear.selectedOptions[0];
-            const profesorId = selectedOption.getAttribute('data-profesor') || '';
-            profesorCrear.value = profesorId;
+            // Actualizar información del estudiante seleccionado
+            actualizarInfoEstudiante(estudianteEditar, profesorEditar, programaEditar, helpEditar);
         });
+
+        // Actualizar cuando cambie el estudiante en edición
+        if (estudianteEditar && profesorEditar && programaEditar) {
+            estudianteEditar.addEventListener('change', function () {
+                actualizarInfoEstudiante(this, profesorEditar, programaEditar, helpEditar);
+            });
+        }
     }
 });
+
+// ========== BÚSQUEDA DINÁMICA ==========
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('searchInput');
+    const tableRows = document.querySelectorAll('tbody tr');
+    const resultCount = document.getElementById('resultCount');
+    const totalRows = tableRows.length;
+
+    if (searchInput && tableRows.length > 0) {
+        // Función para filtrar la tabla
+        function filterTable() {
+            const searchTerm = searchInput.value.toLowerCase().trim();
+            let visibleCount = 0;
+
+            tableRows.forEach(row => {
+                // Obtener el nombre y apellido del estudiante (primera y segunda columna)
+                const nombreCell = row.cells[0];
+                const apellidoCell = row.cells[1];
+                
+                if (nombreCell && apellidoCell) {
+                    const nombre = nombreCell.textContent.toLowerCase();
+                    const apellido = apellidoCell.textContent.toLowerCase();
+                    const nombreCompleto = nombre + ' ' + apellido;
+
+                    // Mostrar/ocultar fila según coincidencia
+                    if (nombreCompleto.includes(searchTerm)) {
+                        row.style.display = '';
+                        visibleCount++;
+                    } else {
+                        row.style.display = 'none';
+                    }
+                }
+            });
+
+            // Actualizar contador de resultados
+            if (searchTerm === '') {
+                resultCount.textContent = `Mostrando todos los ${totalRows} horarios`;
+            } else {
+                resultCount.textContent = `Mostrando ${visibleCount} de ${totalRows} horarios`;
+                if (visibleCount === 0) {
+                    resultCount.innerHTML = `<i class="bi bi-exclamation-circle text-warning"></i> No se encontraron resultados para "${searchTerm}"`;
+                }
+            }
+        }
+
+        // Ejecutar búsqueda mientras el usuario escribe
+        searchInput.addEventListener('input', filterTable);
+        
+        // Mostrar contador inicial
+        resultCount.textContent = `Mostrando todos los ${totalRows} horarios`;
+    }
+});
+
 </script>
 
 @endsection

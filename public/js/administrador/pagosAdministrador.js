@@ -4,14 +4,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const noResultadosDiv = document.getElementById('no-resultados');
     const contadorResultados = document.getElementById('contador-resultados');
 
-    // Filtros
-    const filterTodos = document.getElementById('filter-todos');
-    const filterPendientes = document.getElementById('filter-pendientes');
-    const filterCompletados = document.getElementById('filter-completados');
-
-    let filtroActual = 'todos';
-
-    // Función para filtrar tarjetas
+    // Función para filtrar tarjetas (solo búsqueda)
     function filtrarTarjetas() {
         const searchTerm = buscarInput.value.toLowerCase().trim();
         const tarjetas = document.querySelectorAll('.estudiante-card');
@@ -20,23 +13,14 @@ document.addEventListener('DOMContentLoaded', () => {
         tarjetas.forEach(tarjeta => {
             const tutor = tarjeta.dataset.tutor || '';
             const estudiante = tarjeta.dataset.estudiante || '';
-            const estado = tarjeta.dataset.estado || '';
 
             // Verificar búsqueda
             const coincideBusqueda = searchTerm === '' ||
                 tutor.includes(searchTerm) ||
                 estudiante.includes(searchTerm);
 
-            // Verificar filtro de estado
-            let coincideFiltro = true;
-            if (filtroActual === 'pendientes') {
-                coincideFiltro = estado === 'pendiente';
-            } else if (filtroActual === 'completados') {
-                coincideFiltro = estado === 'completado';
-            }
-
             // Mostrar/ocultar tarjeta
-            if (coincideBusqueda && coincideFiltro) {
+            if (coincideBusqueda) {
                 tarjeta.style.display = '';
                 visibles++;
             } else {
@@ -58,81 +42,59 @@ document.addEventListener('DOMContentLoaded', () => {
     // Event listener para búsqueda
     buscarInput.addEventListener('input', filtrarTarjetas);
 
-    // Event listeners para filtros
-    filterTodos.addEventListener('click', function () {
-        filtroActual = 'todos';
-        actualizarBotonesFiltro(this);
-        filtrarTarjetas();
-    });
-
-    filterPendientes.addEventListener('click', function () {
-        filtroActual = 'pendientes';
-        actualizarBotonesFiltro(this);
-        filtrarTarjetas();
-    });
-
-    filterCompletados.addEventListener('click', function () {
-        filtroActual = 'completados';
-        actualizarBotonesFiltro(this);
-        filtrarTarjetas();
-    });
-
-    // Función para actualizar estado visual de botones de filtro
-    function actualizarBotonesFiltro(botonActivo) {
-        [filterTodos, filterPendientes, filterCompletados].forEach(btn => {
-            btn.classList.remove('active');
-        });
-        botonActivo.classList.add('active');
-    }
-
-    // Modal: pasar el id de la cuota al input oculto
-    const modalRegistrarPago = document.getElementById('modalRegistrarPago');
-    if (modalRegistrarPago) {
-        modalRegistrarPago.addEventListener('show.bs.modal', function (event) {
+    // Modal "Agregar Pago" - Nuevo sistema
+    const modalAgregarPago = document.getElementById('modalAgregarPago');
+    if (modalAgregarPago) {
+        modalAgregarPago.addEventListener('show.bs.modal', function (event) {
             const button = event.relatedTarget;
 
             // Obtener datos del botón
-            const cuotaId = button.getAttribute('data-cuota-id');
-            const monto = button.getAttribute('data-monto');
             const planId = button.getAttribute('data-plan-id');
+            const montoTotal = parseFloat(button.getAttribute('data-monto-total'));
+            const montoPagado = parseFloat(button.getAttribute('data-monto-pagado'));
+            const restante = parseFloat(button.getAttribute('data-restante'));
+            const programaNombre = button.getAttribute('data-programa');
 
             // Verificar que tenemos los datos
-            if (!cuotaId || !monto || !planId) {
-                console.error('Faltan datos de la cuota:', { cuotaId, monto, planId });
+            if (!planId || isNaN(montoTotal) || isNaN(restante)) {
+                console.error('Faltan datos del plan:', { planId, montoTotal, montoPagado, restante });
                 return;
             }
 
-            // Llenar el formulario
-            document.getElementById('modal-cuota-id').value = cuotaId;
-            document.getElementById('modal-monto-pago').value = monto;
-            document.getElementById('modal-id-planes-pagos').value = planId;
-            document.getElementById('modal-fecha-pago').value = new Date().toISOString().split('T')[0];
-            document.getElementById('modal-descripcion').value = `Pago de cuota #${cuotaId}`;
-            document.getElementById('modal-comprobante').value = `COMP-${new Date().getTime()}-${cuotaId}`;
+            // Llenar información del modal
+            document.getElementById('modal-plan-id').value = planId;
+            document.getElementById('modal-programa-nombre').textContent = programaNombre;
+            document.getElementById('modal-monto-total-display').textContent = montoTotal.toFixed(2);
+            document.getElementById('modal-restante-display').textContent = restante.toFixed(2);
+            // document.getElementById('modal-max-monto').textContent = restante.toFixed(2); // Ya no se usa
+
+            // Configurar input de monto
+            const montoInput = document.getElementById('modal-monto-input');
+            montoInput.removeAttribute('max'); // Remover límite máximo
+            montoInput.value = '';
+
+            // Validación en tiempo real (solo negativos)
+            montoInput.addEventListener('input', function () {
+                // Ya no validamos máximo, solo que sea positivo
+            });
         });
     }
 
-    // Función para pagar plan completo (todas las cuotas pendientes)
-    window.pagarPlanCompleto = function (planId, totalPendiente) {
-        if (confirm(`¿Está seguro de PAGAR TODAS LAS CUOTAS PENDIENTES del plan #${planId}?\n\nMonto total: Bs. ${totalPendiente.toFixed(2)}`)) {
-            const form = document.createElement('form');
-            form.method = 'POST';
-            form.action = pagarPlanCompletoUrl;
+    // Validación del formulario antes de enviar
+    const formAgregarPago = document.getElementById('formAgregarPago');
+    if (formAgregarPago) {
+        formAgregarPago.addEventListener('submit', function (e) {
+            const montoInput = document.getElementById('modal-monto-input');
+            const monto = parseFloat(montoInput.value) || 0;
 
-            const csrfInput = document.createElement('input');
-            csrfInput.type = 'hidden';
-            csrfInput.name = '_token';
-            csrfInput.value = csrfToken;
-            form.appendChild(csrfInput);
+            if (monto <= 0) {
+                e.preventDefault();
+                alert('El monto debe ser mayor a 0');
+                return false;
+            }
 
-            const planIdInput = document.createElement('input');
-            planIdInput.type = 'hidden';
-            planIdInput.name = 'plan_id';
-            planIdInput.value = planId;
-            form.appendChild(planIdInput);
-
-            document.body.appendChild(form);
-            form.submit();
-        }
-    };
+            // Ya no validamos el restante
+            return true;
+        });
+    }
 });
