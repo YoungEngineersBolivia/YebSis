@@ -494,6 +494,13 @@
 
                 <!-- Horarios -->
                 <li>
+                    <a href="{{ route('asistencia.admin.index') }}" class="nav-link link-dark sidebar-link d-flex align-items-center gap-3">
+                        <i class="bi bi-calendar-check-fill"></i>
+                        <span>Asistencia</span>
+                    </a>
+                </li>
+                
+                <li>
                     <a href="{{ route('horarios.index') }}" class="nav-link link-dark sidebar-link d-flex align-items-center gap-3">
                         <i class="bi bi-calendar-week"></i>
                         <span>Horarios</span>

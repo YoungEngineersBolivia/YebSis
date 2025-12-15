@@ -16,5 +16,23 @@ class ClasePrueba extends Model
         'Hora_clase',
         'Comentarios',
         'Id_prospectos',
+        'Id_profesores',
+        'Asistencia',
     ];
+
+    /**
+     * Relación con Profesor
+     */
+    public function profesor()
+    {
+        return $this->belongsTo(Profesor::class, 'Id_profesores', 'Id_profesores');
+    }
+
+    /**
+     * Relación con Prospecto
+     */
+    public function prospecto()
+    {
+        return $this->belongsTo(Prospecto::class, 'Id_prospectos', 'Id_prospectos');
+    }
 }

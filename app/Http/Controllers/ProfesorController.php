@@ -6,9 +6,30 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use App\Models\Estudiante;
 use App\Models\Profesor;
+use App\Models\ClasePrueba;
 
 class ProfesorController extends Controller
 {
+    // =====================================================
+    //   DASHBOARD PROFESOR
+    // =====================================================
+    public function home()
+    {
+        $profesor = auth()->user()->profesor;
+        $clasesPrueba = collect();
+
+        if ($profesor) {
+            $clasesPrueba = ClasePrueba::with('prospecto')
+                ->where('Asistencia', 'pendiente')
+                ->orderBy('Fecha_clase', 'asc')
+                ->orderBy('Hora_clase', 'asc')
+                ->take(3)
+                ->get();
+        }
+
+        return view('profesor.homeProfesor', compact('profesor', 'clasesPrueba'));
+    }
+
     // =====================================================
     //   CRUD PROFESOR
     // =====================================================
@@ -115,21 +136,31 @@ class ProfesorController extends Controller
                 ->with('error', 'No se encontró el perfil de profesor asociado.');
         }
 
+        // Obtener IDs únicos de estudiantes que tienen horarios con este profesor
+        $estudiantesIds = \App\Models\Horario::where('Id_profesores', $profesorId)
+            ->distinct()
+            ->pluck('Id_estudiantes')
+            ->toArray();
+
+        // Construir query base con estudiantes que tienen horarios con este profesor
         $estudiantesQuery = Estudiante::with(['persona', 'programa', 'horarios'])
             ->where('Estado', 'activo')
-            ->where('Id_profesores', $profesorId)
+            ->whereIn('Id_estudiantes', $estudiantesIds)
             ->whereHas('persona', function ($query) {
                 $query->where('Id_roles', 4);
             });
 
         $titulo = '';
 
-        if ($tipo === 'evaluar') {
-            $titulo = 'Evaluar Estudiantes';
+        if ($tipo === 'asistencia') {
+            $titulo = 'Registrar Asistencia';
         } elseif ($tipo === 'asignados') {
             $titulo = 'Alumnos Asignados';
         } elseif ($tipo === 'recuperatoria') {
-            $estudiantesQuery->where('clase_recuperatoria', true);
+            $estudiantesQuery->whereHas('asistencias', function($q) use ($profesorId) {
+                $q->where('Estado', 'Reprogramado');
+            });
+            $titulo = 'Alumnos con Clases Reprogramadas';
             $titulo = 'Clase Recuperatoria';
         } else {
             return redirect()->route('profesor.menu-alumnos');

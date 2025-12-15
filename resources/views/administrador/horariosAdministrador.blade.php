@@ -18,6 +18,27 @@
         </button>
     </div>
 
+    {{-- Buscador Dinámico --}}
+    <div class="card shadow-sm border-0 mb-3">
+        <div class="card-body">
+            <div class="row g-3">
+                <div class="col-12">
+                    <div class="input-group">
+                        <span class="input-group-text bg-white"><i class="bi bi-search"></i></span>
+                        <input type="text" 
+                               class="form-control" 
+                               id="searchInput"
+                               placeholder="Buscar por nombre del estudiante..." 
+                               autocomplete="off">
+                    </div>
+                    <small class="text-muted mt-2 d-block">
+                        <span id="resultCount"></span>
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+
     {{-- Mensajes de éxito / error --}}
     @if(session('success'))
         <div class="alert alert-success alert-dismissible fade show" role="alert">
@@ -167,21 +188,37 @@
             <small class="form-text text-muted">El programa se obtiene automáticamente del estudiante</small>
           </div>
 
-          {{-- Día --}}
+          {{-- Horarios (Dinámicos) --}}
           <div class="mb-3">
-            <label for="Dia_crear" class="form-label">Día</label>
-            <select class="form-select" id="Dia_crear" name="Dia" required>
-              <option value="" disabled selected>Seleccione</option>
-              @foreach(['LUNES','MARTES','MIERCOLES','JUEVES','VIERNES','SABADO'] as $dia)
-                <option value="{{ $dia }}">{{ $dia }}</option>
-              @endforeach
-            </select>
-          </div>
-
-          {{-- Hora --}}
-          <div class="mb-3">
-            <label for="Hora_crear" class="form-label">Hora</label>
-            <input type="time" class="form-control" id="Hora_crear" name="Hora" required>
+            <label class="form-label fw-bold">Horarios de la semana</label>
+            <div id="horarios-container">
+              {{-- Primer horario (siempre visible) --}}
+              <div class="horario-item border rounded p-3 mb-2 bg-light">
+                <div class="row g-2">
+                  <div class="col-md-5">
+                    <label class="form-label small">Día</label>
+                    <select class="form-select" name="horarios[0][dia]" required>
+                      <option value="" disabled selected>Seleccione</option>
+                      @foreach(['LUNES','MARTES','MIERCOLES','JUEVES','VIERNES','SABADO'] as $dia)
+                        <option value="{{ $dia }}">{{ $dia }}</option>
+                      @endforeach
+                    </select>
+                  </div>
+                  <div class="col-md-5">
+                    <label class="form-label small">Hora</label>
+                    <input type="time" class="form-control" name="horarios[0][hora]" required>
+                  </div>
+                  <div class="col-md-2 d-flex align-items-end">
+                    <button type="button" class="btn btn-success w-100" id="btn-agregar-horario">
+                      <i class="bi bi-plus-lg"></i>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <small class="form-text text-muted">
+              <i class="bi bi-info-circle me-1"></i>Agregue todos los horarios que el estudiante tendrá durante la semana
+            </small>
           </div>
         </div>
 
@@ -274,6 +311,49 @@
 {{-- Script para mostrar información automática del estudiante --}}
 <script>
 document.addEventListener('DOMContentLoaded', function () {
+    // ========== GESTIÓN DE HORARIOS DINÁMICOS ==========
+    let contadorHorarios = 1; // Comienza en 1 porque ya existe el horario [0]
+
+    // Botón para agregar nuevo horario
+    document.getElementById('btn-agregar-horario').addEventListener('click', function() {
+        const container = document.getElementById('horarios-container');
+        const nuevoHorario = document.createElement('div');
+        nuevoHorario.className = 'horario-item border rounded p-3 mb-2 bg-light';
+        nuevoHorario.innerHTML = `
+            <div class="row g-2">
+                <div class="col-md-5">
+                    <label class="form-label small">Día</label>
+                    <select class="form-select" name="horarios[${contadorHorarios}][dia]" required>
+                        <option value="" disabled selected>Seleccione</option>
+                        <option value="LUNES">LUNES</option>
+                        <option value="MARTES">MARTES</option>
+                        <option value="MIERCOLES">MIERCOLES</option>
+                        <option value="JUEVES">JUEVES</option>
+                        <option value="VIERNES">VIERNES</option>
+                        <option value="SABADO">SABADO</option>
+                    </select>
+                </div>
+                <div class="col-md-5">
+                    <label class="form-label small">Hora</label>
+                    <input type="time" class="form-control" name="horarios[${contadorHorarios}][hora]" required>
+                </div>
+                <div class="col-md-2 d-flex align-items-end">
+                    <button type="button" class="btn btn-danger w-100 btn-eliminar-horario">
+                        <i class="bi bi-trash3"></i>
+                    </button>
+                </div>
+            </div>
+        `;
+        container.appendChild(nuevoHorario);
+        contadorHorarios++;
+
+        // Agregar event listener al botón de eliminación
+        nuevoHorario.querySelector('.btn-eliminar-horario').addEventListener('click', function() {
+            nuevoHorario.remove();
+        });
+    });
+
+    // ========== GESTIÓN DE INFORMACIÓN DEL ESTUDIANTE ==========
     // Función para actualizar información del estudiante
     function actualizarInfoEstudiante(selectElement, profesorSelect, programaInput, helpText) {
         const option = selectElement.selectedOptions[0];
@@ -294,20 +374,20 @@ document.addEventListener('DOMContentLoaded', function () {
 
             // Manejar selector de profesor
             if (profesorId && profesorId !== 'null' && profesorId !== '') {
-                // El estudiante YA tiene profesor asignado
+                // El estudiante YA tiene profesor asignado - preseleccionarlo pero permitir cambio
                 profesorSelect.value = profesorId;
-                profesorSelect.disabled = true;
-                profesorSelect.classList.add('bg-light');
-                helpText.textContent = `Profesor ya asignado: ${profesorNombre}`;
-                helpText.classList.remove('text-muted');
-                helpText.classList.add('text-success');
+                profesorSelect.disabled = false; // PERMITIR cambio
+                profesorSelect.classList.remove('bg-light');
+                helpText.innerHTML = `<i class="bi bi-info-circle me-1"></i>Profesor actual: <strong>${profesorNombre}</strong> (puede cambiarlo si lo desea)`;
+                helpText.classList.remove('text-muted', 'text-warning');
+                helpText.classList.add('text-info');
             } else {
                 // El estudiante NO tiene profesor, permitir selección
                 profesorSelect.value = '';
                 profesorSelect.disabled = false;
                 profesorSelect.classList.remove('bg-light');
-                helpText.textContent = 'Seleccione un profesor para asignar al estudiante';
-                helpText.classList.remove('text-success');
+                helpText.innerHTML = '<i class="bi bi-exclamation-triangle me-1"></i>Este estudiante no tiene profesor asignado. Por favor, seleccione uno.';
+                helpText.classList.remove('text-success', 'text-info');
                 helpText.classList.add('text-warning');
             }
         } else {
@@ -368,6 +448,59 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 });
+
+// ========== BÚSQUEDA DINÁMICA ==========
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('searchInput');
+    const tableRows = document.querySelectorAll('tbody tr');
+    const resultCount = document.getElementById('resultCount');
+    const totalRows = tableRows.length;
+
+    if (searchInput && tableRows.length > 0) {
+        // Función para filtrar la tabla
+        function filterTable() {
+            const searchTerm = searchInput.value.toLowerCase().trim();
+            let visibleCount = 0;
+
+            tableRows.forEach(row => {
+                // Obtener el nombre y apellido del estudiante (primera y segunda columna)
+                const nombreCell = row.cells[0];
+                const apellidoCell = row.cells[1];
+                
+                if (nombreCell && apellidoCell) {
+                    const nombre = nombreCell.textContent.toLowerCase();
+                    const apellido = apellidoCell.textContent.toLowerCase();
+                    const nombreCompleto = nombre + ' ' + apellido;
+
+                    // Mostrar/ocultar fila según coincidencia
+                    if (nombreCompleto.includes(searchTerm)) {
+                        row.style.display = '';
+                        visibleCount++;
+                    } else {
+                        row.style.display = 'none';
+                    }
+                }
+            });
+
+            // Actualizar contador de resultados
+            if (searchTerm === '') {
+                resultCount.textContent = `Mostrando todos los ${totalRows} horarios`;
+            } else {
+                resultCount.textContent = `Mostrando ${visibleCount} de ${totalRows} horarios`;
+                if (visibleCount === 0) {
+                    resultCount.innerHTML = `<i class="bi bi-exclamation-circle text-warning"></i> No se encontraron resultados para "${searchTerm}"`;
+                }
+            }
+        }
+
+        // Ejecutar búsqueda mientras el usuario escribe
+        searchInput.addEventListener('input', filterTable);
+        
+        // Mostrar contador inicial
+        resultCount.textContent = `Mostrando todos los ${totalRows} horarios`;
+    }
+});
+
 </script>
 
 @endsection

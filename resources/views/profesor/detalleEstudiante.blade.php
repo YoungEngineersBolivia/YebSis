@@ -8,6 +8,12 @@
 
 @section('content')
 <div class="student-detail-container">
+    <div class="d-flex align-items-center gap-3 mb-3">
+        <a href="javascript:history.back()" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left me-2"></i>Volver
+        </a>
+    </div>
+    
     <input 
         type="text" 
         class="search-box-detail" 
@@ -71,15 +77,9 @@
             </div>
             
             <div class="action-buttons">
-                @if($yaEvaluado)
-                    <button class="btn-evaluate" onclick="window.location.href='{{ route('profesor.evaluar-estudiante', $estudiante->Id_estudiantes) }}'">
-                        <i class="fas fa-edit me-1"></i>Editar Evaluación
-                    </button>
-                @else
-                    <button class="btn-evaluate" onclick="window.location.href='{{ route('profesor.evaluar-estudiante', $estudiante->Id_estudiantes) }}'">
-                        <i class="fas fa-clipboard-check me-1"></i>Evaluar
-                    </button>
-                @endif
+                <button class="btn-evaluate" onclick="window.location.href='{{ route('profesor.asistencia.index') }}'">
+                    <i class="bi bi-calendar-check me-1"></i>Registrar Asistencia
+                </button>
             </div>
         </div>
     </div>

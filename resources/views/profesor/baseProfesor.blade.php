@@ -37,8 +37,8 @@
 
             <!-- Menú desplegable -->
             <div class="menu-dropdown" id="menuDropdown">
-                <a href="{{ route('profesor.listado-alumnos', 'evaluar') }}" class="menu-item">
-                    <i class="bi bi-clipboard-check"></i> Evaluar Estudiantes
+                <a href="{{ route('profesor.asistencia.index') }}" class="menu-item">
+                    <i class="bi bi-calendar-check"></i> Registro de Asistencia
                 </a>
                 <a href="{{ route('profesor.listado-alumnos', 'asignados') }}" class="menu-item">
                     <i class="bi bi-people-fill"></i> Alumnos Asignados

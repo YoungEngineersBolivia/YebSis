@@ -34,7 +34,14 @@
                 </button>
             </a>
         @endif
-    </main>
+
+        {{-- Botón de Clases de Prueba --}}
+        <a href="{{ route('profesor.clases-prueba.index') }}">
+            <button class="menu-button assigned">
+                <i class="bi bi-chalkboard-teacher"></i> Clases de Prueba
+            </button>
+        </a>
+
 
 <script src="{{ auto_asset('js/profesor/homeProfesor.js') }}"></script>
 @endsection

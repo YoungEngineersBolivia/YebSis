@@ -7,8 +7,8 @@
 
 @section('content')
     <main class="main-content">
-        <a href="{{ route('profesor.listado-alumnos', ['tipo' => 'evaluar']) }}" class="menu-link">
-            <button class="menu-button evaluate">Evaluar</button>
+        <a href="{{ route('profesor.asistencia.index') }}" class="menu-link">
+            <button class="menu-button evaluate">Asistencia</button>
         </a>
         
         <a href="{{ route('profesor.listado-alumnos', ['tipo' => 'asignados']) }}" class="menu-link">
@@ -17,6 +17,10 @@
         
         <a href="{{ route('profesor.listado-alumnos', ['tipo' => 'recuperatoria']) }}" class="menu-link">
             <button class="menu-button recovery">Alumno Registrado<br>Clase Recuperatoria</button>
+        </a>
+
+        <a href="{{ route('profesor.clases-prueba.index') }}" class="menu-link">
+            <button class="menu-button assigned">Clases de Prueba</button>
         </a>
     </main>
 @endsection

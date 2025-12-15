@@ -56,8 +56,9 @@ class ProspectoController extends Controller
     }
 
     $prospectos = $query->orderBy('created_at', 'desc')->paginate(6);
-    $clasesPrueba = ClasePrueba::all();
-    return view('comercial.prospectosComercial', compact('prospectos', 'clasesPrueba'));
+    $clasesPrueba = ClasePrueba::with(['profesor.persona', 'prospecto'])->get();
+    $profesores = \App\Models\Profesor::with('persona')->get();
+    return view('comercial.prospectosComercial', compact('prospectos', 'clasesPrueba', 'profesores'));
 }
 
     public function store(Request $request)
@@ -84,7 +85,7 @@ class ProspectoController extends Controller
     public function updateEstado(Request $request, $id)
     {
         $request->validate([
-            'Estado_prospecto' => 'required|in:nuevo,contactado,clase de prueba',
+            'Estado_prospecto' => 'required|in:nuevo,contactado,clase de prueba,para inscripcion,no asistio',
         ]);
 
         $prospecto = Prospecto::findOrFail($id);

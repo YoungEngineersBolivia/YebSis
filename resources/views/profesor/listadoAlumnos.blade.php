@@ -8,6 +8,11 @@
 <div class="students-container">
     {{-- Título y búsqueda --}}
     <div class="header-section">
+        <div class="d-flex align-items-center gap-3 mb-3">
+            <a href="{{ route('profesor.menu-alumnos') }}" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left me-2"></i>Volver
+            </a>
+        </div>
         <h2 class="page-title">
             @if($tipo === 'evaluar')
                 <i class="bi bi-clipboard-check"></i> Evaluar Estudiantes

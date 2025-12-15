@@ -20,6 +20,7 @@
         </div>
     </div>
 
+    
     {{-- Métricas principales mejoradas --}}
     <div class="row mb-4">
         <div class="col-md-3 mb-3">
@@ -95,6 +96,54 @@
             </div>
         </div>
     </div>
+
+    {{-- Notificación de Clases de Prueba Pendientes --}}
+    @if(isset($clasesPruebaPendientes) && $clasesPruebaPendientes->count() > 0)
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card border-warning shadow-sm">
+                    <div class="card-header bg-warning text-dark d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0"><i class="fas fa-chalkboard-teacher me-2"></i>Clases de Prueba Pendientes</h5>
+                        <span class="badge bg-dark">{{ $clasesPruebaPendientes->count() }}</span>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="list-group list-group-flush">
+                            @foreach($clasesPruebaPendientes as $clase)
+                                <div class="list-group-item">
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <div>
+                                            <strong>{{ $clase->Nombre_Estudiante }}</strong>
+                                            <div class="small text-muted">
+                                                <i class="bi bi-calendar-event me-1"></i>{{ \Carbon\Carbon::parse($clase->Fecha_clase)->format('d/m/Y') }}
+                                                <i class="bi bi-clock ms-2 me-1"></i>{{ \Carbon\Carbon::parse($clase->Hora_clase)->format('H:i') }}
+                                            </div>
+                                        </div>
+                                        <div class="btn-group btn-group-sm">
+                                            <button onclick="confirmarAsistenciaAdmin({{ $clase->Id_clasePrueba }}, 'asistio')" class="btn btn-outline-success" title="Marcar como Asistió">
+                                                <i class="bi bi-check-lg me-1"></i> Asistió
+                                            </button>
+                                            <button onclick="confirmarAsistenciaAdmin({{ $clase->Id_clasePrueba }}, 'no_asistio')" class="btn btn-outline-danger" title="Marcar como Falta">
+                                                <i class="bi bi-x-lg me-1"></i> No Asistió
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="input-group input-group-sm">
+                                        <input type="text" class="form-control" id="comentario_admin_{{ $clase->Id_clasePrueba }}" value="{{ $clase->Comentarios }}" placeholder="Añadir comentario (Recomendado)">
+                                        <button class="btn btn-outline-secondary" onclick="guardarComentarioAdmin({{ $clase->Id_clasePrueba }})" title="Guardar comentario solo">
+                                            <i class="bi bi-save"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+                    </div>
+                    <div class="card-footer bg-light text-center">
+                        <small class="text-muted">Mostrando las 5 más próximas</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    @endif
 
     {{-- Gráficos de ingresos --}}
     <div class="row mb-4">
@@ -222,11 +271,119 @@
 
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
     window.ingresosPorDia = @json($ingresosPorDia->pluck('total'));
     window.fechasPorDia = @json($ingresosPorDia->pluck('fecha'));
     window.ingresosPorMes = @json($ingresosPorMes->pluck('total'));
     window.mesesPorMes = @json($ingresosPorMes->pluck('mes_nombre'));
+
+    function guardarComentarioAdmin(id) {
+        const comment = document.getElementById(`comentario_admin_${id}`).value;
+        fetch(`/administrador/clases-prueba/${id}/comentarios`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            },
+            body: JSON.stringify({ comentarios: comment })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                const toast = Swal.mixin({
+                    toast: true,
+                    position: 'top-end',
+                    showConfirmButton: false,
+                    timer: 3000
+                });
+                toast.fire({
+                    icon: 'success',
+                    title: 'Comentario guardado'
+                });
+            }
+        });
+    }
+
+    function confirmarAsistenciaAdmin(id, estado) {
+        const commentInput = document.getElementById(`comentario_admin_${id}`);
+        const comentario = commentInput.value.trim();
+        const textoAccion = estado === 'asistio' ? 'marcar como ASISTIÓ' : 'marcar como FALTA';
+
+        let confirmOptions = {
+            title: '¿Confirmar asistencia?',
+            text: `Vas a ${textoAccion}.`,
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: 'Sí, enviar',
+            cancelButtonText: 'Cancelar'
+        };
+
+        if (comentario === '') {
+            confirmOptions.title = '¡Atención!';
+            confirmOptions.text = `Estás a punto de ${textoAccion} SIN COMENTARIOS. ¿Estás seguro? Es recomendable añadir una observación.`;
+            confirmOptions.icon = 'warning';
+            confirmOptions.confirmButtonColor = '#d33';
+        }
+
+        Swal.fire(confirmOptions).then((result) => {
+            if (result.isConfirmed) {
+                // Paso 1: Guardar comentario
+                fetch(`/administrador/clases-prueba/${id}/comentarios`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
+                    body: JSON.stringify({ comentarios: commentInput.value })
+                })
+                .then(() => {
+                    // Paso 2: Guardar asistencia
+                    return fetch(`/administrador/clases-prueba/${id}/asistencia`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
+                        body: JSON.stringify({ asistencia: estado })
+                    });
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        Swal.fire({
+                            title: '¡Listo!',
+                            text: 'La asistencia ha sido registrada.',
+                            icon: 'success',
+                            timer: 1500,
+                            showConfirmButton: false
+                        });
+                        
+                        // Eliminar el elemento de la lista visualmente
+                        const row = commentInput.closest('.list-group-item');
+                        if (row) {
+                            row.remove();
+                            
+                            // Actualizar el contador
+                            const badge = document.querySelector('.card-header .badge');
+                            if (badge) {
+                                let count = parseInt(badge.innerText);
+                                if (!isNaN(count)) {
+                                    badge.innerText = Math.max(0, count - 1);
+                                    if (count - 1 === 0) {
+                                        // Ocultar todo el widget si ya no hay
+                                        const widget = document.querySelector('.card.border-warning').closest('.row');
+                                        if (widget) widget.remove();
+                                    }
+                                }
+                            }
+                        }
+                    } else {
+                        Swal.fire('Error', data.message || 'Error desconocido al guardar.', 'error');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    // Intentar leer el mensaje de error de la respuesta si es posible, sino genérico
+                    Swal.fire('Error', 'Hubo un problema de conexión o del servidor.', 'error');
+                });
+            }
+        });
+    }
 </script>
 <script src="{{ auto_asset('js/administrador/dashboard.js') }}"></script>
 @endsection

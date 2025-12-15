@@ -7,6 +7,32 @@
 <div class="container-fluid px-4 py-4">
     <div class="row">
         <div class="col-12">
+            @if ($errors->any())
+                <div class="alert alert-danger alert-dismissible fade show mb-4 shadow-sm" role="alert">
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-exclamation-circle fs-4 me-3"></i>
+                        <div>
+                            <strong>No se pudo guardar la clase:</strong>
+                            <ul class="mb-0 mt-1 ps-3">
+                                @foreach ($errors->all() as $error)
+                                    <li>{{ $error }}</li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    </div>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            @endif
+            @if (session('status'))
+                <div class="alert alert-success alert-dismissible fade show mb-4 shadow-sm" role="alert">
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-check-circle fs-4 me-3"></i>
+                        <div>{{ session('status') }}</div>
+                    </div>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            @endif
+
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <h2 class="h3 mb-0 text-gray-800">
                     <i class="fas fa-users me-2 text-primary"></i>
@@ -105,9 +131,27 @@
                                                 $tieneClase = $clase !== null;
                                             @endphp
                                             @if($tieneClase)
-                                                <span class="badge bg-success">
-                                                    <i class="fas fa-check me-1"></i>Asignada
-                                                </span>
+                                                @if($clase->Asistencia == 'pendiente')
+                                                    <span class="badge bg-warning text-dark">
+                                                        <i class="fas fa-clock me-1"></i>Pendiente
+                                                    </span>
+                                                @elseif($clase->Asistencia == 'asistio')
+                                                    <span class="badge bg-success">
+                                                        <i class="fas fa-check-double me-1"></i>Asistió
+                                                    </span>
+                                                @elseif($clase->Asistencia == 'no_asistio')
+                                                    <span class="badge bg-danger">
+                                                        <i class="fas fa-times-circle me-1"></i>No asistió
+                                                    </span>
+                                                @endif
+                                                <div class="small text-muted mt-1" style="font-size: 0.75rem;">
+                                                    {{ \Carbon\Carbon::parse($clase->Fecha_clase)->format('d/m') }} - {{ \Carbon\Carbon::parse($clase->Hora_clase)->format('H:i') }}
+                                                </div>
+                                                @if($clase->Comentarios)
+                                                    <div class="small text-secondary mt-1 fst-italic" style="font-size: 0.7rem; max-width: 150px; white-space: normal;">
+                                                        <i class="fas fa-comment ms-1"></i> {{ Str::limit($clase->Comentarios, 50) }}
+                                                    </div>
+                                                @endif
                                             @else
                                                 <span class="badge bg-secondary">
                                                     <i class="fas fa-times me-1"></i>Sin asignar
@@ -122,8 +166,8 @@
                                                 Agregar Clase
                                             </button>
                                             @if($clase)
-                                            <button type="button" class="btn btn-info btn-sm ms-1" onclick="verClasePrueba('{{ $clase->Nombre_Estudiante }}', '{{ $clase->Fecha_clase }}', '{{ $clase->Hora_clase }}', `{{ $clase->Comentarios }}`)">
-                                                <i class="fas fa-eye me-1"></i>Ver
+                                            <button type="button" class="btn btn-warning btn-sm ms-1" onclick="editarClasePrueba('{{ $clase->Id_clasePrueba }}', '{{ $clase->Nombre_Estudiante }}', '{{ $clase->Fecha_clase }}', '{{ $clase->Hora_clase }}', `{{ $clase->Comentarios }}`, '{{ $clase->Id_profesores }}')">
+                                                <i class="fas fa-edit me-1"></i>Editar
                                             </button>
                                             @endif
                                         </td>
@@ -155,20 +199,23 @@
             <div class="modal-body p-4">
                 <form method="POST" action="{{ route('claseprueba.store') }}">
                     @csrf
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
+                    <div class="row mb-3">
+                        <div class="col-12">
                             <label class="form-label fw-semibold">
                                 <i class="fas fa-user me-1 text-primary"></i>
-                                Nombre del estudiante
+                                Nombre del Prospecto
                             </label>
                             <input type="text" 
                                    name="Nombre_Estudiante" 
                                    id="modalNombreEstudiante" 
-                                   class="form-control"
-                                   value="Ejemplo Estudiante" 
+                                   class="form-control form-control-lg"
+                                   placeholder="Nombre completo"
                                    required>
                         </div>
-                        <div class="col-md-6 mb-3">
+                    </div>
+                    
+                    <div class="row mb-4">
+                        <div class="col-md-6 mb-3 mb-md-0">
                             <label class="form-label fw-semibold">
                                 <i class="fas fa-calendar me-1 text-primary"></i>
                                 Fecha de clase
@@ -176,12 +223,9 @@
                             <input type="date" 
                                    name="Fecha_clase" 
                                    class="form-control"
-                                   value="2025-09-01" 
                                    required>
                         </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
+                        <div class="col-md-6">
                             <label class="form-label fw-semibold">
                                 <i class="fas fa-clock me-1 text-primary"></i>
                                 Hora de clase
@@ -191,17 +235,6 @@
                                    class="form-control"
                                    value="15:00" 
                                    required>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label fw-semibold">
-                                <i class="fas fa-user-graduate me-1 text-primary"></i>
-                                Prospecto asignado
-                            </label>
-                            <input type="text" 
-                                   id="modalNombreProspecto" 
-                                   class="form-control"
-                                   readonly 
-                                   style="background-color: #f8f9fa;">
                         </div>
                     </div>
                     <div class="mb-3">

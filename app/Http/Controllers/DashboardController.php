@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Sucursal;
 use App\Models\Pago;
+use App\Models\ClasePrueba;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 
@@ -13,6 +14,14 @@ class DashboardController extends Controller
     {
         // Configurar Carbon en español (opcional)
         Carbon::setLocale('es');
+
+        // Obtener clases de prueba pendientes (para notificación)
+        $clasesPruebaPendientes = ClasePrueba::with('prospecto')
+            ->where('Asistencia', 'pendiente')
+            ->orderBy('Fecha_clase', 'asc')
+            ->orderBy('Hora_clase', 'asc')
+            ->take(5)
+            ->get();
         
         $sucursales = Sucursal::all();
 
@@ -148,7 +157,8 @@ class DashboardController extends Controller
             'topDiasIngresos',
             'estadisticasTiempo',
             'proyeccionMes',
-            'egresosTotales'
+            'egresosTotales',
+            'clasesPruebaPendientes'
         ));
     }
 }

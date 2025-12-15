@@ -15,7 +15,7 @@ class HorariosController extends Controller
         $horarios = Horario::with(['estudiante.persona', 'profesor.persona', 'programa'])
             ->orderBy('Dia')
             ->orderBy('Hora')
-            ->paginate(10);
+            ->paginate(6);
 
         // Necesitamos estudiantes y profesores para las vistas
         $estudiantes = Estudiante::with(['persona', 'profesor.persona', 'programa'])->get();
@@ -29,8 +29,9 @@ class HorariosController extends Controller
         $request->validate([
             'Id_estudiantes' => 'required|exists:estudiantes,Id_estudiantes',
             'Id_profesores'  => 'required|exists:profesores,Id_profesores',
-            'Dia'            => 'required|string',
-            'Hora'           => 'required'
+            'horarios'       => 'required|array|min:1',
+            'horarios.*.dia' => 'required|string',
+            'horarios.*.hora'=> 'required'
         ]);
 
         // Obtener el estudiante para extraer su programa
@@ -43,22 +44,28 @@ class HorariosController extends Controller
                 ->withInput();
         }
 
-        // Si el estudiante no tiene profesor asignado, asignárselo
+        // Solo asignar profesor al estudiante si NO tiene ninguno aún
+        // Esto permite que diferentes horarios tengan diferentes profesores
         if (!$estudiante->Id_profesores) {
             $estudiante->Id_profesores = $request->Id_profesores;
             $estudiante->save();
         }
 
-        // Crear el horario con los datos del estudiante
-        Horario::create([
-            'Id_estudiantes' => $request->Id_estudiantes,
-            'Id_profesores'  => $request->Id_profesores,
-            'Id_programas'   => $estudiante->Id_programas,
-            'Dia'            => $request->Dia,
-            'Hora'           => $request->Hora
-        ]);
+        // Crear múltiples horarios (cada uno puede tener un profesor diferente)
+        $horariosCreados = 0;
+        foreach ($request->horarios as $horario) {
+            Horario::create([
+                'Id_estudiantes' => $request->Id_estudiantes,
+                'Id_profesores'  => $request->Id_profesores, // Profesor específico de ESTE horario
+                'Id_programas'   => $estudiante->Id_programas,
+                'Dia'            => $horario['dia'],
+                'Hora'           => $horario['hora']
+            ]);
+            $horariosCreados++;
+        }
 
-        return redirect()->route('horarios.index')->with('success', 'Horario registrado correctamente.');
+        return redirect()->route('horarios.index')
+            ->with('success', "Se crearon {$horariosCreados} horario(s) correctamente.");
     }
 
     public function update(Request $request, $id)

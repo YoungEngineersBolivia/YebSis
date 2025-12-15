@@ -107,6 +107,14 @@ class Profesor extends Model
     }
 
     /**
+     * Relación con Clases de Prueba
+     */
+    public function clasesPrueba()
+    {
+        return $this->hasMany(ClasePrueba::class, 'Id_profesores', 'Id_profesores');
+    }
+
+    /**
      * Accesor para nombre completo
      */
     public function getNombreCompletoAttribute()
