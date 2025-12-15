@@ -373,7 +373,7 @@
             background: white;
             border-radius: 16px;
             width: 100%;
-            max-width: 600px;
+            max-width: 1000px;
             max-height: 90vh;
             overflow-y: auto;
             animation: slideUp 0.3s;
@@ -396,19 +396,21 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+            background: var(--secondary-color);
+            color: white;
+            border-radius: 16px 16px 0 0;
         }
 
         .modal-header h2 {
             margin: 0;
             font-size: 1.5rem;
-            color: var(--text-dark);
         }
 
         .close-btn {
             background: none;
             border: none;
             font-size: 2rem;
-            color: var(--text-light);
+            color: white;
             cursor: pointer;
             padding: 0;
             width: 40px;
@@ -421,14 +423,145 @@
         }
 
         .close-btn:hover {
-            background: var(--bg-light);
-            color: var(--text-dark);
+            background: rgba(255, 255, 255, 0.2);
         }
 
         .modal-body {
             padding: 1.5rem;
         }
 
+        /* Modelo Cards en Modal */
+        .modelos-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .modelo-card {
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.25rem;
+            background: white;
+            transition: all 0.3s;
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .modelo-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 6px 16px rgba(0,0,0,0.12);
+            border-color: var(--secondary-color);
+        }
+
+        .modelo-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 0.75rem;
+        }
+
+        .modelo-name {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: #000;
+        }
+
+        .evaluaciones-count {
+            background: var(--secondary-color);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.85rem;
+        }
+
+        .modelo-info {
+            color: var(--text-light);
+            font-size: 0.875rem;
+        }
+
+        /* Evaluaciones dentro del segundo modal */
+        .evaluacion-item {
+            background: var(--bg-light);
+            padding: 1.25rem;
+            border-radius: 8px;
+            margin-bottom: 1.25rem;
+            border-left: 4px solid var(--secondary-color);
+        }
+
+        .evaluacion-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .evaluacion-programa {
+            background: #e7f1ff;
+            color: var(--secondary-color);
+            font-weight: 500;
+            padding: 6px 12px;
+            border-radius: 4px;
+            display: inline-block;
+            font-size: 0.875rem;
+        }
+
+        .fecha-texto {
+            background: white;
+            color: #000;
+            border: 1px solid var(--border-color);
+            padding: 4px 12px;
+            border-radius: 4px;
+            font-size: 0.85rem;
+        }
+
+        .pregunta-respuesta-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .pregunta-box, .respuesta-box {
+            background: white;
+            padding: 1rem;
+            border-radius: 6px;
+            border-left: 3px solid var(--secondary-color);
+        }
+
+        .respuesta-box {
+            border-left-color: var(--success-color);
+        }
+
+        .label-texto {
+            font-weight: 600;
+            color: #495057;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .contenido-texto {
+            color: #212529;
+            line-height: 1.6;
+            font-size: 0.9rem;
+        }
+
+        .evaluacion-footer {
+            margin-top: 0.75rem;
+            padding-top: 0.75rem;
+            border-top: 1px solid var(--border-color);
+            font-size: 0.875rem;
+            color: var(--text-light);
+        }
+
+        /* Form Groups */
         .form-group {
             margin-bottom: 1.25rem;
         }
@@ -484,54 +617,6 @@
             cursor: not-allowed;
         }
 
-        /* Evaluaciones */
-        .evaluacion-item {
-            background: var(--bg-light);
-            padding: 1rem;
-            border-radius: 8px;
-            margin-bottom: 1rem;
-            border-left: 4px solid var(--secondary-color);
-        }
-
-        .evaluacion-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 0.75rem;
-        }
-
-        .evaluacion-fecha {
-            font-size: 0.875rem;
-            color: var(--text-light);
-        }
-
-        .evaluacion-modelo {
-            font-weight: 600;
-            color: var(--text-dark);
-            margin-bottom: 0.5rem;
-        }
-
-        .evaluacion-pregunta {
-            font-size: 0.9rem;
-            color: var(--text-dark);
-            margin-bottom: 0.5rem;
-        }
-
-        .evaluacion-respuesta {
-            font-size: 0.9rem;
-            color: var(--text-light);
-            padding: 0.5rem;
-            background: white;
-            border-radius: 4px;
-            margin-bottom: 0.5rem;
-        }
-
-        .evaluacion-profesor {
-            font-size: 0.85rem;
-            color: var(--text-light);
-            font-style: italic;
-        }
-
         /* Empty State */
         .empty-state {
             text-align: center;
@@ -553,7 +638,7 @@
 
         .spinner {
             border: 4px solid var(--border-color);
-            border-top: 4px solid var(--primary-color);
+            border-top: 4px solid var(--secondary-color);
             border-radius: 50%;
             width: 40px;
             height: 40px;
@@ -583,6 +668,24 @@
             background: #ffebee;
             color: #c62828;
             border-left: 4px solid #f44336;
+        }
+
+        .btn-back {
+            padding: 0.5rem 1rem;
+            background: var(--text-light);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-back:hover {
+            background: var(--text-dark);
         }
 
         /* Responsive */
@@ -652,6 +755,7 @@
 
             .modal-content {
                 margin: 1rem;
+                max-width: calc(100% - 2rem);
             }
 
             .modal-header {
@@ -660,6 +764,14 @@
 
             .modal-body {
                 padding: 1rem;
+            }
+
+            .modelos-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .pregunta-respuesta-row {
+                grid-template-columns: 1fr;
             }
         }
 
@@ -814,7 +926,7 @@
                             </div>
 
                             <div class="student-actions">
-                                <button class="btn btn-blue" onclick="verEvaluaciones(<?php echo e($estudiante->Id_estudiantes); ?>, '<?php echo e($estudiante->persona->Nombre); ?> <?php echo e($estudiante->persona->Apellido); ?>')">
+                                <button class="btn btn-blue" onclick="verModelosEvaluacion(<?php echo e($estudiante->Id_estudiantes); ?>, '<?php echo e($estudiante->persona->Nombre); ?> <?php echo e($estudiante->persona->Apellido); ?>')">
                                     📊 Ver Evaluaciones
                                 </button>
                                 <button class="btn btn-yellow" onclick="abrirModalCita(<?php echo e($estudiante->Id_estudiantes); ?>, '<?php echo e($estudiante->persona->Nombre); ?> <?php echo e($estudiante->persona->Apellido); ?>')">
@@ -828,16 +940,37 @@
         </div>
     </div>
 
-    <!-- Modal Evaluaciones -->
+    <!-- Modal Selección de Modelos -->
+    <div id="modelosModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>📦 Selecciona un Modelo</h2>
+                <button class="close-btn" onclick="cerrarModalModelos()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <h3 id="estudianteNombreModelos" style="margin-bottom: 1.5rem; color: var(--text-dark);"></h3>
+                <div id="modelosContent">
+                    <div class="loading">
+                        <div class="spinner"></div>
+                        <p style="margin-top: 1rem;">Cargando modelos...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Evaluaciones por Modelo -->
     <div id="evaluacionesModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h2>📊 Evaluaciones del Estudiante</h2>
+                <div>
+                    <h2 id="modeloTitulo">📊 Evaluaciones</h2>
+                </div>
                 <button class="close-btn" onclick="cerrarModalEvaluaciones()">&times;</button>
             </div>
             <div class="modal-body">
-                <h3 id="estudianteNombreEval" style="margin-bottom: 1rem; color: var(--text-dark);"></h3>
-                <div id="evaluacionesContent">
+                <button class="btn-back" onclick="volverAModelos()">← Volver a Modelos</button>
+                <div id="evaluacionesContent" style="margin-top: 1rem;">
                     <div class="loading">
                         <div class="spinner"></div>
                         <p style="margin-top: 1rem;">Cargando evaluaciones...</p>
@@ -887,6 +1020,10 @@
     <script>
         // Configurar CSRF token para todas las peticiones AJAX
         const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+        
+        // Variables globales para mantener el contexto
+        let estudianteIdActual = null;
+        let estudianteNombreActual = '';
 
         // Toggle navbar en mobile
         function toggleNavbar() {
@@ -920,11 +1057,14 @@
             }
         }
 
-        // Ver evaluaciones
-        async function verEvaluaciones(estudianteId, nombreEstudiante) {
-            const modal = document.getElementById('evaluacionesModal');
-            const content = document.getElementById('evaluacionesContent');
-            const nombreElem = document.getElementById('estudianteNombreEval');
+        // Ver modelos de evaluación (primer modal)
+        async function verModelosEvaluacion(estudianteId, nombreEstudiante) {
+            estudianteIdActual = estudianteId;
+            estudianteNombreActual = nombreEstudiante;
+            
+            const modal = document.getElementById('modelosModal');
+            const content = document.getElementById('modelosContent');
+            const nombreElem = document.getElementById('estudianteNombreModelos');
             
             nombreElem.textContent = nombreEstudiante;
             modal.classList.add('active');
@@ -933,7 +1073,7 @@
             content.innerHTML = `
                 <div class="loading">
                     <div class="spinner"></div>
-                    <p style="margin-top: 1rem;">Cargando evaluaciones...</p>
+                    <p style="margin-top: 1rem;">Cargando modelos...</p>
                 </div>
             `;
 
@@ -948,30 +1088,151 @@
 
                 const data = await response.json();
 
+                if (data.success && data.evaluaciones.length > 0) {
+                    // Agrupar evaluaciones por modelo
+                    const evaluacionesPorModelo = new Map();
+                    
+                    data.evaluaciones.forEach(eval => {
+                        // Usar el ID del modelo como clave, o 'sin_modelo' si no existe
+                        const modeloId = eval.Id_modelos ? eval.Id_modelos.toString() : 'sin_modelo';
+                        const modeloNombre = eval.Nombre_modelo || 'Sin modelo';
+                        
+                        if (!evaluacionesPorModelo.has(modeloId)) {
+                            evaluacionesPorModelo.set(modeloId, {
+                                id: modeloId,
+                                nombre: modeloNombre,
+                                evaluaciones: []
+                            });
+                        }
+                        evaluacionesPorModelo.get(modeloId).evaluaciones.push(eval);
+                    });
+
+                    // Debug: mostrar en consola cómo se agruparon
+                    console.log('Evaluaciones por modelo:', Array.from(evaluacionesPorModelo.entries()));
+
+                    // Renderizar tarjetas de modelos
+                    let html = '<div class="modelos-grid">';
+                    
+                    evaluacionesPorModelo.forEach((modelo, modeloId) => {
+                        const count = modelo.evaluaciones.length;
+                        const nombreSafe = modelo.nombre.replace(/'/g, "\\'").replace(/"/g, '&quot;');
+                        html += `
+                            <div class="modelo-card" onclick="verEvaluacionesModelo('${modeloId}', '${nombreSafe}')">
+                                <div class="modelo-header">
+                                    <div class="modelo-name">
+                                        📦 ${modelo.nombre}
+                                    </div>
+                                    <div class="evaluaciones-count">
+                                        ${count}
+                                    </div>
+                                </div>
+                                <div class="modelo-info">
+                                    📊 ${count} ${count === 1 ? 'evaluación' : 'evaluaciones'}
+                                </div>
+                            </div>
+                        `;
+                    });
+                    
+                    html += '</div>';
+                    content.innerHTML = html;
+                } else {
+                    content.innerHTML = `
+                        <div class="empty-state">
+                            <div class="empty-state-icon">📝</div>
+                            <p>No hay evaluaciones registradas para este estudiante</p>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                mostrarError(content, 'Error al cargar los modelos. Por favor, intente nuevamente.');
+            }
+        }
+
+        // Ver evaluaciones de un modelo específico (segundo modal)
+        async function verEvaluacionesModelo(modeloId, modeloNombre) {
+            // Cerrar modal de modelos
+            document.getElementById('modelosModal').classList.remove('active');
+            
+            // Abrir modal de evaluaciones
+            const modal = document.getElementById('evaluacionesModal');
+            const content = document.getElementById('evaluacionesContent');
+            const titulo = document.getElementById('modeloTitulo');
+            
+            titulo.textContent = `📊 Evaluaciones - ${modeloNombre}`;
+            modal.classList.add('active');
+            
+            // Mostrar loading
+            content.innerHTML = `
+                <div class="loading">
+                    <div class="spinner"></div>
+                    <p style="margin-top: 1rem;">Cargando evaluaciones...</p>
+                </div>
+            `;
+
+            try {
+                const response = await fetch(`/tutor/estudiantes/${estudianteIdActual}/evaluaciones`, {
+                    method: 'GET',
+                    headers: {
+                        'X-CSRF-TOKEN': csrfToken,
+                        'Accept': 'application/json'
+                    }
+                });
+
+                const data = await response.json();
+
                 if (data.success) {
-                    if (data.evaluaciones.length === 0) {
+                    // Filtrar evaluaciones del modelo seleccionado
+                    const evaluacionesModelo = data.evaluaciones.filter(eval => {
+                        const evalModeloId = (eval.Id_modelos ? eval.Id_modelos.toString() : 'sin_modelo');
+                        const modeloIdStr = modeloId.toString();
+                        console.log('Comparando:', evalModeloId, '===', modeloIdStr, '=', evalModeloId === modeloIdStr);
+                        return evalModeloId === modeloIdStr;
+                    });
+
+                    console.log('Evaluaciones del modelo:', evaluacionesModelo.length);
+
+                    if (evaluacionesModelo.length === 0) {
                         content.innerHTML = `
                             <div class="empty-state">
                                 <div class="empty-state-icon">📝</div>
-                                <p>No hay evaluaciones registradas para este estudiante</p>
+                                <p>No hay evaluaciones para este modelo</p>
                             </div>
                         `;
                     } else {
                         let html = '';
-                        data.evaluaciones.forEach(eval => {
+                        evaluacionesModelo.forEach(eval => {
                             html += `
                                 <div class="evaluacion-item">
                                     <div class="evaluacion-header">
-                                        <span class="evaluacion-modelo">📦 ${eval.Nombre_modelo || 'Modelo no especificado'}</span>
-                                        <span class="evaluacion-fecha">${formatearFecha(eval.fecha_evaluacion)}</span>
+                                        <span class="evaluacion-programa">
+                                            ${eval.programa_nombre || 'Sin programa'}
+                                        </span>
+                                        <span class="fecha-texto">
+                                            📅 ${formatearFecha(eval.fecha_evaluacion)}
+                                        </span>
                                     </div>
-                                    <div class="evaluacion-pregunta">
-                                        <strong>Pregunta:</strong> ${eval.Pregunta || 'N/A'}
+                                    
+                                    <div class="pregunta-respuesta-row">
+                                        <div class="pregunta-box">
+                                            <div class="label-texto">
+                                                ❓ Pregunta
+                                            </div>
+                                            <div class="contenido-texto">
+                                                ${eval.Pregunta || 'Pregunta no disponible'}
+                                            </div>
+                                        </div>
+                                        <div class="respuesta-box">
+                                            <div class="label-texto">
+                                                ✅ Respuesta
+                                            </div>
+                                            <div class="contenido-texto">
+                                                ${eval.Respuesta || 'Sin respuesta'}
+                                            </div>
+                                        </div>
                                     </div>
-                                    <div class="evaluacion-respuesta">
-                                        <strong>Respuesta:</strong> ${eval.Respuesta || 'N/A'}
-                                    </div>
-                                    <div class="evaluacion-profesor">
+                                    
+                                    <div class="evaluacion-footer">
                                         👨‍🏫 Evaluado por: ${eval.profesor_nombre} ${eval.profesor_apellido}
                                     </div>
                                 </div>
@@ -986,6 +1247,17 @@
                 console.error('Error:', error);
                 mostrarError(content, 'Error al cargar las evaluaciones. Por favor, intente nuevamente.');
             }
+        }
+
+        // Volver al modal de modelos
+        function volverAModelos() {
+            document.getElementById('evaluacionesModal').classList.remove('active');
+            verModelosEvaluacion(estudianteIdActual, estudianteNombreActual);
+        }
+
+        // Cerrar modal modelos
+        function cerrarModalModelos() {
+            document.getElementById('modelosModal').classList.remove('active');
         }
 
         // Cerrar modal evaluaciones
@@ -1102,10 +1374,14 @@
         // Cerrar modales al hacer clic fuera
         window.addEventListener('click', function(event) {
             const citaModal = document.getElementById('citaModal');
+            const modelosModal = document.getElementById('modelosModal');
             const evalModal = document.getElementById('evaluacionesModal');
             
             if (event.target === citaModal) {
                 cerrarModalCita();
+            }
+            if (event.target === modelosModal) {
+                cerrarModalModelos();
             }
             if (event.target === evalModal) {
                 cerrarModalEvaluaciones();
