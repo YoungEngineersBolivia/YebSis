@@ -78,21 +78,73 @@
             
             <div class="action-buttons">
                 <?php if(isset($esRecuperatoria) && $esRecuperatoria): ?>
-                    <button class="btn-evaluate" onclick="window.location.href='<?php echo e(route('profesor.evaluar-estudiante', $estudiante->Id_estudiantes)); ?>'">
+                    <button class="btn-evaluate" onclick="window.location.href='<?php echo e(route('profesor.evaluar-estudiante', $estudiante->Id_estudiantes)); ?>?modelo_id=' + document.querySelector('.model-select').value">
                         <i class="bi bi-clipboard-check me-1"></i>Evaluar y Finalizar
                     </button>
-                <?php elseif(isset($yaEvaluado) && $yaEvaluado): ?>
-                    <button class="btn-evaluate" style="background-color: #f39c12;" onclick="window.location.href='<?php echo e(route('profesor.evaluar-estudiante', $estudiante->Id_estudiantes)); ?>'">
-                        <i class="bi bi-pencil-square me-1"></i>Editar Evaluación
-                    </button>
                 <?php else: ?>
-                    <button class="btn-evaluate" onclick="window.location.href='<?php echo e(route('profesor.evaluar-estudiante', $estudiante->Id_estudiantes)); ?>'">
-                        <i class="bi bi-clipboard-plus me-1"></i>Evaluar Estudiante
-                    </button>
+                    <a id="btn-evaluar-accion" href="#" class="btn-evaluate">
+                        <i class="bi bi-clipboard-plus me-1"></i><span id="txt-evaluar-accion">Evaluar Estudiante</span>
+                    </a>
                 <?php endif; ?>
             </div>
         </div>
     </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const modelSelect = document.querySelector('.model-select');
+    const actionBtn = document.getElementById('btn-evaluar-accion');
+    const actionTxt = document.getElementById('txt-evaluar-accion');
+    const actionIcon = actionBtn ? actionBtn.querySelector('i') : null;
+    
+    // Lista de modelos ya evaluados pasados desde el controlador
+    const modelosEvaluados = <?php echo json_encode($modelosEvaluados ?? [], 15, 512) ?>;
+    const baseEvalUrl = "<?php echo e(route('profesor.evaluar-estudiante', $estudiante->Id_estudiantes)); ?>";
+
+    function updateActionButton() {
+        if (!actionBtn) return; // Si estamos en modo recuperatorio, el botón es diferente
+
+        const selectedModel = modelSelect.value;
+        const isEvaluated = modelosEvaluados.includes(parseInt(selectedModel));
+
+        // Actualizar URL
+        actionBtn.href = `${baseEvalUrl}?modelo_id=${selectedModel}`;
+
+        if (isEvaluated) {
+            // Modo Editar
+            actionBtn.style.backgroundColor = '#f39c12'; // Orange
+            actionTxt.textContent = "Editar Evaluación";
+            if(actionIcon) {
+                actionIcon.className = 'bi bi-pencil-square me-1';
+            }
+        } else {
+            // Modo Evaluar (Crear)
+            actionBtn.style.backgroundColor = ''; // Default (usually generic blue/green from CSS)
+            actionTxt.textContent = "Evaluar Estudiante";
+            if(actionIcon) {
+                actionIcon.className = 'bi bi-clipboard-plus me-1';
+            }
+        }
+        
+        // Validación opcional: Deshabilitar si no hay modelo seleccionado
+        if (!selectedModel) {
+            actionBtn.classList.add('disabled');
+            actionBtn.style.pointerEvents = 'none';
+            actionBtn.style.opacity = '0.6';
+        } else {
+            actionBtn.classList.remove('disabled');
+            actionBtn.style.pointerEvents = 'auto';
+            actionBtn.style.opacity = '1';
+        }
+    }
+
+    if (modelSelect) {
+        modelSelect.addEventListener('change', updateActionButton);
+        // Ejecutar al inicio para establecer estado correcto
+        updateActionButton();
+    }
+});
+</script>
 <?php $__env->stopSection(); ?>
 <?php echo $__env->make('profesor.baseProfesor', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\Users\danil\Desktop\Laravel\Yebolivia\resources\views/profesor/detalleEstudiante.blade.php ENDPATH**/ ?>

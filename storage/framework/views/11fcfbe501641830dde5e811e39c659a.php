@@ -506,7 +506,12 @@
                         <span>Horarios</span>
                     </a>
                 </li>
-
+                <li>
+                    <a href="<?php echo e(route('citas.index')); ?>" class="nav-link link-dark sidebar-link d-flex align-items-center gap-3">
+                        <i class="bi bi-calendar-week"></i>
+                        <span>Citas</span>
+                    </a>
+                </li>
                 <!-- Sección: Finanzas -->
                 <div class="nav-section-title">FINANZAS</div>
 
