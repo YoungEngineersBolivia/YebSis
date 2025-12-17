@@ -38,7 +38,7 @@
 
     <div class="card shadow-sm border-0">
         <div class="card-body p-4">
-            <form action="<?php echo e(route('profesor.asistencia.store')); ?>" method="POST">
+            <form action="<?php echo e(route('profesor.asistencia.store')); ?>" method="POST" id="asistenciaForm">
                 <?php echo csrf_field(); ?>
                 <input type="hidden" name="profesor_id" value="<?php echo e($profesor->Id_profesores); ?>">
                 
@@ -79,25 +79,55 @@
                                         </td>
                                         <td>
                                             <div class="btn-group w-100" role="group">
-                                                <input type="radio" class="btn-check" name="asistencia[<?php echo e($estudiante->Id_estudiantes); ?>]" id="asistio_<?php echo e($estudiante->Id_estudiantes); ?>" value="Asistio" checked onclick="toggleReprogramacion(<?php echo e($estudiante->Id_estudiantes); ?>, false)">
-                                                <label class="btn btn-outline-success btn-sm" for="asistio_<?php echo e($estudiante->Id_estudiantes); ?>">Asistió</label>
+                                                <input type="radio" class="btn-check desktop-input" 
+                                                    name="asistencia[<?php echo e($estudiante->Id_estudiantes); ?>]" 
+                                                    id="asistio_desktop_<?php echo e($estudiante->Id_estudiantes); ?>" 
+                                                    value="Asistio" 
+                                                    checked
+                                                    data-student-id="<?php echo e($estudiante->Id_estudiantes); ?>"
+                                                    onchange="syncInputs(<?php echo e($estudiante->Id_estudiantes); ?>, 'Asistio', 'desktop')">
+                                                <label class="btn btn-outline-success btn-sm" for="asistio_desktop_<?php echo e($estudiante->Id_estudiantes); ?>">Asistió</label>
 
-                                                <input type="radio" class="btn-check" name="asistencia[<?php echo e($estudiante->Id_estudiantes); ?>]" id="falta_<?php echo e($estudiante->Id_estudiantes); ?>" value="Falta" onclick="toggleReprogramacion(<?php echo e($estudiante->Id_estudiantes); ?>, false)">
-                                                <label class="btn btn-outline-danger btn-sm" for="falta_<?php echo e($estudiante->Id_estudiantes); ?>">Falta</label>
+                                                <input type="radio" class="btn-check desktop-input" 
+                                                    name="asistencia[<?php echo e($estudiante->Id_estudiantes); ?>]" 
+                                                    id="falta_desktop_<?php echo e($estudiante->Id_estudiantes); ?>" 
+                                                    value="Falta"
+                                                    data-student-id="<?php echo e($estudiante->Id_estudiantes); ?>"
+                                                    onchange="syncInputs(<?php echo e($estudiante->Id_estudiantes); ?>, 'Falta', 'desktop')">
+                                                <label class="btn btn-outline-danger btn-sm" for="falta_desktop_<?php echo e($estudiante->Id_estudiantes); ?>">Falta</label>
 
-                                                <input type="radio" class="btn-check" name="asistencia[<?php echo e($estudiante->Id_estudiantes); ?>]" id="licencia_<?php echo e($estudiante->Id_estudiantes); ?>" value="Licencia" onclick="toggleReprogramacion(<?php echo e($estudiante->Id_estudiantes); ?>, false)">
-                                                <label class="btn btn-outline-warning btn-sm" for="licencia_<?php echo e($estudiante->Id_estudiantes); ?>">Licencia</label>
+                                                <input type="radio" class="btn-check desktop-input" 
+                                                    name="asistencia[<?php echo e($estudiante->Id_estudiantes); ?>]" 
+                                                    id="licencia_desktop_<?php echo e($estudiante->Id_estudiantes); ?>" 
+                                                    value="Licencia"
+                                                    data-student-id="<?php echo e($estudiante->Id_estudiantes); ?>"
+                                                    onchange="syncInputs(<?php echo e($estudiante->Id_estudiantes); ?>, 'Licencia', 'desktop')">
+                                                <label class="btn btn-outline-warning btn-sm" for="licencia_desktop_<?php echo e($estudiante->Id_estudiantes); ?>">Licencia</label>
 
-                                                <input type="radio" class="btn-check" name="asistencia[<?php echo e($estudiante->Id_estudiantes); ?>]" id="reprogramado_<?php echo e($estudiante->Id_estudiantes); ?>" value="Reprogramado" onclick="toggleReprogramacion(<?php echo e($estudiante->Id_estudiantes); ?>, true)">
-                                                <label class="btn btn-outline-info btn-sm" for="reprogramado_<?php echo e($estudiante->Id_estudiantes); ?>">Reprog.</label>
+                                                <input type="radio" class="btn-check desktop-input" 
+                                                    name="asistencia[<?php echo e($estudiante->Id_estudiantes); ?>]" 
+                                                    id="reprogramado_desktop_<?php echo e($estudiante->Id_estudiantes); ?>" 
+                                                    value="Reprogramado"
+                                                    data-student-id="<?php echo e($estudiante->Id_estudiantes); ?>"
+                                                    onchange="syncInputs(<?php echo e($estudiante->Id_estudiantes); ?>, 'Reprogramado', 'desktop')">
+                                                <label class="btn btn-outline-info btn-sm" for="reprogramado_desktop_<?php echo e($estudiante->Id_estudiantes); ?>">Reprog.</label>
                                             </div>
                                         </td>
                                         <td>
-                                            <input type="text" name="observacion[<?php echo e($estudiante->Id_estudiantes); ?>]" class="form-control form-control-sm mb-2" placeholder="Observación (opcional)">
+                                            <input type="text" 
+                                                name="observacion[<?php echo e($estudiante->Id_estudiantes); ?>]" 
+                                                id="observacion_desktop_<?php echo e($estudiante->Id_estudiantes); ?>"
+                                                class="form-control form-control-sm mb-2" 
+                                                placeholder="Observación (opcional)"
+                                                oninput="syncText(<?php echo e($estudiante->Id_estudiantes); ?>, 'observacion', 'desktop')">
                                             
-                                            <div id="reprogramacion_div_<?php echo e($estudiante->Id_estudiantes); ?>" style="display: none;">
+                                            <div id="reprogramacion_div_desktop_<?php echo e($estudiante->Id_estudiantes); ?>" style="display: none;">
                                                 <label class="form-label small text-info fw-bold">Nueva Fecha:</label>
-                                                <input type="date" name="fecha_reprogramada[<?php echo e($estudiante->Id_estudiantes); ?>]" class="form-control form-control-sm border-info">
+                                                <input type="date" 
+                                                    name="fecha_reprogramada[<?php echo e($estudiante->Id_estudiantes); ?>]" 
+                                                    id="fecha_reprogramada_desktop_<?php echo e($estudiante->Id_estudiantes); ?>"
+                                                    class="form-control form-control-sm border-info"
+                                                    onchange="syncText(<?php echo e($estudiante->Id_estudiantes); ?>, 'fecha_reprogramada', 'desktop')">
                                             </div>
                                         </td>
                                     </tr>
@@ -112,7 +142,6 @@
                     <?php $__currentLoopData = $estudiantes; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $estudiante): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                         <div class="card mb-3 shadow-sm">
                             <div class="card-body">
-                                <input type="hidden" name="programa_id[<?php echo e($estudiante->Id_estudiantes); ?>]" value="<?php echo e($estudiante->Id_programas); ?>">
                                 
                                 <div class="d-flex justify-content-between align-items-start mb-3">
                                     <div>
@@ -126,19 +155,40 @@
                                     <label class="form-label fw-bold small mb-2">Estado de Asistencia:</label>
                                     <div class="row g-2">
                                         <div class="col-6">
-                                            <input type="radio" class="btn-check" name="asistencia[<?php echo e($estudiante->Id_estudiantes); ?>]" id="asistio_mobile_<?php echo e($estudiante->Id_estudiantes); ?>" value="Asistio" checked onclick="toggleReprogramacion(<?php echo e($estudiante->Id_estudiantes); ?>, false)">
+                                            <input type="radio" class="btn-check mobile-input" 
+                                                name="asistencia_mobile[<?php echo e($estudiante->Id_estudiantes); ?>]" 
+                                                id="asistio_mobile_<?php echo e($estudiante->Id_estudiantes); ?>" 
+                                                value="Asistio" 
+                                                checked
+                                                data-student-id="<?php echo e($estudiante->Id_estudiantes); ?>"
+                                                onchange="syncInputs(<?php echo e($estudiante->Id_estudiantes); ?>, 'Asistio', 'mobile')">
                                             <label class="btn btn-outline-success w-100" for="asistio_mobile_<?php echo e($estudiante->Id_estudiantes); ?>">Asistió</label>
                                         </div>
                                         <div class="col-6">
-                                            <input type="radio" class="btn-check" name="asistencia[<?php echo e($estudiante->Id_estudiantes); ?>]" id="falta_mobile_<?php echo e($estudiante->Id_estudiantes); ?>" value="Falta" onclick="toggleReprogramacion(<?php echo e($estudiante->Id_estudiantes); ?>, false)">
+                                            <input type="radio" class="btn-check mobile-input" 
+                                                name="asistencia_mobile[<?php echo e($estudiante->Id_estudiantes); ?>]" 
+                                                id="falta_mobile_<?php echo e($estudiante->Id_estudiantes); ?>" 
+                                                value="Falta"
+                                                data-student-id="<?php echo e($estudiante->Id_estudiantes); ?>"
+                                                onchange="syncInputs(<?php echo e($estudiante->Id_estudiantes); ?>, 'Falta', 'mobile')">
                                             <label class="btn btn-outline-danger w-100" for="falta_mobile_<?php echo e($estudiante->Id_estudiantes); ?>">Falta</label>
                                         </div>
                                         <div class="col-6">
-                                            <input type="radio" class="btn-check" name="asistencia[<?php echo e($estudiante->Id_estudiantes); ?>]" id="licencia_mobile_<?php echo e($estudiante->Id_estudiantes); ?>" value="Licencia" onclick="toggleReprogramacion(<?php echo e($estudiante->Id_estudiantes); ?>, false)">
+                                            <input type="radio" class="btn-check mobile-input" 
+                                                name="asistencia_mobile[<?php echo e($estudiante->Id_estudiantes); ?>]" 
+                                                id="licencia_mobile_<?php echo e($estudiante->Id_estudiantes); ?>" 
+                                                value="Licencia"
+                                                data-student-id="<?php echo e($estudiante->Id_estudiantes); ?>"
+                                                onchange="syncInputs(<?php echo e($estudiante->Id_estudiantes); ?>, 'Licencia', 'mobile')">
                                             <label class="btn btn-outline-warning w-100" for="licencia_mobile_<?php echo e($estudiante->Id_estudiantes); ?>">Licencia</label>
                                         </div>
                                         <div class="col-6">
-                                            <input type="radio" class="btn-check" name="asistencia[<?php echo e($estudiante->Id_estudiantes); ?>]" id="reprogramado_mobile_<?php echo e($estudiante->Id_estudiantes); ?>" value="Reprogramado" onclick="toggleReprogramacion(<?php echo e($estudiante->Id_estudiantes); ?>, true)">
+                                            <input type="radio" class="btn-check mobile-input" 
+                                                name="asistencia_mobile[<?php echo e($estudiante->Id_estudiantes); ?>]" 
+                                                id="reprogramado_mobile_<?php echo e($estudiante->Id_estudiantes); ?>" 
+                                                value="Reprogramado"
+                                                data-student-id="<?php echo e($estudiante->Id_estudiantes); ?>"
+                                                onchange="syncInputs(<?php echo e($estudiante->Id_estudiantes); ?>, 'Reprogramado', 'mobile')">
                                             <label class="btn btn-outline-info w-100" for="reprogramado_mobile_<?php echo e($estudiante->Id_estudiantes); ?>">Reprogramado</label>
                                         </div>
                                     </div>
@@ -146,12 +196,21 @@
 
                                 <div class="mb-2">
                                     <label class="form-label small fw-bold">Observación:</label>
-                                    <input type="text" name="observacion[<?php echo e($estudiante->Id_estudiantes); ?>]" class="form-control" placeholder="Observación (opcional)">
+                                    <input type="text" 
+                                        name="observacion_mobile[<?php echo e($estudiante->Id_estudiantes); ?>]" 
+                                        id="observacion_mobile_<?php echo e($estudiante->Id_estudiantes); ?>"
+                                        class="form-control" 
+                                        placeholder="Observación (opcional)"
+                                        oninput="syncText(<?php echo e($estudiante->Id_estudiantes); ?>, 'observacion', 'mobile')">
                                 </div>
 
-                                <div id="reprogramacion_div_<?php echo e($estudiante->Id_estudiantes); ?>" style="display: none;">
+                                <div id="reprogramacion_div_mobile_<?php echo e($estudiante->Id_estudiantes); ?>" style="display: none;">
                                     <label class="form-label small text-info fw-bold">Nueva Fecha:</label>
-                                    <input type="date" name="fecha_reprogramada[<?php echo e($estudiante->Id_estudiantes); ?>]" class="form-control border-info">
+                                    <input type="date" 
+                                        name="fecha_reprogramada_mobile[<?php echo e($estudiante->Id_estudiantes); ?>]" 
+                                        id="fecha_reprogramada_mobile_<?php echo e($estudiante->Id_estudiantes); ?>"
+                                        class="form-control border-info"
+                                        onchange="syncText(<?php echo e($estudiante->Id_estudiantes); ?>, 'fecha_reprogramada', 'mobile')">
                                 </div>
                             </div>
                         </div>
@@ -169,16 +228,70 @@
 </div>
 
 <script>
-    function toggleReprogramacion(estudianteId, show) {
-        const div = document.getElementById('reprogramacion_div_' + estudianteId);
-        if (show) {
-            div.style.display = 'block';
-            div.querySelector('input').required = true;
-        } else {
-            div.style.display = 'none';
-            div.querySelector('input').required = false;
+    // Sincronizar inputs entre vista Desktop y Mobile
+    function syncInputs(estudianteId, valor, source) {
+        const target = source === 'desktop' ? 'mobile' : 'desktop';
+        
+        // IDs generados
+        const targetRadioId = valor.toLowerCase() + '_' + target + '_' + estudianteId;
+        const targetRadio = document.getElementById(targetRadioId);
+        
+        if (targetRadio) {
+            targetRadio.checked = true;
+        }
+
+        // Manejar visibilidad de reprogramación en AMBOS
+        toggleReprogramacion(estudianteId, valor === 'Reprogramado', 'desktop');
+        toggleReprogramacion(estudianteId, valor === 'Reprogramado', 'mobile');
+    }
+
+    function syncText(estudianteId, fieldName, source) {
+        const target = source === 'desktop' ? 'mobile' : 'desktop';
+        const sourceId = fieldName + '_' + source + '_' + estudianteId;
+        const targetId = fieldName + '_' + target + '_' + estudianteId;
+        
+        const sourceElem = document.getElementById(sourceId);
+        const targetElem = document.getElementById(targetId);
+        
+        if (sourceElem && targetElem) {
+            targetElem.value = sourceElem.value;
         }
     }
+
+    function toggleReprogramacion(estudianteId, show, viewType) {
+        const divId = 'reprogramacion_div_' + viewType + '_' + estudianteId;
+        const inputId = 'fecha_reprogramada_' + viewType + '_' + estudianteId;
+        
+        const div = document.getElementById(divId);
+        const input = document.getElementById(inputId);
+        
+        if (div) {
+            div.style.display = show ? 'block' : 'none';
+            if (show) {
+                // Solo feedback visual, sin required nativo para evitar bloqueos
+                if(div.offsetParent !== null) {
+                   // Visible
+                }
+            } else {
+                input.value = ''; // Limpiar si cambia de estado
+            }
+        }
+    }
+
+    // Inicializar estado al cargar (por si hay old inputs o default checks)
+    document.addEventListener('DOMContentLoaded', function() {
+        <?php $__currentLoopData = $estudiantes; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $estudiante): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+            // Sincronizar estado inicial basado en Desktop (que es el "master" por defecto en HTML)
+            // Buscamos cuál está checkeado en desktop
+            const checkedDesktop_<?php echo e($estudiante->Id_estudiantes); ?> = document.querySelector(`input[name="asistencia[<?php echo e($estudiante->Id_estudiantes); ?>]"]:checked`);
+            if (checkedDesktop_<?php echo e($estudiante->Id_estudiantes); ?>) {
+                syncInputs(<?php echo e($estudiante->Id_estudiantes); ?>, checkedDesktop_<?php echo e($estudiante->Id_estudiantes); ?>.value, 'desktop');
+            } else {
+                 // Fallback si nada está checkeado
+                 syncInputs(<?php echo e($estudiante->Id_estudiantes); ?>, 'Asistio', 'desktop');
+            }
+        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+    });
 </script>
 <?php $__env->stopSection(); ?>
 
