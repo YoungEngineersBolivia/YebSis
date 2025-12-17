@@ -36,6 +36,11 @@
                 <div class="info-label">Nombre del Estudiante</div>
                 <div class="info-value">
                     {{ $estudiante->full_name }}
+                    @if(isset($esRecuperatoria) && $esRecuperatoria)
+                        <span class="badge bg-warning text-dark ms-2" style="font-size: 0.7em; vertical-align: middle;">
+                            <i class="bi bi-calendar-event me-1"></i>CLASE RECUPERATORIA
+                        </span>
+                    @endif
                 </div>
 
 
@@ -78,8 +83,8 @@
             
             <div class="action-buttons">
                 @if(isset($esRecuperatoria) && $esRecuperatoria)
-                    <button class="btn-evaluate" onclick="window.location.href='{{ route('profesor.evaluar-estudiante', $estudiante->Id_estudiantes) }}?modelo_id=' + document.querySelector('.model-select').value">
-                        <i class="bi bi-clipboard-check me-1"></i>Evaluar y Finalizar
+                    <button id="btn-evaluar-recuperatoria" class="btn-evaluate" onclick="window.location.href='{{ route('profesor.evaluar-estudiante', $estudiante->Id_estudiantes) }}?modelo_id=' + document.querySelector('.model-select').value">
+                        <i class="bi bi-clipboard-check me-1"></i><span id="txt-evaluar-recuperatoria">Evaluar y Finalizar</span>
                     </button>
                 @else
                     <a id="btn-evaluar-accion" href="#" class="btn-evaluate">
@@ -94,48 +99,73 @@
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const modelSelect = document.querySelector('.model-select');
-    const actionBtn = document.getElementById('btn-evaluar-accion');
-    const actionTxt = document.getElementById('txt-evaluar-accion');
-    const actionIcon = actionBtn ? actionBtn.querySelector('i') : null;
     
+    // Elementos del botón normal
+    const actionBtnNormal = document.getElementById('btn-evaluar-accion');
+    const actionTxtNormal = document.getElementById('txt-evaluar-accion');
+    const actionIconNormal = actionBtnNormal ? actionBtnNormal.querySelector('i') : null;
+
+    // Elementos del botón recuperatorio
+    const actionBtnRecup = document.getElementById('btn-evaluar-recuperatoria');
+    const actionTxtRecup = document.getElementById('txt-evaluar-recuperatoria');
+    const actionIconRecup = actionBtnRecup ? actionBtnRecup.querySelector('i') : null;
+
     // Lista de modelos ya evaluados pasados desde el controlador
     const modelosEvaluados = @json($modelosEvaluados ?? []);
     const baseEvalUrl = "{{ route('profesor.evaluar-estudiante', $estudiante->Id_estudiantes) }}";
 
     function updateActionButton() {
-        if (!actionBtn) return; // Si estamos en modo recuperatorio, el botón es diferente
-
         const selectedModel = modelSelect.value;
         const isEvaluated = modelosEvaluados.includes(parseInt(selectedModel));
 
-        // Actualizar URL
-        actionBtn.href = `${baseEvalUrl}?modelo_id=${selectedModel}`;
+        // ACTUALIZAR BOTÓN NORMAL (Si existe)
+        if (actionBtnNormal) {
+            actionBtnNormal.href = `${baseEvalUrl}?modelo_id=${selectedModel}`;
+            
+            if (isEvaluated) {
+                // Modo Editar
+                actionBtnNormal.style.backgroundColor = '#f39c12'; // Orange
+                actionTxtNormal.textContent = "Editar Evaluación";
+                if(actionIconNormal) actionIconNormal.className = 'bi bi-pencil-square me-1';
+            } else {
+                // Modo Evaluar (Crear)
+                actionBtnNormal.style.backgroundColor = ''; // Default (usually generic blue/green from CSS)
+                actionTxtNormal.textContent = "Evaluar Estudiante";
+                if(actionIconNormal) actionIconNormal.className = 'bi bi-clipboard-plus me-1';
+            }
 
-        if (isEvaluated) {
-            // Modo Editar
-            actionBtn.style.backgroundColor = '#f39c12'; // Orange
-            actionTxt.textContent = "Editar Evaluación";
-            if(actionIcon) {
-                actionIcon.className = 'bi bi-pencil-square me-1';
-            }
-        } else {
-            // Modo Evaluar (Crear)
-            actionBtn.style.backgroundColor = ''; // Default (usually generic blue/green from CSS)
-            actionTxt.textContent = "Evaluar Estudiante";
-            if(actionIcon) {
-                actionIcon.className = 'bi bi-clipboard-plus me-1';
-            }
+            toggleDisable(actionBtnNormal, selectedModel);
         }
-        
-        // Validación opcional: Deshabilitar si no hay modelo seleccionado
-        if (!selectedModel) {
-            actionBtn.classList.add('disabled');
-            actionBtn.style.pointerEvents = 'none';
-            actionBtn.style.opacity = '0.6';
+
+        // ACTUALIZAR BOTÓN RECUPERATORIO (Si existe)
+        if (actionBtnRecup) {
+            // El onclick ya obtiene el valor de forma dinámica
+            
+            if (isEvaluated) {
+                // Si ya está evaluado, cambiamos a modo Editar aunque sea recuperatorio
+                actionBtnRecup.style.backgroundColor = '#f39c12';
+                actionTxtRecup.textContent = "Editar Evaluación";
+                if(actionIconRecup) actionIconRecup.className = 'bi bi-pencil-square me-1';
+            } else {
+                // Si no, mantenemos el modo "Evaluar y Finalizar"
+                actionBtnRecup.style.backgroundColor = '';
+                actionTxtRecup.textContent = "Evaluar y Finalizar";
+                if(actionIconRecup) actionIconRecup.className = 'bi bi-clipboard-check me-1';
+            }
+
+            toggleDisable(actionBtnRecup, selectedModel);
+        }
+    }
+    
+    function toggleDisable(btn, model) {
+        if (!model) {
+            btn.classList.add('disabled');
+            btn.style.pointerEvents = 'none';
+            btn.style.opacity = '0.6';
         } else {
-            actionBtn.classList.remove('disabled');
-            actionBtn.style.pointerEvents = 'auto';
-            actionBtn.style.opacity = '1';
+            btn.classList.remove('disabled');
+            btn.style.pointerEvents = 'auto';
+            btn.style.opacity = '1';
         }
     }
 
