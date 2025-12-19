@@ -397,6 +397,12 @@
                     <i class="bi bi-arrow-left me-2"></i>Volver a Programas
                 </a>
                 <h2><?php echo e($programa->Nombre); ?></h2>
+                <?php if($programa->Descripcion): ?>
+                    <p class="mb-3" style="font-size: 1rem; opacity: 0.95; line-height: 1.6;">
+                        <?php echo e($programa->Descripcion); ?>
+
+                    </p>
+                <?php endif; ?>
                 <div class="d-flex flex-wrap gap-2">
                     <span class="info-badge">
                         <i class="bi bi-tag-fill"></i>
