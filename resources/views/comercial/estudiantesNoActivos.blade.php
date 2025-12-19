@@ -112,6 +112,7 @@
                         <th>#</th>
                         <th>Nombre</th>
                         <th>Apellido</th>
+                        <th>Sucursal</th>
                         <th>Fecha de inactivación</th>
                         <th class="text-center">Acciones</th>
                     </tr>
@@ -122,6 +123,11 @@
                         <td class="text-muted">{{ $index + 1 }}</td>
                         <td class="fw-semibold">{{ $estudiante->nombre }}</td>
                         <td>{{ $estudiante->apellido }}</td>
+                        <td>
+                            <span class="badge bg-secondary">
+                                <i class="bi bi-building"></i> {{ $estudiante->sucursal }}
+                            </span>
+                        </td>
                         <td>
                             <span class="badge bg-light text-dark">
                                 <i class="bi bi-calendar-x"></i> {{ $estudiante->fecha_inactivacion_fmt }}
@@ -141,7 +147,7 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="5" class="text-center text-muted py-4">
+                        <td colspan="6" class="text-center text-muted py-4">
                             <i class="bi bi-emoji-smile" style="font-size: 2rem;"></i>
                             <p class="mb-0 mt-2">No hay estudiantes inactivos en el período seleccionado.</p>
                             @if($from || $to)
