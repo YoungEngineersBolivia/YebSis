@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Jóvenes Ingenieros - Recuperación de Contraseña</title>
-    <link href="<?php echo e(auto_asset('css/paginaWeb/login.css')); ?>" rel="stylesheet">
+    <link href="<?php echo e(asset('css/paginaWeb/login.css')); ?>" rel="stylesheet">
     <style>
         .forgot-pwd button {
             background-color: transparent;
@@ -20,30 +20,6 @@
             color: #0056b3;
         }
 
-        .alert {
-            padding: 12px 15px;
-            margin-bottom: 20px;
-            border-radius: 4px;
-            font-size: 14px;
-        }
-
-        .alert-success {
-            background-color: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
-        }
-
-        .alert-danger {
-            background-color: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
-        }
-
-        .alert ul {
-            margin: 0;
-            padding-left: 20px;
-        }
-
         .captcha-container {
             background-color: #f8f9fa;
             padding: 15px;
@@ -52,17 +28,20 @@
             border: 2px solid #dee2e6;
         }
 
-        .captcha-question {
-            font-size: 24px;
-            font-weight: bold;
-            color: #333;
+        .captcha-image-wrapper {
             text-align: center;
-            margin-bottom: 10px;
-            font-family: 'Courier New', monospace;
-            background-color: #fff;
-            padding: 10px;
+            margin-bottom: 15px;
+            position: relative;
+        }
+
+        .captcha-image {
+            border: 2px solid #ced4da;
             border-radius: 5px;
-            border: 1px solid #ced4da;
+            background-color: #fff;
+            display: inline-block;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            max-width: 100%;
+            height: auto;
         }
 
         .captcha-label {
@@ -72,10 +51,32 @@
             margin-bottom: 10px;
         }
 
+        .captcha-refresh {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 13px;
+            margin-top: 10px;
+            transition: background-color 0.3s;
+        }
+
+        .captcha-refresh:hover {
+            background-color: #0056b3;
+        }
+
+        .captcha-refresh:disabled {
+            background-color: #6c757d;
+            cursor: not-allowed;
+        }
+
         .captcha-input {
             text-align: center;
             font-size: 18px;
             font-weight: bold;
+            text-transform: uppercase;
         }
 
         .back-to-login {
@@ -98,6 +99,14 @@
             font-size: 13px;
             margin-top: 5px;
         }
+
+        .captcha-instructions {
+            font-size: 13px;
+            color: #495057;
+            text-align: center;
+            margin-bottom: 10px;
+            font-weight: 500;
+        }
     </style>
 </head>
 <body>
@@ -105,34 +114,18 @@
         <div class="left-section">
             <div class="grid-pattern"></div>
             <div class="logo-section">
-                <img src="<?php echo e(auto_asset('img/ES_logo-grande.png')); ?>" alt="Logo YE Bolivia" width="500px" class="me-2">
+                <img src="<?php echo e(asset('img/ES_logo-grande.png')); ?>" alt="Logo YE Bolivia" width="500px" class="me-2">
             </div>
         </div>
         <div class="right-section">
             <div class="login-header">
-                <img src="<?php echo e(auto_asset('img/ES_logo-02.webp')); ?>" alt="Logo YE Bolivia" width="150px" class="me-2">
+                <img src="<?php echo e(asset('img/ES_logo-02.webp')); ?>" alt="Logo YE Bolivia" width="150px" class="me-2">
             </div>
             <p class="welcome-text">
-                <b>
-                Recupera tu contraseña para continuar con tu sesión y seguir avanzando.
-                </b>
+                <b>Recupera tu contraseña para continuar con tu sesión y seguir avanzando.</b>
             </p>
             
-            <?php if(session('status')): ?>
-                <div class="alert alert-success"><?php echo e(session('status')); ?></div>
-            <?php endif; ?>
-            
-            <?php if($errors->any()): ?>
-                <div class="alert alert-danger">
-                    <ul>
-                        <?php $__currentLoopData = $errors->all(); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $error): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                            <li><?php echo e($error); ?></li>
-                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-                    </ul>
-                </div>
-            <?php endif; ?>
-            
-            <form method="POST" action="<?php echo e(route('password.email')); ?>">
+            <form method="POST" action="<?php echo e(route('password.email')); ?>" id="forgot-form">
                 <?php echo csrf_field(); ?>
                 
                 <div class="form-group">
@@ -147,33 +140,38 @@
                         autofocus 
                         value="<?php echo e(old('Correo')); ?>"
                     >
-                    <?php $__errorArgs = ['Correo'];
-$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
-if ($__bag->has($__errorArgs[0])) :
-if (isset($message)) { $__messageOriginal = $message; }
-$message = $__bag->first($__errorArgs[0]); ?>
-                        <div class="error-text"><?php echo e($message); ?></div>
-                    <?php unset($message);
-if (isset($__messageOriginal)) { $message = $__messageOriginal; }
-endif;
-unset($__errorArgs, $__bag); ?>
                 </div>
 
                 <div class="captcha-container">
                     <div class="captcha-label">🔒 Verificación de seguridad</div>
-                    <div class="captcha-question">
-                        <?php echo e(session('captcha_question', $captcha_question ?? '? + ?')); ?> = ?
+                    <div class="captcha-instructions">
+                        Ingresa los caracteres que ves en la imagen
                     </div>
-                    <div class="form-group" style="margin-bottom: 0;">
-                        <label class="form-label" for="captcha">¿Cuál es el resultado?</label>
+                    
+                    <div class="captcha-image-wrapper">
+                        <img src="<?php echo e(route('captcha.generate')); ?>?<?php echo e(time()); ?>" 
+                             alt="CAPTCHA" 
+                             class="captcha-image"
+                             id="captcha-img">
+                    </div>
+                    
+                    <div style="text-align: center;">
+                        <button type="button" class="captcha-refresh" onclick="refreshCaptcha()" id="refresh-btn">
+                            🔄 Generar nuevo código
+                        </button>
+                    </div>
+                    
+                    <div class="form-group" style="margin-bottom: 0; margin-top: 15px;">
+                        <label class="form-label" for="captcha">Ingresa el código</label>
                         <input 
-                            type="number" 
+                            type="text" 
                             name="captcha" 
                             id="captcha" 
                             class="form-input captcha-input" 
-                            placeholder="Tu respuesta" 
+                            placeholder="Escribe el código aquí" 
                             required
                             autocomplete="off"
+                            maxlength="6"
                         >
                         <?php $__errorArgs = ['captcha'];
 $__bag = $errors->getBag($__errorArgs[1] ?? 'default');
@@ -196,5 +194,52 @@ unset($__errorArgs, $__bag); ?>
             </div>
         </div>
     </div>
+
+    <script>
+        function refreshCaptcha() {
+            const captchaImg = document.getElementById('captcha-img');
+            const refreshBtn = document.getElementById('refresh-btn');
+            const captchaInput = document.getElementById('captcha');
+            
+            // Deshabilitar el botón temporalmente
+            refreshBtn.disabled = true;
+            refreshBtn.textContent = '⏳ Cargando...';
+            
+            // Actualizar imagen con timestamp para evitar cache
+            captchaImg.src = '<?php echo e(route("captcha.generate")); ?>?' + new Date().getTime();
+            
+            // Limpiar input
+            captchaInput.value = '';
+            
+            // Llamar al backend para regenerar el código en sesión
+            fetch('<?php echo e(route("captcha.refresh")); ?>', {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': '<?php echo e(csrf_token()); ?>',
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Rehabilitar el botón
+                setTimeout(() => {
+                    refreshBtn.disabled = false;
+                    refreshBtn.textContent = '🔄 Generar nuevo código';
+                    captchaInput.focus();
+                }, 500);
+            })
+            .catch(error => {
+                console.error('Error al refrescar CAPTCHA:', error);
+                refreshBtn.disabled = false;
+                refreshBtn.textContent = '🔄 Generar nuevo código';
+            });
+        }
+
+        // Convertir input a mayúsculas automáticamente
+        document.getElementById('captcha').addEventListener('input', function(e) {
+            this.value = this.value.toUpperCase();
+        });
+    </script>
 </body>
 </html><?php /**PATH C:\Users\danil\Desktop\Laravel\Yebolivia\resources\views/paginaWeb/forgotPassword.blade.php ENDPATH**/ ?>
