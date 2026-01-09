@@ -428,18 +428,21 @@ Route::middleware(['auth', 'role:profesor'])->prefix('profesor')->name('profesor
 
 Route::middleware(['auth', 'role:tutor'])->prefix('tutor')->name('tutor.')->group(function () {
     
-    // Home del tutor (una sola ruta)
+    // Home del tutor
     Route::get('/home', [TutorHomeController::class, 'index'])
         ->name('home');
     
-    // Ver evaluaciones de un estudiante
-    Route::get('/estudiantes/{id}/evaluaciones', [TutorHomeController::class, 'verEvaluaciones'])
+    Route::get('/estudiantes/{id}/evaluaciones/ver', [TutorHomeController::class, 'mostrarEvaluaciones'])
         ->name('estudiantes.evaluaciones');
+    
+    Route::get('/estudiantes/{id}/evaluaciones', [TutorHomeController::class, 'verEvaluaciones'])
+        ->name('estudiantes.evaluaciones.json');
+    
     // Agendar una cita
     Route::post('/citas/agendar', [TutorHomeController::class, 'agendarCita'])
         ->name('citas.agendar');
     
-    // Listar citas del tutor (opcional)
+    // Listar citas del tutor
     Route::get('/citas', [TutorHomeController::class, 'listarCitas'])
         ->name('citas.listar');
 });
