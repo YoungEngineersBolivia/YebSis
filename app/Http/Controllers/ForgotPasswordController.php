@@ -14,17 +14,20 @@ class ForgotPasswordController extends Controller
 {
     public function showLinkRequestForm()
     {
-        // Generar un CAPTCHA matemático simple
-        $num1 = rand(1, 10);
-        $num2 = rand(1, 10);
-        $captchaAnswer = $num1 + $num2;
+        // Generar código CAPTCHA y guardarlo en sesión
+        $this->generateCaptcha();
         
-        // Guardar la respuesta en sesión
-        session(['captcha_answer' => $captchaAnswer]);
-        
-        return view('paginaWeb.forgotPassword', [
-            'captcha_question' => "$num1 + $num2"
-        ]);
+        return view('paginaWeb.forgotPassword');
+    }
+
+    private function generateCaptcha()
+    {
+        $characters = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+        $captchaCode = '';
+        for ($i = 0; $i < 6; $i++) {
+            $captchaCode .= $characters[rand(0, strlen($characters) - 1)];
+        }
+        session(['captcha_code' => $captchaCode]);
     }
 
     public function sendResetLinkEmail(Request $request)
@@ -32,32 +35,27 @@ class ForgotPasswordController extends Controller
         // Validación básica
         $request->validate([
             'Correo' => 'required|email|exists:usuarios,Correo',
-            'captcha' => 'required|numeric',
+            'captcha' => 'required|string',
         ], [
             'Correo.required' => 'El correo electrónico es obligatorio.',
             'Correo.email' => 'Debe proporcionar un correo electrónico válido.',
             'Correo.exists' => 'No encontramos un usuario con ese correo electrónico.',
-            'captcha.required' => 'Debe resolver el CAPTCHA.',
-            'captcha.numeric' => 'El CAPTCHA debe ser un número.',
+            'captcha.required' => 'Debe ingresar el código CAPTCHA.',
         ]);
 
         // Verificar CAPTCHA
-        if (!session()->has('captcha_answer') || 
-            (int)$request->captcha !== (int)session('captcha_answer')) {
-            
+        $sessionCaptcha = session('captcha_code');
+        if (!$sessionCaptcha || strtoupper($request->captcha) !== strtoupper($sessionCaptcha)) {
             // Regenerar CAPTCHA en caso de error
-            $num1 = rand(1, 10);
-            $num2 = rand(1, 10);
-            session(['captcha_answer' => $num1 + $num2]);
+            $this->generateCaptcha();
             
             return back()
                 ->withInput($request->only('Correo'))
-                ->withErrors(['captcha' => 'La respuesta del CAPTCHA es incorrecta.'])
-                ->with('captcha_question', "$num1 + $num2");
+                ->withErrors(['captcha' => 'El código CAPTCHA es incorrecto.']);
         }
 
         // Limpiar el CAPTCHA usado
-        session()->forget('captcha_answer');
+        session()->forget('captcha_code');
 
         // Verificar intentos recientes (protección contra spam)
         $recentAttempt = DB::table('password_reset_tokens')
@@ -66,6 +64,7 @@ class ForgotPasswordController extends Controller
             ->first();
 
         if ($recentAttempt) {
+            $this->generateCaptcha();
             return back()
                 ->withInput($request->only('Correo'))
                 ->withErrors(['Correo' => 'Por favor espera 2 minutos antes de solicitar otro enlace.']);
@@ -75,6 +74,7 @@ class ForgotPasswordController extends Controller
         $usuario = Usuario::where('Correo', $request->Correo)->first();
 
         if (!$usuario) {
+            $this->generateCaptcha();
             return back()->withErrors(['Correo' => 'No podemos encontrar un usuario con esa dirección de correo electrónico.']);
         }
 
@@ -91,22 +91,52 @@ class ForgotPasswordController extends Controller
             ]
         );
 
+        // Crear URL de restablecimiento - CORREGIDO: usar Correo en vez de email
+        $resetUrl = route('password.reset', ['token' => $token, 'Correo' => $request->Correo]);
+
         // Enviar email
         try {
-            Mail::send('emails.password_reset', ['token' => $token, 'usuario' => $usuario], function($message) use ($request) {
+            Mail::send('emails.password_reset', [
+                'token' => $token, 
+                'usuario' => $usuario,
+                'resetUrl' => $resetUrl
+            ], function($message) use ($request) {
                 $message->to($request->Correo);
                 $message->subject('Recuperación de Contraseña - Jóvenes Ingenieros');
             });
             
+            // Verificar si realmente se envió
+            if (count(Mail::failures()) > 0) {
+                \Log::error('Error al enviar correo a: ' . $request->Correo);
+                throw new \Exception('No se pudo enviar el correo');
+            }
+            
+            // Regenerar CAPTCHA para futuros intentos
+            $this->generateCaptcha();
+            
             return back()->with('status', '¡Revisa tu correo electrónico! Te hemos enviado un enlace para restablecer tu contraseña. El enlace expirará en 15 minutos.');
+            
         } catch (\Exception $e) {
-            return back()->withErrors(['Correo' => 'Hubo un error al enviar el correo. Por favor, intenta nuevamente.']);
+            \Log::error('Error en envío de correo: ' . $e->getMessage());
+            \Log::error('Stack trace: ' . $e->getTraceAsString());
+            
+            $this->generateCaptcha();
+            return back()
+                ->withInput($request->only('Correo'))
+                ->withErrors(['Correo' => 'Hubo un error al enviar el correo. Por favor, inténtalo de nuevo más tarde.']);
         }
     }
 
     public function showResetForm(Request $request, $token)
     {
-        return view('paginaWeb.resetPassword', ['token' => $token, 'email' => $request->email]);
+        // Generar CAPTCHA para el formulario de reset
+        $this->generateCaptcha();
+        
+        // CORREGIDO: Usar Correo en vez de email
+        return view('paginaWeb.resetPassword', [
+            'token' => $token, 
+            'Correo' => $request->Correo
+        ]);
     }
 
     public function reset(Request $request)
@@ -115,10 +145,29 @@ class ForgotPasswordController extends Controller
             'token' => 'required',
             'Correo' => 'required|email|exists:usuarios,Correo',
             'password' => 'required|min:8|confirmed',
+            'captcha' => 'required|string',
         ], [
+            'Correo.required' => 'El correo electrónico es obligatorio.',
+            'Correo.email' => 'Debe proporcionar un correo electrónico válido.',
+            'Correo.exists' => 'No encontramos un usuario con ese correo electrónico.',
+            'password.required' => 'La contraseña es obligatoria.',
             'password.confirmed' => 'Las contraseñas no coinciden.',
             'password.min' => 'La contraseña debe tener al menos 8 caracteres.',
+            'captcha.required' => 'Debe ingresar el código CAPTCHA.',
         ]);
+
+        // Verificar CAPTCHA
+        $sessionCaptcha = session('captcha_code');
+        if (!$sessionCaptcha || strtoupper($request->captcha) !== strtoupper($sessionCaptcha)) {
+            $this->generateCaptcha();
+            
+            return back()
+                ->withInput($request->except('password', 'password_confirmation', 'captcha'))
+                ->withErrors(['captcha' => 'El código CAPTCHA es incorrecto.']);
+        }
+
+        // Limpiar el CAPTCHA usado
+        session()->forget('captcha_code');
 
         // Buscar el token
         $resetRecord = DB::table('password_reset_tokens')
@@ -127,31 +176,56 @@ class ForgotPasswordController extends Controller
 
         // Verificar si existe el registro
         if (!$resetRecord) {
-            return back()->withErrors(['Correo' => 'Este enlace de restablecimiento no es válido.']);
+            $this->generateCaptcha();
+            return back()
+                ->withInput($request->except('password', 'password_confirmation', 'captcha'))
+                ->withErrors(['Correo' => 'Este enlace de restablecimiento no es válido.']);
         }
 
         // Verificar si el token ha expirado (15 minutos)
         $tokenCreatedAt = Carbon::parse($resetRecord->created_at);
         if (Carbon::now()->diffInMinutes($tokenCreatedAt) > 15) {
-            // Eliminar token expirado
             DB::table('password_reset_tokens')->where('Correo', $request->Correo)->delete();
             
-            return back()->withErrors(['token' => 'Este enlace ha expirado. Por favor, solicita uno nuevo.']);
+            $this->generateCaptcha();
+            return back()
+                ->withInput($request->except('password', 'password_confirmation', 'captcha'))
+                ->withErrors(['token' => 'Este enlace ha expirado. Por favor, solicita uno nuevo.']);
         }
 
         // Verificar que el token coincida
         if (!Hash::check($request->token, $resetRecord->token)) {
-            return back()->withErrors(['token' => 'Este enlace de restablecimiento no es válido.']);
+            $this->generateCaptcha();
+            return back()
+                ->withInput($request->except('password', 'password_confirmation', 'captcha'))
+                ->withErrors(['token' => 'Este enlace de restablecimiento no es válido.']);
         }
 
         // Actualizar la contraseña
         $usuario = Usuario::where('Correo', $request->Correo)->first();
+        
+        if (!$usuario) {
+            $this->generateCaptcha();
+            return back()
+                ->withInput($request->except('password', 'password_confirmation', 'captcha'))
+                ->withErrors(['Correo' => 'No se pudo encontrar el usuario.']);
+        }
+
         $usuario->Contrasenia = Hash::make($request->password);
         $usuario->save();
 
         // Eliminar el token usado
         DB::table('password_reset_tokens')->where('Correo', $request->Correo)->delete();
 
-        return redirect()->route('login')->with('status', '¡Tu contraseña ha sido restablecida exitosamente!');
+        // Limpiar sesión
+        session()->forget('captcha_code');
+
+        return redirect()->route('login')->with('status', '¡Tu contraseña ha sido restablecida exitosamente! Ahora puedes iniciar sesión con tu nueva contraseña.');
+    }
+
+    public function refreshCaptcha()
+    {
+        $this->generateCaptcha();
+        return response()->json(['success' => true]);
     }
 }
