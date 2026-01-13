@@ -302,6 +302,90 @@
             <?php endif; ?>
         </div>
 
+        
+<div class="info-card">
+    <div class="info-title">
+        <i class="bi bi-bookmark-star-fill"></i> Progreso de Modelos
+    </div>
+    
+    <?php if(isset($ultimoModelo) || isset($proximoModelo)): ?>
+        
+        <?php if(isset($ultimoModelo) && $ultimoModelo): ?>
+            <div class="mb-3 p-3 border-start border-success border-4 bg-light rounded">
+                <div class="d-flex align-items-center mb-2">
+                    <i class="bi bi-check-circle-fill text-success me-2"></i>
+                    <h6 class="mb-0 fw-bold">Último Modelo Completado</h6>
+                </div>
+                <div class="info-item mb-1">
+                    <span class="info-label">
+                        <i class="bi bi-bookmark-check"></i> Modelo
+                    </span>
+                    <span class="info-value">
+                        <strong><?php echo e($ultimoModelo->Nombre_modelo); ?></strong>
+                    </span>
+                </div>
+                <?php if(isset($ultimaEvaluacion) && $ultimaEvaluacion): ?>
+                    <div class="info-item">
+                        <span class="info-label">
+                            <i class="bi bi-calendar-check"></i> Fecha evaluación
+                        </span>
+                        <span class="info-value">
+                            <?php echo e(\Carbon\Carbon::parse($ultimaEvaluacion->fecha_evaluacion)->format('d/m/Y')); ?>
+
+                        </span>
+                    </div>
+                <?php endif; ?>
+            </div>
+        <?php endif; ?>
+
+        
+        <?php if(isset($proximoModelo) && $proximoModelo): ?>
+            <div class="p-3 border-start border-primary border-4 bg-light rounded">
+                <div class="d-flex align-items-center mb-2">
+                    <i class="bi bi-arrow-right-circle-fill text-primary me-2"></i>
+                    <h6 class="mb-0 fw-bold">Próximo Modelo</h6>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">
+                        <i class="bi bi-bookmark"></i> Modelo
+                    </span>
+                    <span class="info-value">
+                        <strong><?php echo e($proximoModelo->Nombre_modelo); ?></strong>
+                    </span>
+                </div>
+                <div class="mt-2">
+                    <span class="badge bg-info">
+                        <i class="bi bi-hourglass-split"></i> Pendiente de evaluación
+                    </span>
+                </div>
+            </div>
+        <?php elseif(isset($ultimoModelo) && $ultimoModelo): ?>
+            <div class="p-3 border-start border-warning border-4 bg-light rounded">
+                <div class="d-flex align-items-center">
+                    <i class="bi bi-trophy-fill text-warning me-2"></i>
+                    <h6 class="mb-0 fw-bold text-success">
+                        ¡Programa Completado!
+                    </h6>
+                </div>
+                <p class="mb-0 mt-2 text-muted small">
+                    El estudiante ha completado todos los modelos del programa.
+                </p>
+            </div>
+        <?php endif; ?>
+    <?php else: ?>
+        <p class="text-muted text-center mt-3 mb-0">
+            <i class="bi bi-info-circle"></i><br>
+            Aún no hay evaluaciones registradas
+            <?php if(isset($proximoModelo) && $proximoModelo): ?>
+                <br>
+                <small class="mt-2 d-block">
+                    Primer modelo del programa: <strong><?php echo e($proximoModelo->Nombre_modelo); ?></strong>
+                </small>
+            <?php endif; ?>
+        </p>
+    <?php endif; ?>
+</div>
+
     </div>
 
 </div>

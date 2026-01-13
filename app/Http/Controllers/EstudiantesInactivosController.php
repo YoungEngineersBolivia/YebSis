@@ -19,6 +19,7 @@ class EstudiantesInactivosController extends Controller
         // ====== TABLA ======
         $inactivosQuery = DB::table('estudiantes')
             ->join('personas', 'estudiantes.Id_personas', '=', 'personas.Id_personas')
+            ->leftJoin('sucursales', 'estudiantes.Id_sucursales', '=', 'sucursales.Id_sucursales')
             ->where('estudiantes.Estado', 'Inactivo');
 
         if ($from && $to) {
@@ -34,6 +35,7 @@ class EstudiantesInactivosController extends Controller
                 estudiantes.Id_estudiantes                                         AS id,
                 personas.Nombre                                                     AS nombre,
                 personas.Apellido                                                   AS apellido,
+                COALESCE(sucursales.Nombre, "Sin asignar")                         AS sucursal,
                 estudiantes.Fecha_estado                                            AS fecha_inactivacion_iso,
                 DATE_FORMAT(estudiantes.Fecha_estado, "%d/%m/%Y")                   AS fecha_inactivacion_fmt
             ')

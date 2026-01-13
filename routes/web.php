@@ -37,7 +37,7 @@ use App\Http\Controllers\ProfesorInventarioController;
 use App\Http\Controllers\MotorMovimientosController;
 use App\Http\Controllers\PreguntasController;
 use App\Http\Controllers\CitasController;
-
+use App\Http\Controllers\CaptchaController;
 
 
 
@@ -428,18 +428,21 @@ Route::middleware(['auth', 'role:profesor'])->prefix('profesor')->name('profesor
 
 Route::middleware(['auth', 'role:tutor'])->prefix('tutor')->name('tutor.')->group(function () {
     
-    // Home del tutor (una sola ruta)
+    // Home del tutor
     Route::get('/home', [TutorHomeController::class, 'index'])
         ->name('home');
     
-    // Ver evaluaciones de un estudiante
-    Route::get('/estudiantes/{id}/evaluaciones', [TutorHomeController::class, 'verEvaluaciones'])
+    Route::get('/estudiantes/{id}/evaluaciones/ver', [TutorHomeController::class, 'mostrarEvaluaciones'])
         ->name('estudiantes.evaluaciones');
+    
+    Route::get('/estudiantes/{id}/evaluaciones', [TutorHomeController::class, 'verEvaluaciones'])
+        ->name('estudiantes.evaluaciones.json');
+    
     // Agendar una cita
     Route::post('/citas/agendar', [TutorHomeController::class, 'agendarCita'])
         ->name('citas.agendar');
     
-    // Listar citas del tutor (opcional)
+    // Listar citas del tutor
     Route::get('/citas', [TutorHomeController::class, 'listarCitas'])
         ->name('citas.listar');
 });
@@ -463,7 +466,35 @@ Route::middleware(['auth', 'role:administrador'])->group(function () {
     Route::get('/profesores', fn() => redirect('/administrador/profesores'));
 });
 
-Route::get('forgot-password', [ForgotPasswordController::class, 'showLinkRequestForm'])->name('password.request');
-Route::post('forgot-password', [ForgotPasswordController::class, 'sendResetLinkEmail'])->name('password.email');
-Route::get('password/reset/{token}', [ResetPasswordController::class, 'showResetForm'])->name('password.reset');
-Route::post('password/reset', [ResetPasswordController::class, 'reset'])->name('password.update');
+Route::get('password/reset', [ForgotPasswordController::class, 'showLinkRequestForm'])
+    ->name('password.request');
+    
+Route::post('password/email', [ForgotPasswordController::class, 'sendResetLinkEmail'])
+    ->name('password.email');
+    
+Route::get('password/reset/{token}', [ForgotPasswordController::class, 'showResetForm'])
+    ->name('password.reset');
+    
+Route::post('password/reset', [ForgotPasswordController::class, 'reset'])
+    ->name('password.update');
+
+// Rutas de CAPTCHA
+Route::get('captcha/generate', [CaptchaController::class, 'generate'])
+    ->name('captcha.generate');
+    
+Route::post('captcha/refresh', [CaptchaController::class, 'refresh'])
+    ->name('captcha.refresh');
+
+// En routes/web.php (solo para pruebas, elimínala después)
+Route::get('/test-email', function() {
+    try {
+        Mail::raw('Prueba de correo desde Laravel', function($message) {
+            $message->to('danielguevarahoyos03@gmail.com')
+                    ->subject('Test Email');
+        });
+        
+        return 'Correo enviado correctamente';
+    } catch (\Exception $e) {
+        return 'Error: ' . $e->getMessage();
+    }
+});
