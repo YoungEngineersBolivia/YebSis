@@ -86,7 +86,7 @@ Es crucial ejecutar los seeders para tener los roles, el usuario administrador y
 **Opción A: Ejecutar todo (Recomendado)**
 Este comando ejecutará automáticamente `RolSeeder`, `AdminSeeder` y `RespuestasSeeder` en el orden correcto.
 ```bash
-php artisan db:seed
+ php artisan db:seed --class=DatabaseSeeder
 ```
 
 **Opción B: Ejecutar seeders específicos (Manual)**
