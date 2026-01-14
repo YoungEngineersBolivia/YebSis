@@ -47,13 +47,11 @@
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2 class="mb-0 fw-bold"><i class="bi bi-calendar-week me-2"></i>Horarios Asignados</h2>
 
-        
         <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalCrear">
             <i class="bi bi-plus-lg me-2"></i>Asignar nuevo horario
         </button>
     </div>
 
-    
     <div class="card shadow-sm border-0 mb-3">
         <div class="card-body">
             <div class="row g-3">
@@ -74,7 +72,6 @@
         </div>
     </div>
 
-    
     <?php if(session('success')): ?>
         <div class="alert alert-success alert-dismissible fade show" role="alert">
             <?php echo e(session('success')); ?>
@@ -94,7 +91,6 @@
         </div>
     <?php endif; ?>
 
-    
     <?php if($horarios->isEmpty()): ?>
         <div class="card shadow-sm border-0">
             <div class="card-body text-center py-5">
@@ -133,7 +129,6 @@
                                     </td>
                                     <td class="pe-3 text-end">
                                         <div class="d-flex justify-content-end gap-2">
-                                            
                                             <button type="button"
                                                     class="btn btn-sm btn-outline-primary"
                                                     title="Editar horario"
@@ -147,7 +142,6 @@
                                                 <i class="bi bi-pencil-square"></i>
                                             </button>
 
-                                            
                                             <form action="<?php echo e(route('horarios.destroy', $horario->Id_horarios)); ?>" method="POST" onsubmit="return confirm('¿Eliminar este horario?');">
                                                 <?php echo csrf_field(); ?>
                                                 <?php echo method_field('DELETE'); ?>
@@ -165,14 +159,12 @@
             </div>
         </div>
 
-        
         <div class="d-flex justify-content-center mt-4 mb-4">
             <?php echo e($horarios->links('pagination::bootstrap-5')); ?>
 
         </div>
     <?php endif; ?>
 </div>
-
 
 <div class="modal fade" id="modalCrear" tabindex="-1" aria-labelledby="modalCrearLabel" aria-hidden="true">
   <div class="modal-dialog">
@@ -185,7 +177,6 @@
         </div>
 
         <div class="modal-body">
-          
           <div class="mb-3 position-relative">
             <label for="estudiante_search_crear" class="form-label">Estudiante</label>
             <div class="input-group">
@@ -195,11 +186,9 @@
             </div>
             <input type="hidden" name="Id_estudiantes" id="Id_estudiantes_crear_hidden" required>
             <div id="results_crear" class="list-group search-results-container position-absolute w-100 shadow-sm d-none">
-                
             </div>
           </div>
 
-          
           <div class="mb-3" id="div_profesor_crear">
             <label for="Id_profesores_crear" class="form-label">Profesor</label>
             <select class="form-select" id="Id_profesores_crear" name="Id_profesores" required>
@@ -216,7 +205,6 @@
             </small>
           </div>
 
-          
           <div class="mb-3">
             <label for="programa_info_crear" class="form-label">Programa Inscrito</label>
             <input type="text" class="form-control" id="programa_info_crear" readonly 
@@ -224,11 +212,9 @@
             <small class="form-text text-muted">El programa se obtiene automáticamente del estudiante</small>
           </div>
 
-          
           <div class="mb-3">
             <label class="form-label fw-bold">Horarios de la semana</label>
             <div id="horarios-container">
-              
               <div class="horario-item border rounded p-3 mb-2 bg-light">
                 <div class="row g-2">
                   <div class="col-md-5">
@@ -267,7 +253,6 @@
   </div>
 </div>
 
-
 <div class="modal fade" id="modalEditar" tabindex="-1" aria-labelledby="modalEditarLabel" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
@@ -280,7 +265,6 @@
         </div>
 
         <div class="modal-body">
-          
           <div class="mb-3 position-relative">
             <label for="estudiante_search_editar" class="form-label">Estudiante</label>
             <div class="input-group">
@@ -290,11 +274,9 @@
             </div>
             <input type="hidden" name="Id_estudiantes" id="Id_estudiantes_editar_hidden" required>
             <div id="results_editar" class="list-group search-results-container position-absolute w-100 shadow-sm d-none">
-                
             </div>
           </div>
 
-          
           <div class="mb-3" id="div_profesor_editar">
             <label for="Id_profesores_editar" class="form-label">Profesor</label>
             <select class="form-select" id="Id_profesores_editar" name="Id_profesores" required>
@@ -310,14 +292,12 @@
             </small>
           </div>
 
-          
           <div class="mb-3">
             <label for="programa_info_editar" class="form-label">Programa Inscrito</label>
             <input type="text" class="form-control" id="programa_info_editar" readonly>
             <small class="form-text text-muted">El programa se obtiene automáticamente del estudiante</small>
           </div>
 
-          
           <div class="mb-3">
             <label for="Dia_editar" class="form-label">Día</label>
             <select class="form-select" id="Dia_editar" name="Dia" required>
@@ -327,7 +307,6 @@
             </select>
           </div>
 
-          
           <div class="mb-3">
             <label for="Hora_editar" class="form-label">Hora</label>
             <input type="time" class="form-control" id="Hora_editar" name="Hora" required>
@@ -343,10 +322,8 @@
   </div>
 </div>
 
-
 <script>
 document.addEventListener('DOMContentLoaded', function () {
-    // ========== DATOS DE ESTUDIANTES ==========
     <?php
         $datosEstudiantes = $estudiantes->map(function($e) {
             return [
@@ -356,13 +333,13 @@ document.addEventListener('DOMContentLoaded', function () {
                 'profesor_nombre' => $e->profesor ? ($e->profesor->persona->Nombre . ' ' . $e->profesor->persona->Apellido) : 'Sin profesor',
                 'programa_id' => $e->Id_programas,
                 'programa_nombre' => $e->programa ? $e->programa->Nombre : 'Sin programa',
-                'codigo' => $e->Cod_estudiante
+                'codigo' => $e->Cod_estudiante,
+                'tiene_horario' => $e->horarios_count > 0
             ];
         });
     ?>
     const estudiantesData = <?php echo json_encode($datosEstudiantes, 15, 512) ?>;
 
-    // ========== FUNCIONES DEL BUSCADOR DINÁMICO ==========
     function setupDynamicSearch(inputId, resultsId, hiddenId, profesorSelect, programaInput, helpText) {
         const searchInput = document.getElementById(inputId);
         const resultsContainer = document.getElementById(resultsId);
@@ -372,6 +349,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
         searchInput.addEventListener('input', function() {
             const term = this.value.toLowerCase().trim();
+            const currentSelectedId = hiddenInput.value;
             resultsContainer.innerHTML = '';
             
             if (term.length < 1) {
@@ -379,9 +357,11 @@ document.addEventListener('DOMContentLoaded', function () {
                 return;
             }
 
-            const filtered = estudiantesData.filter(e => 
-                e.nombre.toLowerCase().includes(term) || (e.codigo && e.codigo.toLowerCase().includes(term))
-            );
+            const filtered = estudiantesData.filter(e => {
+                const matchesTerm = e.nombre.toLowerCase().includes(term) || (e.codigo && e.codigo.toLowerCase().includes(term));
+                const isAvailable = !e.tiene_horario || e.id == currentSelectedId;
+                return matchesTerm && isAvailable;
+            });
 
             if (filtered.length > 0) {
                 filtered.forEach(e => {
@@ -399,7 +379,6 @@ document.addEventListener('DOMContentLoaded', function () {
                         hiddenInput.value = e.id;
                         resultsContainer.classList.add('d-none');
                         
-                        // Fabricar un objeto similar a selectedOptions[0] para reusar actualizarInfoEstudiante
                         const fakeOption = {
                             value: e.id,
                             getAttribute: (attr) => {
@@ -429,7 +408,6 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // ========== GESTIÓN DE INFORMACIÓN DEL ESTUDIANTE ==========
     function actualizarInfoEstudianteDesdeData(dataObj, profesorSelect, programaInput, helpText) {
         if (dataObj && dataObj.value) {
             const profesorId = dataObj.getAttribute('data-profesor');
@@ -480,7 +458,6 @@ document.addEventListener('DOMContentLoaded', function () {
         document.getElementById('profesor_help_editar')
     );
 
-    // ========== GESTIÓN DE HORARIOS DINÁMICOS ==========
     let contadorHorarios = 1; 
 
     document.getElementById('btn-agregar-horario').addEventListener('click', function() {
@@ -520,7 +497,6 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 
-    // ========== MODAL DE EDICIÓN ==========
     const modalEditar = document.getElementById('modalEditar');
     if (modalEditar) {
         modalEditar.addEventListener('show.bs.modal', function (event) {
@@ -542,12 +518,10 @@ document.addEventListener('DOMContentLoaded', function () {
             document.getElementById('Dia_editar').value = dia;
             document.getElementById('Hora_editar').value = hora;
 
-            // Encontrar el nombre del estudiante para el input de búsqueda
             const est = estudiantesData.find(e => e.id == estudianteId);
             if (est) {
                 estudianteSearchInput.value = est.nombre;
                 
-                // Actualizar info adicional
                 const fakeOption = {
                     value: est.id,
                     getAttribute: (attr) => {
@@ -563,7 +537,6 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 });
 
-// ========== BÚSQUEDA DINÁMICA ==========
 document.addEventListener('DOMContentLoaded', function() {
     const searchInput = document.getElementById('searchInput');
     const tableRows = document.querySelectorAll('tbody tr');
@@ -571,13 +544,11 @@ document.addEventListener('DOMContentLoaded', function() {
     const totalRows = tableRows.length;
 
     if (searchInput && tableRows.length > 0) {
-        // Función para filtrar la tabla
         function filterTable() {
             const searchTerm = searchInput.value.toLowerCase().trim();
             let visibleCount = 0;
 
             tableRows.forEach(row => {
-                // Obtener el nombre y apellido del estudiante (primera y segunda columna)
                 const nombreCell = row.cells[0];
                 const apellidoCell = row.cells[1];
                 
@@ -586,7 +557,6 @@ document.addEventListener('DOMContentLoaded', function() {
                     const apellido = apellidoCell.textContent.toLowerCase();
                     const nombreCompleto = nombre + ' ' + apellido;
 
-                    // Mostrar/ocultar fila según coincidencia
                     if (nombreCompleto.includes(searchTerm)) {
                         row.style.display = '';
                         visibleCount++;
@@ -596,7 +566,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             });
 
-            // Actualizar contador de resultados
             if (searchTerm === '') {
                 resultCount.textContent = `Mostrando todos los ${totalRows} horarios`;
             } else {
@@ -607,10 +576,8 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
 
-        // Ejecutar búsqueda mientras el usuario escribe
         searchInput.addEventListener('input', filterTable);
         
-        // Mostrar contador inicial
         resultCount.textContent = `Mostrando todos los ${totalRows} horarios`;
     }
 });

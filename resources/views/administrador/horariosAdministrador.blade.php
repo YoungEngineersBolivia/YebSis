@@ -330,7 +330,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 'profesor_nombre' => $e->profesor ? ($e->profesor->persona->Nombre . ' ' . $e->profesor->persona->Apellido) : 'Sin profesor',
                 'programa_id' => $e->Id_programas,
                 'programa_nombre' => $e->programa ? $e->programa->Nombre : 'Sin programa',
-                'codigo' => $e->Cod_estudiante
+                'codigo' => $e->Cod_estudiante,
+                'tiene_horario' => $e->horarios_count > 0
             ];
         });
     @endphp
@@ -345,6 +346,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
         searchInput.addEventListener('input', function() {
             const term = this.value.toLowerCase().trim();
+            const currentSelectedId = hiddenInput.value;
             resultsContainer.innerHTML = '';
             
             if (term.length < 1) {
@@ -352,9 +354,11 @@ document.addEventListener('DOMContentLoaded', function () {
                 return;
             }
 
-            const filtered = estudiantesData.filter(e => 
-                e.nombre.toLowerCase().includes(term) || (e.codigo && e.codigo.toLowerCase().includes(term))
-            );
+            const filtered = estudiantesData.filter(e => {
+                const matchesTerm = e.nombre.toLowerCase().includes(term) || (e.codigo && e.codigo.toLowerCase().includes(term));
+                const isAvailable = !e.tiene_horario || e.id == currentSelectedId;
+                return matchesTerm && isAvailable;
+            });
 
             if (filtered.length > 0) {
                 filtered.forEach(e => {
