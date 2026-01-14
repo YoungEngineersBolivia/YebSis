@@ -17,7 +17,7 @@ class HorariosController extends Controller
             ->orderBy('Hora')
             ->paginate(6);
 
-        $estudiantes = Estudiante::activos()->with(['persona', 'profesor.persona', 'programa'])->get();
+        $estudiantes = Estudiante::activos()->withCount('horarios')->with(['persona', 'profesor.persona', 'programa'])->get();
         $profesores = Profesor::with('persona')->get();
 
         return view('administrador.horariosAdministrador', compact('horarios', 'estudiantes', 'profesores'));
