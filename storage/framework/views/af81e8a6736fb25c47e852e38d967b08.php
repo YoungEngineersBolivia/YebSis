@@ -1,9 +1,7 @@
-@extends('administrador.baseAdministrador')
+<?php $__env->startSection('title', 'Horarios de Estudiantes'); ?>
 
-@section('title', 'Horarios de Estudiantes')
-
-@section('styles')
-<link href="{{ auto_asset('css/style.css') }}" rel="stylesheet">
+<?php $__env->startSection('styles'); ?>
+<link href="<?php echo e(auto_asset('css/style.css')); ?>" rel="stylesheet">
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 <style>
     .search-results-container {
@@ -42,18 +40,20 @@
         color: #20c997;
     }
 </style>
-@endsection
+<?php $__env->stopSection(); ?>
 
-@section('content')
+<?php $__env->startSection('content'); ?>
 <div class="container-fluid mt-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2 class="mb-0 fw-bold"><i class="bi bi-calendar-week me-2"></i>Horarios Asignados</h2>
 
+        
         <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalCrear">
             <i class="bi bi-plus-lg me-2"></i>Asignar nuevo horario
         </button>
     </div>
 
+    
     <div class="card shadow-sm border-0 mb-3">
         <div class="card-body">
             <div class="row g-3">
@@ -74,32 +74,35 @@
         </div>
     </div>
 
-    @if(session('success'))
+    
+    <?php if(session('success')): ?>
         <div class="alert alert-success alert-dismissible fade show" role="alert">
-            {{ session('success') }}
+            <?php echo e(session('success')); ?>
+
             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         </div>
-    @endif
+    <?php endif; ?>
 
-    @if($errors->any())
+    <?php if($errors->any()): ?>
         <div class="alert alert-danger alert-dismissible fade show" role="alert">
             <ul class="mb-0">
-                @foreach($errors->all() as $err)
-                    <li>{{ $err }}</li>
-                @endforeach
+                <?php $__currentLoopData = $errors->all(); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $err): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                    <li><?php echo e($err); ?></li>
+                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
             </ul>
             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         </div>
-    @endif
+    <?php endif; ?>
 
-    @if($horarios->isEmpty())
+    
+    <?php if($horarios->isEmpty()): ?>
         <div class="card shadow-sm border-0">
             <div class="card-body text-center py-5">
                 <i class="bi bi-calendar-x text-muted mb-3" style="font-size: 3rem;"></i>
                 <h5 class="text-muted">No hay horarios asignados aún.</h5>
             </div>
         </div>
-    @else
+    <?php else: ?>
         <div class="card shadow-sm border-0 overflow-hidden">
             <div class="card-body p-0">
                 <div class="table-responsive">
@@ -116,35 +119,38 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach($horarios as $horario)
+                            <?php $__currentLoopData = $horarios; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $horario): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                 <tr>
-                                    <td class="ps-3 fw-semibold">{{ $horario->estudiante?->persona?->Nombre ?? '—' }}</td>
-                                    <td>{{ $horario->estudiante?->persona?->Apellido ?? '—' }}</td>
-                                    <td>{{ $horario->programa?->Nombre ?? '—' }}</td>
-                                    <td><span class="badge bg-light text-dark border">{{ $horario->Dia ?? '—' }}</span></td>
-                                    <td>{{ $horario->Hora ?? '—' }}</td>
+                                    <td class="ps-3 fw-semibold"><?php echo e($horario->estudiante?->persona?->Nombre ?? '—'); ?></td>
+                                    <td><?php echo e($horario->estudiante?->persona?->Apellido ?? '—'); ?></td>
+                                    <td><?php echo e($horario->programa?->Nombre ?? '—'); ?></td>
+                                    <td><span class="badge bg-light text-dark border"><?php echo e($horario->Dia ?? '—'); ?></span></td>
+                                    <td><?php echo e($horario->Hora ?? '—'); ?></td>
                                     <td>
-                                        @php $pp = $horario->profesor?->persona; @endphp
-                                        {{ ($pp?->Nombre && $pp?->Apellido) ? ($pp->Nombre.' '.$pp->Apellido) : 'Sin profesor' }}
+                                        <?php $pp = $horario->profesor?->persona; ?>
+                                        <?php echo e(($pp?->Nombre && $pp?->Apellido) ? ($pp->Nombre.' '.$pp->Apellido) : 'Sin profesor'); ?>
+
                                     </td>
                                     <td class="pe-3 text-end">
                                         <div class="d-flex justify-content-end gap-2">
+                                            
                                             <button type="button"
                                                     class="btn btn-sm btn-outline-primary"
                                                     title="Editar horario"
                                                     data-bs-toggle="modal"
                                                     data-bs-target="#modalEditar"
-                                                    data-id="{{ $horario->Id_horarios }}"
-                                                    data-estudiante="{{ $horario->Id_estudiantes }}"
-                                                    data-profesor="{{ $horario->Id_profesores }}"
-                                                    data-dia="{{ $horario->Dia }}"
-                                                    data-hora="{{ $horario->Hora }}">
+                                                    data-id="<?php echo e($horario->Id_horarios); ?>"
+                                                    data-estudiante="<?php echo e($horario->Id_estudiantes); ?>"
+                                                    data-profesor="<?php echo e($horario->Id_profesores); ?>"
+                                                    data-dia="<?php echo e($horario->Dia); ?>"
+                                                    data-hora="<?php echo e($horario->Hora); ?>">
                                                 <i class="bi bi-pencil-square"></i>
                                             </button>
 
-                                            <form action="{{ route('horarios.destroy', $horario->Id_horarios) }}" method="POST" onsubmit="return confirm('¿Eliminar este horario?');">
-                                                @csrf
-                                                @method('DELETE')
+                                            
+                                            <form action="<?php echo e(route('horarios.destroy', $horario->Id_horarios)); ?>" method="POST" onsubmit="return confirm('¿Eliminar este horario?');">
+                                                <?php echo csrf_field(); ?>
+                                                <?php echo method_field('DELETE'); ?>
                                                 <button class="btn btn-sm btn-outline-danger" title="Eliminar">
                                                     <i class="bi bi-trash3-fill"></i>
                                                 </button>
@@ -152,30 +158,34 @@
                                         </div>
                                     </td>
                                 </tr>
-                            @endforeach
+                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                         </tbody>
                     </table>
                 </div>
             </div>
         </div>
 
+        
         <div class="d-flex justify-content-center mt-4 mb-4">
-            {{ $horarios->links('pagination::bootstrap-5') }}
+            <?php echo e($horarios->links('pagination::bootstrap-5')); ?>
+
         </div>
-    @endif
+    <?php endif; ?>
 </div>
+
 
 <div class="modal fade" id="modalCrear" tabindex="-1" aria-labelledby="modalCrearLabel" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
-      <form method="POST" action="{{ route('horarios.store') }}">
-        @csrf
+      <form method="POST" action="<?php echo e(route('horarios.store')); ?>">
+        <?php echo csrf_field(); ?>
         <div class="modal-header bg-primary text-white">
           <h5 class="modal-title" id="modalCrearLabel"><i class="bi bi-calendar-plus me-2"></i>Asignar nuevo horario</h5>
           <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
         </div>
 
         <div class="modal-body">
+          
           <div class="mb-3 position-relative">
             <label for="estudiante_search_crear" class="form-label">Estudiante</label>
             <div class="input-group">
@@ -185,24 +195,28 @@
             </div>
             <input type="hidden" name="Id_estudiantes" id="Id_estudiantes_crear_hidden" required>
             <div id="results_crear" class="list-group search-results-container position-absolute w-100 shadow-sm d-none">
+                
             </div>
           </div>
 
+          
           <div class="mb-3" id="div_profesor_crear">
             <label for="Id_profesores_crear" class="form-label">Profesor</label>
             <select class="form-select" id="Id_profesores_crear" name="Id_profesores" required>
               <option value="" disabled selected>Seleccione un estudiante primero</option>
-              @foreach($profesores as $p)
-                <option value="{{ $p->Id_profesores }}">
-                  {{ $p->persona?->Nombre }} {{ $p->persona?->Apellido }}
+              <?php $__currentLoopData = $profesores; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $p): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                <option value="<?php echo e($p->Id_profesores); ?>">
+                  <?php echo e($p->persona?->Nombre); ?> <?php echo e($p->persona?->Apellido); ?>
+
                 </option>
-              @endforeach
+              <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
             </select>
             <small class="form-text text-muted" id="profesor_help_crear">
               El profesor se asignará automáticamente si el estudiante ya tiene uno
             </small>
           </div>
 
+          
           <div class="mb-3">
             <label for="programa_info_crear" class="form-label">Programa Inscrito</label>
             <input type="text" class="form-control" id="programa_info_crear" readonly 
@@ -210,18 +224,20 @@
             <small class="form-text text-muted">El programa se obtiene automáticamente del estudiante</small>
           </div>
 
+          
           <div class="mb-3">
             <label class="form-label fw-bold">Horarios de la semana</label>
             <div id="horarios-container">
+              
               <div class="horario-item border rounded p-3 mb-2 bg-light">
                 <div class="row g-2">
                   <div class="col-md-5">
                     <label class="form-label small">Día</label>
                     <select class="form-select" name="horarios[0][dia]" required>
                       <option value="" disabled selected>Seleccione</option>
-                      @foreach(['LUNES','MARTES','MIERCOLES','JUEVES','VIERNES','SABADO'] as $dia)
-                        <option value="{{ $dia }}">{{ $dia }}</option>
-                      @endforeach
+                      <?php $__currentLoopData = ['LUNES','MARTES','MIERCOLES','JUEVES','VIERNES','SABADO']; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $dia): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                        <option value="<?php echo e($dia); ?>"><?php echo e($dia); ?></option>
+                      <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                     </select>
                   </div>
                   <div class="col-md-5">
@@ -251,18 +267,20 @@
   </div>
 </div>
 
+
 <div class="modal fade" id="modalEditar" tabindex="-1" aria-labelledby="modalEditarLabel" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
       <form method="POST" id="formEditar">
-        @csrf
-        @method('PUT')
+        <?php echo csrf_field(); ?>
+        <?php echo method_field('PUT'); ?>
         <div class="modal-header bg-primary text-white">
           <h5 class="modal-title" id="modalEditarLabel"><i class="bi bi-pencil-square me-2"></i>Editar horario</h5>
           <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
         </div>
 
         <div class="modal-body">
+          
           <div class="mb-3 position-relative">
             <label for="estudiante_search_editar" class="form-label">Estudiante</label>
             <div class="input-group">
@@ -272,38 +290,44 @@
             </div>
             <input type="hidden" name="Id_estudiantes" id="Id_estudiantes_editar_hidden" required>
             <div id="results_editar" class="list-group search-results-container position-absolute w-100 shadow-sm d-none">
+                
             </div>
           </div>
 
+          
           <div class="mb-3" id="div_profesor_editar">
             <label for="Id_profesores_editar" class="form-label">Profesor</label>
             <select class="form-select" id="Id_profesores_editar" name="Id_profesores" required>
-              @foreach($profesores as $p)
-                <option value="{{ $p->Id_profesores }}">
-                  {{ $p->persona?->Nombre }} {{ $p->persona?->Apellido }}
+              <?php $__currentLoopData = $profesores; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $p): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                <option value="<?php echo e($p->Id_profesores); ?>">
+                  <?php echo e($p->persona?->Nombre); ?> <?php echo e($p->persona?->Apellido); ?>
+
                 </option>
-              @endforeach
+              <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
             </select>
             <small class="form-text text-muted" id="profesor_help_editar">
               El profesor se asignará automáticamente si el estudiante ya tiene uno
             </small>
           </div>
 
+          
           <div class="mb-3">
             <label for="programa_info_editar" class="form-label">Programa Inscrito</label>
             <input type="text" class="form-control" id="programa_info_editar" readonly>
             <small class="form-text text-muted">El programa se obtiene automáticamente del estudiante</small>
           </div>
 
+          
           <div class="mb-3">
             <label for="Dia_editar" class="form-label">Día</label>
             <select class="form-select" id="Dia_editar" name="Dia" required>
-              @foreach(['LUNES','MARTES','MIERCOLES','JUEVES','VIERNES','SABADO'] as $dia)
-                <option value="{{ $dia }}">{{ $dia }}</option>
-              @endforeach
+              <?php $__currentLoopData = ['LUNES','MARTES','MIERCOLES','JUEVES','VIERNES','SABADO']; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $dia): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                <option value="<?php echo e($dia); ?>"><?php echo e($dia); ?></option>
+              <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
             </select>
           </div>
 
+          
           <div class="mb-3">
             <label for="Hora_editar" class="form-label">Hora</label>
             <input type="time" class="form-control" id="Hora_editar" name="Hora" required>
@@ -319,9 +343,11 @@
   </div>
 </div>
 
+
 <script>
 document.addEventListener('DOMContentLoaded', function () {
-    @php
+    // ========== DATOS DE ESTUDIANTES ==========
+    <?php
         $datosEstudiantes = $estudiantes->map(function($e) {
             return [
                 'id' => $e->Id_estudiantes,
@@ -333,9 +359,10 @@ document.addEventListener('DOMContentLoaded', function () {
                 'codigo' => $e->Cod_estudiante
             ];
         });
-    @endphp
-    const estudiantesData = @json($datosEstudiantes);
+    ?>
+    const estudiantesData = <?php echo json_encode($datosEstudiantes, 15, 512) ?>;
 
+    // ========== FUNCIONES DEL BUSCADOR DINÁMICO ==========
     function setupDynamicSearch(inputId, resultsId, hiddenId, profesorSelect, programaInput, helpText) {
         const searchInput = document.getElementById(inputId);
         const resultsContainer = document.getElementById(resultsId);
@@ -372,6 +399,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         hiddenInput.value = e.id;
                         resultsContainer.classList.add('d-none');
                         
+                        // Fabricar un objeto similar a selectedOptions[0] para reusar actualizarInfoEstudiante
                         const fakeOption = {
                             value: e.id,
                             getAttribute: (attr) => {
@@ -401,6 +429,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
+    // ========== GESTIÓN DE INFORMACIÓN DEL ESTUDIANTE ==========
     function actualizarInfoEstudianteDesdeData(dataObj, profesorSelect, programaInput, helpText) {
         if (dataObj && dataObj.value) {
             const profesorId = dataObj.getAttribute('data-profesor');
@@ -451,6 +480,7 @@ document.addEventListener('DOMContentLoaded', function () {
         document.getElementById('profesor_help_editar')
     );
 
+    // ========== GESTIÓN DE HORARIOS DINÁMICOS ==========
     let contadorHorarios = 1; 
 
     document.getElementById('btn-agregar-horario').addEventListener('click', function() {
@@ -490,6 +520,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 
+    // ========== MODAL DE EDICIÓN ==========
     const modalEditar = document.getElementById('modalEditar');
     if (modalEditar) {
         modalEditar.addEventListener('show.bs.modal', function (event) {
@@ -501,7 +532,7 @@ document.addEventListener('DOMContentLoaded', function () {
             const hora = button.getAttribute('data-hora');
 
             const form = document.getElementById('formEditar');
-            form.action = "{{ route('horarios.update', ':id') }}".replace(':id', id);
+            form.action = "<?php echo e(route('horarios.update', ':id')); ?>".replace(':id', id);
 
             const estudianteIdHidden = document.getElementById('Id_estudiantes_editar_hidden');
             const estudianteSearchInput = document.getElementById('estudiante_search_editar');
@@ -511,10 +542,12 @@ document.addEventListener('DOMContentLoaded', function () {
             document.getElementById('Dia_editar').value = dia;
             document.getElementById('Hora_editar').value = hora;
 
+            // Encontrar el nombre del estudiante para el input de búsqueda
             const est = estudiantesData.find(e => e.id == estudianteId);
             if (est) {
                 estudianteSearchInput.value = est.nombre;
                 
+                // Actualizar info adicional
                 const fakeOption = {
                     value: est.id,
                     getAttribute: (attr) => {
@@ -530,6 +563,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 });
 
+// ========== BÚSQUEDA DINÁMICA ==========
 document.addEventListener('DOMContentLoaded', function() {
     const searchInput = document.getElementById('searchInput');
     const tableRows = document.querySelectorAll('tbody tr');
@@ -537,11 +571,13 @@ document.addEventListener('DOMContentLoaded', function() {
     const totalRows = tableRows.length;
 
     if (searchInput && tableRows.length > 0) {
+        // Función para filtrar la tabla
         function filterTable() {
             const searchTerm = searchInput.value.toLowerCase().trim();
             let visibleCount = 0;
 
             tableRows.forEach(row => {
+                // Obtener el nombre y apellido del estudiante (primera y segunda columna)
                 const nombreCell = row.cells[0];
                 const apellidoCell = row.cells[1];
                 
@@ -550,6 +586,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     const apellido = apellidoCell.textContent.toLowerCase();
                     const nombreCompleto = nombre + ' ' + apellido;
 
+                    // Mostrar/ocultar fila según coincidencia
                     if (nombreCompleto.includes(searchTerm)) {
                         row.style.display = '';
                         visibleCount++;
@@ -559,6 +596,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             });
 
+            // Actualizar contador de resultados
             if (searchTerm === '') {
                 resultCount.textContent = `Mostrando todos los ${totalRows} horarios`;
             } else {
@@ -569,12 +607,15 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
 
+        // Ejecutar búsqueda mientras el usuario escribe
         searchInput.addEventListener('input', filterTable);
         
+        // Mostrar contador inicial
         resultCount.textContent = `Mostrando todos los ${totalRows} horarios`;
     }
 });
 
 </script>
 
-@endsection
+<?php $__env->stopSection(); ?>
+<?php echo $__env->make('administrador.baseAdministrador', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\Users\DANTE\Desktop\YebSis\resources\views/administrador/horariosAdministrador.blade.php ENDPATH**/ ?>
