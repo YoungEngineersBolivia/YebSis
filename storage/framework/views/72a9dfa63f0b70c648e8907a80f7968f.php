@@ -4,8 +4,10 @@
 <div class="row mb-3">
     <div class="col-md-12">
         <label><b>Buscar Tutor</b></label>
-        <input type="text" id="buscarTutor" class="form-control" placeholder="Escriba el nombre del tutor">
-        <ul id="listaTutor" class="list-group position-absolute" style="z-index:1000;"></ul>
+        <div style="position: relative;">
+            <input type="text" id="buscarTutor" class="form-control" placeholder="Escriba el nombre del tutor">
+            <ul id="listaTutor" class="list-group" style="position:absolute; z-index:1000; width:100%;"></ul>
+        </div>
     </div>
 </div>
 
@@ -42,7 +44,7 @@
             <div class="col-md-6">
                 <label>Nombre</label>
                 <input type="text" name="tutor_nombre" class="form-control" value="<?php echo e(old('tutor_nombre')); ?>" placeholder="Ej: Juan" required>
-                <input type="hidden" name="tutor_id_existente" id="tutor_id_existente" value="">
+                <input type="hidden" name="tutor_id_existente" id="tutor_id_existente" value="<?php echo e(old('tutor_id_existente')); ?>">
             </div>
             <div class="col-md-6">
                 <label>Apellido</label>
@@ -95,6 +97,10 @@
                 <label>Correo</label>
                 <input type="email" name="tutor_email" class="form-control" value="<?php echo e(old('tutor_email')); ?>" placeholder="Ej: juan.perez@gmail.com" required>
             </div>
+             <div class="col-md-6">
+                <label>Descuento Especial (%)</label>
+                <input type="number" step="0.01" name="tutor_descuento" id="tutor_descuento" class="form-control" value="<?php echo e(old('tutor_descuento')); ?>" placeholder="0 - 100">
+            </div>
 
         </div>
 
@@ -104,7 +110,7 @@
         
         <h4>Datos del Estudiante</h4>
         
-        <input type="hidden" name="estudiante_id_existente" id="estudiante_id_existente" value="">
+        <input type="hidden" name="estudiante_id_existente" id="estudiante_id_existente" value="<?php echo e(old('estudiante_id_existente')); ?>">
         
         <div class="row" id="form-estudiante">
             <div class="col-md-6">
@@ -139,123 +145,135 @@
                 <label>Código de Estudiante</label>
                 <input type="text" name="codigo_estudiante" class="form-control" value="<?php echo e(old('codigo_estudiante')); ?>" placeholder="Ej: EST-2024-001" required>
             </div>
-            <div class="col-md-6">
+             <div class="col-md-6">
                 <label>Programa</label>
-                <select name="programa" class="form-control" required>
-                    <option value="">Seleccione...</option>
-                    <?php $__currentLoopData = $programas; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $p): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                        <option value="<?php echo e($p->Id_programas); ?>" <?php echo e(old('programa')==$p->Id_programas?'selected':''); ?>>
-                            <?php echo e($p->Nombre); ?>
+                <select name="programa" id="programa" class="form-control" required>
+                     <option value="" disabled selected>Seleccione un programa</option>
+                     <?php $__currentLoopData = $programas; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $prog): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                        <option value="<?php echo e($prog->Id_programas); ?>" 
+                            data-precio="<?php echo e($prog->Costo); ?>"
+                            <?php echo e(old('programa') == $prog->Id_programas ? 'selected' : ''); ?>>
+                            <?php echo e($prog->Nombre); ?>
 
                         </option>
                     <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                 </select>
             </div>
-        <div class="col-md-6">
-            <label>Sucursal</label>
-            <select name="sucursal" class="form-control" required>
-                <option value="">Seleccione...</option>
-                <?php $__empty_1 = true; $__currentLoopData = $sucursales; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $s): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
-                    <option value="<?php echo e($s->Id_sucursales); ?>" <?php echo e(old('sucursal') == $s->Id_sucursales ? 'selected' : ''); ?>>
-                        <?php echo e($s->Nombre); ?>
+            <div class="col-md-6">
+                <label>Sucursal</label>
+                <select name="sucursal" class="form-control" required>
+                    <option value="">Seleccione...</option>
+                    <?php $__empty_1 = true; $__currentLoopData = $sucursales; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $s): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
+                        <option value="<?php echo e($s->Id_sucursales); ?>" <?php echo e(old('sucursal') == $s->Id_sucursales ? 'selected' : ''); ?>>
+                            <?php echo e($s->Nombre); ?>
 
-                    </option>
-                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
-                    <option value="">No hay sucursales registradas</option>
-                <?php endif; ?>
-            </select>
-        </div>
-        
-      <div class="col-md-6">
-    <label>Profesor</label>
-    <select name="profesor" class="form-control" >
-        <option value="">Seleccione...</option>
-        <?php $__currentLoopData = $profesores; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $prof): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-            <option value="<?php echo e($prof->Id_profesores); ?>"
-                <?php echo e(old('profesor') == $prof->Id_profesores ? 'selected' : ''); ?>>
-                <?php echo e($prof->persona->Nombre); ?> <?php echo e($prof->persona->Apellido); ?>
-
-            </option>
-        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-    </select>
-</div>
-
-
-        <hr>
-        
-        <h4>Plan de Pagos</h4>
-        <div class="row">
-            <div class="col-md-4">
-                <label>Matrícula (Bs)</label>
-                <input type="number" step="0.01" name="Monto_matricula" id="Monto_matricula" class="form-control" value="<?php echo e(old('Monto_matricula')); ?>" placeholder="Ej: 500">
-            </div>
-            <div class="col-md-4">
-                <label>Matrícula en cuántas partes</label>
-                <select name="Partes_matricula" class="form-control">
-                    <option value="1" <?php echo e(old('Partes_matricula') == '1' ? 'selected' : ''); ?>>1</option>
-                    <option value="2" <?php echo e(old('Partes_matricula') == '2' ? 'selected' : ''); ?>>2</option>
-                    <option value="3" <?php echo e(old('Partes_matricula') == '3' ? 'selected' : ''); ?>>3</option>
+                        </option>
+                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
+                        <option value="">No hay sucursales registradas</option>
+                    <?php endif; ?>
                 </select>
             </div>
-            <div class="col-md-4">
-                <label>Precio del Programa (Bs)</label>
-                <input type="number" step="0.01" id="Precio_programa" class="form-control" >
-            </div>
-            <div class="col-md-4">
-                <label>Nro de cuotas</label>
-                <input type="number" name="Nro_cuotas" id="nro_cuotas" class="form-control" value="<?php echo e(old('Nro_cuotas')); ?>" placeholder="Ej: 10" required>
-            </div>
-            <div class="col-md-4">
-                <label>Monto total</label>
-                <input type="number" step="0.01" name="Monto_total" id="Monto_total" class="form-control" value="<?php echo e(old('Monto_total')); ?>" placeholder="Ej: 5000" required>
-            </div>
-            <div class="col-md-4">
-                <label>Descuento (%)</label>
-                <input type="number" step="0.01" name="tutor_descuento" id="tutor_descuento" class="form-control" value="<?php echo e(old('tutor_descuento')); ?>" placeholder="Ej: 10">
-            </div>
-            <div class="col-md-4">
-                <label>Descuento aplicado (Bs)</label>
-                <input type="number" step="0.01" id="Descuento_aplicado" class="form-control"
-                    value=""
-                    readonly>
-            </div>
-            <div class="col-md-4">
-                <label>Total con descuento aplicado (Bs)</label>
-                <input type="number" step="0.01" id="Total_con_descuento" class="form-control"
-                    value=""
-                    readonly>
-            </div>
-            <div class="col-md-4">
-                <label>Fecha plan de pagos</label>
-                <input type="date" name="fecha_plan_pagos" class="form-control" 
-                    value="<?php echo e(old('fecha_plan_pagos', \Carbon\Carbon::now()->format('Y-m-d'))); ?>" required>
-            </div>
-        </div>
-        <div class="row mt-3">
             
-            <input type="hidden" name="Estado_plan" value="Pendiente">
-        </div>
-        <input type="hidden" name="Id_programas" value="<?php echo e(old('programa')); ?>">
+          <div class="col-md-6">
+        <label>Profesor</label>
+        <select name="profesor" class="form-control" >
+            <option value="">Seleccione...</option>
+            <?php $__currentLoopData = $profesores; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $prof): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                <option value="<?php echo e($prof->Id_profesores); ?>"
+                    <?php echo e(old('profesor') == $prof->Id_profesores ? 'selected' : ''); ?>>
+                    <?php echo e($prof->persona->Nombre); ?> <?php echo e($prof->persona->Apellido); ?>
+
+                </option>
+            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+        </select>
+    </div>
+    </div>
+
         <hr>
         
-        <h5>Cuotas generadas automáticamente</h5>
-        <div class="table-responsive">
-            <table class="table table-bordered" id="tabla-cuotas-auto">
-                <thead>
-                    <tr>
-                        <th>Nro de cuota</th>
-                        <th>Fecha vencimiento</th>
-                        <th>Monto cuota</th>
-                        <th>Estado cuota</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    
-                </tbody>
-            </table>
+        <h4>Pago</h4>
+        <div class="row">
+            
+            <input type="hidden" name="Nro_cuotas" value="1">
+            <input type="hidden" name="Estado_plan" value="Completado">
+            
+            <input type="hidden" name="Monto_total" id="hidden_monto_total">
+            
+            <div class="col-md-6">
+                <label>Descripción</label>
+                <input type="text" name="Descripcion" class="form-control" placeholder="Ej: Pago de Matrícula" value="<?php echo e(old('Descripcion', 'Pago del Curso')); ?>">
+            </div>
+            <div class="col-md-6">
+                <label>Comprobante</label>
+                <div class="input-group">
+                    <input type="text" name="Comprobante" id="input_comprobante" class="form-control" placeholder="Se llena con Nombre Factura" value="<?php echo e(old('Comprobante')); ?>">
+                    <button class="btn btn-outline-secondary" type="button" id="btn-copy-factura">
+                        <i class="fas fa-sync"></i>
+                    </button>
+                </div>
+                <small class="text-muted">Se llena automáticamente con el Nombre de Factura</small>
+            </div>
+            <div class="col-md-6 mt-3">
+                <label>Monto (Bs)</label>
+                <input type="number" step="0.01" name="Monto_pago" id="input_monto_pago" class="form-control" required placeholder="0.00" value="<?php echo e(old('Monto_pago')); ?>">
+            </div>
+            <div class="col-md-6 mt-3">
+                <label>Fecha</label>
+                <input type="date" name="Fecha_pago" class="form-control" value="<?php echo e(old('Fecha_pago', \Carbon\Carbon::now()->format('Y-m-d'))); ?>" required>
+            </div>
         </div>
-        <!-- Agrega este div oculto para los inputs de cuotas generadas -->
-        <div id="cuotas-auto-hidden-inputs"></div>
+        
+        
+        <div class="d-none">
+            <h4>Plan de Pagos (Oculto)</h4>
+             <div class="row">
+                <div class="col-md-4">
+                    <label>Matrícula (Bs)</label>
+                    <input type="number" step="0.01" name="Monto_matricula" id="Monto_matricula" class="form-control" value="<?php echo e(old('Monto_matricula')); ?>">
+                </div>
+                <div class="col-md-4">
+                    <label>Matrícula en cuántas partes</label>
+                    <select name="Partes_matricula" class="form-control">
+                        <option value="1" <?php echo e(old('Partes_matricula') == 1 ? 'selected' : ''); ?>>1</option>
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label>Precio del Programa (Bs)</label>
+                    <input type="number" step="0.01" id="Precio_programa" class="form-control" >
+                </div>
+                <div class="col-md-4">
+                    <label>Nro de cuotas</label>
+                    <input type="number" id="nro_cuotas_dummy" class="form-control">
+                </div>
+                <div class="col-md-4">
+                    <label>Monto total</label>
+                    <input type="number" step="0.01" id="Monto_total_dummy" class="form-control">
+                </div>
+                <div class="col-md-4">
+                    <label>Descuento (%)</label>
+                    <input type="number" step="0.01" name="tutor_descuento_hidden" id="tutor_descuento_hidden" class="form-control">
+                </div>
+                 <div class="col-md-4">
+                    <label>Descuento aplicado (Bs)</label>
+                    <input type="number" step="0.01" id="Descuento_aplicado" class="form-control" readonly>
+                </div>
+                <div class="col-md-4">
+                    <label>Total con descuento aplicado (Bs)</label>
+                    <input type="number" step="0.01" id="Total_con_descuento" class="form-control" readonly>
+                </div>
+                <div class="col-md-4">
+                    <label>Fecha plan de pagos</label>
+                    <input type="date" name="fecha_plan_pagos" class="form-control" value="<?php echo e(old('fecha_plan_pagos', \Carbon\Carbon::now()->format('Y-m-d'))); ?>">
+                </div>
+            </div>
+             <div class="table-responsive mt-3">
+                <table class="table table-bordered" id="tabla-cuotas-auto">
+                    <thead><tr><th>Nro</th><th>Fecha</th><th>Monto</th><th>Estado</th></tr></thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+            <div id="cuotas-auto-hidden-inputs"></div>
+        </div>
         <hr>
 
         <button type="submit" class="btn btn-primary mt-4" id="btnRegistrar">
@@ -263,6 +281,38 @@
             <span id="btnSpinner" class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
         </button>
     </form>
+</div>
+
+
+<div class="modal fade" id="modalEstudiantesExistentes" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Hijos Registrados del Tutor</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Seleccione uno de los hijos registrados para inscribirlo en un nuevo programa.</p>
+                <div class="table-responsive">
+                    <table class="table table-hover" id="tablaHijos">
+                        <thead>
+                            <tr>
+                                <th>Nombre</th>
+                                <th>Apellido</th>
+                                <th>Acción</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Se llena dinámicamente -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
 </div>
 
 
@@ -480,6 +530,41 @@
             this.programaSelect.addEventListener('change', () => this.actualizarPrecio());
         }
         
+        // --- NUEVO: Sincronización para vista simplificada de Pago ---
+        const inputMontoPago = document.getElementById('input_monto_pago');
+        const hiddenMontoTotal = document.getElementById('hidden_monto_total');
+        const inputComprobante = document.getElementById('input_comprobante');
+        const btnCopyFactura = document.getElementById('btn-copy-factura');
+        const inputNombreFactura = document.querySelector('input[name="tutor_nombre_factura"]');
+
+        if (inputMontoPago) {
+            inputMontoPago.addEventListener('input', () => {
+                // Sincronizar Monto Total oculto con Monto Pago
+                if (hiddenMontoTotal) {
+                    hiddenMontoTotal.value = inputMontoPago.value;
+                }
+            });
+        }
+
+        // Función para copiar nombre de factura
+        const copiarNombreFactura = () => {
+            if (inputNombreFactura && inputComprobante) {
+                inputComprobante.value = inputNombreFactura.value;
+            }
+        };
+
+        // Escuchar cambios en nombre factura
+        if (inputNombreFactura) {
+             inputNombreFactura.addEventListener('input', copiarNombreFactura);
+             inputNombreFactura.addEventListener('change', copiarNombreFactura);
+        }
+
+        if (btnCopyFactura) {
+            btnCopyFactura.addEventListener('click', copiarNombreFactura);
+        }
+
+        // --- MANEJO DE PLAN DE PAGOS (AUNQUE ESTÉ OCULTO) ---
+        // Mantener listeners antiguos para evitar errores si existen elementos
         if (this.matriculaInput) {
             this.matriculaInput.addEventListener('input', () => this.actualizarMontoTotal());
         }
@@ -685,4 +770,4 @@ document.addEventListener('DOMContentLoaded', function() {
 window.RegistroCombinado = RegistroCombinado;
 
 </script>
-<?php echo $__env->make('/administrador/baseAdministrador', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\Users\danil\Desktop\Laravel\Yebolivia\resources\views/administrador/tutorEstudianteAdministrador.blade.php ENDPATH**/ ?>
+<?php echo $__env->make('administrador.baseAdministrador', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\Users\danil\Desktop\Laravel\Yebolivia\resources\views/administrador/tutorEstudianteAdministrador.blade.php ENDPATH**/ ?>

@@ -280,4 +280,59 @@ class TutorHomeController extends Controller
             ], 500);
         }
     }
+
+    public function mostrarEvaluaciones($id)
+    {
+        try {
+            $usuario = Auth::user();
+            $tutor = Tutores::where('Id_usuarios', $usuario->Id_usuarios)->first();
+
+            if (!$tutor) {
+                return redirect()->route('tutor.home')
+                    ->with('error', 'Tutor no encontrado');
+            }
+
+            // Verificar que el estudiante pertenece al tutor
+            $estudiante = Estudiante::with([
+                'persona',
+                'programa',
+                'sucursal',
+                'profesor.persona'
+            ])
+            ->where('Id_estudiantes', $id)
+            ->where('Id_tutores', $tutor->Id_tutores)
+            ->first();
+
+            if (!$estudiante) {
+                return redirect()->route('tutor.home')
+                    ->with('error', 'No tiene permiso para ver las evaluaciones de este estudiante');
+            }
+
+            // Obtener las evaluaciones del estudiante
+            $evaluaciones = \App\Models\Evaluacion::with([
+                'pregunta',
+                'respuesta',
+                'modelo',
+                'profesor.persona',
+                'programa'
+            ])
+            ->where('Id_estudiantes', $id)
+            ->orderBy('fecha_evaluacion', 'desc')
+            ->get();
+
+            // Retornar la vista HTML
+            return view('tutor.evaluacionesTutorEstudiante', [
+                'estudiante' => $estudiante,
+                'evaluaciones' => $evaluaciones,
+                'tutor' => $tutor
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('Error al mostrar evaluaciones del tutor: ' . $e->getMessage());
+            Log::error('Stack trace: ' . $e->getTraceAsString());
+            
+            return redirect()->route('tutor.home')
+                ->with('error', 'Error al cargar las evaluaciones. Por favor, intente nuevamente.');
+        }
+    }
 }

@@ -81,17 +81,14 @@ class HorariosController extends Controller
             'Hora' => 'required'
         ]);
 
-        // Obtener el estudiante para extraer su programa
         $estudiante = Estudiante::findOrFail($request->Id_estudiantes);
 
-        // Validar que el estudiante tenga programa asignado
         if (!$estudiante->Id_programas) {
             return redirect()->back()
                 ->withErrors(['error' => 'El estudiante seleccionado no tiene un programa asignado.'])
                 ->withInput();
         }
 
-        // Si el estudiante no tiene profesor asignado, asignárselo
         if (!$estudiante->Id_profesores) {
             $estudiante->Id_profesores = $request->Id_profesores;
             $estudiante->save();
@@ -117,7 +114,6 @@ class HorariosController extends Controller
         return redirect()->route('horarios.index')->with('success', 'Horario eliminado correctamente.');
     }
 
-    // Endpoint para obtener datos del estudiante via AJAX (opcional)
     public function buscarEstudiante($idEstudiante)
     {
         $estudiante = Estudiante::with(['profesor.persona', 'programa'])->find($idEstudiante);
