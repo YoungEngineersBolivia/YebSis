@@ -16,11 +16,12 @@ class HorariosController extends Controller
 
         $horarios = Horario::with(['estudiante.persona', 'profesor.persona', 'programa'])
             ->when($search, function ($query) use ($search) {
-                $query->whereHas('estudiante.persona', function ($q) use ($search) {
-                    $q->where('Nombre', 'like', "%{$search}%")
-                        ->orWhere('Apellido', 'like', "%{$search}%");
-                })->orWhereHas('estudiante', function ($q) use ($search) {
-                    $q->where('Cod_estudiante', 'like', "%{$search}%");
+                $query->whereHas('estudiante.persona', function ($qp) use ($search) {
+                    $qp->where(function ($q) use ($search) {
+                        $q->where('Nombre', 'like', "%{$search}%")
+                            ->orWhere('Apellido', 'like', "%{$search}%")
+                            ->orWhereRaw("CONCAT_WS(' ', Nombre, Apellido) LIKE ?", ["%{$search}%"]);
+                    });
                 });
             })
             ->orderBy('Dia')
