@@ -110,64 +110,9 @@
         </div>
       </div>
     @else
-        <div class="card shadow-sm border-0 overflow-hidden">
-          <div class="card-body p-0">
-            <div class="table-responsive">
-              <table class="table table-striped table-hover align-middle mb-0">
-                <thead class="bg-primary text-white">
-                  <tr>
-                    <th class="ps-3 py-3">Nombre</th>
-                    <th class="py-3">Apellido</th>
-                    <th class="py-3">Programa</th>
-                    <th class="py-3">Día</th>
-                    <th class="py-3">Hora</th>
-                    <th class="py-3">Profesor Asignado</th>
-                    <th class="pe-3 py-3 text-end">Acciones</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  @foreach($horarios as $horario)
-                    <tr>
-                      <td class="ps-3 fw-semibold">{{ $horario->estudiante?->persona?->Nombre ?? '—' }}</td>
-                      <td>{{ $horario->estudiante?->persona?->Apellido ?? '—' }}</td>
-                      <td>{{ $horario->programa?->Nombre ?? '—' }}</td>
-                      <td><span class="badge bg-light text-dark border">{{ $horario->Dia ?? '—' }}</span></td>
-                      <td>{{ $horario->Hora ?? '—' }}</td>
-                      <td>
-                        @php $pp = $horario->profesor?->persona; @endphp
-                        {{ ($pp?->Nombre && $pp?->Apellido) ? ($pp->Nombre . ' ' . $pp->Apellido) : 'Sin profesor' }}
-                      </td>
-                      <td class="pe-3 text-end">
-                        <div class="d-flex justify-content-end gap-2">
-                          <button type="button" class="btn btn-sm btn-outline-primary" title="Editar horario"
-                            data-bs-toggle="modal" data-bs-target="#modalEditar" data-id="{{ $horario->Id_horarios }}"
-                            data-estudiante="{{ $horario->Id_estudiantes }}" data-profesor="{{ $horario->Id_profesores }}"
-                            data-dia="{{ $horario->Dia }}" data-hora="{{ $horario->Hora }}">
-                            <i class="bi bi-pencil-square"></i>
-                          </button>
-
-                          <form action="{{ route('horarios.destroy', $horario->Id_horarios) }}" method="POST"
-                            onsubmit="return confirm('¿Eliminar este horario?');">
-                            @csrf
-                            @method('DELETE')
-                            <button class="btn btn-sm btn-outline-danger" title="Eliminar">
-                              <i class="bi bi-trash3-fill"></i>
-                            </button>
-                          </form>
-                        </div>
-                      </td>
-                    </tr>
-                  @endforeach
-                </tbody>
-              </table>
-            </div>
-          </div>
+        <div id="table-container">
+            @include('administrador.partials.horarios_table')
         </div>
-      </div>
-
-      <div class="d-flex justify-content-center mt-4 mb-4">
-        {{ $horarios->appends(['search' => $search])->links('pagination::bootstrap-5') }}
-      </div>
     @endif
   </div>
 
@@ -340,6 +285,9 @@
           });
         @endphp
         const estudiantesData = @json($datosEstudiantes);
+        const searchInputGlobal = document.getElementById('searchInput');
+        const resultCountGlobal = document.getElementById('resultCount');
+        const tableContainer = document.getElementById('table-container');
 
         function setupDynamicSearch(inputId, resultsId, hiddenId, profesorSelect, programaInput, helpText) {
             const searchInput = document.getElementById(inputId);
@@ -389,7 +337,6 @@
                                     return null;
                                 }
                             };
-
                             actualizarInfoEstudianteDesdeData(fakeOption, profesorSelect, programaInput, helpText);
                         });
                         resultsContainer.appendChild(item);
@@ -400,7 +347,6 @@
                     resultsContainer.classList.remove('d-none');
                 }
             });
-
 
             document.addEventListener('click', function(e) {
                 if (!searchInput.contains(e.target) && !resultsContainer.contains(e.target)) {
@@ -413,93 +359,99 @@
             if (dataObj && dataObj.value) {
                 const profesorId = dataObj.getAttribute('data-profesor');
                 const programaNombre = dataObj.getAttribute('data-programa-nombre') || 'Sin programa asignado';
-                const profesorNombre = dataObj.getAttribute('data-profesor-nombre') || '';
+                const profesorNombre = dataObj.getAttribute('data-profesor-nombre') || 'Sin profesor';
 
-                programaInput.value = programaNombre;
-                if (programaNombre === 'Sin programa asignado') {
-                    programaInput.classList.add('is-invalid');
-                } else {
-                    programaInput.classList.remove('is-invalid');
+                if (programaInput) {
+                    programaInput.value = programaNombre;
+                    if (programaNombre === 'Sin programa asignado') {
+                        programaInput.classList.add('is-invalid');
+                    } else {
+                        programaInput.classList.remove('is-invalid');
+                    }
                 }
 
-                if (profesorId && profesorId !== 'null' && profesorId !== '') {
-                    profesorSelect.value = profesorId;
-                    profesorSelect.disabled = false;
-                    profesorSelect.classList.remove('bg-light');
-                    helpText.innerHTML = `<i class="bi bi-info-circle me-1"></i>Profesor actual: <strong>${profesorNombre}</strong> (puede cambiarlo)`;
-                    helpText.classList.remove('text-muted', 'text-warning');
-                    helpText.classList.add('text-info');
-                } else {
-                    profesorSelect.value = '';
-                    profesorSelect.disabled = false;
-                    profesorSelect.classList.remove('bg-light');
-                    helpText.innerHTML = '<i class="bi bi-exclamation-triangle me-1"></i>Este estudiante no tiene profesor asignado.';
-                    helpText.classList.remove('text-success', 'text-info');
-                    helpText.classList.add('text-warning');
+                if (profesorSelect) {
+                    if (profesorId && profesorId !== 'null' && profesorId !== '') {
+                        profesorSelect.value = profesorId;
+                        profesorSelect.disabled = false;
+                        profesorSelect.classList.remove('bg-light');
+                        if (helpText) {
+                            helpText.innerHTML = `<i class="bi bi-info-circle me-1"></i>Profesor actual: <strong>${profesorNombre}</strong> (puede cambiarlo)`;
+                            helpText.classList.remove('text-muted', 'text-warning');
+                            helpText.classList.add('text-info');
+                        }
+                    } else {
+                        profesorSelect.value = '';
+                        profesorSelect.disabled = false;
+                        profesorSelect.classList.remove('bg-light');
+                        if (helpText) {
+                            helpText.innerHTML = '<i class="bi bi-exclamation-triangle me-1"></i>Este estudiante no tiene profesor asignado.';
+                            helpText.classList.remove('text-success', 'text-info');
+                            helpText.classList.add('text-warning');
+                        }
+                    }
                 }
             }
         }
 
-
+        // --- Modals logic ---
         setupDynamicSearch(
-            'estudiante_search_crear', 
-            'results_crear', 
-            'Id_estudiantes_crear_hidden', 
-            document.getElementById('Id_profesores_crear'), 
-            document.getElementById('programa_info_crear'), 
+            'estudiante_search_crear',
+            'results_crear',
+            'Id_estudiantes_crear_hidden',
+            document.getElementById('Id_profesores_crear'),
+            document.getElementById('programa_info_crear'),
             document.getElementById('profesor_help_crear')
         );
 
         setupDynamicSearch(
-            'estudiante_search_editar', 
-            'results_editar', 
-            'Id_estudiantes_editar_hidden', 
-            document.getElementById('Id_profesores_editar'), 
-            document.getElementById('programa_info_editar'), 
+            'estudiante_search_editar',
+            'results_editar',
+            'Id_estudiantes_editar_hidden',
+            document.getElementById('Id_profesores_editar'),
+            document.getElementById('programa_info_editar'),
             document.getElementById('profesor_help_editar')
         );
 
-        let contadorHorarios = 1; 
-
+        let contadorHorarios = 1;
         const btnAgregar = document.getElementById('btn-agregar-horario');
         if (btnAgregar) {
-          btnAgregar.addEventListener('click', function () {
-            const container = document.getElementById('horarios-container');
-            const nuevoHorario = document.createElement('div');
-            nuevoHorario.className = 'horario-item border rounded p-3 mb-2 bg-light';
-            nuevoHorario.innerHTML = `
-                  <div class="row g-2">
-                      <div class="col-md-5">
-                          <label class="form-label small">Día</label>
-                          <select class="form-select" name="horarios[${contadorHorarios}][dia]" required>
-                              <option value="" disabled selected>Seleccione</option>
-                              <option value="LUNES">LUNES</option>
-                              <option value="MARTES">MARTES</option>
-                              <option value="MIERCOLES">MIERCOLES</option>
-                              <option value="JUEVES">JUEVES</option>
-                              <option value="VIERNES">VIERNES</option>
-                              <option value="SABADO">SABADO</option>
-                          </select>
+            btnAgregar.addEventListener('click', function () {
+                const container = document.getElementById('horarios-container');
+                const nuevoHorario = document.createElement('div');
+                nuevoHorario.className = 'horario-item border rounded p-3 mb-2 bg-light';
+                nuevoHorario.innerHTML = `
+                      <div class="row g-2">
+                          <div class="col-md-5">
+                              <label class="form-label small">Día</label>
+                              <select class="form-select" name="horarios[${contadorHorarios}][dia]" required>
+                                  <option value="" disabled selected>Seleccione</option>
+                                  <option value="LUNES">LUNES</option>
+                                  <option value="MARTES">MARTES</option>
+                                  <option value="MIERCOLES">MIERCOLES</option>
+                                  <option value="JUEVES">JUEVES</option>
+                                  <option value="VIERNES">VIERNES</option>
+                                  <option value="SABADO">SABADO</option>
+                              </select>
+                          </div>
+                          <div class="col-md-5">
+                              <label class="form-label small">Hora</label>
+                              <input type="time" class="form-control" name="horarios[${contadorHorarios}][hora]" required>
+                          </div>
+                          <div class="col-md-2 d-flex align-items-end">
+                              <button type="button" class="btn btn-danger w-100 btn-eliminar-horario">
+                                  <i class="bi bi-trash3"></i>
+                              </button>
+                          </div>
                       </div>
-                      <div class="col-md-5">
-                          <label class="form-label small">Hora</label>
-                          <input type="time" class="form-control" name="horarios[${contadorHorarios}][hora]" required>
-                      </div>
-                      <div class="col-md-2 d-flex align-items-end">
-                          <button type="button" class="btn btn-danger w-100 btn-eliminar-horario">
-                              <i class="bi bi-trash3"></i>
-                          </button>
-                      </div>
-                  </div>
-              `;
-            container.appendChild(nuevoHorario);
-            contadorHorarios++;
-
-            nuevoHorario.querySelector('.btn-eliminar-horario').addEventListener('click', function () {
-              nuevoHorario.remove();
+                  `;
+                container.appendChild(nuevoHorario);
+                contadorHorarios++;
+                nuevoHorario.querySelector('.btn-eliminar-horario').addEventListener('click', function () {
+                    nuevoHorario.remove();
+                });
             });
-          });
-
+        }
 
         const modalEditar = document.getElementById('modalEditar');
         if (modalEditar) {
@@ -539,36 +491,68 @@
             });
         }
 
+        // --- Table Search logic (AJAX) ---
+        if (searchInputGlobal && tableContainer) {
+            let searchTimeout;
+            searchInputGlobal.addEventListener('input', function() {
+                clearTimeout(searchTimeout);
+                const query = this.value;
+                searchTimeout = setTimeout(() => {
+                    fetchResults(query);
+                }, 400);
+            });
 
-        const searchInputGlobal = document.getElementById('searchInput');
-        const searchFormGlobal = document.getElementById('searchForm');
-        const resultCountGlobal = document.getElementById('resultCount');
+            const searchForm = document.getElementById('searchForm');
+            if (searchForm) {
+                searchForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    fetchResults(searchInputGlobal.value);
+                });
+            }
+        }
 
-        if (searchInputGlobal && resultCountGlobal) {
-          let timeout = null;
-          searchInputGlobal.addEventListener('input', function () {
-            clearTimeout(timeout);
-            timeout = setTimeout(() => {
-              searchFormGlobal.submit();
-            }, 600);
-          });
+        function fetchResults(query = '', page = 1) {
+            const url = new URL('{{ route('horarios.index') }}');
+            url.searchParams.set('search', query);
+            url.searchParams.set('page', page);
 
-          const val = searchInputGlobal.value;
-          searchInputGlobal.value = '';
-          searchInputGlobal.value = val;
-          searchInputGlobal.focus();
+            fetch(url.toString(), {
+                headers: { 'X-Requested-With': 'XMLHttpRequest' }
+            })
+            .then(response => response.text())
+            .then(html => {
+                tableContainer.innerHTML = html;
+                window.history.pushState(null, '', url.toString());
+                updateResultCount(query);
+            })
+            .catch(error => console.error('Error:', error));
+        }
 
-          const totalRows = {{ $horarios->total() }};
-          const isSearching = "{{ $search }}" !== "";
+        function updateResultCount(query) {
+            if (resultCountGlobal) {
+                resultCountGlobal.textContent = query ? `Buscando resultados para "${query}"...` : 'Mostrando todos los horarios';
+            }
+        }
 
-          if (isSearching) {
-            resultCountGlobal.textContent = `Mostrando ${totalRows} resultados para "{{ $search }}"`;
-          } else {
-            resultCountGlobal.textContent = `Mostrando todos los ${totalRows} horarios`;
-          }
+        tableContainer.addEventListener('click', function(e) {
+            const link = e.target.closest('.pagination a');
+            if (link) {
+                e.preventDefault();
+                const urlObj = new URL(link.href);
+                const pageNum = urlObj.searchParams.get('page') || 1;
+                fetchResults(searchInputGlobal.value, pageNum);
+            }
+        });
+
+        if (searchInputGlobal) {
+            searchInputGlobal.focus();
+            const totalRows = {{ $horarios->total() }};
+            const currentSearch = "{{ $search }}";
+            resultCountGlobal.textContent = currentSearch ? 
+                `Mostrando ${totalRows} resultados para "${currentSearch}"` : 
+                `Mostrando todos los ${totalRows} horarios`;
         }
       });
-
-  </script>
+    </script>
 
 @endsection
