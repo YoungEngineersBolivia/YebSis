@@ -14,27 +14,16 @@ class HorariosController extends Controller
     {
         $search = $request->input('search');
 
-        $horarios = Horario::with(['estudiante.persona', 'profesor.persona', 'programa'])
-            ->when($search, function ($query) use ($search) {
-                $query->whereHas('estudiante.persona', function ($qp) use ($search) {
-                    $qp->where(function ($q) use ($search) {
-                        $q->where('Nombre', 'like', "%{$search}%")
-                            ->orWhere('Apellido', 'like', "%{$search}%")
-                            ->orWhereRaw("CONCAT_WS(' ', Nombre, Apellido) LIKE ?", ["%{$search}%"]);
-                    });
+        $query = Horario::with(['estudiante.persona', 'profesor.persona', 'programa'])
+            ->when($search, function ($q) use ($search) {
+                $q->whereHas('estudiante.persona', function ($qp) use ($search) {
+                    $qp->where('Nombre', 'like', "%{$search}%")
+                        ->orWhere('Apellido', 'like', "%{$search}%")
+                        ->orWhereRaw("CONCAT_WS(' ', Nombre, Apellido) LIKE ?", ["%{$search}%"]);
                 });
             })
             ->orderBy('Dia')
             ->orderBy('Hora');
-
-        // Búsqueda
-        if ($request->has('search') && $request->search != '') {
-            $search = $request->search;
-            $query->whereHas('estudiante.persona', function ($q) use ($search) {
-                $q->where('Nombre', 'like', "%{$search}%")
-                    ->orWhere('Apellido', 'like', "%{$search}%");
-            });
-        }
 
         $horarios = $query->paginate(6);
 
@@ -43,7 +32,11 @@ class HorariosController extends Controller
             return view('administrador.partials.horarios_table', compact('horarios'))->render();
         }
 
-        $estudiantes = Estudiante::with(['persona', 'profesor.persona', 'programa'])->get();
+        $estudiantes = Estudiante::activos()
+            ->with(['persona', 'profesor.persona', 'programa'])
+            ->withCount('horarios')
+            ->get();
+
         $profesores = Profesor::with('persona')->get();
 
         return view('administrador.horariosAdministrador', compact('horarios', 'estudiantes', 'profesores', 'search'));
