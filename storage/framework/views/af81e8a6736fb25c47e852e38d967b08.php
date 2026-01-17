@@ -99,8 +99,74 @@
             </div>
         </div>
     <?php else: ?>
+<<<<<<< HEAD
         <div id="table-container">
             <?php echo $__env->make('administrador.partials.horarios_table', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
+=======
+        <div class="card shadow-sm border-0 overflow-hidden">
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover align-middle mb-0">
+                        <thead class="bg-primary text-white">
+                            <tr>
+                                <th class="ps-3 py-3">Nombre</th>
+                                <th class="py-3">Apellido</th>
+                                <th class="py-3">Programa</th>
+                                <th class="py-3">Día</th>
+                                <th class="py-3">Hora</th>
+                                <th class="py-3">Profesor Asignado</th>
+                                <th class="pe-3 py-3 text-end">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php $__currentLoopData = $horarios; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $horario): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                <tr>
+                                    <td class="ps-3 fw-semibold"><?php echo e($horario->estudiante?->persona?->Nombre ?? '—'); ?></td>
+                                    <td><?php echo e($horario->estudiante?->persona?->Apellido ?? '—'); ?></td>
+                                    <td><?php echo e($horario->programa?->Nombre ?? '—'); ?></td>
+                                    <td><span class="badge bg-light text-dark border"><?php echo e($horario->Dia ?? '—'); ?></span></td>
+                                    <td><?php echo e($horario->Hora ?? '—'); ?></td>
+                                    <td>
+                                        <?php $pp = $horario->profesor?->persona; ?>
+                                        <?php echo e(($pp?->Nombre && $pp?->Apellido) ? ($pp->Nombre.' '.$pp->Apellido) : 'Sin profesor'); ?>
+
+                                    </td>
+                                    <td class="pe-3 text-end">
+                                        <div class="d-flex justify-content-end gap-2">
+                                            <button type="button"
+                                                    class="btn btn-sm btn-outline-primary"
+                                                    title="Editar horario"
+                                                    data-bs-toggle="modal"
+                                                    data-bs-target="#modalEditar"
+                                                    data-id="<?php echo e($horario->Id_horarios); ?>"
+                                                    data-estudiante="<?php echo e($horario->Id_estudiantes); ?>"
+                                                    data-profesor="<?php echo e($horario->Id_profesores); ?>"
+                                                    data-dia="<?php echo e($horario->Dia); ?>"
+                                                    data-hora="<?php echo e($horario->Hora); ?>">
+                                                <i class="bi bi-pencil-square"></i>
+                                            </button>
+
+                                            <form action="<?php echo e(route('horarios.destroy', $horario->Id_horarios)); ?>" method="POST" onsubmit="return confirm('¿Eliminar este horario?');">
+                                                <?php echo csrf_field(); ?>
+                                                <?php echo method_field('DELETE'); ?>
+                                                <button class="btn btn-sm btn-outline-danger" title="Eliminar">
+                                                    <i class="bi bi-trash3-fill"></i>
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="d-flex justify-content-center mt-4 mb-4">
+            <?php echo e($horarios->links('pagination::bootstrap-5')); ?>
+
+>>>>>>> 54ee8a043b547eaa578cefe6ce5378f4e39823da
         </div>
     <?php endif; ?>
 </div>
@@ -272,7 +338,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 'profesor_nombre' => $e->profesor ? ($e->profesor->persona->Nombre . ' ' . $e->profesor->persona->Apellido) : 'Sin profesor',
                 'programa_id' => $e->Id_programas,
                 'programa_nombre' => $e->programa ? $e->programa->Nombre : 'Sin programa',
-                'codigo' => $e->Cod_estudiante
+                'codigo' => $e->Cod_estudiante,
+                'tiene_horario' => $e->horarios_count > 0
             ];
         });
     ?>
@@ -287,6 +354,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
         searchInput.addEventListener('input', function() {
             const term = this.value.toLowerCase().trim();
+            const currentSelectedId = hiddenInput.value;
             resultsContainer.innerHTML = '';
             
             if (term.length < 1) {
@@ -294,9 +362,11 @@ document.addEventListener('DOMContentLoaded', function () {
                 return;
             }
 
-            const filtered = estudiantesData.filter(e => 
-                e.nombre.toLowerCase().includes(term) || (e.codigo && e.codigo.toLowerCase().includes(term))
-            );
+            const filtered = estudiantesData.filter(e => {
+                const matchesTerm = e.nombre.toLowerCase().includes(term) || (e.codigo && e.codigo.toLowerCase().includes(term));
+                const isAvailable = !e.tiene_horario || e.id == currentSelectedId;
+                return matchesTerm && isAvailable;
+            });
 
             if (filtered.length > 0) {
                 filtered.forEach(e => {
@@ -472,6 +542,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 });
 
+<<<<<<< HEAD
     // ========== AJAX SEARCH FOR TABLE ==========
     const searchInputTable = document.getElementById('searchInput');
     const tableContainer = document.getElementById('table-container');
@@ -484,6 +555,50 @@ document.addEventListener('DOMContentLoaded', function () {
             const query = searchInputTable.value;
             fetchResults(query);
         });
+=======
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('searchInput');
+    const tableRows = document.querySelectorAll('tbody tr');
+    const resultCount = document.getElementById('resultCount');
+    const totalRows = tableRows.length;
+
+    if (searchInput && tableRows.length > 0) {
+        function filterTable() {
+            const searchTerm = searchInput.value.toLowerCase().trim();
+            let visibleCount = 0;
+
+            tableRows.forEach(row => {
+                const nombreCell = row.cells[0];
+                const apellidoCell = row.cells[1];
+                
+                if (nombreCell && apellidoCell) {
+                    const nombre = nombreCell.textContent.toLowerCase();
+                    const apellido = apellidoCell.textContent.toLowerCase();
+                    const nombreCompleto = nombre + ' ' + apellido;
+
+                    if (nombreCompleto.includes(searchTerm)) {
+                        row.style.display = '';
+                        visibleCount++;
+                    } else {
+                        row.style.display = 'none';
+                    }
+                }
+            });
+
+            if (searchTerm === '') {
+                resultCount.textContent = `Mostrando todos los ${totalRows} horarios`;
+            } else {
+                resultCount.textContent = `Mostrando ${visibleCount} de ${totalRows} horarios`;
+                if (visibleCount === 0) {
+                    resultCount.innerHTML = `<i class="bi bi-exclamation-circle text-warning"></i> No se encontraron resultados para "${searchTerm}"`;
+                }
+            }
+        }
+
+        searchInput.addEventListener('input', filterTable);
+        
+        resultCount.textContent = `Mostrando todos los ${totalRows} horarios`;
+>>>>>>> 54ee8a043b547eaa578cefe6ce5378f4e39823da
     }
 
     if (searchInputTable) {
