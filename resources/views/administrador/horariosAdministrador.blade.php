@@ -100,67 +100,8 @@
             </div>
         </div>
     @else
-        <div class="card shadow-sm border-0 overflow-hidden">
-            <div class="card-body p-0">
-                <div class="table-responsive">
-                    <table class="table table-striped table-hover align-middle mb-0">
-                        <thead class="bg-primary text-white">
-                            <tr>
-                                <th class="ps-3 py-3">Nombre</th>
-                                <th class="py-3">Apellido</th>
-                                <th class="py-3">Programa</th>
-                                <th class="py-3">Día</th>
-                                <th class="py-3">Hora</th>
-                                <th class="py-3">Profesor Asignado</th>
-                                <th class="pe-3 py-3 text-end">Acciones</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach($horarios as $horario)
-                                <tr>
-                                    <td class="ps-3 fw-semibold">{{ $horario->estudiante?->persona?->Nombre ?? '—' }}</td>
-                                    <td>{{ $horario->estudiante?->persona?->Apellido ?? '—' }}</td>
-                                    <td>{{ $horario->programa?->Nombre ?? '—' }}</td>
-                                    <td><span class="badge bg-light text-dark border">{{ $horario->Dia ?? '—' }}</span></td>
-                                    <td>{{ $horario->Hora ?? '—' }}</td>
-                                    <td>
-                                        @php $pp = $horario->profesor?->persona; @endphp
-                                        {{ ($pp?->Nombre && $pp?->Apellido) ? ($pp->Nombre.' '.$pp->Apellido) : 'Sin profesor' }}
-                                    </td>
-                                    <td class="pe-3 text-end">
-                                        <div class="d-flex justify-content-end gap-2">
-                                            <button type="button"
-                                                    class="btn btn-sm btn-outline-primary"
-                                                    title="Editar horario"
-                                                    data-bs-toggle="modal"
-                                                    data-bs-target="#modalEditar"
-                                                    data-id="{{ $horario->Id_horarios }}"
-                                                    data-estudiante="{{ $horario->Id_estudiantes }}"
-                                                    data-profesor="{{ $horario->Id_profesores }}"
-                                                    data-dia="{{ $horario->Dia }}"
-                                                    data-hora="{{ $horario->Hora }}">
-                                                <i class="bi bi-pencil-square"></i>
-                                            </button>
-
-                                            <form action="{{ route('horarios.destroy', $horario->Id_horarios) }}" method="POST" onsubmit="return confirm('¿Eliminar este horario?');">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button class="btn btn-sm btn-outline-danger" title="Eliminar">
-                                                    <i class="bi bi-trash3-fill"></i>
-                                                </button>
-                                            </form>
-                                        </div>
-                                    </td>
-                                </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-
-        <div class="d-flex justify-content-center mt-4 mb-4">
-            {{ $horarios->links('pagination::bootstrap-5') }}
+        <div id="table-container">
+            @include('administrador.partials.horarios_table')
         </div>
     @endif
 </div>
@@ -530,50 +471,64 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 });
 
-document.addEventListener('DOMContentLoaded', function() {
-    const searchInput = document.getElementById('searchInput');
-    const tableRows = document.querySelectorAll('tbody tr');
-    const resultCount = document.getElementById('resultCount');
-    const totalRows = tableRows.length;
+    // ========== AJAX SEARCH FOR TABLE ==========
+    const searchInputTable = document.getElementById('searchInput');
+    const tableContainer = document.getElementById('table-container');
+    const searchFormTable = document.querySelector('form[action="{{ route('horarios.index') }}"]');
+    let searchTimeout;
 
-    if (searchInput && tableRows.length > 0) {
-        function filterTable() {
-            const searchTerm = searchInput.value.toLowerCase().trim();
-            let visibleCount = 0;
-
-            tableRows.forEach(row => {
-                const nombreCell = row.cells[0];
-                const apellidoCell = row.cells[1];
-                
-                if (nombreCell && apellidoCell) {
-                    const nombre = nombreCell.textContent.toLowerCase();
-                    const apellido = apellidoCell.textContent.toLowerCase();
-                    const nombreCompleto = nombre + ' ' + apellido;
-
-                    if (nombreCompleto.includes(searchTerm)) {
-                        row.style.display = '';
-                        visibleCount++;
-                    } else {
-                        row.style.display = 'none';
-                    }
-                }
-            });
-
-            if (searchTerm === '') {
-                resultCount.textContent = `Mostrando todos los ${totalRows} horarios`;
-            } else {
-                resultCount.textContent = `Mostrando ${visibleCount} de ${totalRows} horarios`;
-                if (visibleCount === 0) {
-                    resultCount.innerHTML = `<i class="bi bi-exclamation-circle text-warning"></i> No se encontraron resultados para "${searchTerm}"`;
-                }
-            }
-        }
-
-        searchInput.addEventListener('input', filterTable);
-        
-        resultCount.textContent = `Mostrando todos los ${totalRows} horarios`;
+    if (searchFormTable) {
+        searchFormTable.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const query = searchInputTable.value;
+            fetchResults(query);
+        });
     }
-});
+
+    if (searchInputTable) {
+        searchInputTable.addEventListener('input', function() {
+            clearTimeout(searchTimeout);
+            const query = this.value;
+
+            searchTimeout = setTimeout(() => {
+                fetchResults(query);
+            }, 250);
+        });
+    }
+
+    function fetchResults(query = '', page = 1) {
+        // Usar la ruta absoluta para evitar problemas
+        const url = new URL('{{ route('horarios.index') }}');
+        url.searchParams.set('search', query);
+        url.searchParams.set('page', page);
+
+        fetch(url.toString(), {
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(response => response.text())
+        .then(html => {
+            tableContainer.innerHTML = html;
+            // Actualizar URL sin recargar para que el "volver" funcione
+            window.history.pushState(null, '', url.toString());
+        })
+        .catch(error => console.error('Error:', error));
+    }
+
+    // Usar delegación de eventos para la paginación dinámica
+    tableContainer.addEventListener('click', function(e) {
+        if (e.target.closest('.pagination a')) {
+            e.preventDefault();
+            const urlStr = e.target.closest('.pagination a').href;
+            const urlObj = new URL(urlStr);
+            const pageNum = urlObj.searchParams.get('page') || 1;
+            const currentQuery = searchInputTable.value;
+            fetchResults(currentQuery, pageNum);
+        }
+    });
+
+    // ========== CLIENT-SIDE SEARCH FOR MODAL (PRESERVED) ==========
 
 </script>
 

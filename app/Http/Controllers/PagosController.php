@@ -17,33 +17,33 @@ class PagosController extends Controller
             'tutor.persona',
             'planesPago.cuotas'
         ])
-        ->orderBy('Id_estudiantes', 'desc')
-        ->get();
+            ->orderBy('Id_estudiantes', 'desc')
+            ->get();
 
         return view('administrador.pagosAdministrador', compact('estudiantes'));
     }
 
     public function index(Request $request)
-{
-    $query = Estudiante::query()->with([
-        'persona',
-        'tutor.persona',
-        'planesPago.cuotas'
-    ]);
+    {
+        $query = Estudiante::query()->with([
+            'persona',
+            'tutor.persona',
+            'planesPago.cuotas'
+        ]);
 
-    if ($request->has('nombre') && $request->nombre != '') {
-        $query->whereHas('persona', function($q) use ($request) {
-            $q->where('Nombre', 'like', '%' . $request->nombre . '%')
-              ->orWhere('Apellido', 'like', '%' . $request->nombre . '%');
-        });
+        if ($request->has('nombre') && $request->nombre != '') {
+            $query->whereHas('persona', function ($q) use ($request) {
+                $q->where('Nombre', 'like', '%' . $request->nombre . '%')
+                    ->orWhere('Apellido', 'like', '%' . $request->nombre . '%');
+            });
+        }
+
+        $estudiantes = $query
+            ->orderBy('Id_estudiantes', 'desc')   // <-- correcto
+            ->get();
+
+        return view('administrador.pagosAdministrador', compact('estudiantes'));
     }
-
-    $estudiantes = $query
-        ->orderBy('Id_estudiantes', 'desc')   // <-- correcto
-        ->get();
-
-    return view('administrador.pagosAdministrador', compact('estudiantes'));
-}
 
 
     public function registrarPago(Request $request)
@@ -52,7 +52,7 @@ class PagosController extends Controller
         $request->validate([
             'plan_id' => 'required|exists:planes_pagos,Id_planes_pagos',
             'descripcion' => 'required|string|max:255',
-            'comprobante' => 'required|string|max:255',
+            'comprobante' => 'nullable|string|max:255',
             'monto_pago' => 'required|numeric|min:0.01',
             'fecha_pago' => 'required|date',
         ], [
@@ -65,7 +65,7 @@ class PagosController extends Controller
 
             // Obtener el plan
             $plan = PlanesPago::with('pagos')->findOrFail($request->plan_id);
-            
+
             // Calcular total pagado
             $totalPagado = $plan->pagos->sum('Monto_pago');
             $montoPago = (float) $request->monto_pago;
@@ -80,10 +80,9 @@ class PagosController extends Controller
             ]);
 
             \DB::commit();
-            
-            $nuevoTotal = $totalPagado + $montoPago;
-            $mensaje = 'Pago registrado correctamente. Total pagado: Bs. ' . number_format($nuevoTotal, 2);
-            
+
+            $mensaje = 'Pago registrado correctamente por Bs. ' . number_format($montoPago, 2);
+
             return back()->with('success', $mensaje);
 
         } catch (\Exception $e) {
@@ -115,7 +114,7 @@ class PagosController extends Controller
 
             foreach ($cuotasPendientes as $cuota) {
                 $montoPendiente = $cuota->Monto_cuota - ($cuota->Monto_pagado ?? 0);
-                
+
                 // Actualizar cuota
                 $cuota->Monto_pagado = $cuota->Monto_cuota;
                 $cuota->Estado_cuota = 'Pagado';
@@ -135,7 +134,7 @@ class PagosController extends Controller
             }
 
             \DB::commit();
-            
+
             return back()->with('success', "Plan de pago completado exitosamente. {$cuotasPagadas} cuotas pagadas por un total de Bs. " . number_format($totalPagado, 2));
 
         } catch (\Exception $e) {

@@ -10,12 +10,27 @@ use App\Models\Programa;
 
 class HorariosController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $horarios = Horario::with(['estudiante.persona', 'profesor.persona', 'programa'])
+        $query = Horario::with(['estudiante.persona', 'profesor.persona', 'programa'])
             ->orderBy('Dia')
-            ->orderBy('Hora')
-            ->paginate(6);
+            ->orderBy('Hora');
+
+        // Búsqueda
+        if ($request->has('search') && $request->search != '') {
+            $search = $request->search;
+            $query->whereHas('estudiante.persona', function ($q) use ($search) {
+                $q->where('Nombre', 'like', "%{$search}%")
+                    ->orWhere('Apellido', 'like', "%{$search}%");
+            });
+        }
+
+        $horarios = $query->paginate(6);
+
+        // Si es petición AJAX, devolvemos solo la tabla
+        if ($request->ajax()) {
+            return view('administrador.partials.horarios_table', compact('horarios'))->render();
+        }
 
         $estudiantes = Estudiante::activos()->with(['persona', 'profesor.persona', 'programa'])->get();
         $profesores = Profesor::with('persona')->get();

@@ -47,13 +47,11 @@
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2 class="mb-0 fw-bold"><i class="bi bi-calendar-week me-2"></i>Horarios Asignados</h2>
 
-        
         <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalCrear">
             <i class="bi bi-plus-lg me-2"></i>Asignar nuevo horario
         </button>
     </div>
 
-    
     <div class="card shadow-sm border-0 mb-3">
         <div class="card-body">
             <div class="row g-3">
@@ -74,7 +72,6 @@
         </div>
     </div>
 
-    
     <?php if(session('success')): ?>
         <div class="alert alert-success alert-dismissible fade show" role="alert">
             <?php echo e(session('success')); ?>
@@ -94,7 +91,6 @@
         </div>
     <?php endif; ?>
 
-    
     <?php if($horarios->isEmpty()): ?>
         <div class="card shadow-sm border-0">
             <div class="card-body text-center py-5">
@@ -103,76 +99,11 @@
             </div>
         </div>
     <?php else: ?>
-        <div class="card shadow-sm border-0 overflow-hidden">
-            <div class="card-body p-0">
-                <div class="table-responsive">
-                    <table class="table table-striped table-hover align-middle mb-0">
-                        <thead class="bg-primary text-white">
-                            <tr>
-                                <th class="ps-3 py-3">Nombre</th>
-                                <th class="py-3">Apellido</th>
-                                <th class="py-3">Programa</th>
-                                <th class="py-3">Día</th>
-                                <th class="py-3">Hora</th>
-                                <th class="py-3">Profesor Asignado</th>
-                                <th class="pe-3 py-3 text-end">Acciones</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php $__currentLoopData = $horarios; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $horario): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                                <tr>
-                                    <td class="ps-3 fw-semibold"><?php echo e($horario->estudiante?->persona?->Nombre ?? '—'); ?></td>
-                                    <td><?php echo e($horario->estudiante?->persona?->Apellido ?? '—'); ?></td>
-                                    <td><?php echo e($horario->programa?->Nombre ?? '—'); ?></td>
-                                    <td><span class="badge bg-light text-dark border"><?php echo e($horario->Dia ?? '—'); ?></span></td>
-                                    <td><?php echo e($horario->Hora ?? '—'); ?></td>
-                                    <td>
-                                        <?php $pp = $horario->profesor?->persona; ?>
-                                        <?php echo e(($pp?->Nombre && $pp?->Apellido) ? ($pp->Nombre.' '.$pp->Apellido) : 'Sin profesor'); ?>
-
-                                    </td>
-                                    <td class="pe-3 text-end">
-                                        <div class="d-flex justify-content-end gap-2">
-                                            
-                                            <button type="button"
-                                                    class="btn btn-sm btn-outline-primary"
-                                                    title="Editar horario"
-                                                    data-bs-toggle="modal"
-                                                    data-bs-target="#modalEditar"
-                                                    data-id="<?php echo e($horario->Id_horarios); ?>"
-                                                    data-estudiante="<?php echo e($horario->Id_estudiantes); ?>"
-                                                    data-profesor="<?php echo e($horario->Id_profesores); ?>"
-                                                    data-dia="<?php echo e($horario->Dia); ?>"
-                                                    data-hora="<?php echo e($horario->Hora); ?>">
-                                                <i class="bi bi-pencil-square"></i>
-                                            </button>
-
-                                            
-                                            <form action="<?php echo e(route('horarios.destroy', $horario->Id_horarios)); ?>" method="POST" onsubmit="return confirm('¿Eliminar este horario?');">
-                                                <?php echo csrf_field(); ?>
-                                                <?php echo method_field('DELETE'); ?>
-                                                <button class="btn btn-sm btn-outline-danger" title="Eliminar">
-                                                    <i class="bi bi-trash3-fill"></i>
-                                                </button>
-                                            </form>
-                                        </div>
-                                    </td>
-                                </tr>
-                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-
-        
-        <div class="d-flex justify-content-center mt-4 mb-4">
-            <?php echo e($horarios->links('pagination::bootstrap-5')); ?>
-
+        <div id="table-container">
+            <?php echo $__env->make('administrador.partials.horarios_table', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
         </div>
     <?php endif; ?>
 </div>
-
 
 <div class="modal fade" id="modalCrear" tabindex="-1" aria-labelledby="modalCrearLabel" aria-hidden="true">
   <div class="modal-dialog">
@@ -185,7 +116,6 @@
         </div>
 
         <div class="modal-body">
-          
           <div class="mb-3 position-relative">
             <label for="estudiante_search_crear" class="form-label">Estudiante</label>
             <div class="input-group">
@@ -195,11 +125,9 @@
             </div>
             <input type="hidden" name="Id_estudiantes" id="Id_estudiantes_crear_hidden" required>
             <div id="results_crear" class="list-group search-results-container position-absolute w-100 shadow-sm d-none">
-                
             </div>
           </div>
 
-          
           <div class="mb-3" id="div_profesor_crear">
             <label for="Id_profesores_crear" class="form-label">Profesor</label>
             <select class="form-select" id="Id_profesores_crear" name="Id_profesores" required>
@@ -216,7 +144,6 @@
             </small>
           </div>
 
-          
           <div class="mb-3">
             <label for="programa_info_crear" class="form-label">Programa Inscrito</label>
             <input type="text" class="form-control" id="programa_info_crear" readonly 
@@ -224,11 +151,9 @@
             <small class="form-text text-muted">El programa se obtiene automáticamente del estudiante</small>
           </div>
 
-          
           <div class="mb-3">
             <label class="form-label fw-bold">Horarios de la semana</label>
             <div id="horarios-container">
-              
               <div class="horario-item border rounded p-3 mb-2 bg-light">
                 <div class="row g-2">
                   <div class="col-md-5">
@@ -267,7 +192,6 @@
   </div>
 </div>
 
-
 <div class="modal fade" id="modalEditar" tabindex="-1" aria-labelledby="modalEditarLabel" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
@@ -280,7 +204,6 @@
         </div>
 
         <div class="modal-body">
-          
           <div class="mb-3 position-relative">
             <label for="estudiante_search_editar" class="form-label">Estudiante</label>
             <div class="input-group">
@@ -290,11 +213,9 @@
             </div>
             <input type="hidden" name="Id_estudiantes" id="Id_estudiantes_editar_hidden" required>
             <div id="results_editar" class="list-group search-results-container position-absolute w-100 shadow-sm d-none">
-                
             </div>
           </div>
 
-          
           <div class="mb-3" id="div_profesor_editar">
             <label for="Id_profesores_editar" class="form-label">Profesor</label>
             <select class="form-select" id="Id_profesores_editar" name="Id_profesores" required>
@@ -310,14 +231,12 @@
             </small>
           </div>
 
-          
           <div class="mb-3">
             <label for="programa_info_editar" class="form-label">Programa Inscrito</label>
             <input type="text" class="form-control" id="programa_info_editar" readonly>
             <small class="form-text text-muted">El programa se obtiene automáticamente del estudiante</small>
           </div>
 
-          
           <div class="mb-3">
             <label for="Dia_editar" class="form-label">Día</label>
             <select class="form-select" id="Dia_editar" name="Dia" required>
@@ -327,7 +246,6 @@
             </select>
           </div>
 
-          
           <div class="mb-3">
             <label for="Hora_editar" class="form-label">Hora</label>
             <input type="time" class="form-control" id="Hora_editar" name="Hora" required>
@@ -343,10 +261,8 @@
   </div>
 </div>
 
-
 <script>
 document.addEventListener('DOMContentLoaded', function () {
-    // ========== DATOS DE ESTUDIANTES ==========
     <?php
         $datosEstudiantes = $estudiantes->map(function($e) {
             return [
@@ -362,7 +278,6 @@ document.addEventListener('DOMContentLoaded', function () {
     ?>
     const estudiantesData = <?php echo json_encode($datosEstudiantes, 15, 512) ?>;
 
-    // ========== FUNCIONES DEL BUSCADOR DINÁMICO ==========
     function setupDynamicSearch(inputId, resultsId, hiddenId, profesorSelect, programaInput, helpText) {
         const searchInput = document.getElementById(inputId);
         const resultsContainer = document.getElementById(resultsId);
@@ -399,7 +314,6 @@ document.addEventListener('DOMContentLoaded', function () {
                         hiddenInput.value = e.id;
                         resultsContainer.classList.add('d-none');
                         
-                        // Fabricar un objeto similar a selectedOptions[0] para reusar actualizarInfoEstudiante
                         const fakeOption = {
                             value: e.id,
                             getAttribute: (attr) => {
@@ -429,7 +343,6 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // ========== GESTIÓN DE INFORMACIÓN DEL ESTUDIANTE ==========
     function actualizarInfoEstudianteDesdeData(dataObj, profesorSelect, programaInput, helpText) {
         if (dataObj && dataObj.value) {
             const profesorId = dataObj.getAttribute('data-profesor');
@@ -480,7 +393,6 @@ document.addEventListener('DOMContentLoaded', function () {
         document.getElementById('profesor_help_editar')
     );
 
-    // ========== GESTIÓN DE HORARIOS DINÁMICOS ==========
     let contadorHorarios = 1; 
 
     document.getElementById('btn-agregar-horario').addEventListener('click', function() {
@@ -520,7 +432,6 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 
-    // ========== MODAL DE EDICIÓN ==========
     const modalEditar = document.getElementById('modalEditar');
     if (modalEditar) {
         modalEditar.addEventListener('show.bs.modal', function (event) {
@@ -542,12 +453,10 @@ document.addEventListener('DOMContentLoaded', function () {
             document.getElementById('Dia_editar').value = dia;
             document.getElementById('Hora_editar').value = hora;
 
-            // Encontrar el nombre del estudiante para el input de búsqueda
             const est = estudiantesData.find(e => e.id == estudianteId);
             if (est) {
                 estudianteSearchInput.value = est.nombre;
                 
-                // Actualizar info adicional
                 const fakeOption = {
                     value: est.id,
                     getAttribute: (attr) => {
@@ -563,57 +472,64 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 });
 
-// ========== BÚSQUEDA DINÁMICA ==========
-document.addEventListener('DOMContentLoaded', function() {
-    const searchInput = document.getElementById('searchInput');
-    const tableRows = document.querySelectorAll('tbody tr');
-    const resultCount = document.getElementById('resultCount');
-    const totalRows = tableRows.length;
+    // ========== AJAX SEARCH FOR TABLE ==========
+    const searchInputTable = document.getElementById('searchInput');
+    const tableContainer = document.getElementById('table-container');
+    const searchFormTable = document.querySelector('form[action="<?php echo e(route('horarios.index')); ?>"]');
+    let searchTimeout;
 
-    if (searchInput && tableRows.length > 0) {
-        // Función para filtrar la tabla
-        function filterTable() {
-            const searchTerm = searchInput.value.toLowerCase().trim();
-            let visibleCount = 0;
-
-            tableRows.forEach(row => {
-                // Obtener el nombre y apellido del estudiante (primera y segunda columna)
-                const nombreCell = row.cells[0];
-                const apellidoCell = row.cells[1];
-                
-                if (nombreCell && apellidoCell) {
-                    const nombre = nombreCell.textContent.toLowerCase();
-                    const apellido = apellidoCell.textContent.toLowerCase();
-                    const nombreCompleto = nombre + ' ' + apellido;
-
-                    // Mostrar/ocultar fila según coincidencia
-                    if (nombreCompleto.includes(searchTerm)) {
-                        row.style.display = '';
-                        visibleCount++;
-                    } else {
-                        row.style.display = 'none';
-                    }
-                }
-            });
-
-            // Actualizar contador de resultados
-            if (searchTerm === '') {
-                resultCount.textContent = `Mostrando todos los ${totalRows} horarios`;
-            } else {
-                resultCount.textContent = `Mostrando ${visibleCount} de ${totalRows} horarios`;
-                if (visibleCount === 0) {
-                    resultCount.innerHTML = `<i class="bi bi-exclamation-circle text-warning"></i> No se encontraron resultados para "${searchTerm}"`;
-                }
-            }
-        }
-
-        // Ejecutar búsqueda mientras el usuario escribe
-        searchInput.addEventListener('input', filterTable);
-        
-        // Mostrar contador inicial
-        resultCount.textContent = `Mostrando todos los ${totalRows} horarios`;
+    if (searchFormTable) {
+        searchFormTable.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const query = searchInputTable.value;
+            fetchResults(query);
+        });
     }
-});
+
+    if (searchInputTable) {
+        searchInputTable.addEventListener('input', function() {
+            clearTimeout(searchTimeout);
+            const query = this.value;
+
+            searchTimeout = setTimeout(() => {
+                fetchResults(query);
+            }, 250);
+        });
+    }
+
+    function fetchResults(query = '', page = 1) {
+        // Usar la ruta absoluta para evitar problemas
+        const url = new URL('<?php echo e(route('horarios.index')); ?>');
+        url.searchParams.set('search', query);
+        url.searchParams.set('page', page);
+
+        fetch(url.toString(), {
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(response => response.text())
+        .then(html => {
+            tableContainer.innerHTML = html;
+            // Actualizar URL sin recargar para que el "volver" funcione
+            window.history.pushState(null, '', url.toString());
+        })
+        .catch(error => console.error('Error:', error));
+    }
+
+    // Usar delegación de eventos para la paginación dinámica
+    tableContainer.addEventListener('click', function(e) {
+        if (e.target.closest('.pagination a')) {
+            e.preventDefault();
+            const urlStr = e.target.closest('.pagination a').href;
+            const urlObj = new URL(urlStr);
+            const pageNum = urlObj.searchParams.get('page') || 1;
+            const currentQuery = searchInputTable.value;
+            fetchResults(currentQuery, pageNum);
+        }
+    });
+
+    // ========== CLIENT-SIDE SEARCH FOR MODAL (PRESERVED) ==========
 
 </script>
 
