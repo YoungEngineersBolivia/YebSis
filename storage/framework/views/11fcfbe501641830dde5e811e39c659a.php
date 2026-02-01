@@ -487,7 +487,6 @@
                     <div class="collapse" id="submenuProgramas">
                         <ul class="nav flex-column gap-1 mt-1">
                             <li><a class="nav-link link-dark submenu-item" href="<?php echo e(url('administrador/programasAdministrador')); ?>">Ver Programas</a></li>
-                            <li><a class="nav-link link-dark submenu-item" href="<?php echo e(route('reportes.talleres')); ?>">Reportes de Talleres</a></li>
                         </ul>
                     </div>
                 </li>

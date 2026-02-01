@@ -199,6 +199,16 @@
         color: white;
     }
 
+    .btn-outline-success {
+        border: 2px solid var(--success-color);
+        color: var(--success-color);
+    }
+
+    .btn-outline-success:hover {
+        background-color: var(--success-color);
+        color: white;
+    }
+
     /* Alertas */
     .alert {
         border-radius: 12px;
@@ -272,7 +282,7 @@
         border: none;
     }
 
-    /* Tabla */
+    /* Tabla - Desktop */
     .table-responsive {
         border-radius: 16px;
     }
@@ -290,6 +300,7 @@
         letter-spacing: 0.05em;
         padding: 16px;
         border-bottom: none;
+        white-space: nowrap;
     }
 
     .table tbody td {
@@ -307,6 +318,78 @@
         background-color: #f9fafb;
         transform: scale(1.002);
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    }
+
+    /* Vista de tarjetas para móviles */
+    .program-card {
+        background: white;
+        border-radius: 16px;
+        box-shadow: var(--card-shadow);
+        margin-bottom: 16px;
+        overflow: hidden;
+        transition: all 0.3s ease;
+    }
+
+    .program-card:hover {
+        box-shadow: var(--card-shadow-hover);
+        transform: translateY(-2px);
+    }
+
+    .program-card-header {
+        background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+        color: white;
+        padding: 20px;
+    }
+
+    .program-card-header h5 {
+        font-weight: 700;
+        margin-bottom: 8px;
+        font-size: 1.25rem;
+    }
+
+    .program-card-body {
+        padding: 20px;
+    }
+
+    .program-info-item {
+        display: flex;
+        align-items: center;
+        margin-bottom: 12px;
+        padding-bottom: 12px;
+        border-bottom: 1px solid #f3f4f6;
+    }
+
+    .program-info-item:last-child {
+        border-bottom: none;
+        margin-bottom: 0;
+        padding-bottom: 0;
+    }
+
+    .program-info-item i {
+        width: 24px;
+        color: var(--primary-color);
+        margin-right: 12px;
+    }
+
+    .program-info-label {
+        font-weight: 600;
+        color: var(--dark-color);
+        margin-right: 8px;
+        min-width: 80px;
+    }
+
+    .program-card-actions {
+        padding: 16px 20px;
+        background-color: #f9fafb;
+        border-top: 1px solid #e5e7eb;
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+    }
+
+    .program-card-actions .btn {
+        flex: 1;
+        min-width: calc(50% - 4px);
     }
 
     /* Badges */
@@ -384,6 +467,114 @@
         -webkit-font-smoothing: antialiased;
         -moz-osx-font-smoothing: grayscale;
     }
+
+    /* Mejorar visualización de tabla en diferentes tamaños */
+    @media (max-width: 1200px) {
+        .desktop-view .table-responsive {
+            font-size: 0.9rem;
+        }
+        
+        .desktop-view .btn-group .btn {
+            padding: 4px 6px;
+        }
+    }
+
+    @media (max-width: 992px) {
+        .desktop-view th:nth-child(4),
+        .desktop-view td:nth-child(4) {
+            display: none;
+        }
+        
+        .desktop-view .btn-sm {
+            padding: 3px 5px;
+            font-size: 0.75rem;
+        }
+        
+        .desktop-view .badge {
+            padding: 4px 8px;
+            font-size: 0.7rem;
+        }
+    }
+
+    /* Asegurar que las acciones tengan suficiente espacio */
+    .desktop-view .btn-group {
+        display: flex;
+        flex-wrap: nowrap;
+        gap: 2px;
+    }
+
+    .desktop-view .btn-group .btn {
+        flex: 1;
+        min-width: 32px;
+    }
+
+    /* Responsive Utilities */
+    @media (max-width: 768px) {
+        .page-header h1 {
+            font-size: 1.5rem;
+        }
+
+        .btn-lg {
+            padding: 12px 20px;
+            font-size: 0.95rem;
+        }
+
+        .modal-dialog {
+            margin: 0.5rem;
+        }
+
+        .modal-title {
+            font-size: 1.2rem;
+        }
+
+        /* Ocultar tabla en móviles */
+        .desktop-view {
+            display: none !important;
+        }
+
+        /* Mostrar cards en móviles */
+        .mobile-view {
+            display: block !important;
+        }
+
+        /* Ajustar filtros en móvil */
+        .btn-group {
+            display: flex;
+            width: 100%;
+        }
+
+        .btn-group .btn {
+            flex: 1;
+            font-size: 0.85rem;
+            padding: 8px 12px;
+        }
+
+        .btn-group .btn i {
+            display: none;
+        }
+    }
+
+    @media (min-width: 769px) {
+        /* Ocultar cards en desktop */
+        .mobile-view {
+            display: none !important;
+        }
+
+        /* Mostrar tabla en desktop */
+        .desktop-view {
+            display: block !important;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .page-header {
+            padding: 20px;
+        }
+
+        .program-card-actions .btn {
+            min-width: 100%;
+        }
+    }
 </style>
 @endsection
 
@@ -436,9 +627,9 @@
         </div>
     @endif
 
-    {{-- Search and Filter Section --}}
+    {{-- Search and Filter Section --}} 
     <div class="row mb-4">
-        <div class="col-lg-6 col-md-8 mb-3 mb-lg-0">
+        <div class="col-lg-6 col-md-12 mb-3 mb-lg-0">
             <div class="input-group input-group-lg search-box">
                 <span class="input-group-text">
                     <i class="fas fa-search text-muted"></i>
@@ -449,8 +640,8 @@
                        id="searchInput">
             </div>
         </div>
-        <div class="col-lg-6 col-md-4 text-end">
-            <div class="btn-group" id="filterButtonsGroup" role="group" aria-label="Filtrar programas por tipo">
+        <div class="col-lg-6 col-md-12">
+            <div class="btn-group w-100" id="filterButtonsGroup" role="group" aria-label="Filtrar programas por tipo">
                 <button type="button" class="btn btn-outline-primary active" data-filter="all" aria-pressed="true">
                     <i class="fas fa-list me-1"></i>Todos
                 </button>
@@ -464,7 +655,7 @@
         </div>
     </div>
 
-    {{-- Programs Table --}}
+    {{-- Programs Content --}}
     @if($programas->isEmpty())
         <div class="row">
             <div class="col-12">
@@ -478,7 +669,8 @@
             </div>
         </div>
     @else
-        <div class="row">
+        {{-- Vista Desktop (Tabla) --}}
+        <div class="row desktop-view">
             <div class="col-12">
                 <div class="card">
                     <div class="card-body p-0">
@@ -489,9 +681,7 @@
                                         <th class="ps-4">Nombre</th>
                                         <th>Tipo</th>
                                         <th>Costo</th>
-                                        <th>Rango de Edad</th>
-                                        <th>Duración</th>
-                                        <th>Descripción</th>
+                                        <th class="d-none d-md-table-cell">Rango de Edad</th>
                                         <th class="text-center">Modelos</th>
                                         <th class="text-center">Preguntas</th>
                                         <th class="text-center pe-4">Acciones</th>
@@ -500,7 +690,12 @@
                                 <tbody>
                                     @foreach ($programas as $programa)
                                     <tr data-tipo="{{ $programa->Tipo }}">
-                                        <td class="ps-4 fw-semibold">{{ $programa->Nombre }}</td>
+                                        <td class="ps-4 fw-semibold">
+                                            <div class="d-flex flex-column">
+                                                <span>{{ $programa->Nombre }}</span>
+                                                <small class="text-muted">{{ Str::limit($programa->Descripcion, 40) }}</small>
+                                            </div>
+                                        </td>
                                         <td>
                                             @if($programa->Tipo === 'programa')
                                                 <span class="badge bg-primary">
@@ -513,14 +708,8 @@
                                             @endif
                                         </td>
                                         <td class="fw-bold text-success">{{ number_format($programa->Costo, 2) }} Bs</td>
-                                        <td>
+                                        <td class="d-none d-md-table-cell">
                                             <i class="fas fa-users text-muted me-1"></i>{{ $programa->Rango_edad }}
-                                        </td>
-                                        <td>
-                                            <i class="far fa-clock text-muted me-1"></i>{{ $programa->Duracion }}
-                                        </td>
-                                        <td>
-                                            <span class="text-muted">{{ Str::limit($programa->Descripcion, 50) }}</span>
                                         </td>
                                         <td class="text-center">
                                             <button type="button" 
@@ -579,6 +768,89 @@
             </div>
         </div>
 
+        {{-- Vista Móvil (Cards) --}}
+        <div class="row mobile-view" id="programsCardsContainer">
+            @foreach ($programas as $programa)
+            <div class="col-12 program-card-wrapper" data-tipo="{{ $programa->Tipo }}">
+                <div class="program-card">
+                    <div class="program-card-header">
+                        <h5 class="mb-0">{{ $programa->Nombre }}</h5>
+                        @if($programa->Tipo === 'programa')
+                            <span class="badge bg-light text-primary mt-2">
+                                <i class="fas fa-book me-1"></i>Programa
+                            </span>
+                        @else
+                            <span class="badge bg-light text-info mt-2">
+                                <i class="fas fa-tools me-1"></i>Taller
+                            </span>
+                        @endif
+                    </div>
+                    
+                    <div class="program-card-body">
+                        <div class="program-info-item">
+                            <i class="fas fa-dollar-sign"></i>
+                            <span class="program-info-label">Costo:</span>
+                            <span class="fw-bold text-success">{{ number_format($programa->Costo, 2) }} Bs</span>
+                        </div>
+                        
+                        <div class="program-info-item">
+                            <i class="fas fa-users"></i>
+                            <span class="program-info-label">Edad:</span>
+                            <span>{{ $programa->Rango_edad }}</span>
+                        </div>
+                        
+                        <div class="program-info-item">
+                            <i class="fas fa-align-left"></i>
+                            <span class="program-info-label">Descripción:</span>
+                        </div>
+                        <p class="text-muted mb-3">{{ Str::limit($programa->Descripcion, 100) }}</p>
+                        
+                        <div class="d-flex gap-2 mb-2">
+                            <button type="button" 
+                                    class="btn btn-sm btn-outline-primary flex-fill" 
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#modelosModal{{ $programa->Id_programas }}">
+                                <i class="fas fa-cubes me-1"></i>Modelos 
+                                <span class="badge bg-primary">{{ $programa->modelos_count ?? 0 }}</span>
+                            </button>
+                            
+                            <a href="{{ route('admin.preguntas.index', $programa->Id_programas) }}" 
+                               class="btn btn-sm btn-outline-success flex-fill">
+                                <i class="fas fa-question-circle me-1"></i>Preguntas
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <div class="program-card-actions">
+                        <a href="{{ route('programas.show', $programa->Id_programas) }}" 
+                           class="btn btn-sm btn-outline-dark">
+                            <i class="bi bi-eye-fill me-1"></i>Ver
+                        </a>
+                        
+                        <button type="button" 
+                                class="btn btn-sm btn-outline-warning" 
+                                data-bs-toggle="modal"
+                                data-bs-target="#editarProgramaModal{{ $programa->Id_programas }}">
+                            <i class="bi bi-pencil-square me-1"></i>Editar
+                        </button>
+                        
+                        <form action="{{ route('programas.destroy', $programa->Id_programas) }}" 
+                              method="POST" 
+                              style="display:inline; flex: 1;"
+                              onsubmit="return confirm('¿Estás seguro de eliminar este programa?')">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" 
+                                    class="btn btn-sm btn-outline-danger w-100">
+                                <i class="bi bi-trash3-fill me-1"></i>Eliminar
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            @endforeach
+        </div>
+
         {{-- Pagination --}}
         <div class="row mt-4">
             <div class="col-12">
@@ -627,7 +899,7 @@
                     </div>
 
                     <div class="row">
-                        <div class="col-md-4 mb-3">
+                        <div class="col-md-6 mb-3">
                             <label class="form-label">
                                 <i class="fas fa-dollar-sign me-1"></i>Costo (Bs)
                             </label>
@@ -638,7 +910,7 @@
                                    placeholder="0.00"
                                    required>
                         </div>
-                        <div class="col-md-4 mb-3">
+                        <div class="col-md-6 mb-3">
                             <label class="form-label">
                                 <i class="fas fa-users me-1"></i>Rango de Edad
                             </label>
@@ -646,16 +918,6 @@
                                    class="form-control" 
                                    name="rango_edad" 
                                    placeholder="Ej: 6-12 años"
-                                   required>
-                        </div>
-                        <div class="col-md-4 mb-3">
-                            <label class="form-label">
-                                <i class="far fa-clock me-1"></i>Duración
-                            </label>
-                            <input type="text" 
-                                   class="form-control" 
-                                   name="duracion" 
-                                   placeholder="Ej: 3 meses"
                                    required>
                         </div>
                     </div>
@@ -740,7 +1002,7 @@
                     </div>
 
                     <div class="row">
-                        <div class="col-md-4 mb-3">
+                        <div class="col-md-6 mb-3">
                             <label class="form-label">
                                 <i class="fas fa-dollar-sign me-1"></i>Costo (Bs)
                             </label>
@@ -751,7 +1013,7 @@
                                    value="{{ $programa->Costo }}" 
                                    required>
                         </div>
-                        <div class="col-md-4 mb-3">
+                        <div class="col-md-6 mb-3">
                             <label class="form-label">
                                 <i class="fas fa-users me-1"></i>Rango de Edad
                             </label>
@@ -761,15 +1023,21 @@
                                    value="{{ $programa->Rango_edad }}" 
                                    required>
                         </div>
-                        <div class="col-md-4 mb-3">
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-12 mb-3">
                             <label class="form-label">
-                                <i class="far fa-clock me-1"></i>Duración
+                                <i class="fas fa-clock me-1"></i>Duración
                             </label>
                             <input type="text" 
                                    class="form-control" 
                                    name="duracion" 
-                                   value="{{ $programa->Duracion }}" 
-                                   required>
+                                   value="{{ $programa->Duracion ?? '' }}" 
+                                   placeholder="Ej: 3 meses, 12 semanas, 40 horas">
+                            <small class="text-muted">
+                                <i class="fas fa-info-circle me-1"></i>Opcional: Especifica la duración del programa
+                            </small>
                         </div>
                     </div>
 
@@ -918,25 +1186,40 @@
 document.addEventListener('DOMContentLoaded', function() {
     const searchInput = document.getElementById('searchInput');
     const table = document.getElementById('programasTable');
+    const cardsContainer = document.getElementById('programsCardsContainer');
     const filterGroup = document.getElementById('filterButtonsGroup');
-
-    if (!table) return;
 
     const normalize = (s) => (s || '').toString().toLowerCase().trim();
     let currentFilter = 'all';
 
     function applyFilters() {
-        const rows = table.querySelectorAll('tbody tr');
         const query = searchInput ? normalize(searchInput.value) : '';
 
-        rows.forEach(row => {
-            const tipo = normalize(row.getAttribute('data-tipo'));
-            const text = normalize(row.textContent);
-            const matchesFilter = (currentFilter === 'all') || (tipo === currentFilter);
-            const matchesSearch = !query || text.includes(query);
+        // Filtrar tabla (desktop)
+        if (table) {
+            const rows = table.querySelectorAll('tbody tr');
+            rows.forEach(row => {
+                const tipo = normalize(row.getAttribute('data-tipo'));
+                const text = normalize(row.textContent);
+                const matchesFilter = (currentFilter === 'all') || (tipo === currentFilter);
+                const matchesSearch = !query || text.includes(query);
 
-            row.style.display = (matchesFilter && matchesSearch) ? '' : 'none';
-        });
+                row.style.display = (matchesFilter && matchesSearch) ? '' : 'none';
+            });
+        }
+
+        // Filtrar cards (móvil)
+        if (cardsContainer) {
+            const cards = cardsContainer.querySelectorAll('.program-card-wrapper');
+            cards.forEach(card => {
+                const tipo = normalize(card.getAttribute('data-tipo'));
+                const text = normalize(card.textContent);
+                const matchesFilter = (currentFilter === 'all') || (tipo === currentFilter);
+                const matchesSearch = !query || text.includes(query);
+
+                card.style.display = (matchesFilter && matchesSearch) ? '' : 'none';
+            });
+        }
     }
 
     // Delegación de eventos para los botones de filtro

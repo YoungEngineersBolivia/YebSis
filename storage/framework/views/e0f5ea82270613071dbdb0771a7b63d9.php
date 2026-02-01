@@ -1,3 +1,5 @@
+ 
+
 <?php $__env->startSection('title', 'Usuarios'); ?>
 <?php $__env->startSection('styles'); ?>
 <link href="<?php echo e(auto_asset('css/style.css')); ?>" rel="stylesheet">
@@ -35,7 +37,7 @@
                         <form action="<?php echo e(route('usuarios.index')); ?>" method="GET">
                             <div class="input-group">
                                 <span class="input-group-text bg-light border-end-0"><i class="fas fa-search text-muted"></i></span>
-                                <input type="text" class="form-control border-start-0 ps-0" name="search" placeholder="Nombre..." value="<?php echo e(request()->search); ?>" data-table-filter="usersTable">
+                                <input type="text" class="form-control border-start-0 ps-0" name="search" placeholder="Nombre, apellido o correo..." value="<?php echo e(request()->search); ?>" data-table-filter="usersTable">
                                 <button type="submit" class="btn btn-primary ms-2"><i class="bi bi-search"></i></button>
                             </div>
                         </form>
