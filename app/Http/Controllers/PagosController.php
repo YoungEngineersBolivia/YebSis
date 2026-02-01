@@ -12,13 +12,40 @@ class PagosController extends Controller
 {
     public function form(Request $request)
     {
-        $estudiantes = Estudiante::with([
+        $search = $request->input('search');
+
+        $query = Estudiante::with([
             'persona',
             'tutor.persona',
-            'planesPago.cuotas'
-        ])
+            'planesPago.cuotas',
+            'planesPago.programa',
+            'planesPago.pagos'
+        ]);
+
+        if ($search) {
+            $query->where(function ($q) use ($search) {
+                // Buscar en Estudiantes (Nombre + Apellido)
+                $q->whereHas('persona', function ($q2) use ($search) {
+                    $q2->whereRaw("CONCAT(Nombre, ' ', Apellido) LIKE ?", ["%{$search}%"])
+                        ->orWhere('Nombre', 'like', "%{$search}%")
+                        ->orWhere('Apellido', 'like', "%{$search}%");
+                })
+                    // O buscar en Tutores (Nombre + Apellido)
+                    ->orWhereHas('tutor.persona', function ($q2) use ($search) {
+                        $q2->whereRaw("CONCAT(Nombre, ' ', Apellido) LIKE ?", ["%{$search}%"])
+                            ->orWhere('Nombre', 'like', "%{$search}%")
+                            ->orWhere('Apellido', 'like', "%{$search}%");
+                    });
+            });
+        }
+
+        $estudiantes = $query
             ->orderBy('Id_estudiantes', 'desc')
-            ->get();
+            ->paginate(10);
+
+        if ($request->ajax()) {
+            return view('administrador.partials.pagos_lista', compact('estudiantes'))->render();
+        }
 
         return view('administrador.pagosAdministrador', compact('estudiantes'));
     }
