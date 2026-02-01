@@ -15,13 +15,18 @@ class EstudiantesActivosController extends Controller
     {
         $from = $request->input('from'); // YYYY-MM-DD
         $to   = $request->input('to');   // YYYY-MM-DD
+        $programa = $request->input('programa');
+        $sucursal = $request->input('sucursal');
+        $search = $request->input('search');
 
         // ====== TABLA ======
         $activosQuery = DB::table('estudiantes')
             ->join('personas', 'estudiantes.Id_personas', '=', 'personas.Id_personas')
             ->leftJoin('sucursales', 'estudiantes.Id_sucursales', '=', 'sucursales.Id_sucursales')
+            ->leftJoin('programas', 'estudiantes.Id_programas', '=', 'programas.Id_programas')
             ->where('estudiantes.Estado', 'Activo');
 
+        // Filtros de fecha
         if ($from && $to) {
             $activosQuery->whereBetween('estudiantes.Fecha_estado', [$from, $to]);
         } elseif ($from) {
@@ -30,12 +35,32 @@ class EstudiantesActivosController extends Controller
             $activosQuery->whereDate('estudiantes.Fecha_estado', '<=', $to);
         }
 
+        // Filtro de programa
+        if ($programa) {
+            $activosQuery->where('estudiantes.Id_programas', $programa);
+        }
+
+        // Filtro de sucursal
+        if ($sucursal) {
+            $activosQuery->where('estudiantes.Id_sucursales', $sucursal);
+        }
+
+        // Filtro de búsqueda por nombre y apellido
+        if ($search) {
+            $activosQuery->where(function($query) use ($search) {
+                $query->where('personas.Nombre', 'LIKE', '%' . $search . '%')
+                      ->orWhere('personas.Apellido', 'LIKE', '%' . $search . '%')
+                      ->orWhereRaw("CONCAT(personas.Nombre, ' ', personas.Apellido) LIKE ?", ['%' . $search . '%']);
+            });
+        }
+
         $estudiantesActivos = $activosQuery
             ->selectRaw('
                 estudiantes.Id_estudiantes                                         AS id,
                 personas.Nombre                                                     AS nombre,
                 personas.Apellido                                                   AS apellido,
                 COALESCE(sucursales.Nombre, "Sin asignar")                         AS sucursal,
+                COALESCE(programas.Nombre, "Sin asignar")                          AS programa,
                 estudiantes.Fecha_estado                                            AS fecha_activacion_iso,
                 DATE_FORMAT(estudiantes.Fecha_estado, "%d/%m/%Y")                   AS fecha_activacion_fmt
             ')
@@ -52,6 +77,14 @@ class EstudiantesActivosController extends Controller
             $serieQuery->whereDate('Fecha_estado', '>=', $from);
         } elseif ($to) {
             $serieQuery->whereDate('Fecha_estado', '<=', $to);
+        }
+
+        if ($programa) {
+            $serieQuery->where('Id_programas', $programa);
+        }
+
+        if ($sucursal) {
+            $serieQuery->where('Id_sucursales', $sucursal);
         }
 
         $fechasActivacion = $serieQuery
@@ -83,12 +116,29 @@ class EstudiantesActivosController extends Controller
             ->limit(12)
             ->get();
 
+        // Obtener lista de programas
+        $programas = DB::table('programas')
+            ->select('Id_programas', 'Nombre')
+            ->orderBy('Nombre')
+            ->get();
+
+        // Obtener lista de sucursales
+        $sucursales = DB::table('sucursales')
+            ->select('Id_sucursales', 'Nombre')
+            ->orderBy('Nombre')
+            ->get();
+
         return view('comercial.estudiantesActivosComercial', [
             'estudiantesActivos' => $estudiantesActivos,
             'fechasActivacion'   => $fechasActivacion,
             'mesesDisponibles'   => $mesesDisponibles,
+            'programas'          => $programas,
+            'sucursales'         => $sucursales,
             'from'               => $from,
             'to'                 => $to,
+            'programa'           => $programa,
+            'sucursal'           => $sucursal,
+            'search'             => $search,
         ]);
     }
 
