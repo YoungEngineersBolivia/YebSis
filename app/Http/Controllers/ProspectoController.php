@@ -9,57 +9,57 @@ use App\Models\ClasePrueba;
 class ProspectoController extends Controller
 {
     public function index(Request $request)
-{
-    $query = Prospecto::query();
+    {
+        $query = Prospecto::query();
 
-    // Búsqueda general
-    if ($request->filled('search')) {
-        $search = $request->search;
-        $query->where(function($q) use ($search) {
-            $q->where('Nombre', 'like', "%{$search}%")
-              ->orWhere('Apellido', 'like', "%{$search}%")
-              ->orWhere('Celular', 'like', "%{$search}%");
-        });
-    }
-
-    // Filtro rápido
-    if ($request->filled('filtro_rapido')) {
-        switch ($request->filtro_rapido) {
-            case 'ultimos7':
-                $query->where('created_at', '>=', now()->subDays(7));
-                break;
-            case 'ayer':
-                $query->whereDate('created_at', now()->subDay());
-                break;
-            case 'mespasado':
-                $query->whereMonth('created_at', now()->subMonth()->month)
-                      ->whereYear('created_at', now()->subMonth()->year);
-                break;
-            case 'ultimos3meses':
-                $query->where('created_at', '>=', now()->subMonths(3));
-                break;
-            case 'esteano':
-                $query->whereYear('created_at', now()->year);
-                break;
-            case 'anopasado':
-                $query->whereYear('created_at', now()->subYear()->year);
-                break;
+        // Búsqueda general
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('Nombre', 'like', "%{$search}%")
+                    ->orWhere('Apellido', 'like', "%{$search}%")
+                    ->orWhere('Celular', 'like', "%{$search}%");
+            });
         }
-    }
 
-    // Filtro personalizado por fechas
-    if ($request->filled('desde')) {
-        $query->whereDate('created_at', '>=', $request->desde);
-    }
-    if ($request->filled('hasta')) {
-        $query->whereDate('created_at', '<=', $request->hasta);
-    }
+        // Filtro rápido
+        if ($request->filled('filtro_rapido')) {
+            switch ($request->filtro_rapido) {
+                case 'ultimos7':
+                    $query->where('created_at', '>=', now()->subDays(7));
+                    break;
+                case 'ayer':
+                    $query->whereDate('created_at', now()->subDay());
+                    break;
+                case 'mespasado':
+                    $query->whereMonth('created_at', now()->subMonth()->month)
+                        ->whereYear('created_at', now()->subMonth()->year);
+                    break;
+                case 'ultimos3meses':
+                    $query->where('created_at', '>=', now()->subMonths(3));
+                    break;
+                case 'esteano':
+                    $query->whereYear('created_at', now()->year);
+                    break;
+                case 'anopasado':
+                    $query->whereYear('created_at', now()->subYear()->year);
+                    break;
+            }
+        }
 
-    $prospectos = $query->orderBy('created_at', 'desc')->paginate(6);
-    $clasesPrueba = ClasePrueba::with(['profesor.persona', 'prospecto'])->get();
-    $profesores = \App\Models\Profesor::with('persona')->get();
-    return view('comercial.prospectosComercial', compact('prospectos', 'clasesPrueba', 'profesores'));
-}
+        // Filtro personalizado por fechas
+        if ($request->filled('desde')) {
+            $query->whereDate('created_at', '>=', $request->desde);
+        }
+        if ($request->filled('hasta')) {
+            $query->whereDate('created_at', '<=', $request->hasta);
+        }
+
+        $prospectos = $query->orderBy('created_at', 'desc')->paginate(6);
+        $clasesPrueba = ClasePrueba::with(['profesor.persona', 'prospecto'])->get();
+        $profesores = \App\Models\Profesor::with('persona')->get();
+        return view('comercial.prospectosComercial', compact('prospectos', 'clasesPrueba', 'profesores'));
+    }
 
     public function store(Request $request)
     {
@@ -80,7 +80,7 @@ class ProspectoController extends Controller
         ]);
 
         // Redirigir con mensaje de éxito
-        return redirect()->back()->with('success', '¡Gracias! Nos contactaremos contigo pronto.');
+        return redirect()->back()->with('status', 'Prospecto registrado correctamente.');
     }
     public function updateEstado(Request $request, $id)
     {
@@ -93,5 +93,17 @@ class ProspectoController extends Controller
         $prospecto->save();
 
         return redirect()->back()->with('status', 'Estado actualizado correctamente.');
+    }
+
+    public function destroy($id)
+    {
+        $prospecto = Prospecto::findOrFail($id);
+
+        // Eliminar clases de prueba asociadas
+        $prospecto->clasesPrueba()->delete();
+
+        $prospecto->delete();
+
+        return redirect()->back()->with('status', 'Prospecto eliminado correctamente.');
     }
 }
