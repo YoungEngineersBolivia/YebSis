@@ -6,6 +6,47 @@
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
 <link href="{{ auto_asset('css/administrador/profesoresAdministrador.css') }}" rel="stylesheet">
+<style>
+    /* Estilos adicionales para mejorar la visualización */
+    .table-responsive {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    /* Asegurar que las acciones tengan suficiente espacio */
+    .actions-container {
+        min-width: 160px;
+        display: flex;
+        justify-content: flex-end;
+    }
+    
+    .action-buttons {
+        display: flex;
+        gap: 6px;
+        flex-wrap: nowrap;
+    }
+    
+    /* Ajustes para pantallas más pequeñas */
+    @media (max-width: 768px) {
+        .action-buttons {
+            flex-wrap: wrap;
+            justify-content: flex-end;
+        }
+        
+        .action-buttons .btn {
+            padding: 4px 8px;
+            font-size: 0.875rem;
+        }
+    }
+    
+    /* Hacer el correo más compacto */
+    .email-cell {
+        max-width: 200px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+</style>
 @endsection
 
 @section('content')
@@ -81,10 +122,9 @@
                                 <th class="ps-3 py-3">Nombre</th>
                                 <th class="py-3">Apellido</th>
                                 <th class="py-3">Teléfono</th>
-                                <th class="py-3">Profesión</th>
                                 <th class="py-3">Correo</th>
                                 <th class="py-3">Rol componentes</th>
-                                <th class="pe-3 py-3 text-end" style="min-width: 150px;">Acciones</th>
+                                <th class="pe-3 py-3 text-end actions-container">Acciones</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -93,11 +133,16 @@
                                 <td class="ps-3 fw-semibold">{{ $profesor->persona->Nombre ?? '' }}</td>
                                 <td>{{ $profesor->persona->Apellido ?? '' }}</td>
                                 <td>{{ $profesor->persona->Celular ?? '' }}</td>
-                                <td>{{ $profesor->Profesion ?? '' }}</td>
-                                <td>{{ $profesor->usuario->Correo ?? '' }}</td>
-                                <td><span class="badge bg-light text-dark border">{{ $profesor->Rol_componentes ?? 'Ninguno' }}</span></td>
-                                <td class="pe-3 text-end">
-                                    <div class="d-flex gap-2 justify-content-end">
+                                <td class="email-cell" title="{{ $profesor->usuario->Correo ?? '' }}">
+                                    {{ $profesor->usuario->Correo ?? '' }}
+                                </td>
+                                <td>
+                                    <span class="badge bg-light text-dark border">
+                                        {{ $profesor->Rol_componentes ?? 'Ninguno' }}
+                                    </span>
+                                </td>
+                                <td class="pe-3 text-end actions-container">
+                                    <div class="action-buttons">
                                         <!-- Ver -->
                                         <button type="button" class="btn btn-sm btn-outline-info" data-bs-toggle="modal" data-bs-target="#verProfesorModal{{ $profesor->Id_profesores }}" title="Ver detalles">
                                             <i class="bi bi-eye-fill"></i>
@@ -109,7 +154,7 @@
                                         </button>
 
                                         <!-- Eliminar -->
-                                        <form action="{{ route('profesores.destroy', $profesor->Id_profesores) }}" method="POST" onsubmit="return confirm('¿Seguro que deseas eliminar este profesor?')">
+                                        <form action="{{ route('profesores.destroy', $profesor->Id_profesores) }}" method="POST" onsubmit="return confirm('¿Seguro que deseas eliminar este profesor?')" class="d-inline">
                                             @csrf
                                             @method('DELETE')
                                             <button type="submit" class="btn btn-sm btn-outline-danger" title="Eliminar">
@@ -148,11 +193,11 @@
                                                 </div>
                                                 <div class="col-md-6">
                                                     <label class="fw-bold text-muted small">Profesión</label>
-                                                    <div class="fs-5">{{ $profesor->Profesion ?? '' }}</div>
+                                                    <div class="fs-5">{{ $profesor->Profesion ?? 'No especificada' }}</div>
                                                 </div>
                                                 <div class="col-md-6">
                                                     <label class="fw-bold text-muted small">Rol Componentes</label>
-                                                    <div class="fs-5">{{ $profesor->Rol_componentes ?? '' }}</div>
+                                                    <div class="fs-5">{{ $profesor->Rol_componentes ?? 'Ninguno' }}</div>
                                                 </div>
                                             </div>
                                         </div>
@@ -235,23 +280,36 @@
 
 @section('scripts')
 <script>
-/* MIGRADO A baseAdministrador.blade.php */
-/*
-document.addEventListener('DOMContentLoaded', () => {
-    const input = document.querySelector('#searchInput');
-    const table = document.querySelector('#teachersTable');
-    if (!input || !table) return;
-
-    input.addEventListener('input', function () {
-        const query = this.value.toLowerCase().trim();
-        const rows = table.querySelectorAll('tbody tr');
-
-        rows.forEach(row => {
-            const text = row.innerText.toLowerCase();
-            row.style.display = text.includes(query) ? '' : 'none';
+    // Asegurar que la tabla sea responsive en móviles
+    document.addEventListener('DOMContentLoaded', function() {
+        // Agregar tooltips a los botones de acción
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[title]'));
+        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl);
         });
+        
+        // Ajustar visualización en pantallas pequeñas
+        function adjustTableForMobile() {
+            const table = document.getElementById('teachersTable');
+            if (!table) return;
+            
+            const isMobile = window.innerWidth < 768;
+            const actionCells = table.querySelectorAll('.actions-container');
+            
+            if (isMobile) {
+                actionCells.forEach(cell => {
+                    cell.style.minWidth = '180px';
+                });
+            } else {
+                actionCells.forEach(cell => {
+                    cell.style.minWidth = '160px';
+                });
+            }
+        }
+        
+        // Ejecutar al cargar y al redimensionar
+        adjustTableForMobile();
+        window.addEventListener('resize', adjustTableForMobile);
     });
-});
-*/
 </script>
 @endsection

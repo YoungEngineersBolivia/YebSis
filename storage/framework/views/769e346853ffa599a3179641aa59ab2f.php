@@ -1,39 +1,38 @@
-@extends('administrador.baseAdministrador')
-@section('styles')
-    <link href="{{ asset('css/comercial/prospectosComercial.css') }}" rel="stylesheet">
-    {{-- Forzar carga de iconos si fallan en el base --}}
+<?php $__env->startSection('styles'); ?>
+    <link href="<?php echo e(asset('css/comercial/prospectosComercial.css')); ?>" rel="stylesheet">
+    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
-@endsection
-@section('content')
+<?php $__env->stopSection(); ?>
+<?php $__env->startSection('content'); ?>
     <div class="container-fluid px-4 py-4">
         <div class="row">
             <div class="col-12">
-                @if ($errors->any())
+                <?php if($errors->any()): ?>
                     <div class="alert alert-danger alert-dismissible fade show mb-4 shadow-sm" role="alert">
                         <div class="d-flex align-items-center">
                             <i class="fas fa-exclamation-circle fs-4 me-3"></i>
                             <div>
                                 <strong>No se pudo guardar la clase:</strong>
                                 <ul class="mb-0 mt-1 ps-3">
-                                    @foreach ($errors->all() as $error)
-                                        <li>{{ $error }}</li>
-                                    @endforeach
+                                    <?php $__currentLoopData = $errors->all(); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $error): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                        <li><?php echo e($error); ?></li>
+                                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                 </ul>
                             </div>
                         </div>
                         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                     </div>
-                @endif
-                @if (session('status'))
+                <?php endif; ?>
+                <?php if(session('status')): ?>
                     <div class="alert alert-success alert-dismissible fade show mb-4 shadow-sm" role="alert">
                         <div class="d-flex align-items-center">
                             <i class="fas fa-check-circle fs-4 me-3"></i>
-                            <div>{{ session('status') }}</div>
+                            <div><?php echo e(session('status')); ?></div>
                         </div>
                         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                     </div>
-                @endif
+                <?php endif; ?>
 
                 <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
                     <h2 class="h3 mb-0 text-gray-800">
@@ -47,7 +46,7 @@
                             Nuevo Prospecto
                         </button>
                         <div class="text-muted fw-bold bg-light px-3 py-2 rounded-pill shadow-sm">
-                            Total: {{ $prospectos->total() }} prospectos
+                            Total: <?php echo e($prospectos->total()); ?> prospectos
                         </div>
                     </div>
                 </div>
@@ -58,26 +57,26 @@
                             id="filtroFechasForm"
                             style="background: #fff; border-radius: 16px; box-shadow: 0 2px 12px rgba(0,0,0,0.08); min-width: 420px; flex-wrap: wrap;">
                             <input type="text" name="search" class="form-control form-control-sm" placeholder="Buscar..."
-                                value="{{ request('search') }}" style="max-width: 200px;">
+                                value="<?php echo e(request('search')); ?>" style="max-width: 200px;">
                             <input type="date" name="desde" id="inputDesde" class="form-control form-control-sm"
-                                style="max-width: 160px; margin-left: 0;" value="{{ request('desde') }}">
+                                style="max-width: 160px; margin-left: 0;" value="<?php echo e(request('desde')); ?>">
                             <span class="mx-1">—</span>
                             <input type="date" name="hasta" id="inputHasta" class="form-control form-control-sm"
-                                style="max-width: 160px; margin-left: 0;" value="{{ request('hasta') }}">
+                                style="max-width: 160px; margin-left: 0;" value="<?php echo e(request('hasta')); ?>">
                             <button type="submit" class="btn btn-primary btn-sm ms-2">Filtrar</button>
                             <select name="filtro_rapido" class="form-select form-select-sm ms-2" style="max-width:180px;"
                                 onchange="this.form.submit()">
                                 <option value="">Rápido...</option>
-                                <option value="ultimos7" @if(request('filtro_rapido') == 'ultimos7') selected @endif>Últimos 7
+                                <option value="ultimos7" <?php if(request('filtro_rapido') == 'ultimos7'): ?> selected <?php endif; ?>>Últimos 7
                                     días</option>
-                                <option value="ayer" @if(request('filtro_rapido') == 'ayer') selected @endif>Ayer</option>
-                                <option value="mespasado" @if(request('filtro_rapido') == 'mespasado') selected @endif>Mes
+                                <option value="ayer" <?php if(request('filtro_rapido') == 'ayer'): ?> selected <?php endif; ?>>Ayer</option>
+                                <option value="mespasado" <?php if(request('filtro_rapido') == 'mespasado'): ?> selected <?php endif; ?>>Mes
                                     pasado</option>
-                                <option value="ultimos3meses" @if(request('filtro_rapido') == 'ultimos3meses') selected
-                                @endif>Últimos 3 meses</option>
-                                <option value="esteano" @if(request('filtro_rapido') == 'esteano') selected @endif>Este año
+                                <option value="ultimos3meses" <?php if(request('filtro_rapido') == 'ultimos3meses'): ?> selected
+                                <?php endif; ?>>Últimos 3 meses</option>
+                                <option value="esteano" <?php if(request('filtro_rapido') == 'esteano'): ?> selected <?php endif; ?>>Este año
                                 </option>
-                                <option value="anopasado" @if(request('filtro_rapido') == 'anopasado') selected @endif>Año
+                                <option value="anopasado" <?php if(request('filtro_rapido') == 'anopasado'): ?> selected <?php endif; ?>>Año
                                     pasado</option>
                             </select>
                         </form>
@@ -111,19 +110,22 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @foreach($prospectos as $prospecto)
-                                        @php
+                                    <?php $__currentLoopData = $prospectos; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $prospecto): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                        <?php
                                             $clase = isset($clasesPrueba) ? $clasesPrueba->firstWhere('Id_prospectos', $prospecto->Id_prospectos) : null;
-                                        @endphp
+                                        ?>
                                         <tr class="border-bottom">
                                             <td class="py-3">
                                                 <div class="d-flex align-items-center">
                                                     <div class="avatar-circle me-3">
-                                                        {{ strtoupper(substr($prospecto->Nombre, 0, 1)) }}{{ strtoupper(substr($prospecto->Apellido, 0, 1)) }}
+                                                        <?php echo e(strtoupper(substr($prospecto->Nombre, 0, 1))); ?><?php echo e(strtoupper(substr($prospecto->Apellido, 0, 1))); ?>
+
                                                     </div>
                                                     <div>
-                                                        <div class="fw-semibold text-dark">{{ $prospecto->Nombre }}
-                                                            {{ $prospecto->Apellido }}
+                                                        <div class="fw-semibold text-dark"><?php echo e($prospecto->Nombre); ?>
+
+                                                            <?php echo e($prospecto->Apellido); ?>
+
                                                         </div>
                                                     </div>
                                                 </div>
@@ -131,92 +133,96 @@
                                             <td class="py-3">
                                                 <span class="text-muted">
                                                     <i class="fas fa-mobile-alt me-1"></i>
-                                                    {{ $prospecto->Celular }}
+                                                    <?php echo e($prospecto->Celular); ?>
+
                                                 </span>
                                             </td>
                                             <td class="py-3">
-                                                {{ $prospecto->created_at ? $prospecto->created_at->format('d-m-Y') : '' }}
+                                                <?php echo e($prospecto->created_at ? $prospecto->created_at->format('d-m-Y') : ''); ?>
+
                                             </td>
                                             <td class="py-3">
                                                 <form method="POST"
-                                                    action="{{ route('prospectos.updateEstado', $prospecto->Id_prospectos) }}"
+                                                    action="<?php echo e(route('prospectos.updateEstado', $prospecto->Id_prospectos)); ?>"
                                                     class="d-inline">
-                                                    @csrf
-                                                    @method('PUT')
+                                                    <?php echo csrf_field(); ?>
+                                                    <?php echo method_field('PUT'); ?>
                                                     <select name="Estado_prospecto"
                                                         class="form-select form-select-sm estado-select"
                                                         onchange="this.form.submit()">
-                                                        <option value="nuevo" @if($prospecto->Estado_prospecto == 'nuevo')
-                                                        selected @endif>Nuevo</option>
+                                                        <option value="nuevo" <?php if($prospecto->Estado_prospecto == 'nuevo'): ?>
+                                                        selected <?php endif; ?>>Nuevo</option>
                                                         <option value="contactado"
-                                                            @if($prospecto->Estado_prospecto == 'contactado') selected @endif>
+                                                            <?php if($prospecto->Estado_prospecto == 'contactado'): ?> selected <?php endif; ?>>
                                                             Contactado</option>
-                                                        <option value="clase de prueba" @if($prospecto->Estado_prospecto == 'clase de prueba') selected @endif>Clase de Prueba</option>
+                                                        <option value="clase de prueba" <?php if($prospecto->Estado_prospecto == 'clase de prueba'): ?> selected <?php endif; ?>>Clase de Prueba</option>
                                                     </select>
                                                 </form>
                                             </td>
                                             <td class="py-3">
-                                                @php
+                                                <?php
                                                     $tieneClase = $clase !== null;
-                                                @endphp
-                                                @if($tieneClase)
-                                                    @if($clase->Asistencia == 'pendiente')
+                                                ?>
+                                                <?php if($tieneClase): ?>
+                                                    <?php if($clase->Asistencia == 'pendiente'): ?>
                                                         <span class="badge bg-warning text-dark">
                                                             <i class="fas fa-clock me-1"></i>Pendiente
                                                         </span>
-                                                    @elseif($clase->Asistencia == 'asistio')
+                                                    <?php elseif($clase->Asistencia == 'asistio'): ?>
                                                         <span class="badge bg-success">
                                                             <i class="fas fa-check-double me-1"></i>Asistió
                                                         </span>
-                                                    @elseif($clase->Asistencia == 'no_asistio')
+                                                    <?php elseif($clase->Asistencia == 'no_asistio'): ?>
                                                         <span class="badge bg-danger">
                                                             <i class="fas fa-times-circle me-1"></i>No asistió
                                                         </span>
-                                                    @endif
+                                                    <?php endif; ?>
                                                     <div class="small text-muted mt-1" style="font-size: 0.75rem;">
-                                                        {{ \Carbon\Carbon::parse($clase->Fecha_clase)->format('d/m') }} -
-                                                        {{ \Carbon\Carbon::parse($clase->Hora_clase)->format('H:i') }}
+                                                        <?php echo e(\Carbon\Carbon::parse($clase->Fecha_clase)->format('d/m')); ?> -
+                                                        <?php echo e(\Carbon\Carbon::parse($clase->Hora_clase)->format('H:i')); ?>
+
                                                     </div>
-                                                    @if($clase->Comentarios)
+                                                    <?php if($clase->Comentarios): ?>
                                                         <div class="small text-secondary mt-1 fst-italic"
                                                             style="font-size: 0.7rem; max-width: 150px; white-space: normal;">
                                                             <i class="fas fa-comment ms-1"></i>
-                                                            {{ Str::limit($clase->Comentarios, 50) }}
+                                                            <?php echo e(Str::limit($clase->Comentarios, 50)); ?>
+
                                                         </div>
-                                                    @endif
-                                                @else
+                                                    <?php endif; ?>
+                                                <?php else: ?>
                                                     <span class="badge bg-secondary">
                                                         <i class="fas fa-times me-1"></i>Sin asignar
                                                     </span>
-                                                @endif
+                                                <?php endif; ?>
                                             </td>
                                             <td class="py-3">
                                                 <div class="d-flex align-items-center gap-2 justify-content-start">
-                                                    {{-- Botón Clase de Prueba --}}
+                                                    
                                                     <button type="button"
                                                         class="btn btn-primary btn-sm d-flex align-items-center px-3"
                                                         style="border-radius: 6px; font-weight: 500; height: 34px; white-space: nowrap;"
-                                                        onclick="abrirModalClasePrueba('{{ $prospecto->Id_prospectos }}', '{{ $prospecto->Nombre }} {{ $prospecto->Apellido }}')">
+                                                        onclick="abrirModalClasePrueba('<?php echo e($prospecto->Id_prospectos); ?>', '<?php echo e($prospecto->Nombre); ?> <?php echo e($prospecto->Apellido); ?>')">
                                                         <i class="fas fa-plus-circle me-1"></i>
                                                         <span>Clase de prueba</span>
                                                     </button>
 
-                                                    @if($clase)
+                                                    <?php if($clase): ?>
                                                         <button type="button"
                                                             class="btn btn-warning btn-sm d-flex align-items-center justify-content-center"
                                                             style="width: 34px; height: 34px; border-radius: 6px;"
-                                                            onclick="editarClasePrueba('{{ $clase->Id_clasePrueba }}', '{{ $clase->Nombre_Estudiante }}', '{{ $clase->Fecha_clase }}', '{{ $clase->Hora_clase }}', `{{ $clase->Comentarios }}`, '{{ $clase->Id_profesores }}')"
+                                                            onclick="editarClasePrueba('<?php echo e($clase->Id_clasePrueba); ?>', '<?php echo e($clase->Nombre_Estudiante); ?>', '<?php echo e($clase->Fecha_clase); ?>', '<?php echo e($clase->Hora_clase); ?>', `<?php echo e($clase->Comentarios); ?>`, '<?php echo e($clase->Id_profesores); ?>')"
                                                             title="Editar Clase">
                                                             <i class="fas fa-edit"></i>
                                                         </button>
-                                                    @endif
+                                                    <?php endif; ?>
 
-                                                    <form action="{{ route('prospectos.destroy', $prospecto->Id_prospectos) }}"
+                                                    <form action="<?php echo e(route('prospectos.destroy', $prospecto->Id_prospectos)); ?>"
                                                         method="POST"
                                                         onsubmit="return confirm('¿Estás seguro de eliminar este prospecto?')"
                                                         class="d-inline m-0">
-                                                        @csrf
-                                                        @method('DELETE')
+                                                        <?php echo csrf_field(); ?>
+                                                        <?php echo method_field('DELETE'); ?>
                                                         <button type="submit"
                                                             class="btn btn-danger btn-sm d-flex align-items-center justify-content-center"
                                                             style="width: 34px; height: 34px; border-radius: 6px;"
@@ -227,12 +233,13 @@
                                                 </div>
                                             </td>
                                         </tr>
-                                    @endforeach
+                                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                 </tbody>
                             </table>
                         </div>
                         <div class="d-flex justify-content-center mt-3 mb-3">
-                            {{ $prospectos->appends(request()->query())->links('pagination::bootstrap-5') }}
+                            <?php echo e($prospectos->appends(request()->query())->links('pagination::bootstrap-5')); ?>
+
                         </div>
                     </div>
                 </div>
@@ -253,8 +260,8 @@
                         aria-label="Close"></button>
                 </div>
                 <div class="modal-body p-4">
-                    <form method="POST" action="{{ route('claseprueba.store') }}">
-                        @csrf
+                    <form method="POST" action="<?php echo e(route('claseprueba.store')); ?>">
+                        <?php echo csrf_field(); ?>
                         <div class="row mb-3">
                             <div class="col-12">
                                 <label class="form-label fw-semibold">
@@ -346,8 +353,8 @@
                         aria-label="Close"></button>
                 </div>
                 <div class="modal-body p-4">
-                    <form method="POST" action="{{ route('prospectos.store') }}">
-                        @csrf
+                    <form method="POST" action="<?php echo e(route('prospectos.store')); ?>">
+                        <?php echo csrf_field(); ?>
                         <div class="mb-3">
                             <label class="form-label fw-semibold">Nombres</label>
                             <input type="text" name="nombres" class="form-control" placeholder="Ej: Juan" required>
@@ -374,5 +381,6 @@
         </div>
     </div>
 
-    <script src="{{ auto_asset('js/comercial/prospectosComercial.js') }}"></script>
-@endsection
+    <script src="<?php echo e(auto_asset('js/comercial/prospectosComercial.js')); ?>"></script>
+<?php $__env->stopSection(); ?>
+<?php echo $__env->make('administrador.baseAdministrador', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\Users\DANTE\Desktop\YebSis\resources\views/comercial/prospectosComercial.blade.php ENDPATH**/ ?>

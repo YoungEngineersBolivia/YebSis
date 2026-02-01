@@ -4,43 +4,80 @@ document.addEventListener('DOMContentLoaded', () => {
     const noResultadosDiv = document.getElementById('no-resultados');
     const contadorResultados = document.getElementById('contador-resultados');
 
-    // Función para filtrar tarjetas (solo búsqueda)
-    function filtrarTarjetas() {
-        const searchTerm = buscarInput.value.toLowerCase().trim();
-        const tarjetas = document.querySelectorAll('.estudiante-card');
-        let visibles = 0;
+    let timeout = null;
 
-        tarjetas.forEach(tarjeta => {
-            const tutor = tarjeta.dataset.tutor || '';
-            const estudiante = tarjeta.dataset.estudiante || '';
+    // Función para buscar vía AJAX
+    function buscarEstudiantes() {
+        const searchTerm = buscarInput.value.trim();
+        const url = new URL(window.location.href);
+        url.searchParams.set('search', searchTerm);
+        // Al buscar, usualmente queremos volver a la página 1
+        url.searchParams.delete('page');
 
-            // Verificar búsqueda
-            const coincideBusqueda = searchTerm === '' ||
-                tutor.includes(searchTerm) ||
-                estudiante.includes(searchTerm);
+        // Mostrar un pequeño indicador de carga si lo hubiera
+        // (Opcional, pero ayuda a la experiencia)
 
-            // Mostrar/ocultar tarjeta
-            if (coincideBusqueda) {
-                tarjeta.style.display = '';
-                visibles++;
-            } else {
-                tarjeta.style.display = 'none';
+        fetch(url, {
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
             }
-        });
+        })
+            .then(response => response.text())
+            .then(html => {
+                document.getElementById('contenedor-estudiantes').innerHTML = html;
 
-        // Actualizar contador y mensaje de no resultados
-        if (visibles === 0) {
-            noResultadosDiv.style.display = 'block';
-            contadorResultados.textContent = 'No se encontraron resultados';
-        } else {
-            noResultadosDiv.style.display = 'none';
-            const plural = visibles === 1 ? 'estudiante' : 'estudiantes';
-            contadorResultados.textContent = `${visibles} ${plural}`;
-        }
+                // Actualizar contador
+                const totalHidden = document.getElementById('total-count-hidden');
+                if (totalHidden) {
+                    const total = totalHidden.value;
+                    contadorResultados.textContent = total;
+                    if (noResultadosDiv) {
+                        if (parseInt(total) === 0) {
+                            noResultadosDiv.style.display = 'block';
+                        } else {
+                            noResultadosDiv.style.display = 'none';
+                        }
+                    }
+                }
+
+                // Re-vincular eventos si es necesario (ej: botones de paginación)
+                vincularPaginacion();
+            })
+            .catch(error => console.error('Error al buscar:', error));
     }
 
-    // Event listener para búsqueda
-    buscarInput.addEventListener('input', filtrarTarjetas);
+    // Función para manejar clicks en links de paginación (AJAX)
+    function vincularPaginacion() {
+        const links = document.querySelectorAll('#pagination-links a');
+        links.forEach(link => {
+            link.addEventListener('click', function (e) {
+                e.preventDefault();
+                const url = this.href;
+
+                fetch(url, {
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                })
+                    .then(response => response.text())
+                    .then(html => {
+                        document.getElementById('contenedor-estudiantes').innerHTML = html;
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                        vincularPaginacion();
+                    })
+                    .catch(error => console.error('Error en paginación:', error));
+            });
+        });
+    }
+
+    // Event listener para búsqueda con debounce
+    buscarInput.addEventListener('input', () => {
+        clearTimeout(timeout);
+        timeout = setTimeout(buscarEstudiantes, 500);
+    });
+
+    // Inicializar paginación AJAX
+    vincularPaginacion();
 
     // Modal "Agregar Pago" - Nuevo sistema
     const modalAgregarPago = document.getElementById('modalAgregarPago');
