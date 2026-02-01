@@ -67,7 +67,7 @@
     <div class="chart-wrap card-soft mb-4">
         <div class="d-flex justify-content-between align-items-center mb-3">
             <h5 class="mb-0">Estudiantes Activos</h5>
-            <?php if($from || $to): ?>
+            <?php if($from || $to || $programa || $sucursal || $search): ?>
             <span class="badge bg-info">
                 <i class="bi bi-funnel-fill"></i> Filtrado
             </span>
@@ -80,6 +80,10 @@
     <div class="card-soft p-3">
         <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
             <form class="d-flex gap-2 flex-wrap" method="GET" action="<?php echo e(route('estudiantesActivos')); ?>">
+                <div class="input-group" style="max-width: 250px;">
+                    <span class="input-group-text"><i class="bi bi-search"></i></span>
+                    <input type="text" name="search" value="<?php echo e($search); ?>" class="form-control" placeholder="Buscar nombre o apellido">
+                </div>
                 <div class="input-group" style="max-width: 200px;">
                     <span class="input-group-text"><i class="bi bi-calendar-date"></i></span>
                     <input type="date" name="from" value="<?php echo e($from); ?>" class="form-control" placeholder="Desde">
@@ -88,10 +92,34 @@
                     <span class="input-group-text"><i class="bi bi-calendar-date"></i></span>
                     <input type="date" name="to" value="<?php echo e($to); ?>" class="form-control" placeholder="Hasta">
                 </div>
+                <div class="input-group" style="max-width: 220px;">
+                    <span class="input-group-text"><i class="bi bi-book"></i></span>
+                    <select name="programa" class="form-select">
+                        <option value="">Todos los programas</option>
+                        <?php $__currentLoopData = $programas; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $prog): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                            <option value="<?php echo e($prog->Id_programas); ?>" <?php echo e($programa == $prog->Id_programas ? 'selected' : ''); ?>>
+                                <?php echo e($prog->Nombre); ?>
+
+                            </option>
+                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                    </select>
+                </div>
+                <div class="input-group" style="max-width: 220px;">
+                    <span class="input-group-text"><i class="bi bi-building"></i></span>
+                    <select name="sucursal" class="form-select">
+                        <option value="">Todas las sucursales</option>
+                        <?php $__currentLoopData = $sucursales; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $suc): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                            <option value="<?php echo e($suc->Id_sucursales); ?>" <?php echo e($sucursal == $suc->Id_sucursales ? 'selected' : ''); ?>>
+                                <?php echo e($suc->Nombre); ?>
+
+                            </option>
+                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                    </select>
+                </div>
                 <button class="btn btn-primary" type="submit">
                     <i class="bi bi-funnel"></i> Aplicar
                 </button>
-                <?php if($from || $to): ?>
+                <?php if($from || $to || $programa || $sucursal || $search): ?>
                     <a class="btn btn-outline-secondary" href="<?php echo e(route('estudiantesActivos')); ?>">
                         <i class="bi bi-arrow-clockwise"></i> Limpiar
                     </a>
@@ -114,6 +142,7 @@
                         <th>#</th>
                         <th>Nombre</th>
                         <th>Apellido</th>
+                        <th>Programa</th>
                         <th>Sucursal</th>
                         <th>Fecha de activación</th>
                         <th class="text-center">Acciones</th>
@@ -125,6 +154,12 @@
                         <td class="text-muted"><?php echo e($index + 1); ?></td>
                         <td class="fw-semibold"><?php echo e($estudiante->nombre); ?></td>
                         <td><?php echo e($estudiante->apellido); ?></td>
+                        <td>
+                            <span class="badge bg-info">
+                                <i class="bi bi-book"></i> <?php echo e($estudiante->programa); ?>
+
+                            </span>
+                        </td>
                         <td>
                             <span class="badge bg-secondary">
                                 <i class="bi bi-building"></i> <?php echo e($estudiante->sucursal); ?>
@@ -151,10 +186,10 @@
                     </tr>
                 <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
                     <tr>
-                        <td colspan="6" class="text-center text-muted py-4">
+                        <td colspan="7" class="text-center text-muted py-4">
                             <i class="bi bi-inbox" style="font-size: 2rem;"></i>
                             <p class="mb-0 mt-2">No hay estudiantes activos en el período seleccionado.</p>
-                            <?php if($from || $to): ?>
+                            <?php if($from || $to || $programa || $sucursal || $search): ?>
                                 <a href="<?php echo e(route('estudiantesActivos')); ?>" class="btn btn-sm btn-primary mt-2">
                                     Ver todos los estudiantes
                                 </a>
@@ -252,6 +287,6 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 });
-</script>
+</script> 
 <?php $__env->stopSection(); ?>
 <?php echo $__env->make('administrador.baseAdministrador', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\Users\danil\Desktop\Laravel\Yebolivia\resources\views/comercial/estudiantesActivosComercial.blade.php ENDPATH**/ ?>
