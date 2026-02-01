@@ -1,4 +1,4 @@
-@extends('administrador.baseAdministrador')
+@extends('administrador.baseAdministrador') 
 
 @section('title', 'Usuarios')
 @section('styles')
@@ -35,7 +35,7 @@
                         <form action="{{ route('usuarios.index') }}" method="GET">
                             <div class="input-group">
                                 <span class="input-group-text bg-light border-end-0"><i class="fas fa-search text-muted"></i></span>
-                                <input type="text" class="form-control border-start-0 ps-0" name="search" placeholder="Nombre..." value="{{ request()->search }}" data-table-filter="usersTable">
+                                <input type="text" class="form-control border-start-0 ps-0" name="search" placeholder="Nombre, apellido o correo..." value="{{ request()->search }}" data-table-filter="usersTable">
                                 <button type="submit" class="btn btn-primary ms-2"><i class="bi bi-search"></i></button>
                             </div>
                         </form>
