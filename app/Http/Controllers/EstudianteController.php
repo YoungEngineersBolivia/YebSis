@@ -20,22 +20,41 @@ class EstudianteController extends Controller
 {
     public function index(Request $request)
     {
-        // Obtener el término de búsqueda desde el request
-        $search = $request->input('search');  
+        // Obtener los parámetros de filtrado
+        $search = $request->input('search');
+        $estado = $request->input('estado');
+        $programa = $request->input('programa');
+        $sucursal = $request->input('sucursal');
 
         // Realizar la consulta para obtener los estudiantes filtrados
         $estudiantes = Estudiante::with(['persona', 'programa', 'sucursal', 'profesor', 'profesor.persona'])
             ->when($search, function($query, $search) {
-                return $query->whereHas('persona', function($q) use ($search) {
-                    $q->where('Nombre', 'like', "%$search%")
-                    ->orWhere('Apellido', 'like', "%$search%");
-                })
-                ->orWhere('Cod_estudiante', 'like', "%$search%");
+                return $query->where(function($q) use ($search) {
+                    // Buscar por código
+                    $q->where('Cod_estudiante', 'like', "%$search%")
+                    // Buscar por nombre completo concatenado (nombre + apellido)
+                    ->orWhereHas('persona', function($subQ) use ($search) {
+                        $subQ->whereRaw("CONCAT(Nombre, ' ', Apellido) LIKE ?", ["%$search%"])
+                            ->orWhereRaw("CONCAT(Apellido, ' ', Nombre) LIKE ?", ["%$search%"])
+                            ->orWhere('Nombre', 'like', "%$search%")
+                            ->orWhere('Apellido', 'like', "%$search%");
+                    });
+                });
+            })
+            ->when($estado, function($query, $estado) {
+                return $query->where('Estado', $estado);
+            })
+            ->when($programa, function($query, $programa) {
+                return $query->where('Id_programas', $programa);
+            })
+            ->when($sucursal, function($query, $sucursal) {
+                return $query->where('Id_sucursales', $sucursal);
             })
             ->orderBy('Id_estudiantes', 'desc')
-            ->paginate(10);  // Paginación de resultados
+            ->paginate(10)
+            ->appends($request->all()); // Mantener los filtros en la paginación
 
-        // Obtener las listas adicionales necesarias para los formularios de edición
+        // Obtener las listas adicionales necesarias para los formularios de edición y filtros
         $programas = Programa::all();
         $sucursales = Sucursal::all();
         $tutores = Tutores::with('persona')->get();
