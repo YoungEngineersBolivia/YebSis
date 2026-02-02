@@ -7,16 +7,16 @@
 <?php $__env->stopSection(); ?>
 
 <?php $__env->startSection('content'); ?>
-<div class="container-fluid mt-4">
+<div class="mt-2">
 
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2 class="mb-0 fw-bold"><i class="bi bi-people-fill me-2"></i>Lista de Estudiantes</h2>
-        <div class="d-flex gap-2">
-            <a href="<?php echo e(route('estudiantes.exportarPDF')); ?>" class="btn btn-danger">
-                <i class="fas fa-file-pdf me-2"></i>Exportar PDF
+    <div class="d-flex flex-wrap gap-2 justify-content-between align-items-center mb-4">
+        <h2 class="mb-0 fw-bold fs-4"><i class="bi bi-people-fill me-2"></i>Lista de Estudiantes</h2>
+        <div class="d-flex flex-wrap gap-2">
+            <a href="<?php echo e(route('estudiantes.exportarPDF')); ?>" class="btn btn-sm btn-danger">
+                <i class="fas fa-file-pdf me-2"></i>PDF
             </a>
-            <a href="<?php echo e(route('registroCombinado.registrar')); ?>" class="btn btn-primary">
-                <i class="fas fa-plus me-2"></i>Registrar Estudiante
+            <a href="<?php echo e(route('registroCombinado.registrar')); ?>" class="btn btn-sm btn-primary">
+                <i class="fas fa-plus me-2"></i>Registrar
             </a>
         </div>
     </div>
@@ -49,19 +49,78 @@
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
         </div>
     <?php endif; ?>
-
+ 
     
     <div class="card shadow-sm mb-4 border-0">
         <div class="card-body">
-            <form action="<?php echo e(route('estudiantes.index')); ?>" method="GET">
-                <div class="row align-items-center">
-                    <div class="col-md-6">
-                        <label for="searchInput" class="form-label mb-1 fw-semibold text-muted">Buscar Estudiante</label>
-                        <div class="input-group">
-                            <span class="input-group-text bg-light border-end-0"><i class="fas fa-search text-muted"></i></span>
-                            <input type="text" id="searchInput" class="form-control border-start-0 ps-0" placeholder="Filtrar por código, nombre o apellido..." name="search" value="<?php echo e(request()->search); ?>" data-table-filter="studentsTable">
-                        </div>
+            <form action="<?php echo e(route('estudiantes.index')); ?>" method="GET" id="filtrosForm">
+                <div class="row g-3">
+                    
+                    <div class="col-md-3">
+                        <label for="searchInput" class="form-label mb-1 fw-semibold text-muted small">
+                            <i class="fas fa-search me-1"></i>Buscador
+                        </label>
+                        <input type="text" 
+                               id="searchInput" 
+                               class="form-control form-control-sm" 
+                               placeholder="Buscar..." 
+                               name="search" 
+                               value="<?php echo e(request()->search); ?>">
                     </div>
+
+                    
+                    <div class="col-md-2">
+                        <label for="estadoFilter" class="form-label mb-1 fw-semibold text-muted small">
+                            <i class="fas fa-toggle-on me-1"></i>Estado
+                        </label>
+                        <select class="form-select form-select-sm" id="estadoFilter" name="estado">
+                            <option value="">Todos</option>
+                            <option value="Activo" <?php echo e(request()->estado == 'Activo' ? 'selected' : ''); ?>>Activo</option>
+                            <option value="Inactivo" <?php echo e(request()->estado == 'Inactivo' ? 'selected' : ''); ?>>Inactivo</option>
+                        </select>
+                    </div>
+
+                    
+                    <div class="col-md-3">
+                        <label for="programaFilter" class="form-label mb-1 fw-semibold text-muted small">
+                            <i class="fas fa-book me-1"></i>Programa
+                        </label>
+                        <select class="form-select form-select-sm" id="programaFilter" name="programa">
+                            <option value="">Todos</option>
+                            <?php $__currentLoopData = $programas; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $prog): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                <option value="<?php echo e($prog->Id_programas); ?>" 
+                                        <?php echo e(request()->programa == $prog->Id_programas ? 'selected' : ''); ?>>
+                                    <?php echo e($prog->Nombre); ?>
+
+                                </option>
+                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                        </select>
+                    </div>
+
+                    
+                    <div class="col-md-2">
+                        <label for="sucursalFilter" class="form-label mb-1 fw-semibold text-muted small">
+                            <i class="fas fa-map-marker-alt me-1"></i>Sucursal
+                        </label>
+                        <select class="form-select form-select-sm" id="sucursalFilter" name="sucursal">
+                            <option value="">Todas</option>
+                            <?php $__currentLoopData = $sucursales; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $suc): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                <option value="<?php echo e($suc->Id_sucursales); ?>" 
+                                        <?php echo e(request()->sucursal == $suc->Id_sucursales ? 'selected' : ''); ?>>
+                                    <?php echo e($suc->Nombre); ?>
+
+                                </option>
+                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                        </select>
+                    </div>
+
+                    <div class="col-md-2 d-flex align-items-end">
+                        <button type="submit" class="btn btn-sm btn-primary w-100">
+                            <i class="fas fa-filter"></i>
+                        </button>
+                    </div>
+
+                    
                 </div>
             </form>
         </div>
@@ -73,26 +132,34 @@
                 <div class="mb-3">
                     <i class="bi bi-people text-muted" style="font-size: 3rem;"></i>
                 </div>
-                <h5 class="text-muted">No hay estudiantes registrados</h5>
-                <p class="text-muted mb-4">Comienza registrando un nuevo estudiante en el sistema.</p>
-                <a href="<?php echo e(route('registroCombinado.registrar')); ?>" class="btn btn-primary">
-                    <i class="fas fa-user-plus me-2"></i>Registrar el primero
-                </a>
+                <?php if(request()->hasAny(['search', 'estado', 'programa', 'sucursal'])): ?>
+                    <h5 class="text-muted">No se encontraron estudiantes con los filtros aplicados</h5>
+                    <p class="text-muted mb-4">Intenta ajustar los criterios de búsqueda o limpia los filtros.</p>
+                    <a href="<?php echo e(route('estudiantes.index')); ?>" class="btn btn-primary">
+                        <i class="fas fa-redo me-2"></i>Limpiar Filtros
+                    </a>
+                <?php else: ?>
+                    <h5 class="text-muted">No hay estudiantes registrados</h5>
+                    <p class="text-muted mb-4">Comienza registrando un nuevo estudiante en el sistema.</p>
+                    <a href="<?php echo e(route('registroCombinado.registrar')); ?>" class="btn btn-primary">
+                        <i class="fas fa-user-plus me-2"></i>Registrar el primero
+                    </a>
+                <?php endif; ?>
             </div>
         </div>
     <?php else: ?>
-        <div class="card shadow-sm border-0 overflow-hidden">
+        <div class="card shadow-sm border-0">
             <div class="card-body p-0">
                 <div class="table-responsive">
                     <table class="table table-striped table-hover align-middle mb-0" id="studentsTable">
                         <thead class="bg-primary text-white">
                             <tr>
-                                <th class="ps-3 py-3" style="min-width:120px;">Código</th>
-                                <th class="py-3" style="min-width:220px;">Nombre</th>
-                                <th class="py-3" style="min-width:180px;">Programa</th>
-                                <th class="py-3" style="min-width:160px;">Sucursal</th>
-                                <th class="py-3" style="min-width:120px;">Estado</th>
-                                <th class="pe-3 py-3 text-end" style="min-width:140px;">Acciones</th>
+                                <th class="ps-3 py-3" style="width: 100px;">Código</th>
+                                <th class="py-3">Nombre</th>
+                                <th class="py-3" style="width: 150px;">Programa</th>
+                                <th class="py-3" style="width: 130px;">Sucursal</th>
+                                <th class="py-3" style="width: 100px;">Estado</th>
+                                <th class="pe-3 py-3 text-end" style="width: 100px;"></th>
                             </tr>
                         </thead>
                         <tbody>
@@ -135,7 +202,6 @@
                                                     class="btn btn-sm btn-outline-primary" 
                                                     data-bs-toggle="modal" 
                                                     data-bs-target="#editarModal<?php echo e($estudiante->Id_estudiantes); ?>"
-                                                    data-bs-toggle="tooltip" 
                                                     title="Editar">
                                                 <i class="bi bi-pencil-square"></i>
                                             </button>
@@ -143,7 +209,6 @@
                                             
                                             <a href="<?php echo e(route('estudiantes.ver', $estudiante->Id_estudiantes ?? 0)); ?>" 
                                                class="btn btn-sm btn-outline-info" 
-                                               data-bs-toggle="tooltip"
                                                title="Ver perfil">
                                                 <i class="bi bi-eye-fill"></i>
                                             </a>
@@ -155,6 +220,12 @@
                     </table>
                 </div>
             </div>
+        </div>
+
+        
+        <div class="d-flex justify-content-center mt-4 mb-4">
+            <?php echo e($estudiantes->links('pagination::bootstrap-5')); ?>
+
         </div>
     <?php endif; ?>
 
@@ -270,8 +341,8 @@
                                 </select>
                             </div>
 
-                        </div> <!-- modal-body -->
-                    </div>
+                        </div> <!-- row -->
+                    </div> <!-- modal-body -->
                     <div class="modal-footer bg-light">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
                         <button type="submit" class="btn btn-primary">Guardar cambios</button>
@@ -281,38 +352,26 @@
         </div>
     </div>
     <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-    <!-- Paginación -->
-    <div class="d-flex justify-content-center mt-4 mb-4">
-        <?php echo e($estudiantes->links('pagination::bootstrap-5')); ?>
-
-    </div>
 </div>
 <?php $__env->stopSection(); ?>
 
 <?php $__env->startSection('scripts'); ?>
 <script>
-    // Filtro de tabla en vivo
-    // Filtro de tabla en vivo - MIGRADO A baseAdministrador.blade.php
-    /*
-    (function () {
-        const input = document.querySelector('input[name="search"]');
-        const table = document.getElementById('studentsTable');
-        if (!input || !table) return;
-
-        input.addEventListener('input', function () {
-            const q = this.value.trim().toLowerCase();
-            const rows = table.querySelectorAll('tbody tr');
-
-            rows.forEach(row => {
-                const text = row.innerText.toLowerCase();
-                row.style.display = text.includes(q) ? '' : 'none';
+    // Auto-submit al cambiar los filtros (opcional - puedes comentar si prefieres usar el botón)
+    document.addEventListener('DOMContentLoaded', function() {
+        const form = document.getElementById('filtrosForm');
+        const selects = form.querySelectorAll('select');
+        
+        // Descomentar las siguientes líneas si quieres que los filtros se apliquen automáticamente
+        /*
+        selects.forEach(select => {
+            select.addEventListener('change', function() {
+                form.submit();
             });
         });
-    })();
-    */
+        */
 
-    // Auto-cerrar alertas después de 5 segundos
-    document.addEventListener('DOMContentLoaded', function() {
+        // Auto-cerrar alertas después de 5 segundos
         const alerts = document.querySelectorAll('.alert');
         alerts.forEach(alert => {
             setTimeout(() => {

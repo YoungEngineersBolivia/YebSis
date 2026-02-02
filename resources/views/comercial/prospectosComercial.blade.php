@@ -6,7 +6,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
 @endsection
 @section('content')
-    <div class="container-fluid px-4 py-4">
+    <div class="container-fluid p-2 p-md-3">
         <div class="row">
             <div class="col-12">
                 @if ($errors->any())
@@ -51,12 +51,10 @@
                         </div>
                     </div>
                 </div>
-                <!-- Filtros de fecha bonitos -->
                 <div class="row mb-4">
                     <div class="col-12 d-flex justify-content-center">
                         <form method="GET" class="d-flex align-items-center gap-2 filtro-fecha-box p-2"
-                            id="filtroFechasForm"
-                            style="background: #fff; border-radius: 16px; box-shadow: 0 2px 12px rgba(0,0,0,0.08); min-width: 420px; flex-wrap: wrap;">
+                            id="filtroFechasForm">
                             <input type="text" name="search" class="form-control form-control-sm" placeholder="Buscar..."
                                 value="{{ request('search') }}" style="max-width: 200px;">
                             <input type="date" name="desde" id="inputDesde" class="form-control form-control-sm"
@@ -91,23 +89,24 @@
                                 <thead class="bg-light">
                                     <tr>
                                         <th class="border-0 fw-semibold text-dark py-3">
-                                            <i class="fas fa-user me-1"></i>Nombre Completo
+                                            <i class="fas fa-user me-1"></i>Nombre
                                         </th>
-                                        <th class="border-0 fw-semibold text-dark py-3">
+                                        <th class="border-0 fw-semibold text-dark py-3 text-nowrap">
                                             <i class="fas fa-phone me-1"></i>Celular
                                         </th>
-                                        <th class="border-0 fw-semibold text-dark py-3">
-                                            <i class="fas fa-calendar-alt me-1"></i>Fecha de Registro
+                                        <th class="border-0 fw-semibold text-dark py-3 text-nowrap">
+                                            <i class="fas fa-calendar-alt me-1"></i>Registro
                                         </th>
-                                        <th class="border-0 fw-semibold text-dark py-3">
+                                        <th class="border-0 fw-semibold text-dark py-3" style="min-width: 140px;">
                                             <i class="fas fa-flag me-1"></i>Estado
                                         </th>
-                                        <th class="border-0 fw-semibold text-dark py-3">
-                                            <i class="fas fa-chalkboard-teacher me-1"></i>Clase de Prueba
+                                        <th class="border-0 fw-semibold text-dark py-3 text-nowrap">
+                                            <i class="fas fa-chalkboard-teacher me-1"></i>Clase
                                         </th>
-                                        <th class="border-0 fw-semibold text-dark py-3">
-                                            <i class="fas fa-cog me-1"></i>Acciones
+                                        <th class="border-0 fw-semibold text-dark py-3 text-nowrap">
+                                            <i class="fas fa-chalkboard-teacher me-1"></i>Acciones
                                         </th>
+                                        <th class="border-0 fw-semibold text-dark py-3"></th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -194,17 +193,15 @@
                                                 <div class="d-flex align-items-center gap-2 justify-content-start">
                                                     {{-- Botón Clase de Prueba --}}
                                                     <button type="button"
-                                                        class="btn btn-primary btn-sm d-flex align-items-center px-3"
-                                                        style="border-radius: 6px; font-weight: 500; height: 34px; white-space: nowrap;"
+                                                        class="btn btn-primary btn-sm btn-action-sm d-flex align-items-center"
                                                         onclick="abrirModalClasePrueba('{{ $prospecto->Id_prospectos }}', '{{ $prospecto->Nombre }} {{ $prospecto->Apellido }}')">
                                                         <i class="fas fa-plus-circle me-1"></i>
-                                                        <span>Clase de prueba</span>
+                                                        <span class="btn-text-hide">Clase</span>
                                                     </button>
 
                                                     @if($clase)
                                                         <button type="button"
-                                                            class="btn btn-warning btn-sm d-flex align-items-center justify-content-center"
-                                                            style="width: 34px; height: 34px; border-radius: 6px;"
+                                                            class="btn btn-warning btn-sm btn-action-sm d-flex align-items-center justify-content-center"
                                                             onclick="editarClasePrueba('{{ $clase->Id_clasePrueba }}', '{{ $clase->Nombre_Estudiante }}', '{{ $clase->Fecha_clase }}', '{{ $clase->Hora_clase }}', `{{ $clase->Comentarios }}`, '{{ $clase->Id_profesores }}')"
                                                             title="Editar Clase">
                                                             <i class="fas fa-edit"></i>
@@ -218,8 +215,7 @@
                                                         @csrf
                                                         @method('DELETE')
                                                         <button type="submit"
-                                                            class="btn btn-danger btn-sm d-flex align-items-center justify-content-center"
-                                                            style="width: 34px; height: 34px; border-radius: 6px;"
+                                                            class="btn btn-danger btn-sm btn-action-sm d-flex align-items-center justify-content-center"
                                                             title="Eliminar Prospecto">
                                                             <i class="fas fa-trash"></i>
                                                         </button>

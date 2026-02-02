@@ -65,7 +65,7 @@
                 </div>
             </div>
         @else
-            <div class="card shadow-sm border-0 overflow-hidden">
+            <div class="card shadow-sm border-0">
                 <div class="card-body p-0">
                     <div class="table-responsive">
                         <table class="table table-striped table-hover align-middle mb-0" id="egresosTable">

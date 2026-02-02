@@ -55,7 +55,7 @@
                 </div>
             </div>
         @else
-            <div class="card shadow-sm border-0 overflow-hidden">
+            <div class="card shadow-sm border-0">
                 <div class="card-body p-0">
                     <div class="table-responsive">
                         <table class="table table-striped table-hover align-middle mb-0" id="usersTable">
@@ -107,7 +107,8 @@
                                                 <div class="modal-content">
                                                     <div class="modal-header bg-primary text-white">
                                                         <h5 class="modal-title" id="editarUsuarioLabel{{ $usuario->Id_usuarios }}">
-                                                            <i class="bi bi-person-gear me-2"></i>Editar Usuario</h5>
+                                                            <i class="bi bi-person-gear me-2"></i>Editar Usuario
+                                                        </h5>
                                                         <button type="button" class="btn-close btn-close-white"
                                                             data-bs-dismiss="modal" aria-label="Cerrar"></button>
                                                     </div>

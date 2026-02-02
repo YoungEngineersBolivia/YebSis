@@ -256,145 +256,146 @@
                     <i class="fas fa-users"></i> Alumnos por programa en {{ $sucursal->Nombre }}
                 </div>
                 <div class="card-body p-0">
-                    <table class="table table-striped table-hover align-middle mb-0">
-                        <thead class="bg-primary text-white">
-                            <tr>
-                                <th>Programa</th>
-                                <th>Total de Alumnos</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @forelse($alumnosPorSucursal[$sucursal->Id_sucursales] as $row)
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover align-middle mb-0">
+                            <thead class="bg-primary text-white">
                                 <tr>
-                                    <td>{{ $row->programa }}</td>
-                                    <td><strong>{{ $row->total }}</strong></td>
+                                    <th>Programa</th>
+                                    <th>Total de Alumnos</th>
                                 </tr>
-                            @empty
-                                <tr>
-                                    <td colspan="2" class="text-center text-muted">No hay datos disponibles</td>
-                                </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody>
+                                @forelse($alumnosPorSucursal[$sucursal->Id_sucursales] as $row)
+                                    <tr>
+                                        <td>{{ $row->programa }}</td>
+                                        <td><strong>{{ $row->total }}</strong></td>
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="2" class="text-center text-muted">No hay datos disponibles</td>
+                                    </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
-            </div>
         @endforeach
 
-    </div>
+        </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script>
-        window.ingresosPorDia = @json($ingresosPorDia->pluck('total'));
-        window.fechasPorDia = @json($ingresosPorDia->pluck('fecha'));
-        window.ingresosPorMes = @json($ingresosPorMes->pluck('total'));
-        window.mesesPorMes = @json($ingresosPorMes->pluck('mes_nombre'));
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        <script>
+            window.ingresosPorDia = @json($ingresosPorDia->pluck('total'));
+            window.fechasPorDia = @json($ingresosPorDia->pluck('fecha'));
+            window.ingresosPorMes = @json($ingresosPorMes->pluck('total'));
+            window.mesesPorMes = @json($ingresosPorMes->pluck('mes_nombre'));
 
-        function guardarComentarioAdmin(id) {
-            const comment = document.getElementById(`comentario_admin_${id}`).value;
-            fetch(`/administrador/clases-prueba/${id}/comentarios`, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                },
-                body: JSON.stringify({ comentarios: comment })
-            })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        const toast = Swal.mixin({
-                            toast: true,
-                            position: 'top-end',
-                            showConfirmButton: false,
-                            timer: 3000
-                        });
-                        toast.fire({
-                            icon: 'success',
-                            title: 'Comentario guardado'
-                        });
-                    }
-                });
-        }
-
-        function confirmarAsistenciaAdmin(id, estado) {
-            const commentInput = document.getElementById(`comentario_admin_${id}`);
-            const comentario = commentInput.value.trim();
-            const textoAccion = estado === 'asistio' ? 'marcar como ASISTIÓ' : 'marcar como FALTA';
-
-            let confirmOptions = {
-                title: '¿Confirmar asistencia?',
-                text: `Vas a ${textoAccion}.`,
-                icon: 'question',
-                showCancelButton: true,
-                confirmButtonText: 'Sí, enviar',
-                cancelButtonText: 'Cancelar'
-            };
-
-            if (comentario === '') {
-                confirmOptions.title = '¡Atención!';
-                confirmOptions.text = `Estás a punto de ${textoAccion} SIN COMENTARIOS. ¿Estás seguro? Es recomendable añadir una observación.`;
-                confirmOptions.icon = 'warning';
-                confirmOptions.confirmButtonColor = '#d33';
+            function guardarComentarioAdmin(id) {
+                const comment = document.getElementById(`comentario_admin_${id}`).value;
+                fetch(`/administrador/clases-prueba/${id}/comentarios`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    },
+                    body: JSON.stringify({ comentarios: comment })
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            const toast = Swal.mixin({
+                                toast: true,
+                                position: 'top-end',
+                                showConfirmButton: false,
+                                timer: 3000
+                            });
+                            toast.fire({
+                                icon: 'success',
+                                title: 'Comentario guardado'
+                            });
+                        }
+                    });
             }
 
-            Swal.fire(confirmOptions).then((result) => {
-                if (result.isConfirmed) {
-                    // Paso 1: Guardar comentario
-                    fetch(`/administrador/clases-prueba/${id}/comentarios`, {
-                        method: 'PUT',
-                        headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
-                        body: JSON.stringify({ comentarios: commentInput.value })
-                    })
-                        .then(() => {
-                            // Paso 2: Guardar asistencia
-                            return fetch(`/administrador/clases-prueba/${id}/asistencia`, {
-                                method: 'PUT',
-                                headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
-                                body: JSON.stringify({ asistencia: estado })
-                            });
+            function confirmarAsistenciaAdmin(id, estado) {
+                const commentInput = document.getElementById(`comentario_admin_${id}`);
+                const comentario = commentInput.value.trim();
+                const textoAccion = estado === 'asistio' ? 'marcar como ASISTIÓ' : 'marcar como FALTA';
+
+                let confirmOptions = {
+                    title: '¿Confirmar asistencia?',
+                    text: `Vas a ${textoAccion}.`,
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonText: 'Sí, enviar',
+                    cancelButtonText: 'Cancelar'
+                };
+
+                if (comentario === '') {
+                    confirmOptions.title = '¡Atención!';
+                    confirmOptions.text = `Estás a punto de ${textoAccion} SIN COMENTARIOS. ¿Estás seguro? Es recomendable añadir una observación.`;
+                    confirmOptions.icon = 'warning';
+                    confirmOptions.confirmButtonColor = '#d33';
+                }
+
+                Swal.fire(confirmOptions).then((result) => {
+                    if (result.isConfirmed) {
+                        // Paso 1: Guardar comentario
+                        fetch(`/administrador/clases-prueba/${id}/comentarios`, {
+                            method: 'PUT',
+                            headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
+                            body: JSON.stringify({ comentarios: commentInput.value })
                         })
-                        .then(response => response.json())
-                        .then(data => {
-                            if (data.success) {
-                                Swal.fire({
-                                    title: '¡Listo!',
-                                    text: 'La asistencia ha sido registrada.',
-                                    icon: 'success',
-                                    timer: 1500,
-                                    showConfirmButton: false
+                            .then(() => {
+                                // Paso 2: Guardar asistencia
+                                return fetch(`/administrador/clases-prueba/${id}/asistencia`, {
+                                    method: 'PUT',
+                                    headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
+                                    body: JSON.stringify({ asistencia: estado })
                                 });
+                            })
+                            .then(response => response.json())
+                            .then(data => {
+                                if (data.success) {
+                                    Swal.fire({
+                                        title: '¡Listo!',
+                                        text: 'La asistencia ha sido registrada.',
+                                        icon: 'success',
+                                        timer: 1500,
+                                        showConfirmButton: false
+                                    });
 
-                                // Eliminar el elemento de la lista visualmente
-                                const row = commentInput.closest('.list-group-item');
-                                if (row) {
-                                    row.remove();
+                                    // Eliminar el elemento de la lista visualmente
+                                    const row = commentInput.closest('.list-group-item');
+                                    if (row) {
+                                        row.remove();
 
-                                    // Actualizar el contador
-                                    const badge = document.querySelector('.card-header .badge');
-                                    if (badge) {
-                                        let count = parseInt(badge.innerText);
-                                        if (!isNaN(count)) {
-                                            badge.innerText = Math.max(0, count - 1);
-                                            if (count - 1 === 0) {
-                                                // Ocultar todo el widget si ya no hay
-                                                const widget = document.querySelector('.card.border-warning').closest('.row');
-                                                if (widget) widget.remove();
+                                        // Actualizar el contador
+                                        const badge = document.querySelector('.card-header .badge');
+                                        if (badge) {
+                                            let count = parseInt(badge.innerText);
+                                            if (!isNaN(count)) {
+                                                badge.innerText = Math.max(0, count - 1);
+                                                if (count - 1 === 0) {
+                                                    // Ocultar todo el widget si ya no hay
+                                                    const widget = document.querySelector('.card.border-warning').closest('.row');
+                                                    if (widget) widget.remove();
+                                                }
                                             }
                                         }
                                     }
+                                } else {
+                                    Swal.fire('Error', data.message || 'Error desconocido al guardar.', 'error');
                                 }
-                            } else {
-                                Swal.fire('Error', data.message || 'Error desconocido al guardar.', 'error');
-                            }
-                        })
-                        .catch(error => {
-                            console.error('Error:', error);
-                            // Intentar leer el mensaje de error de la respuesta si es posible, sino genérico
-                            Swal.fire('Error', 'Hubo un problema de conexión o del servidor.', 'error');
-                        });
-                }
-            });
-        }
-    </script>
-    <script src="{{ auto_asset('js/administrador/dashboard.js') }}"></script>
+                            })
+                            .catch(error => {
+                                console.error('Error:', error);
+                                // Intentar leer el mensaje de error de la respuesta si es posible, sino genérico
+                                Swal.fire('Error', 'Hubo un problema de conexión o del servidor.', 'error');
+                            });
+                    }
+                });
+            }
+        </script>
+        <script src="{{ auto_asset('js/administrador/dashboard.js') }}"></script>
 @endsection

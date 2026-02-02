@@ -87,13 +87,40 @@
 
         /* Tablas */
         .table-responsive {
-            border-radius: 16px;
+            display: block;
+            width: 100%;
             overflow-x: auto;
             -webkit-overflow-scrolling: touch;
+            border-radius: 12px;
+            position: relative;
+            background: white;
+            border: 1px solid #e5e7eb;
+        }
+
+        /* Scrollbar personalizada para tablas */
+        .table-responsive::-webkit-scrollbar {
+            height: 8px;
+        }
+
+        .table-responsive::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 4px;
+        }
+
+        .table-responsive::-webkit-scrollbar-thumb {
+            background: #cbd5e0;
+            border-radius: 4px;
+        }
+
+        .table-responsive::-webkit-scrollbar-thumb:hover {
+            background: #a0aec0;
         }
 
         .table {
+            width: 100%;
             margin-bottom: 0;
+            vertical-align: middle;
+            background-color: white;
         }
 
         .table thead th {
@@ -396,44 +423,91 @@
         .main-content {
             margin-left: 280px;
             min-height: 100vh;
-            width: calc(100% - 280px); /* Usar width en lugar de max-width para asegurar que el contenido se ajuste */
+            width: calc(100% - 280px);
+            /* Usar width en lugar de max-width para asegurar que el contenido se ajuste */
             background-color: var(--light-bg);
             transition: all 0.3s ease;
         }
 
         /* Responsive */
-        @media (max-width: 1200px) {
+        @media (max-width: 1300px) {
             .sidebar-container {
                 width: 240px;
             }
+
             .main-content {
                 margin-left: 240px;
                 width: calc(100% - 240px);
             }
         }
 
-        @media (max-width: 992px) {
+        @media (max-width: 1100px) {
             .sidebar-container {
-                width: 220px;
+                width: 190px;
+                padding: 0.75rem;
             }
+
+            .sidebar-logo img {
+                width: 140px !important;
+            }
+
             .main-content {
-                margin-left: 220px;
-                width: calc(100% - 220px);
+                margin-left: 190px;
+                width: calc(100% - 190px);
+            }
+
+            .sidebar-link span {
+                font-size: 0.75rem;
+            }
+
+            .sidebar-link {
+                padding: 10px 12px;
+            }
+
+            .container-fluid {
+                padding-left: 0.5rem !important;
+                padding-right: 0.5rem !important;
+            }
+
+            /* Compactar tablas */
+            .table thead th,
+            .table tbody td {
+                padding: 10px 8px !important;
+                font-size: 0.8rem !important;
+            }
+
+            .page-header {
+                padding: 20px !important;
             }
         }
 
-        @media (max-width: 768px) {
+        @media (max-width: 992px) {
+            .app-wrapper {
+                flex-direction: column !important;
+            }
+
             .sidebar-container {
                 width: 100%;
                 height: auto;
                 position: relative;
                 border-right: none;
                 border-bottom: 1px solid #e5e7eb;
+                padding: 1rem;
             }
 
             .main-content {
                 margin-left: 0;
                 width: 100%;
+                min-height: auto;
+            }
+
+            .sidebar-menu {
+                max-height: none;
+                overflow: visible;
+            }
+
+            .table {
+                min-width: 700px;
             }
         }
     </style>
@@ -441,7 +515,7 @@
 
 <body>
 
-    <div class="d-flex">
+    <div class="d-flex app-wrapper">
         <!-- Sidebar -->
         <div class="sidebar-container">
             <!-- Logo -->
@@ -681,8 +755,8 @@
         </div>
 
         <!-- Contenido Principal -->
-    <div class="main-content">
-        <div class="container-fluid p-3 p-md-4">
+        <div class="main-content">
+            <div class="container-fluid p-2 p-md-3 p-lg-4">
                 <?php if(session('success')): ?>
                     <div class="alert alert-success alert-dismissible fade show shadow-sm border-0 mb-4" role="alert">
                         <i class="bi bi-check-circle-fill me-2 fs-5"></i>
