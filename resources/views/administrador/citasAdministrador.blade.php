@@ -308,19 +308,19 @@
                                                 <td>
                                                     <div class="d-flex align-items-center">
                                                         <div class="estudiante-avatar me-3">
-                                                            {{ substr($cita->estudiante->persona->Nombre ?? 'E', 0, 1) }}
+                                                            {{ substr($cita->estudiante?->persona?->Nombre ?? 'E', 0, 1) }}
                                                         </div>
                                                         <div>
-                                                            <div class="fw-bold">{{ $cita->estudiante->persona->Nombre ?? '' }}
-                                                                {{ $cita->estudiante->persona->Apellido ?? '' }}</div>
+                                                            <div class="fw-bold">{{ $cita->estudiante?->persona?->Nombre ?? '' }}
+                                                                {{ $cita->estudiante?->persona?->Apellido ?? '' }}</div>
                                                             <small
-                                                                class="text-muted">{{ $cita->estudiante->Cod_estudiante ?? '' }}</small>
+                                                                class="text-muted">{{ $cita->estudiante?->Cod_estudiante ?? '' }}</small>
                                                         </div>
                                                     </div>
                                                 </td>
                                                 <td>
-                                                    {{ $cita->tutor->persona->Nombre ?? '' }}
-                                                    {{ $cita->tutor->persona->Apellido ?? '' }}
+                                                    {{ $cita->tutor?->persona?->Nombre ?? '' }}
+                                                    {{ $cita->tutor?->persona?->Apellido ?? '' }}
                                                 </td>
                                                 <td>
                                                     <div class="fw-bold">{{ $fechaCita->format('d/m/Y') }}</div>
@@ -504,7 +504,7 @@
                                 <select class="form-select" name="estudiante_id" required>
                                     <option value="">Seleccionar estudiante...</option>
                                     @foreach($estudiantes ?? [] as $estudiante)
-                                        <option value="{{ $estudiante->Id_estudiantes }}" {{ old('estudiante_id') == $estudiante->Id_estudiantes ? 'selected' : '' }}>
+                                        <option value="{{ $estudiante?->Id_estudiantes }}" {{ old('estudiante_id') == $estudiante?->Id_estudiantes ? 'selected' : '' }}>
                                             {{ $estudiante?->persona?->Nombre ?? '' }} {{ $estudiante?->persona?->Apellido ?? '' }}
                                             - {{ $estudiante?->Cod_estudiante }}
                                         </option>
@@ -516,7 +516,7 @@
                                 <select class="form-select" name="tutor_id" required>
                                     <option value="">Seleccionar tutor...</option>
                                     @foreach($tutores ?? [] as $tutor)
-                                        <option value="{{ $tutor->Id_tutores }}" {{ old('tutor_id') == $tutor->Id_tutores ? 'selected' : '' }}>
+                                        <option value="{{ $tutor?->Id_tutores }}" {{ old('tutor_id') == $tutor?->Id_tutores ? 'selected' : '' }}>
                                             {{ $tutor?->persona?->Nombre ?? '' }} {{ $tutor?->persona?->Apellido ?? '' }}
                                         </option>
                                     @endforeach

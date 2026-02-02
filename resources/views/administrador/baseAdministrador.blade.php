@@ -397,6 +397,7 @@
             margin-left: 280px;
             min-height: 100vh;
             width: calc(100% - 280px);
+            /* Usar width en lugar de max-width para asegurar que el contenido se ajuste */
             background-color: var(--light-bg);
             transition: all 0.3s ease;
         }
