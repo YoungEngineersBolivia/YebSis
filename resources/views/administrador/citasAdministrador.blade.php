@@ -33,6 +33,8 @@
         .tabla-scroll {
             max-height: 500px;
             overflow-y: auto;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
         }
         .filtros-card {
             background-color: #f8f9fa;
