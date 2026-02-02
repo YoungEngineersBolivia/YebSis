@@ -86,10 +86,8 @@
 @endsection
 
 @section('content')
-    <div class="container-fluid mt-4">
-
-        {{-- Encabezado --}}
-        <div class="d-flex justify-content-between align-items-center mb-4">
+    <div class="mt-2 text-start">
+        <div class="d-flex flex-wrap gap-2 justify-content-between align-items-center mb-4">
             <div>
                 <h2 class="mb-0 fw-bold">
                     <i class="bi bi-calendar-check me-2"></i>Administración de Citas
@@ -312,7 +310,8 @@
                                                         </div>
                                                         <div>
                                                             <div class="fw-bold">{{ $cita->estudiante?->persona?->Nombre ?? '' }}
-                                                                {{ $cita->estudiante?->persona?->Apellido ?? '' }}</div>
+                                                                {{ $cita->estudiante?->persona?->Apellido ?? '' }}
+                                                            </div>
                                                             <small
                                                                 class="text-muted">{{ $cita->estudiante?->Cod_estudiante ?? '' }}</small>
                                                         </div>
@@ -422,7 +421,8 @@
                                                         </div>
                                                         <div>
                                                             <div class="fw-bold">{{ $cita->estudiante->persona->Nombre ?? '' }}
-                                                                {{ $cita->estudiante->persona->Apellido ?? '' }}</div>
+                                                                {{ $cita->estudiante->persona->Apellido ?? '' }}
+                                                            </div>
                                                             <small
                                                                 class="text-muted">{{ $cita->estudiante->Cod_estudiante ?? '' }}</small>
                                                         </div>
@@ -505,7 +505,8 @@
                                     <option value="">Seleccionar estudiante...</option>
                                     @foreach($estudiantes ?? [] as $estudiante)
                                         <option value="{{ $estudiante?->Id_estudiantes }}" {{ old('estudiante_id') == $estudiante?->Id_estudiantes ? 'selected' : '' }}>
-                                            {{ $estudiante?->persona?->Nombre ?? '' }} {{ $estudiante?->persona?->Apellido ?? '' }}
+                                            {{ $estudiante?->persona?->Nombre ?? '' }}
+                                            {{ $estudiante?->persona?->Apellido ?? '' }}
                                             - {{ $estudiante?->Cod_estudiante }}
                                         </option>
                                     @endforeach
@@ -571,7 +572,8 @@
                                     </div>
                                     <div>
                                         <p class="fw-bold mb-0">{{ $cita->estudiante->persona->Nombre ?? '' }}
-                                            {{ $cita->estudiante->persona->Apellido ?? '' }}</p>
+                                            {{ $cita->estudiante->persona->Apellido ?? '' }}
+                                        </p>
                                         <small class="text-muted">{{ $cita->estudiante->Cod_estudiante ?? '' }}</small>
                                     </div>
                                 </div>
@@ -678,7 +680,7 @@
                 const modal = new bootstrap.Modal(document.getElementById('crearCitaModal'));
                 modal.show();
             @endif
-        });
+            });
 
         // Función para limpiar filtros
         function limpiarFiltros() {
@@ -771,12 +773,12 @@
                     const mensaje = document.createElement('div');
                     mensaje.className = 'sin-resultados-mensaje text-center py-5';
                     mensaje.innerHTML = `
-                        <div class="mb-3">
-                            <i class="bi bi-search text-muted" style="font-size: 3rem;"></i>
-                        </div>
-                        <h5 class="text-muted">No se encontraron resultados</h5>
-                        <p class="text-muted">Intenta con otros filtros de búsqueda.</p>
-                    `;
+                            <div class="mb-3">
+                                <i class="bi bi-search text-muted" style="font-size: 3rem;"></i>
+                            </div>
+                            <h5 class="text-muted">No se encontraron resultados</h5>
+                            <p class="text-muted">Intenta con otros filtros de búsqueda.</p>
+                        `;
                     tabActiva.querySelector('.tabla-scroll').style.display = 'none';
                     tabActiva.appendChild(mensaje);
                 }
@@ -868,10 +870,10 @@
             alertDiv.className = `alert alert-${tipo} alert-dismissible fade show position-fixed top-0 start-50 translate-middle-x mt-3`;
             alertDiv.style.zIndex = '9999';
             alertDiv.innerHTML = `
-                <i class="bi bi-${tipo === 'success' ? 'check-circle-fill' : 'exclamation-triangle-fill'} me-2"></i>
-                ${mensaje}
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-            `;
+                    <i class="bi bi-${tipo === 'success' ? 'check-circle-fill' : 'exclamation-triangle-fill'} me-2"></i>
+                    ${mensaje}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                `;
             document.body.appendChild(alertDiv);
 
             setTimeout(() => {

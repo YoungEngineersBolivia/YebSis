@@ -403,7 +403,7 @@
         }
 
         /* Responsive */
-        @media (max-width: 1200px) {
+        @media (max-width: 1300px) {
             .sidebar-container {
                 width: 240px;
             }
@@ -414,18 +414,7 @@
             }
         }
 
-        @media (max-width: 992px) {
-            .sidebar-container {
-                width: 220px;
-            }
-
-            .main-content {
-                margin-left: 220px;
-                width: calc(100% - 220px);
-            }
-        }
-
-        @media (max-width: 768px) {
+        @media (max-width: 1100px) {
             .sidebar-container {
                 width: 100%;
                 height: auto;
