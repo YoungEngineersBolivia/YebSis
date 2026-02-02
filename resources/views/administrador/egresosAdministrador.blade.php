@@ -2,13 +2,13 @@
 
 @section('title', 'Egresos')
 @section('styles')
-<link href="{{ auto_asset('css/style.css') }}" rel="stylesheet">
-<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="{{ auto_asset('css/style.css') }}" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 @endsection
 
 @section('content')
-    <div class="container-fluid mt-4">
-        <div class="d-flex justify-content-between align-items-center mb-4">
+    <div class="mt-2 text-start">
+        <div class="d-flex flex-wrap gap-2 justify-content-between align-items-center mb-4">
             <h2 class="mb-0 fw-bold"><i class="bi bi-cash-stack me-2"></i>Egresos</h2>
             <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalRegistrarEgreso">
                 <i class="bi bi-plus-lg me-2"></i>Registrar Egreso
@@ -47,8 +47,10 @@
                     <div class="col-md-6">
                         <label for="searchInput" class="form-label mb-1 fw-semibold text-muted">Buscar Egreso</label>
                         <div class="input-group">
-                            <span class="input-group-text bg-light border-end-0"><i class="fas fa-search text-muted"></i></span>
-                            <input type="text" class="form-control border-start-0 ps-0" placeholder="Descripción, tipo..." id="searchInput" data-table-filter="egresosTable">
+                            <span class="input-group-text bg-light border-end-0"><i
+                                    class="fas fa-search text-muted"></i></span>
+                            <input type="text" class="form-control border-start-0 ps-0" placeholder="Descripción, tipo..."
+                                id="searchInput" data-table-filter="egresosTable">
                         </div>
                     </div>
                 </div>
@@ -86,21 +88,18 @@
                                         <td class="pe-3 text-end">
                                             <div class="d-flex justify-content-end gap-2">
                                                 <!-- Botón Editar -->
-                                                <button class="btn btn-sm btn-outline-primary btn-editar" title="Editar" 
-                                                    data-bs-toggle="modal" 
-                                                    data-bs-target="#modalEditarEgreso" 
-                                                    data-id="{{ $egreso->Id_egreso }}" 
-                                                    data-tipo="{{ $egreso->Tipo }}" 
-                                                    data-descripcion="{{ $egreso->Descripcion_egreso }}" 
-                                                    data-fecha="{{ $egreso->Fecha_egreso }}" 
+                                                <button class="btn btn-sm btn-outline-primary btn-editar" title="Editar"
+                                                    data-bs-toggle="modal" data-bs-target="#modalEditarEgreso"
+                                                    data-id="{{ $egreso->Id_egreso }}" data-tipo="{{ $egreso->Tipo }}"
+                                                    data-descripcion="{{ $egreso->Descripcion_egreso }}"
+                                                    data-fecha="{{ $egreso->Fecha_egreso }}"
                                                     data-monto="{{ $egreso->Monto_egreso }}">
                                                     <i class="bi bi-pencil-square"></i>
                                                 </button>
 
                                                 <!-- Botón Eliminar -->
-                                                <button class="btn btn-sm btn-outline-danger btn-eliminar" title="Eliminar" 
-                                                    data-bs-toggle="modal" 
-                                                    data-bs-target="#modalEliminarEgreso" 
+                                                <button class="btn btn-sm btn-outline-danger btn-eliminar" title="Eliminar"
+                                                    data-bs-toggle="modal" data-bs-target="#modalEliminarEgreso"
                                                     data-id="{{ $egreso->Id_egreso }}"
                                                     data-descripcion="{{ $egreso->Descripcion_egreso }}">
                                                     <i class="bi bi-trash3-fill"></i>
@@ -117,14 +116,17 @@
         @endif
 
         <!-- Modal Registrar Egreso -->
-        <div class="modal fade" id="modalRegistrarEgreso" tabindex="-1" aria-labelledby="modalRegistrarEgresoLabel" aria-hidden="true">
+        <div class="modal fade" id="modalRegistrarEgreso" tabindex="-1" aria-labelledby="modalRegistrarEgresoLabel"
+            aria-hidden="true">
             <div class="modal-dialog">
                 <div class="modal-content">
                     <form method="POST" action="{{ route('egresos.store') }}">
                         @csrf
                         <div class="modal-header bg-primary text-white">
-                            <h5 class="modal-title" id="modalRegistrarEgresoLabel"><i class="bi bi-plus-circle me-2"></i>Registrar Nuevo Egreso</h5>
-                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                            <h5 class="modal-title" id="modalRegistrarEgresoLabel"><i
+                                    class="bi bi-plus-circle me-2"></i>Registrar Nuevo Egreso</h5>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                                aria-label="Close"></button>
                         </div>
                         <div class="modal-body">
                             <div class="mb-3">
@@ -133,15 +135,18 @@
                             </div>
                             <div class="mb-3">
                                 <label for="descripcion" class="form-label fw-bold">Descripción</label>
-                                <textarea class="form-control" id="descripcion" name="Descripcion_egreso" rows="3" required></textarea>
+                                <textarea class="form-control" id="descripcion" name="Descripcion_egreso" rows="3"
+                                    required></textarea>
                             </div>
                             <div class="mb-3">
                                 <label for="fecha" class="form-label fw-bold">Fecha</label>
-                                <input type="date" class="form-control" id="fecha" name="Fecha_egreso" value="{{ date('Y-m-d') }}" required>
+                                <input type="date" class="form-control" id="fecha" name="Fecha_egreso"
+                                    value="{{ date('Y-m-d') }}" required>
                             </div>
                             <div class="mb-3">
                                 <label for="monto" class="form-label fw-bold">Monto (Bs)</label>
-                                <input type="number" step="0.01" class="form-control" id="monto" name="Monto_egreso" min="0" required>
+                                <input type="number" step="0.01" class="form-control" id="monto" name="Monto_egreso" min="0"
+                                    required>
                             </div>
                         </div>
                         <div class="modal-footer bg-light">
@@ -154,15 +159,18 @@
         </div>
 
         <!-- Modal Editar Egreso -->
-        <div class="modal fade" id="modalEditarEgreso" tabindex="-1" aria-labelledby="modalEditarEgresoLabel" aria-hidden="true">
+        <div class="modal fade" id="modalEditarEgreso" tabindex="-1" aria-labelledby="modalEditarEgresoLabel"
+            aria-hidden="true">
             <div class="modal-dialog">
                 <div class="modal-content">
                     <form method="POST" action="#" id="formEditarEgreso">
                         @csrf
                         @method('PUT')
                         <div class="modal-header bg-primary text-white">
-                            <h5 class="modal-title" id="modalEditarEgresoLabel"><i class="bi bi-pencil-square me-2"></i>Editar Egreso</h5>
-                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                            <h5 class="modal-title" id="modalEditarEgresoLabel"><i
+                                    class="bi bi-pencil-square me-2"></i>Editar Egreso</h5>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                                aria-label="Close"></button>
                         </div>
                         <div class="modal-body">
                             <div class="mb-3">
@@ -171,7 +179,8 @@
                             </div>
                             <div class="mb-3">
                                 <label for="editDescripcion" class="form-label fw-bold">Descripción</label>
-                                <textarea class="form-control" id="editDescripcion" name="Descripcion_egreso" rows="3" required></textarea>
+                                <textarea class="form-control" id="editDescripcion" name="Descripcion_egreso" rows="3"
+                                    required></textarea>
                             </div>
                             <div class="mb-3">
                                 <label for="editFecha" class="form-label fw-bold">Fecha</label>
@@ -179,7 +188,8 @@
                             </div>
                             <div class="mb-3">
                                 <label for="editMonto" class="form-label fw-bold">Monto (Bs)</label>
-                                <input type="number" step="0.01" class="form-control" id="editMonto" name="Monto_egreso" min="0" required>
+                                <input type="number" step="0.01" class="form-control" id="editMonto" name="Monto_egreso"
+                                    min="0" required>
                             </div>
                         </div>
                         <div class="modal-footer bg-light">
@@ -192,15 +202,18 @@
         </div>
 
         <!-- Modal Eliminar Egreso -->
-        <div class="modal fade" id="modalEliminarEgreso" tabindex="-1" aria-labelledby="modalEliminarEgresoLabel" aria-hidden="true">
+        <div class="modal fade" id="modalEliminarEgreso" tabindex="-1" aria-labelledby="modalEliminarEgresoLabel"
+            aria-hidden="true">
             <div class="modal-dialog">
                 <div class="modal-content">
                     <form method="POST" action="#" id="formEliminarEgreso">
                         @csrf
                         @method('DELETE')
                         <div class="modal-header bg-danger text-white">
-                            <h5 class="modal-title" id="modalEliminarEgresoLabel"><i class="bi bi-exclamation-triangle-fill me-2"></i>Eliminar Egreso</h5>
-                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                            <h5 class="modal-title" id="modalEliminarEgresoLabel"><i
+                                    class="bi bi-exclamation-triangle-fill me-2"></i>Eliminar Egreso</h5>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                                aria-label="Close"></button>
                         </div>
                         <div class="modal-body">
                             <div class="text-center py-3">
@@ -217,56 +230,55 @@
                 </div>
             </div>
         </div>
-    </div>
 
 @endsection
 
-@section('scripts')
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script>
-$(document).ready(function() {
-    // BÚSQUEDA EN TIEMPO REAL - MIGRADO A baseAdministrador.blade.php
-    /*
-    $('#searchInput').on('keyup', function() {
-        const searchValue = $(this).val().toLowerCase();
-        
-        $('tbody tr').filter(function() {
-            $(this).toggle($(this).text().toLowerCase().indexOf(searchValue) > -1);
-        });
-    });
-    */
+    @section('scripts')
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <script>
+            $(document).ready(function () {
+                // BÚSQUEDA EN TIEMPO REAL - MIGRADO A baseAdministrador.blade.php
+                /*
+                $('#searchInput').on('keyup', function() {
+                    const searchValue = $(this).val().toLowerCase();
 
-    // MODAL EDITAR - Llenar con datos del egreso
-    $('.btn-editar').on('click', function() {
-        const id = $(this).data('id');
-        const tipo = $(this).data('tipo');
-        const descripcion = $(this).data('descripcion');
-        const fecha = $(this).data('fecha');
-        const monto = $(this).data('monto');
+                    $('tbody tr').filter(function() {
+                        $(this).toggle($(this).text().toLowerCase().indexOf(searchValue) > -1);
+                    });
+                });
+                */
 
-        // Llenar campos del modal
-        $('#editTipo').val(tipo);
-        $('#editDescripcion').val(descripcion);
-        $('#editFecha').val(fecha);
-        $('#editMonto').val(monto);
+                // MODAL EDITAR - Llenar con datos del egreso
+                $('.btn-editar').on('click', function () {
+                    const id = $(this).data('id');
+                    const tipo = $(this).data('tipo');
+                    const descripcion = $(this).data('descripcion');
+                    const fecha = $(this).data('fecha');
+                    const monto = $(this).data('monto');
 
-        // Actualizar action del formulario con el ID correcto
-        const actionUrl = "{{ route('egresos.update', ':id') }}".replace(':id', id);
-        $('#formEditarEgreso').attr('action', actionUrl);
-    });
+                    // Llenar campos del modal
+                    $('#editTipo').val(tipo);
+                    $('#editDescripcion').val(descripcion);
+                    $('#editFecha').val(fecha);
+                    $('#editMonto').val(monto);
 
-    // MODAL ELIMINAR - Configurar con ID del egreso
-    $('.btn-eliminar').on('click', function() {
-        const id = $(this).data('id');
-        const descripcion = $(this).data('descripcion');
+                    // Actualizar action del formulario con el ID correcto
+                    const actionUrl = "{{ route('egresos.update', ':id') }}".replace(':id', id);
+                    $('#formEditarEgreso').attr('action', actionUrl);
+                });
 
-        // Mostrar descripción del egreso a eliminar
-        $('#egresoEliminarDescripcion').text(descripcion);
+                // MODAL ELIMINAR - Configurar con ID del egreso
+                $('.btn-eliminar').on('click', function () {
+                    const id = $(this).data('id');
+                    const descripcion = $(this).data('descripcion');
 
-        // Actualizar action del formulario con el ID correcto
-        const actionUrl = "{{ route('egresos.destroy', ':id') }}".replace(':id', id);
-        $('#formEliminarEgreso').attr('action', actionUrl);
-    });
-});
-</script>
-@endsection
+                    // Mostrar descripción del egreso a eliminar
+                    $('#egresoEliminarDescripcion').text(descripcion);
+
+                    // Actualizar action del formulario con el ID correcto
+                    const actionUrl = "{{ route('egresos.destroy', ':id') }}".replace(':id', id);
+                    $('#formEliminarEgreso').attr('action', actionUrl);
+                });
+            });
+        </script>
+    @endsection

@@ -8,7 +8,7 @@
 @endsection
 
 @section('content')
-    <div class="container-fluid mt-4">
+    <div class="mt-2 text-start">
 
         <!-- Header Principal -->
         <div class="page-header d-flex flex-wrap justify-content-between align-items-center gap-3">
@@ -115,8 +115,8 @@
 
 @section('scripts')
     <script id="estudiantes-data" type="application/json">
-                                    {!! json_encode($estudiantes) !!}
-                                </script>
+                                        {!! json_encode($estudiantes) !!}
+                                    </script>
 
     <script>
         const estudiantes = JSON.parse(document.getElementById('estudiantes-data').textContent);

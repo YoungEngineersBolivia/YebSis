@@ -9,9 +9,9 @@
 @endsection
 
 @section('content')
-<div class="container-fluid mt-4">
+<div class="mt-2">
 
-    <div class="d-flex justify-content-between align-items-center mb-4">
+    <div class="d-flex flex-wrap gap-3 justify-content-between align-items-center mb-4">
         <h2 class="mb-0 fw-bold"><i class="bi bi-people-fill me-2"></i>Lista de Estudiantes</h2>
         <div class="d-flex gap-2">
             <a href="{{ route('estudiantes.exportarPDF') }}" class="btn btn-danger">
