@@ -28,26 +28,24 @@ class EstudianteController extends Controller
 
         // Realizar la consulta para obtener los estudiantes filtrados
         $estudiantes = Estudiante::with(['persona', 'programa', 'sucursal', 'profesor', 'profesor.persona'])
-            ->when($search, function($query, $search) {
-                return $query->where(function($q) use ($search) {
-                    // Buscar por código
+            ->when($search, function ($query, $search) {
+                return $query->where(function ($q) use ($search) {
                     $q->where('Cod_estudiante', 'like', "%$search%")
-                    // Buscar por nombre completo concatenado (nombre + apellido)
-                    ->orWhereHas('persona', function($subQ) use ($search) {
-                        $subQ->whereRaw("CONCAT(Nombre, ' ', Apellido) LIKE ?", ["%$search%"])
-                            ->orWhereRaw("CONCAT(Apellido, ' ', Nombre) LIKE ?", ["%$search%"])
-                            ->orWhere('Nombre', 'like', "%$search%")
-                            ->orWhere('Apellido', 'like', "%$search%");
-                    });
+                        ->orWhereHas('persona', function ($subQ) use ($search) {
+                            $subQ->where('Nombre', 'like', "%$search%")
+                                ->orWhere('Apellido', 'like', "%$search%")
+                                ->orWhereRaw("CONCAT(Nombre, ' ', Apellido) LIKE ?", ["%$search%"])
+                                ->orWhereRaw("CONCAT(Apellido, ' ', Nombre) LIKE ?", ["%$search%"]);
+                        });
                 });
             })
-            ->when($estado, function($query, $estado) {
+            ->when($estado, function ($query, $estado) {
                 return $query->where('Estado', $estado);
             })
-            ->when($programa, function($query, $programa) {
+            ->when($programa, function ($query, $programa) {
                 return $query->where('Id_programas', $programa);
             })
-            ->when($sucursal, function($query, $sucursal) {
+            ->when($sucursal, function ($query, $sucursal) {
                 return $query->where('Id_sucursales', $sucursal);
             })
             ->orderBy('Id_estudiantes', 'desc')
@@ -203,73 +201,73 @@ class EstudianteController extends Controller
     }
 
     public function ver($id)
-{
-    // Cargar el estudiante con todas sus relaciones
-    $estudiante = Estudiante::with([
-        'persona',
-        'programa',
-        'sucursal',
-        'profesor.persona',
-        'tutor.persona',
-        'horarios' => function($query) {
-            $query->orderBy('Dia', 'asc')->orderBy('Hora', 'asc');
-        },
-        'horarios.programa',
-        'horarios.profesor.persona',
-        'planesPago' => function($query) {
-            $query->latest('fecha_plan_pagos')->limit(3);
-        },
-        'planesPago.programa',
-        'evaluaciones' => function($query) {
-            $query->latest('fecha_evaluacion')->limit(5);
-        },
-        'evaluaciones.programa',
-        'evaluaciones.profesor.persona',
-        'evaluaciones.modelo',
-    ])->findOrFail($id);
+    {
+        // Cargar el estudiante con todas sus relaciones
+        $estudiante = Estudiante::with([
+            'persona',
+            'programa',
+            'sucursal',
+            'profesor.persona',
+            'tutor.persona',
+            'horarios' => function ($query) {
+                $query->orderBy('Dia', 'asc')->orderBy('Hora', 'asc');
+            },
+            'horarios.programa',
+            'horarios.profesor.persona',
+            'planesPago' => function ($query) {
+                $query->latest('fecha_plan_pagos')->limit(3);
+            },
+            'planesPago.programa',
+            'evaluaciones' => function ($query) {
+                $query->latest('fecha_evaluacion')->limit(5);
+            },
+            'evaluaciones.programa',
+            'evaluaciones.profesor.persona',
+            'evaluaciones.modelo',
+        ])->findOrFail($id);
 
-    // Obtener el último modelo evaluado
-    $ultimaEvaluacion = Evaluacion::where('Id_estudiantes', $id)
-        ->with('modelo')
-        ->orderBy('fecha_evaluacion', 'desc')
-        ->first();
-
-    $ultimoModelo = $ultimaEvaluacion ? $ultimaEvaluacion->modelo : null;
-    $proximoModelo = null;
-
-    // Si hay un último modelo, buscar el próximo
-    if ($ultimoModelo && $estudiante->programa) {
-        // Obtener todos los modelos del programa ordenados
-        $modelosPrograma = \App\Models\Modelo::where('Id_programa', $estudiante->Id_programas)
-            ->orderBy('Id_modelos', 'asc')
-            ->get();
-
-        // Encontrar el índice del último modelo evaluado
-        $indiceUltimoModelo = $modelosPrograma->search(function($modelo) use ($ultimoModelo) {
-            return $modelo->Id_modelos == $ultimoModelo->Id_modelos;
-        });
-
-        // Si se encontró el último modelo y hay un siguiente
-        if ($indiceUltimoModelo !== false && $indiceUltimoModelo < $modelosPrograma->count() - 1) {
-            $proximoModelo = $modelosPrograma[$indiceUltimoModelo + 1];
-        }
-    } else if ($estudiante->programa) {
-        // Si no hay evaluaciones previas, el próximo modelo es el primero del programa
-        $proximoModelo = \App\Models\Modelo::where('Id_programa', $estudiante->Id_programas)
-            ->orderBy('Id_modelos', 'asc')
+        // Obtener el último modelo evaluado
+        $ultimaEvaluacion = Evaluacion::where('Id_estudiantes', $id)
+            ->with('modelo')
+            ->orderBy('fecha_evaluacion', 'desc')
             ->first();
+
+        $ultimoModelo = $ultimaEvaluacion ? $ultimaEvaluacion->modelo : null;
+        $proximoModelo = null;
+
+        // Si hay un último modelo, buscar el próximo
+        if ($ultimoModelo && $estudiante->programa) {
+            // Obtener todos los modelos del programa ordenados
+            $modelosPrograma = \App\Models\Modelo::where('Id_programa', $estudiante->Id_programas)
+                ->orderBy('Id_modelos', 'asc')
+                ->get();
+
+            // Encontrar el índice del último modelo evaluado
+            $indiceUltimoModelo = $modelosPrograma->search(function ($modelo) use ($ultimoModelo) {
+                return $modelo->Id_modelos == $ultimoModelo->Id_modelos;
+            });
+
+            // Si se encontró el último modelo y hay un siguiente
+            if ($indiceUltimoModelo !== false && $indiceUltimoModelo < $modelosPrograma->count() - 1) {
+                $proximoModelo = $modelosPrograma[$indiceUltimoModelo + 1];
+            }
+        } else if ($estudiante->programa) {
+            // Si no hay evaluaciones previas, el próximo modelo es el primero del programa
+            $proximoModelo = \App\Models\Modelo::where('Id_programa', $estudiante->Id_programas)
+                ->orderBy('Id_modelos', 'asc')
+                ->first();
+        }
+
+        // Calcular estadísticas adicionales
+        $estadisticas = [
+            'total_horarios' => $estudiante->horarios->count(),
+            'total_planes_pago' => $estudiante->planesPago->count(),
+            'total_evaluaciones' => $estudiante->evaluaciones()->count(),
+            'planes_activos' => $estudiante->planesPago->where('Estado_plan', 'Activo')->count(),
+        ];
+
+        return view('administrador.detallesEstudiante', compact('estudiante', 'estadisticas', 'ultimoModelo', 'proximoModelo', 'ultimaEvaluacion'));
     }
-
-    // Calcular estadísticas adicionales
-    $estadisticas = [
-        'total_horarios'   => $estudiante->horarios->count(),
-        'total_planes_pago' => $estudiante->planesPago->count(),
-        'total_evaluaciones' => $estudiante->evaluaciones()->count(),
-        'planes_activos'   => $estudiante->planesPago->where('Estado_plan', 'Activo')->count(),
-    ];
-
-    return view('administrador.detallesEstudiante', compact('estudiante', 'estadisticas', 'ultimoModelo', 'proximoModelo', 'ultimaEvaluacion'));
-}
 
 
     /**
@@ -281,7 +279,7 @@ class EstudianteController extends Controller
 
         // Cambiar el estado
         $nuevoEstado = $estudiante->Estado === 'Activo' ? 'Inactivo' : 'Activo';
-        
+
         $estudiante->update([
             'Estado' => $nuevoEstado,
             'Fecha_estado' => now()
@@ -303,7 +301,7 @@ class EstudianteController extends Controller
         $planesPago = PlanesPago::where('Id_estudiantes', $id)
             ->with([
                 'programa',
-                'cuotas' => function($query) {
+                'cuotas' => function ($query) {
                     $query->orderBy('Nro_de_cuota', 'asc');
                 }
             ])

@@ -4,20 +4,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@yield('title', 'Panel del Profesor')</title>
+    <title><?php echo $__env->yieldContent('title', 'Panel del Profesor'); ?></title>
 
-    {{-- Bootstrap CSS --}}
+    
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 
-    {{-- Bootstrap Icons --}}
+    
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
 
-    {{-- Estilos propios de cada vista --}}
-    <link rel="stylesheet" href="{{ auto_asset('css/profesor/baseProfesor.css') }}">
+    
+    <link rel="stylesheet" href="<?php echo e(auto_asset('css/profesor/baseProfesor.css')); ?>">
 
-    {{-- Estilos adicionales de cada vista --}}
-    @yield('styles')
-    @stack('styles')
+    
+    <?php echo $__env->yieldContent('styles'); ?>
+    <?php echo $__env->yieldPushContent('styles'); ?>
 </head>
 
 <body>
@@ -25,9 +25,10 @@
         <header class="header">
             <div class="logo">
                 <div class="logo-icon">e</div>
-                {{-- Correo del profesor (sin invitados) --}}
+                
                 <span class="username">
-                    {{ Auth::user()->Correo }}
+                    <?php echo e(Auth::user()->Correo); ?>
+
                 </span>
             </div>
 
@@ -39,16 +40,16 @@
 
             <!-- Menú desplegable -->
             <div class="menu-dropdown" id="menuDropdown">
-                <a href="{{ route('profesor.asistencia.index') }}" class="menu-item">
+                <a href="<?php echo e(route('profesor.asistencia.index')); ?>" class="menu-item">
                     <i class="bi bi-calendar-check"></i> Registro de Asistencia
                 </a>
-                <a href="{{ route('profesor.asistencia.historial') }}" class="menu-item">
+                <a href="<?php echo e(route('profesor.asistencia.historial')); ?>" class="menu-item">
                     <i class="bi bi-clock-history"></i> Historial de Asistencias
                 </a>
-                <a href="{{ route('profesor.listado-alumnos', 'asignados') }}" class="menu-item">
+                <a href="<?php echo e(route('profesor.listado-alumnos', 'asignados')); ?>" class="menu-item">
                     <i class="bi bi-people-fill"></i> Alumnos Asignados
                 </a>
-                <a href="{{ route('profesor.listado-alumnos', 'recuperatoria') }}" class="menu-item">
+                <a href="<?php echo e(route('profesor.listado-alumnos', 'recuperatoria')); ?>" class="menu-item">
                     <i class="bi bi-calendar-event"></i> Clase Recuperatoria
                 </a>
                 <a href="#" class="menu-item menu-item-logout"
@@ -57,23 +58,23 @@
                 </a>
             </div>
 
-            <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
-                @csrf
+            <form id="logout-form" action="<?php echo e(route('logout')); ?>" method="POST" style="display: none;">
+                <?php echo csrf_field(); ?>
             </form>
         </header>
 
         <main>
-            {{-- Contenido principal de cada vista --}}
-            @yield('content')
+            
+            <?php echo $__env->yieldContent('content'); ?>
         </main>
     </div>
 
-    {{-- Bootstrap JS --}}
+    
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    {{-- FontAwesome --}}
+    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-    {{-- Scripts base --}}
+    
     <script>
         function toggleMenu() {
             const dropdown = document.getElementById('menuDropdown');
@@ -91,9 +92,9 @@
         }
     </script>
 
-    {{-- Scripts adicionales de cada vista --}}
-    @yield('scripts')
-    @stack('scripts')
+    
+    <?php echo $__env->yieldContent('scripts'); ?>
+    <?php echo $__env->yieldPushContent('scripts'); ?>
 </body>
 
-</html>
+</html><?php /**PATH C:\Users\DANTE\Desktop\YebSis\resources\views/profesor/baseProfesor.blade.php ENDPATH**/ ?>

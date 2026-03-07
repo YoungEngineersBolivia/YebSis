@@ -1,52 +1,51 @@
-@extends('profesor.baseProfesor')
-
-@section('content')
+<?php $__env->startSection('content'); ?>
     <div class="container-fluid">
         <div class="row mb-4">
             <div class="col">
                 <div class="d-flex align-items-center gap-3 mb-3">
-                    <a href="{{ route('profesor.home') }}" class="btn btn-outline-secondary">
+                    <a href="<?php echo e(route('profesor.home')); ?>" class="btn btn-outline-secondary">
                         <i class="bi bi-arrow-left me-2"></i>Volver
                     </a>
                 </div>
                 <h2 class="text-uppercase fw-bold text-dark">
                     <i class="bi bi-calendar-check me-2"></i> Registro de Asistencia
                 </h2>
-                <p class="text-muted mb-0">Profesor: {{ $profesor->persona->Nombre }} {{ $profesor->persona->Apellido }}</p>
+                <p class="text-muted mb-0">Profesor: <?php echo e($profesor->persona->Nombre); ?> <?php echo e($profesor->persona->Apellido); ?></p>
             </div>
         </div>
 
-        @if(session('success'))
+        <?php if(session('success')): ?>
             <div class="alert alert-success alert-dismissible fade show" role="alert">
-                <i class="bi bi-check-circle me-2"></i> {{ session('success') }}
+                <i class="bi bi-check-circle me-2"></i> <?php echo e(session('success')); ?>
+
                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
-        @endif
+        <?php endif; ?>
 
-        @if($errors->any())
+        <?php if($errors->any()): ?>
             <div class="alert alert-danger alert-dismissible fade show" role="alert">
                 <i class="bi bi-exclamation-triangle me-2"></i> <strong>Error:</strong> Por favor revise el formulario.
                 <ul>
-                    @foreach ($errors->all() as $error)
-                        <li>{{ $error }}</li>
-                    @endforeach
+                    <?php $__currentLoopData = $errors->all(); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $error): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                        <li><?php echo e($error); ?></li>
+                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                 </ul>
                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
-        @endif
+        <?php endif; ?>
 
         <div class="card shadow-sm border-0">
             <div class="card-body p-4">
-                <form action="{{ route('profesor.asistencia.store') }}" method="POST" id="asistenciaForm"
+                <form action="<?php echo e(route('profesor.asistencia.store')); ?>" method="POST" id="asistenciaForm"
                     onsubmit="confirmarEnvio(event)">
-                    @csrf
-                    <input type="hidden" name="profesor_id" value="{{ $profesor->Id_profesores }}">
+                    <?php echo csrf_field(); ?>
+                    <input type="hidden" name="profesor_id" value="<?php echo e($profesor->Id_profesores); ?>">
 
                     <div class="row mb-4 align-items-end">
                         <div class="col-md-5 mb-3 mb-md-0">
                             <label for="fecha" class="form-label fw-bold">Fecha de Clase</label>
                             <input type="date" name="fecha" id="fecha" class="form-control"
-                                value="{{ request('fecha', date('Y-m-d')) }}" onchange="loadAttendance()" required>
+                                value="<?php echo e(request('fecha', date('Y-m-d'))); ?>" onchange="loadAttendance()" required>
                         </div>
                         <div class="col-md-5 mb-3 mb-md-0 position-relative">
                             <label for="search_estudiante" class="form-label fw-bold">Añadir Estudiante</label>
@@ -65,15 +64,15 @@
                         </div>
                     </div>
 
-                    <div id="no-students-msg" class="text-center py-5 {{ $estudiantes->isEmpty() ? '' : 'd-none' }}">
+                    <div id="no-students-msg" class="text-center py-5 <?php echo e($estudiantes->isEmpty() ? '' : 'd-none'); ?>">
                         <i class="bi bi-people display-4 text-muted mb-3 d-block"></i>
                         <p class="text-muted lead">Usa el buscador para añadir a los alumnos que asistieron hoy.</p>
                     </div>
 
-                    {{-- Vista de tabla para pantallas grandes --}}
+                    
                     <div class="d-none d-lg-block">
                         <div class="table-responsive">
-                            <table class="table table-hover align-middle {{ $estudiantes->isEmpty() ? 'd-none' : '' }}"
+                            <table class="table table-hover align-middle <?php echo e($estudiantes->isEmpty() ? 'd-none' : ''); ?>"
                                 id="attendance-table">
                                 <thead class="table-light">
                                     <tr>
@@ -85,15 +84,15 @@
                                     </tr>
                                 </thead>
                                 <tbody id="attendance-tbody">
-                                    {{-- Las filas se añadirán dinámicamente --}}
+                                    
                                 </tbody>
                             </table>
                         </div>
                     </div>
 
-                    {{-- Vista de cards para móviles/tablets --}}
+                    
                     <div class="d-lg-none" id="attendance-cards">
-                        {{-- Las cards se añadirán dinámicamente --}}
+                        
                     </div>
                 </form>
             </div>
@@ -204,7 +203,7 @@
 
             // Buscador más rápido: bajamos de 300ms a 100ms
             searchTimeout = setTimeout(() => {
-                fetch(`{{ route('profesor.asistencia.buscarEstudiantes') }}?q=${encodeURIComponent(query)}`)
+                fetch(`<?php echo e(route('profesor.asistencia.buscarEstudiantes')); ?>?q=${encodeURIComponent(query)}`)
                     .then(res => res.json())
                     .then(data => {
                         searchResults.innerHTML = '';
@@ -303,7 +302,7 @@
             const btnText = document.getElementById('btn-text');
             if (!fechaVal) return;
 
-            fetch(`{{ route('profesor.asistencia.cargar') }}?fecha=${fechaVal}`)
+            fetch(`<?php echo e(route('profesor.asistencia.cargar')); ?>?fecha=${fechaVal}`)
                 .then(res => res.json())
                 .then(data => {
                     // Limpiar lista actual
@@ -375,19 +374,19 @@
         document.addEventListener('DOMContentLoaded', () => {
             loadAttendance();
 
-            @if(session('success'))
+            <?php if(session('success')): ?>
                 Swal.fire({
                     icon: 'success',
                     title: '¡Registrado!',
-                    text: "{{ session('success') }}",
+                    text: "<?php echo e(session('success')); ?>",
                     timer: 3000,
                     showConfirmButton: false
                 });
-            @endif
+            <?php endif; ?>
             });
     </script>
 
-    {{-- SweetAlert2 --}}
+    
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
         function removeStudent(id) {
@@ -506,4 +505,5 @@
             }
         }
     </style>
-@endsection
+<?php $__env->stopSection(); ?>
+<?php echo $__env->make('profesor.baseProfesor', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\Users\DANTE\Desktop\YebSis\resources\views/profesor/asistenciaProfesor.blade.php ENDPATH**/ ?>

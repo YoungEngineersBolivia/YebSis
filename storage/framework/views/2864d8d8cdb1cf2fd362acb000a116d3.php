@@ -1,11 +1,8 @@
-{{-- resources/views/profesor/evaluarAlumno.blade.php --}}
-@extends('profesor.baseProfesor')
+<?php $__env->startSection('styles'); ?>
+<link rel="stylesheet" href="<?php echo e(auto_asset('css/profesor/evaluarAlumno.css')); ?>">
+<?php $__env->stopSection(); ?>
 
-@section('styles')
-<link rel="stylesheet" href="{{ auto_asset('css/profesor/evaluarAlumno.css') }}">
-@endsection
-
-@section('content')
+<?php $__env->startSection('content'); ?>
 <div class="evaluation-container">
     <div class="d-flex align-items-center gap-3 mb-3">
         <a href="javascript:history.back()" class="btn btn-outline-secondary">
@@ -14,114 +11,118 @@
     </div>
     
     <h2 class="evaluation-title">
-        @if($evaluacionesExistentes->count() > 0)
+        <?php if($evaluacionesExistentes->count() > 0): ?>
             <i class="fas fa-edit me-2"></i>Editar Evaluación
-        @else
+        <?php else: ?>
             <i class="fas fa-clipboard-check me-2"></i>Evaluar Alumno
-        @endif
+        <?php endif; ?>
     </h2>    
     
-    {{-- Banner de información del estudiante --}}
+    
     <div class="student-info-banner">
-        <div class="info-banner-item">{{ $estudiante->persona->Nombre ?? 'Nombre Alumno' }} {{ $estudiante->persona->Apellido ?? '' }}</div>
-        <div class="info-banner-item">{{ $estudiante->programa->Nombre ?? 'Programa' }}</div>
+        <div class="info-banner-item"><?php echo e($estudiante->persona->Nombre ?? 'Nombre Alumno'); ?> <?php echo e($estudiante->persona->Apellido ?? ''); ?></div>
+        <div class="info-banner-item"><?php echo e($estudiante->programa->Nombre ?? 'Programa'); ?></div>
     </div>
 
-    {{-- Mensajes de alerta --}}
-    @if(session('success'))
+    
+    <?php if(session('success')): ?>
         <div class="alert alert-success alert-dismissible fade show" role="alert">
-            <i class="fas fa-check-circle me-2"></i>{{ session('success') }}
+            <i class="fas fa-check-circle me-2"></i><?php echo e(session('success')); ?>
+
             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         </div>
-    @endif
+    <?php endif; ?>
 
-    @if(session('error'))
+    <?php if(session('error')): ?>
         <div class="alert alert-danger alert-dismissible fade show" role="alert">
-            <i class="fas fa-exclamation-circle me-2"></i>{{ session('error') }}
+            <i class="fas fa-exclamation-circle me-2"></i><?php echo e(session('error')); ?>
+
             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         </div>
-    @endif
+    <?php endif; ?>
 
-    @if($errors->any())
+    <?php if($errors->any()): ?>
         <div class="alert alert-danger alert-dismissible fade show" role="alert">
             <strong>Errores:</strong>
             <ul class="mb-0">
-                @foreach($errors->all() as $error)
-                    <li>{{ $error }}</li>
-                @endforeach
+                <?php $__currentLoopData = $errors->all(); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $error): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                    <li><?php echo e($error); ?></li>
+                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
             </ul>
         </div>
-    @endif
+    <?php endif; ?>
 
-    @if($preguntas->isEmpty())
-        {{-- No hay preguntas --}}
+    <?php if($preguntas->isEmpty()): ?>
+        
         <div class="alert alert-warning">
             <i class="fas fa-exclamation-triangle me-2"></i>
             <strong>No hay preguntas configuradas</strong><br>
             Este programa no tiene preguntas de evaluación. Contacta al administrador para que las agregue.
         </div>
-    @else
-        <form action="{{ route('profesor.guardar-evaluacion') }}" method="POST" id="evaluationForm">
-            @csrf
-            <input type="hidden" name="estudiante_id" value="{{ $estudiante->Id_estudiantes ?? '' }}">
+    <?php else: ?>
+        <form action="<?php echo e(route('profesor.guardar-evaluacion')); ?>" method="POST" id="evaluationForm">
+            <?php echo csrf_field(); ?>
+            <input type="hidden" name="estudiante_id" value="<?php echo e($estudiante->Id_estudiantes ?? ''); ?>">
             
-            {{-- Selector de Modelo --}}
+            
             <div class="evaluation-section">
                 <div class="section-title">
                     <i class="fas fa-cubes me-2"></i>Selecciona el Modelo
                 </div>
                 <select name="modelo_id" id="modelo_select" class="form-select" required>
                     <option value="">-- Selecciona un modelo --</option>
-                    @foreach($modelos as $modelo)
-                        <option value="{{ $modelo->Id_modelos }}" 
-                                {{ $modeloSeleccionado == $modelo->Id_modelos ? 'selected' : '' }}>
-                            {{ $modelo->Nombre_modelo }} @if(isset($modelosEvaluados) && in_array($modelo->Id_modelos, $modelosEvaluados)) ✅ @endif
+                    <?php $__currentLoopData = $modelos; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $modelo): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                        <option value="<?php echo e($modelo->Id_modelos); ?>" 
+                                <?php echo e($modeloSeleccionado == $modelo->Id_modelos ? 'selected' : ''); ?>>
+                            <?php echo e($modelo->Nombre_modelo); ?> <?php if(isset($modelosEvaluados) && in_array($modelo->Id_modelos, $modelosEvaluados)): ?> ✅ <?php endif; ?>
                         </option>
-                    @endforeach
+                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                 </select>
             </div>
 
-            {{-- Preguntas dinámicas --}}
-            @foreach($preguntas as $index => $pregunta)
-                @php
+            
+            <?php $__currentLoopData = $preguntas; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $index => $pregunta): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                <?php
                     // Obtener respuesta guardada si existe
                     $evaluacionPrevia = $evaluacionesExistentes->get($pregunta->Id_preguntas);
                     $respuestaSeleccionada = $evaluacionPrevia->Id_respuestas ?? null;
-                @endphp
+                ?>
                 <div class="evaluation-section">
-                    <div class="section-title">{{ $pregunta->Pregunta }}</div>
+                    <div class="section-title"><?php echo e($pregunta->Pregunta); ?></div>
                     <div class="option-buttons">
-                        @foreach($respuestas as $respuesta)
+                        <?php $__currentLoopData = $respuestas; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $respuesta): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                         <button type="button" 
-                                class="option-btn {{ $respuestaSeleccionada == $respuesta->Id_respuestas ? 'selected-' . ($respuesta->Id_respuestas == 1 ? 'si' : ($respuesta->Id_respuestas == 2 ? 'no' : 'proceso')) : '' }}" 
-                                data-question="pregunta_{{ $pregunta->Id_preguntas }}" 
-                                data-value="{{ $respuesta->Id_respuestas }}">
-                            {{ $respuesta->Respuesta }}
+                                class="option-btn <?php echo e($respuestaSeleccionada == $respuesta->Id_respuestas ? 'selected-' . ($respuesta->Id_respuestas == 1 ? 'si' : ($respuesta->Id_respuestas == 2 ? 'no' : 'proceso')) : ''); ?>" 
+                                data-question="pregunta_<?php echo e($pregunta->Id_preguntas); ?>" 
+                                data-value="<?php echo e($respuesta->Id_respuestas); ?>">
+                            <?php echo e($respuesta->Respuesta); ?>
+
                         </button>
-                        @endforeach
+                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                     </div>
                     <input type="hidden" 
-                           name="respuestas[{{ $pregunta->Id_preguntas }}]" 
-                           id="pregunta_{{ $pregunta->Id_preguntas }}_value"
-                           value="{{ $respuestaSeleccionada }}">
+                           name="respuestas[<?php echo e($pregunta->Id_preguntas); ?>]" 
+                           id="pregunta_<?php echo e($pregunta->Id_preguntas); ?>_value"
+                           value="<?php echo e($respuestaSeleccionada); ?>">
                 </div>
-            @endforeach
+            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
             
-            {{-- Botones de acción --}}
+            
             <div class="d-flex gap-2 mt-4">
                 <button type="button" class="btn-preview" id="btnPreview">
                     <i class="fas fa-eye me-2"></i>Vista Previa
                 </button>
                 <button type="submit" class="btn-save">
                     <i class="fas fa-save me-2"></i>
-                    {{ $evaluacionesExistentes->count() > 0 ? 'Actualizar Evaluación' : 'Guardar Evaluación' }}
+                    <?php echo e($evaluacionesExistentes->count() > 0 ? 'Actualizar Evaluación' : 'Guardar Evaluación'); ?>
+
                 </button>
             </div>
         </form>
-    @endif
+    <?php endif; ?>
 </div>
 
-{{-- Modal de Vista Previa --}}
+
 <div class="modal fade" id="previewModal" tabindex="-1" aria-labelledby="previewModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-scrollable">
         <div class="modal-content">
@@ -137,13 +138,13 @@
                     Revisa las respuestas antes de guardar. Puedes cerrar esta ventana para editar.
                 </div>
                 
-                <h6 class="fw-bold mb-3">Estudiante: {{ $estudiante->persona->Nombre }} {{ $estudiante->persona->Apellido }}</h6>
-                <h6 class="fw-bold mb-3">Programa: {{ $estudiante->programa->Nombre }}</h6>
+                <h6 class="fw-bold mb-3">Estudiante: <?php echo e($estudiante->persona->Nombre); ?> <?php echo e($estudiante->persona->Apellido); ?></h6>
+                <h6 class="fw-bold mb-3">Programa: <?php echo e($estudiante->programa->Nombre); ?></h6>
                 <h6 class="fw-bold mb-4">Modelo: <span id="preview-modelo-nombre"></span></h6>
 
                 <h6 class="fw-bold mb-3">Respuestas:</h6>
                 <div id="preview-respuestas" class="list-group">
-                    {{-- Se llenará dinámicamente con JavaScript --}}
+                    
                 </div>
             </div>
             <div class="modal-footer">
@@ -158,7 +159,7 @@
     </div>
 </div>
 
-<script src="{{ auto_asset('js/profesor/evaluarAlumno.js') }}"></script>
+<script src="<?php echo e(auto_asset('js/profesor/evaluarAlumno.js')); ?>"></script>
 
 <script>
 // Script para vista previa
@@ -183,9 +184,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Datos de preguntas y respuestas
-    const preguntas = @json($preguntas);
-    const respuestas = @json($respuestas);
-    const modelos = @json($modelos);
+    const preguntas = <?php echo json_encode($preguntas, 15, 512) ?>;
+    const respuestas = <?php echo json_encode($respuestas, 15, 512) ?>;
+    const modelos = <?php echo json_encode($modelos, 15, 512) ?>;
 
     btnPreview.addEventListener('click', () => {
         // Validar que se seleccionó modelo
@@ -252,4 +253,5 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 </script>
-@endsection
+<?php $__env->stopSection(); ?>
+<?php echo $__env->make('profesor.baseProfesor', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\Users\DANTE\Desktop\YebSis\resources\views/profesor/evaluarAlumno.blade.php ENDPATH**/ ?>

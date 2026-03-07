@@ -32,7 +32,7 @@ use App\Http\Controllers\MotoresAsignadosController;
 use App\Http\Controllers\ForgotPasswordController;
 use App\Http\Controllers\ResetPasswordController;
 use App\Http\Controllers\ModeloController;
-use App\Http\Controllers\CuotaController;
+use App\Http\Controllers\EvaluacionesEstudiantesController;
 use App\Http\Controllers\ProfesorInventarioController;
 use App\Http\Controllers\MotorMovimientosController;
 use App\Http\Controllers\PreguntasController;
@@ -133,7 +133,7 @@ Route::middleware(['auth', 'role:administrador'])->prefix('administrador')->grou
     Route::get('/estudiantes/{id}/evaluaciones', [EstudianteController::class, 'evaluaciones'])->name('estudiantes.evaluaciones');
     Route::get('/estudiantes/{id}/horarios', [EstudianteController::class, 'horarios'])->name('estudiantes.horarios');
     Route::get('/estudiantes/exportar-pdf', [EstudianteController::class, 'exportarPDF'])->name('estudiantes.exportarPDF');
-    Route::put('/cuotas/{id}/registrar-pago', [CuotaController::class, 'registrarPago'])->name('cuotas.registrarPago');
+    Route::put('/cuotas/{id}/registrar-pago', [PagosController::class, 'registrarPago'])->name('cuotas.registrarPago');
 
     // Estudiantes Activos
     Route::get('/estudiantesActivos', [EstudiantesActivosController::class, 'index'])->name('estudiantesActivos');
@@ -273,11 +273,11 @@ Route::middleware(['auth', 'role:administrador'])->prefix('administrador')->grou
 
     /*-------------EVALUACIONES------------ */
     // Ruta para ver TODAS las evaluaciones (con buscador)
-    Route::get('/evaluaciones', [EvaluacionesEstudianteController::class, 'index'])
+    Route::get('/evaluaciones', [EvaluacionesEstudiantesController::class, 'index'])
         ->name('evaluaciones.index');
 
     // Ruta para ver evaluaciones de UN estudiante específico
-    Route::get('/evaluaciones/estudiante/{id}', [EvaluacionesEstudianteController::class, 'show'])
+    Route::get('/evaluaciones/estudiante/{id}', [EvaluacionesEstudiantesController::class, 'show'])
         ->name('evaluaciones.estudiante.show');
 
     // Cambiar estado del estudiante
@@ -412,7 +412,10 @@ Route::middleware(['auth', 'role:profesor'])->prefix('profesor')->name('profesor
 
     /* ----------------- ASISTENCIA - PROFESOR ----------------- */
     Route::get('/asistencia', [\App\Http\Controllers\AsistenciaProfesorController::class, 'index'])->name('asistencia.index');
+    Route::get('/asistencia/historial', [\App\Http\Controllers\AsistenciaProfesorController::class, 'historial'])->name('asistencia.historial');
     Route::post('/asistencia', [\App\Http\Controllers\AsistenciaProfesorController::class, 'store'])->name('asistencia.store');
+    Route::get('/buscar-estudiantes-asistencia', [\App\Http\Controllers\AsistenciaProfesorController::class, 'buscarEstudiantes'])->name('asistencia.buscarEstudiantes');
+    Route::get('/cargar-asistencia-fecha', [\App\Http\Controllers\AsistenciaProfesorController::class, 'obtenerAsistenciaPorFecha'])->name('asistencia.cargar');
 
     /* ----------------- CLASES DE PRUEBA - PROFESOR ----------------- */
     Route::get('/clases-prueba', [\App\Http\Controllers\ProfesorTrialClassController::class, 'index'])->name('clases-prueba.index');
