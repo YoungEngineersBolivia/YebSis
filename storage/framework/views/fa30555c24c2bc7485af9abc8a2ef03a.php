@@ -1,10 +1,8 @@
-@extends('/administrador/baseAdministrador')
+<?php $__env->startSection('title', 'Detalles del Tutor'); ?>
 
-@section('title', 'Detalles del Tutor')
-
-@section('styles')
-    <meta name="csrf-token" content="{{ csrf_token() }}">
-    <link href="{{ auto_asset('css/style.css') }}" rel="stylesheet">
+<?php $__env->startSection('styles'); ?>
+    <meta name="csrf-token" content="<?php echo e(csrf_token()); ?>">
+    <link href="<?php echo e(auto_asset('css/style.css')); ?>" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
         .info-card {
@@ -92,29 +90,31 @@
             color: #6c757d;
         }
     </style>
-@endsection
+<?php $__env->stopSection(); ?>
 
-@section('content')
+<?php $__env->startSection('content'); ?>
     <div class="container-fluid mt-4">
 
-        {{-- Mensajes de sesión --}}
-        @if(session('success'))
+        
+        <?php if(session('success')): ?>
             <div class="alert alert-success alert-dismissible fade show" role="alert">
-                {{ session('success') }}
+                <?php echo e(session('success')); ?>
+
                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
             </div>
-        @endif
-        @if(session('error'))
+        <?php endif; ?>
+        <?php if(session('error')): ?>
             <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                {{ session('error') }}
+                <?php echo e(session('error')); ?>
+
                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
             </div>
-        @endif
+        <?php endif; ?>
 
         <div class="d-flex justify-content-between align-items-center mb-4">
             <h1 class="mb-0"><i class="bi bi-person-badge"></i> Detalles del Tutor</h1>
             <div class="d-flex gap-2">
-                <a href="{{ route('tutores.index') }}" class="btn btn-secondary">
+                <a href="<?php echo e(route('tutores.index')); ?>" class="btn btn-secondary">
                     <i class="bi bi-arrow-left"></i> Volver
                 </a>
             </div>
@@ -127,47 +127,51 @@
                 <div class="col-md-6">
                     <div class="info-row">
                         <span class="info-label">Nombre Completo:</span>
-                        <span class="info-value">{{ $tutor->persona->Nombre }} {{ $tutor->persona->Apellido }}</span>
+                        <span class="info-value"><?php echo e($tutor->persona->Nombre); ?> <?php echo e($tutor->persona->Apellido); ?></span>
                     </div>
                     <div class="info-row">
                         <span class="info-label">Celular:</span>
                         <span class="info-value">
-                            <i class="bi bi-phone"></i> {{ $tutor->persona->Celular ?? 'No especificado' }}
+                            <i class="bi bi-phone"></i> <?php echo e($tutor->persona->Celular ?? 'No especificado'); ?>
+
                         </span>
                     </div>
                     <div class="info-row">
                         <span class="info-label">Dirección:</span>
                         <span class="info-value">
-                            <i class="bi bi-geo-alt"></i> {{ $tutor->persona->Direccion_domicilio ?? 'No especificado' }}
+                            <i class="bi bi-geo-alt"></i> <?php echo e($tutor->persona->Direccion_domicilio ?? 'No especificado'); ?>
+
                         </span>
                     </div>
                     <div class="info-row">
                         <span class="info-label">Género:</span>
-                        <span class="info-value">{{ $tutor->persona->Genero ?? 'No especificado' }}</span>
+                        <span class="info-value"><?php echo e($tutor->persona->Genero ?? 'No especificado'); ?></span>
                     </div>
                 </div>
                 <div class="col-md-6">
                     <div class="info-row">
                         <span class="info-label">Correo:</span>
                         <span class="info-value">
-                            <i class="bi bi-envelope"></i> {{ $tutor->usuario->Correo }}
+                            <i class="bi bi-envelope"></i> <?php echo e($tutor->usuario->Correo); ?>
+
                         </span>
                     </div>
                     <div class="info-row">
                         <span class="info-label">Parentesco:</span>
                         <span class="info-value">
-                            <i class="bi bi-people"></i> {{ $tutor->Parentesco }}
+                            <i class="bi bi-people"></i> <?php echo e($tutor->Parentesco); ?>
+
                         </span>
                     </div>
                     <div class="info-row">
                         <span class="info-label">Descuento:</span>
                         <span class="info-value">
-                            <span class="badge bg-success">{{ $tutor->Descuento ?? 0 }}%</span>
+                            <span class="badge bg-success"><?php echo e($tutor->Descuento ?? 0); ?>%</span>
                         </span>
                     </div>
                     <div class="info-row">
                         <span class="info-label">NIT:</span>
-                        <span class="info-value">{{ $tutor->Nit ?? 'No registrado' }}</span>
+                        <span class="info-value"><?php echo e($tutor->Nit ?? 'No registrado'); ?></span>
                     </div>
                 </div>
             </div>
@@ -177,71 +181,79 @@
         <div class="mt-4">
             <h3 class="mb-3">
                 <i class="bi bi-people-fill text-primary"></i> Estudiantes Asociados
-                <span class="badge bg-primary">{{ $tutor->estudiantes->count() }}</span>
+                <span class="badge bg-primary"><?php echo e($tutor->estudiantes->count()); ?></span>
             </h3>
 
-            @if($tutor->estudiantes->isEmpty())
+            <?php if($tutor->estudiantes->isEmpty()): ?>
                 <div class="alert alert-info">
                     <i class="bi bi-info-circle"></i> Este tutor no tiene estudiantes asociados.
                 </div>
-            @else
-                @foreach($tutor->estudiantes as $estudiante)
+            <?php else: ?>
+                <?php $__currentLoopData = $tutor->estudiantes; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $estudiante): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                     <div class="student-card">
                         <div class="row align-items-center mb-3">
                             <div class="col-md-8">
                                 <h4 class="mb-1">
                                     <i class="bi bi-mortarboard-fill text-primary"></i>
-                                    {{ $estudiante->persona->Nombre }} {{ $estudiante->persona->Apellido }}
+                                    <?php echo e($estudiante->persona->Nombre); ?> <?php echo e($estudiante->persona->Apellido); ?>
+
                                 </h4>
                                 <div class="d-flex gap-3 flex-wrap">
                                     <small class="text-muted">
-                                        <i class="bi bi-hash"></i> <strong>Código:</strong> {{ $estudiante->Cod_estudiante }}
+                                        <i class="bi bi-hash"></i> <strong>Código:</strong> <?php echo e($estudiante->Cod_estudiante); ?>
+
                                     </small>
                                     <small class="text-muted">
                                         <i class="bi bi-calendar"></i> <strong>Estado:</strong>
-                                        <span class="badge bg-{{ $estudiante->Estado == 'Activo' ? 'success' : 'secondary' }}">
-                                            {{ $estudiante->Estado ?? 'No especificado' }}
+                                        <span class="badge bg-<?php echo e($estudiante->Estado == 'Activo' ? 'success' : 'secondary'); ?>">
+                                            <?php echo e($estudiante->Estado ?? 'No especificado'); ?>
+
                                         </span>
                                     </small>
                                     <small class="text-muted">
                                         <i class="bi bi-book"></i> <strong>Programa:</strong>
-                                        {{ $estudiante->programa->Nombre ?? 'N/A' }}
+                                        <?php echo e($estudiante->programa->Nombre ?? 'N/A'); ?>
+
                                     </small>
                                     <small class="text-muted">
                                         <i class="bi bi-building"></i> <strong>Sucursal:</strong>
-                                        {{ $estudiante->sucursal->Nombre ?? 'N/A' }}
+                                        <?php echo e($estudiante->sucursal->Nombre ?? 'N/A'); ?>
+
                                     </small>
                                 </div>
                             </div>
                             <div class="col-md-4 text-end">
                                 <div class="stat-box">
                                     <div class="stat-number text-primary">
-                                        {{ $estudiante->planesPago ? $estudiante->planesPago->count() : 0 }}</div>
+                                        <?php echo e($estudiante->planesPago ? $estudiante->planesPago->count() : 0); ?></div>
                                     <div class="stat-label">Planes de Pago</div>
                                 </div>
                             </div>
                         </div>
 
-                        @if($estudiante->planesPago->isEmpty())
+                        <?php if($estudiante->planesPago->isEmpty()): ?>
                             <div class="alert alert-warning mb-0">
                                 <i class="bi bi-exclamation-triangle"></i> No hay planes de pago registrados para este estudiante.
                             </div>
-                        @else
-                            @foreach($estudiante->planesPago as $index => $plan)
+                        <?php else: ?>
+                            <?php $__currentLoopData = $estudiante->planesPago; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $index => $plan): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                 <div class="plan-card">
                                     <div class="d-flex justify-content-between align-items-start mb-3">
                                         <div>
                                             <h5 class="mb-1">
-                                                <i class="bi bi-credit-card"></i> Plan de Pago #{{ $index + 1 }}
+                                                <i class="bi bi-credit-card"></i> Plan de Pago #<?php echo e($index + 1); ?>
+
                                             </h5>
                                             <small class="text-muted">
                                                 <i class="bi bi-calendar-check"></i>
-                                                Fecha: {{ \Carbon\Carbon::parse($plan->fecha_plan_pagos)->format('d/m/Y') }}
+                                                Fecha: <?php echo e(\Carbon\Carbon::parse($plan->fecha_plan_pagos)->format('d/m/Y')); ?>
+
                                             </small>
                                         </div>
                                         <div class="text-end">
                                             <div class="h5 mb-0 text-primary">
-                                                Bs. {{ number_format($plan->Monto_total, 2) }}
+                                                Bs. <?php echo e(number_format($plan->Monto_total, 2)); ?>
+
                                             </div>
                                             <small class="text-muted">Monto Total</small>
                                         </div>
@@ -249,17 +261,19 @@
 
                                     <div class="mb-2">
                                         <strong><i class="bi bi-book"></i> Programa:</strong>
-                                        {{ $plan->programa->Nombre ?? 'No especificado' }}
+                                        <?php echo e($plan->programa->Nombre ?? 'No especificado'); ?>
+
                                     </div>
                                     <div class="mb-3">
                                         <strong><i class="bi bi-info-circle"></i> Estado del Plan:</strong>
-                                        <span class="badge bg-{{ $plan->Estado_plan == 'Activo' ? 'success' : 'secondary' }}">
-                                            {{ $plan->Estado_plan ?? 'No especificado' }}
+                                        <span class="badge bg-<?php echo e($plan->Estado_plan == 'Activo' ? 'success' : 'secondary'); ?>">
+                                            <?php echo e($plan->Estado_plan ?? 'No especificado'); ?>
+
                                         </span>
                                     </div>
 
-                                    @if($plan->cuotas->isNotEmpty())
-                                        @php
+                                    <?php if($plan->cuotas->isNotEmpty()): ?>
+                                        <?php
                                             $totalCuotas = $plan->cuotas->count();
                                             $cuotasPagadas = $plan->cuotas->where('Estado_cuota', 'Pagado')->count();
                                             $cuotasPendientes = $plan->cuotas->where('Estado_cuota', 'Pendiente')->count();
@@ -270,13 +284,13 @@
                                             $porcentajePagado = $totalCuotas > 0 ? round(($cuotasPagadas / $totalCuotas) * 100, 1) : 0;
                                             $montoPagado = $plan->cuotas->where('Estado_cuota', 'Pagado')->sum('Monto_pagado');
                                             $montoPendiente = $plan->Monto_total - $montoPagado;
-                                        @endphp
+                                        ?>
 
                                         <div class="progress-summary">
                                             <div class="row mb-3">
                                                 <div class="col-md-3">
                                                     <div class="stat-box">
-                                                        <div class="stat-number text-success">{{ $cuotasPagadas }}</div>
+                                                        <div class="stat-number text-success"><?php echo e($cuotasPagadas); ?></div>
                                                         <div class="stat-label">
                                                             <i class="bi bi-check-circle-fill"></i> Pagadas
                                                         </div>
@@ -284,7 +298,7 @@
                                                 </div>
                                                 <div class="col-md-3">
                                                     <div class="stat-box">
-                                                        <div class="stat-number text-warning">{{ $cuotasPendientes }}</div>
+                                                        <div class="stat-number text-warning"><?php echo e($cuotasPendientes); ?></div>
                                                         <div class="stat-label">
                                                             <i class="bi bi-clock-fill"></i> Pendientes
                                                         </div>
@@ -292,7 +306,7 @@
                                                 </div>
                                                 <div class="col-md-3">
                                                     <div class="stat-box">
-                                                        <div class="stat-number text-danger">{{ $cuotasVencidas }}</div>
+                                                        <div class="stat-number text-danger"><?php echo e($cuotasVencidas); ?></div>
                                                         <div class="stat-label">
                                                             <i class="bi bi-exclamation-circle-fill"></i> Vencidas
                                                         </div>
@@ -300,7 +314,7 @@
                                                 </div>
                                                 <div class="col-md-3">
                                                     <div class="stat-box">
-                                                        <div class="stat-number">{{ $totalCuotas }}</div>
+                                                        <div class="stat-number"><?php echo e($totalCuotas); ?></div>
                                                         <div class="stat-label">
                                                             <i class="bi bi-list-ol"></i> Total
                                                         </div>
@@ -311,13 +325,14 @@
                                             <div class="mb-2">
                                                 <div class="d-flex justify-content-between mb-1">
                                                     <span><strong>Progreso de Pagos</strong></span>
-                                                    <span><strong>{{ $porcentajePagado }}%</strong></span>
+                                                    <span><strong><?php echo e($porcentajePagado); ?>%</strong></span>
                                                 </div>
                                                 <div class="progress" style="height: 25px;">
                                                     <div class="progress-bar bg-success" role="progressbar"
-                                                        style="width: {{ $porcentajePagado }}%" aria-valuenow="{{ $porcentajePagado }}"
+                                                        style="width: <?php echo e($porcentajePagado); ?>%" aria-valuenow="<?php echo e($porcentajePagado); ?>"
                                                         aria-valuemin="0" aria-valuemax="100">
-                                                        {{ $cuotasPagadas }}/{{ $totalCuotas }}
+                                                        <?php echo e($cuotasPagadas); ?>/<?php echo e($totalCuotas); ?>
+
                                                     </div>
                                                 </div>
                                             </div>
@@ -325,11 +340,11 @@
                                             <div class="d-flex justify-content-between mt-2">
                                                 <span>
                                                     <strong>Pagado:</strong>
-                                                    <span class="text-success">Bs. {{ number_format($montoPagado, 2) }}</span>
+                                                    <span class="text-success">Bs. <?php echo e(number_format($montoPagado, 2)); ?></span>
                                                 </span>
                                                 <span>
                                                     <strong>Pendiente:</strong>
-                                                    <span class="text-danger">Bs. {{ number_format($montoPendiente, 2) }}</span>
+                                                    <span class="text-danger">Bs. <?php echo e(number_format($montoPendiente, 2)); ?></span>
                                                 </span>
                                             </div>
                                         </div>
@@ -346,8 +361,8 @@
                                                     </tr>
                                                 </thead>
                                                 <tbody>
-                                                    @foreach($plan->cuotas as $cuota)
-                                                        @php
+                                                    <?php $__currentLoopData = $plan->cuotas; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $cuota): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                                        <?php
                                                             $estaVencida = $cuota->Estado_cuota === 'Pendiente' &&
                                                                 \Carbon\Carbon::parse($cuota->Fecha_vencimiento)->isPast();
                                                             $estadoClass = $cuota->Estado_cuota === 'Pagado' ? 'status-pagado' :
@@ -357,71 +372,74 @@
                                                             $fechaVencimiento = \Carbon\Carbon::parse($cuota->Fecha_vencimiento);
                                                             // Convertir a entero los días
                                                             $diasRestantes = (int) $fechaVencimiento->diffInDays(\Carbon\Carbon::now(), false);
-                                                        @endphp
-                                                        <tr class="{{ $estaVencida ? 'table-danger' : '' }}">
-                                                            <td><strong>{{ $cuota->Nro_de_cuota }}</strong></td>
-                                                            <td>Bs. {{ number_format($cuota->Monto_cuota, 2) }}</td>
+                                                        ?>
+                                                        <tr class="<?php echo e($estaVencida ? 'table-danger' : ''); ?>">
+                                                            <td><strong><?php echo e($cuota->Nro_de_cuota); ?></strong></td>
+                                                            <td>Bs. <?php echo e(number_format($cuota->Monto_cuota, 2)); ?></td>
                                                             <td>
-                                                                @if($cuota->Monto_pagado)
+                                                                <?php if($cuota->Monto_pagado): ?>
                                                                     <span class="text-success">
-                                                                        Bs. {{ number_format($cuota->Monto_pagado, 2) }}
+                                                                        Bs. <?php echo e(number_format($cuota->Monto_pagado, 2)); ?>
+
                                                                     </span>
-                                                                @else
+                                                                <?php else: ?>
                                                                     <span class="text-muted">Bs. 0.00</span>
-                                                                @endif
+                                                                <?php endif; ?>
                                                             </td>
                                                             <td>
-                                                                {{ $fechaVencimiento->format('d/m/Y') }}
-                                                                @if($cuota->Estado_cuota !== 'Pagado')
-                                                                    @if($estaVencida)
+                                                                <?php echo e($fechaVencimiento->format('d/m/Y')); ?>
+
+                                                                <?php if($cuota->Estado_cuota !== 'Pagado'): ?>
+                                                                    <?php if($estaVencida): ?>
                                                                         <br><small class="text-danger">
                                                                             <i class="bi bi-exclamation-triangle"></i>
-                                                                            Vencido hace {{ abs($diasRestantes) }} días
+                                                                            Vencido hace <?php echo e(abs($diasRestantes)); ?> días
                                                                         </small>
-                                                                    @else
+                                                                    <?php else: ?>
                                                                         <br><small class="text-muted">
                                                                             <i class="bi bi-clock"></i>
-                                                                            Faltan {{ abs($diasRestantes) }} días
+                                                                            Faltan <?php echo e(abs($diasRestantes)); ?> días
                                                                         </small>
-                                                                    @endif
-                                                                @endif
+                                                                    <?php endif; ?>
+                                                                <?php endif; ?>
                                                             </td>
                                                             <td>
-                                                                <span class="payment-status-badge {{ $estadoClass }}">
-                                                                    @if($cuota->Estado_cuota === 'Pagado')
+                                                                <span class="payment-status-badge <?php echo e($estadoClass); ?>">
+                                                                    <?php if($cuota->Estado_cuota === 'Pagado'): ?>
                                                                         <i class="bi bi-check-circle"></i>
-                                                                    @elseif($estaVencida)
+                                                                    <?php elseif($estaVencida): ?>
                                                                         <i class="bi bi-exclamation-circle"></i>
-                                                                    @else
+                                                                    <?php else: ?>
                                                                         <i class="bi bi-clock"></i>
-                                                                    @endif
-                                                                    {{ $estadoTexto }}
+                                                                    <?php endif; ?>
+                                                                    <?php echo e($estadoTexto); ?>
+
                                                                 </span>
                                                             </td>
                                                         </tr>
-                                                    @endforeach
+                                                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                                 </tbody>
                                             </table>
-                                        @else
+                                        <?php else: ?>
                                             <div class="alert alert-warning mb-0">
                                                 <i class="bi bi-exclamation-triangle"></i> No hay cuotas registradas para este plan de pagos.
                                             </div>
-                                        @endif
+                                        <?php endif; ?>
 
-                                        {{-- Historial de Pagos Realizados (Corregido: Ahora se muestra siempre) --}}
+                                        
                                         <div class="mt-4 border-top pt-4">
                                             <div class="d-flex justify-content-between align-items-center mb-3">
                                                 <h6 class="fw-bold text-dark mb-0">
                                                     <i class="bi bi-receipt-cutoff me-2 text-primary"></i>Historial de Transacciones (Caja)
                                                 </h6>
-                                                <span class="badge bg-light text-dark border">{{ $plan->pagos->count() }} transacciones</span>
+                                                <span class="badge bg-light text-dark border"><?php echo e($plan->pagos->count()); ?> transacciones</span>
                                             </div>
 
-                                            @if($plan->pagos->isNotEmpty())
-                                                @php
+                                            <?php if($plan->pagos->isNotEmpty()): ?>
+                                                <?php
                                                     $pagosOrdenados = $plan->pagos->sortByDesc('Id_pagos');
                                                     $totalTransacciones = $plan->pagos->count();
-                                                @endphp
+                                                ?>
                                                 <div class="table-responsive">
                                                     <table class="table table-sm table-hover align-middle" style="font-size: 0.85rem;">
                                                         <thead class="bg-light text-muted small text-uppercase">
@@ -434,62 +452,66 @@
                                                             </tr>
                                                         </thead>
                                                         <tbody>
-                                                            @foreach ($pagosOrdenados as $pago)
-                                                                @php
+                                                            <?php $__currentLoopData = $pagosOrdenados; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $pago): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                                                <?php
                                                                     $nroPago = $totalTransacciones - $loop->index - 1;
-                                                                @endphp
+                                                                ?>
                                                                 <tr>
                                                                     <td class="ps-3">
                                                                         <span
-                                                                            class="badge {{ $nroPago == 0 ? 'bg-dark' : 'bg-secondary' }} rounded-pill">
-                                                                            #{{ $nroPago }}
+                                                                            class="badge <?php echo e($nroPago == 0 ? 'bg-dark' : 'bg-secondary'); ?> rounded-pill">
+                                                                            #<?php echo e($nroPago); ?>
+
                                                                         </span>
                                                                     </td>
                                                                     <td>
-                                                                        <div class="fw-bold text-dark">{{ $pago->Descripcion }}</div>
-                                                                        @if($nroPago == 0)
+                                                                        <div class="fw-bold text-dark"><?php echo e($pago->Descripcion); ?></div>
+                                                                        <?php if($nroPago == 0): ?>
                                                                             <span class="text-primary small" style="font-size: 0.7rem;">
                                                                                 <i class="bi bi-info-circle"></i> Registro Inicial
                                                                             </span>
-                                                                        @endif
+                                                                        <?php endif; ?>
                                                                     </td>
                                                                     <td class="text-center">
                                                                         <span class="font-monospace text-muted">
-                                                                            {{ $pago->Comprobante ?: 'S/N' }}
+                                                                            <?php echo e($pago->Comprobante ?: 'S/N'); ?>
+
                                                                         </span>
                                                                     </td>
                                                                     <td class="text-center">
                                                                         <div class="text-muted">
-                                                                            {{ \Carbon\Carbon::parse($pago->Fecha_pago)->format('d/m/Y') }}
+                                                                            <?php echo e(\Carbon\Carbon::parse($pago->Fecha_pago)->format('d/m/Y')); ?>
+
                                                                         </div>
                                                                     </td>
                                                                     <td class="pe-3 text-end fw-bold text-primary">
-                                                                        Bs. {{ number_format($pago->Monto_pago, 2) }}
+                                                                        Bs. <?php echo e(number_format($pago->Monto_pago, 2)); ?>
+
                                                                     </td>
                                                                 </tr>
-                                                            @endforeach
+                                                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                                         </tbody>
                                                     </table>
                                                 </div>
-                                            @else
+                                            <?php else: ?>
                                                 <div class="text-muted small ps-3 py-3 bg-light rounded shadow-sm">
                                                     <i class="bi bi-info-circle me-1 text-primary"></i>
                                                     No se han registrado transacciones de pago físicas para este plan aún.
                                                 </div>
-                                            @endif
+                                            <?php endif; ?>
                                         </div>
                                 </div>
-                            @endforeach
-                        @endif
+                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                        <?php endif; ?>
                     </div>
-                @endforeach
-            @endif
+                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+            <?php endif; ?>
         </div>
 
     </div>
-@endsection
+<?php $__env->stopSection(); ?>
 
-@section('scripts')
+<?php $__env->startSection('scripts'); ?>
     <script>
         (function () {
             // Autocierre de alertas después de 5 segundos
@@ -503,4 +525,5 @@
             console.log('Detalles del tutor cargados correctamente');
         })();
     </script>
-@endsection
+<?php $__env->stopSection(); ?>
+<?php echo $__env->make('/administrador/baseAdministrador', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\Users\DANTE\Desktop\YebSis\resources\views/administrador/detallesTutor.blade.php ENDPATH**/ ?>

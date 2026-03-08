@@ -10,21 +10,36 @@
     <div class="mt-2 text-start">
 
         {{-- Header con información temporal --}}
-        <div class="d-flex flex-wrap gap-2 justify-content-between align-items-center mb-4">
-            <div>
-                <h1><i class="fas fa-chart-line"></i> Dashboard Administrativo</h1>
+        {{-- Header con filtros --}}
+        <div class="row mb-4 align-items-center">
+            <div class="col-md-6">
+                <h1><i class="fas fa-chart-line text-primary"></i> Dashboard</h1>
+                <p class="text-muted mb-0">Visualizando datos de <strong>{{ $estadisticasTiempo['mes_nombre'] }}
+                        {{ $estadisticasTiempo['anio_actual'] }}</strong></p>
             </div>
-            <div class="text-end">
-                <p class="mb-0"><strong>{{ $estadisticasTiempo['fecha_actual'] }}</strong></p>
-                <small class="text-muted">{{ $estadisticasTiempo['mes_actual'] }} {{ $estadisticasTiempo['año_actual'] }} |
-                    Semana {{ $estadisticasTiempo['semana_año'] }}</small>
+            <div class="col-md-6 text-end">
+                <form action="{{ route('admin.dashboard') }}" method="GET" class="d-inline-flex gap-2">
+                    <select name="mes" class="form-select form-select-sm" onchange="this.form.submit()">
+                        @for($m = 1; $m <= 12; $m++)
+                            <option value="{{ $m }}" {{ $estadisticasTiempo['mes_num'] == $m ? 'selected' : '' }}>
+                                {{ Carbon\Carbon::create()->month($m)->monthName }}
+                            </option>
+                        @endfor
+                    </select>
+                    <input type="number" name="anio" class="form-control form-control-sm" min="2000"
+                        value="{{ $estadisticasTiempo['anio_actual'] }}" onchange="this.form.submit()">
+                    <a href="{{ route('admin.dashboard') }}" class="btn btn-sm btn-outline-secondary"
+                        title="Reiniciar filtros">
+                        <i class="fas fa-sync-alt"></i>
+                    </a>
+                </form>
             </div>
         </div>
 
 
         {{-- Métricas principales mejoradas --}}
         <div class="row mb-4">
-            <div class="col-md-3 mb-3">
+            <div class="col-md-4 mb-3">
                 <div class="card metric-card shadow-sm">
                     <div class="card-body">
                         <div class="d-flex justify-content-between">
@@ -46,57 +61,42 @@
                 </div>
             </div>
 
-            <div class="col-md-3 mb-3">
+            <div class="col-md-4 mb-3">
                 <div class="card metric-card shadow-sm">
                     <div class="card-body">
                         <div class="d-flex justify-content-between">
                             <div>
-                                <h6 class="text-muted"><i class="fas fa-chart-bar"></i> Total Ingresos</h6>
-                                <h3>Bs {{ number_format($ingresosTotales, 2, '.', ',') }}</h3>
-                                <small class="text-muted">Histórico completo</small>
+                                <h6 class="text-muted"><i class="fas fa-minus-circle"></i> Egresos Este Mes</h6>
+                                <h3 class="text-danger">Bs {{ number_format($egresosMesActual, 2, '.', ',') }}</h3>
+                                <small class="text-muted">Gatos registrados</small>
                             </div>
-                            <div class="text-success">
-                                <i class="fas fa-money-bill-wave fa-2x"></i>
+                            <div class="text-danger">
+                                <i class="fas fa-receipt fa-2x"></i>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <div class="col-md-3 mb-3">
+            <div class="col-md-4 mb-3">
                 <div class="card metric-card shadow-sm">
                     <div class="card-body">
                         <div class="d-flex justify-content-between">
                             <div>
-                                <h6 class="text-muted"><i class="fas fa-chart-line"></i> Proyección Mes</h6>
-                                <h3>Bs {{ number_format($proyeccionMes, 2, '.', ',') }}</h3>
-                                <small class="text-muted">Basada en {{ $estadisticasTiempo['dias_transcurridos_mes'] }}
-                                    días</small>
+                                <h6 class="text-muted"><i class="fas fa-hand-holding-usd"></i> Balance Mes</h6>
+                                <h3 class="{{ $balanceMesActual >= 0 ? 'text-success' : 'text-danger' }}">
+                                    Bs {{ number_format($balanceMesActual, 2, '.', ',') }}
+                                </h3>
+                                <small class="text-muted">Neto mensual</small>
                             </div>
-                            <div class="text-info">
-                                <i class="fas fa-crystal-ball fa-2x"></i>
+                            <div class="{{ $balanceMesActual >= 0 ? 'text-success' : 'text-danger' }}">
+                                <i class="fas fa-balance-scale fa-2x"></i>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <div class="col-md-3 mb-3">
-                <div class="card metric-card shadow-sm">
-                    <div class="card-body">
-                        <div class="d-flex justify-content-between">
-                            <div>
-                                <h6 class="text-muted"><i class="fas fa-building"></i> Sucursales</h6>
-                                <h3>{{ count($sucursales) }}</h3>
-                                <small class="text-muted">Total activas</small>
-                            </div>
-                            <div class="text-warning">
-                                <i class="fas fa-building fa-2x"></i>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
         </div>
 
         {{-- Notificación de Clases de Prueba Pendientes --}}
@@ -205,11 +205,12 @@
             <div class="col-lg-8 mb-3">
                 <div class="card shadow-sm">
                     <div class="card-header bg-info text-white">
-                        <i class="fas fa-chart-bar"></i> Ingresos por Mes ({{ $estadisticasTiempo['año_actual'] }})
+                        <i class="fas fa-chart-bar"></i> Comparativa Ingresos vs Egresos por Mes
+                        ({{ $estadisticasTiempo['anio_actual'] }})
                     </div>
                     <div class="card-body">
                         <div class="chart-container">
-                            <canvas id="ingresosMensuales"></canvas>
+                            <canvas id="comparativaAnual"></canvas>
                         </div>
                     </div>
                 </div>
@@ -237,11 +238,11 @@
                             <div class="col-12">
                                 <div class="progress mb-2">
                                     @php
-                                        $porcentajeMes = ($estadisticasTiempo['dias_transcurridos_mes'] / ($estadisticasTiempo['dias_transcurridos_mes'] + $estadisticasTiempo['dias_restantes_mes'])) * 100;
+                                        $porcentajeMes = ($estadisticasTiempo['dias_transcurridos_mes'] / $estadisticasTiempo['dias_totales_mes']) * 100;
                                     @endphp
                                     <div class="progress-bar bg-success" style="width: {{ $porcentajeMes }}%"></div>
                                 </div>
-                                <small>{{ round($porcentajeMes, 1) }}% del mes completado</small>
+                                <small>{{ round($porcentajeMes, 1) }}% del mes seleccionado completado</small>
                             </div>
                         </div>
                     </div>
@@ -287,8 +288,7 @@
         <script>
             window.ingresosPorDia = @json($ingresosPorDia->pluck('total'));
             window.fechasPorDia = @json($ingresosPorDia->pluck('fecha'));
-            window.ingresosPorMes = @json($ingresosPorMes->pluck('total'));
-            window.mesesPorMes = @json($ingresosPorMes->pluck('mes_nombre'));
+            window.graficoAnual = @json($graficoMensual);
 
             function guardarComentarioAdmin(id) {
                 const comment = document.getElementById(`comentario_admin_${id}`).value;

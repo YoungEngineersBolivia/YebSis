@@ -303,7 +303,8 @@ class EstudianteController extends Controller
                 'programa',
                 'cuotas' => function ($query) {
                     $query->orderBy('Nro_de_cuota', 'asc');
-                }
+                },
+                'pagos'
             ])
             ->orderBy('fecha_plan_pagos', 'desc')
             ->get();

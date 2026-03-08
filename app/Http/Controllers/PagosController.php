@@ -47,15 +47,31 @@ class PagosController extends Controller
             return view('administrador.partials.pagos_lista', compact('estudiantes'))->render();
         }
 
-        return view('administrador.pagosAdministrador', compact('estudiantes'));
+        $mesSeleccionado = null;
+        $anioSeleccionado = null;
+
+        return view('administrador.pagosAdministrador', compact('estudiantes', 'mesSeleccionado', 'anioSeleccionado'));
     }
 
     public function index(Request $request)
     {
+        $mesSeleccionado = $request->input('mes');
+        $anioSeleccionado = $request->input('anio');
+
         $query = Estudiante::query()->with([
             'persona',
             'tutor.persona',
-            'planesPago.cuotas'
+            'planesPago' => function ($q) use ($mesSeleccionado, $anioSeleccionado) {
+                $q->with([
+                    'pagos' => function ($pq) use ($mesSeleccionado, $anioSeleccionado) {
+                        if ($mesSeleccionado)
+                            $pq->whereMonth('Fecha_pago', $mesSeleccionado);
+                        if ($anioSeleccionado)
+                            $pq->whereYear('Fecha_pago', $anioSeleccionado);
+                    },
+                    'cuotas'
+                ]);
+            }
         ]);
 
         if ($request->has('nombre') && $request->nombre != '') {
@@ -65,11 +81,19 @@ class PagosController extends Controller
             });
         }
 
-        $estudiantes = $query
-            ->orderBy('Id_estudiantes', 'desc')   // <-- correcto
-            ->get();
+        // Si filtramos por fecha, solo mostrar estudiantes que tengan pagos en ese rango
+        if ($mesSeleccionado || $anioSeleccionado) {
+            $query->whereHas('planesPago.pagos', function ($q) use ($mesSeleccionado, $anioSeleccionado) {
+                if ($mesSeleccionado)
+                    $q->whereMonth('Fecha_pago', $mesSeleccionado);
+                if ($anioSeleccionado)
+                    $q->whereYear('Fecha_pago', $anioSeleccionado);
+            });
+        }
 
-        return view('administrador.pagosAdministrador', compact('estudiantes'));
+        $estudiantes = $query->orderBy('Id_estudiantes', 'desc')->paginate(10);
+
+        return view('administrador.pagosAdministrador', compact('estudiantes', 'mesSeleccionado', 'anioSeleccionado'));
     }
 
 
@@ -168,5 +192,169 @@ class PagosController extends Controller
             \DB::rollBack();
             return back()->with('error', 'Error al pagar plan completo: ' . $e->getMessage());
         }
+    }
+
+    public function update(Request $request, $id)
+    {
+        $request->validate([
+            'descripcion' => 'required|string|max:255',
+            'monto_pago' => 'required|numeric|min:0.01',
+            'fecha_pago' => 'required|date',
+            'comprobante' => 'nullable|string|max:255',
+        ]);
+
+        try {
+            $pago = Pago::findOrFail($id);
+            $pago->update([
+                'Descripcion' => $request->descripcion,
+                'Monto_pago' => $request->monto_pago,
+                'Fecha_pago' => $request->fecha_pago,
+                'Comprobante' => $request->comprobante,
+            ]);
+
+            return back()->with('success', 'Pago actualizado correctamente.');
+        } catch (\Exception $e) {
+            return back()->with('error', 'Error al actualizar el pago: ' . $e->getMessage());
+        }
+    }
+
+    public function destroy($id)
+    {
+        try {
+            $pago = Pago::findOrFail($id);
+            $pago->delete();
+            return back()->with('success', 'Pago eliminado correctamente.');
+        } catch (\Exception $e) {
+            return back()->with('error', 'Error al eliminar el pago: ' . $e->getMessage());
+        }
+    }
+
+    public function reporteMensual(Request $request)
+    {
+        $anioSeleccionado = $request->input('anio', \Carbon\Carbon::now()->year);
+
+        $query = Pago::select(
+            \DB::raw('YEAR(Fecha_pago) as anio'),
+            \DB::raw('MONTH(Fecha_pago) as mes'),
+            \DB::raw('SUM(Monto_pago) as total'),
+            \DB::raw('COUNT(*) as cantidad_pagos'),
+            \DB::raw('MAX(Fecha_pago) as ultima_fecha')
+        );
+
+        $query->whereYear('Fecha_pago', $anioSeleccionado);
+
+        $ingresosMensuales = $query->groupBy('anio', 'mes')
+            ->orderBy('anio', 'desc')
+            ->orderBy('mes', 'desc')
+            ->get()
+            ->map(function ($item) {
+                $item->nombre_mes = \Carbon\Carbon::create()->month($item->mes)->monthName;
+                return $item;
+            });
+
+        // Obtener el año más antiguo registrado para el dropdown dinámico
+        $anioMinimo = Pago::min(\DB::raw('YEAR(Fecha_pago)')) ?? \Carbon\Carbon::now()->year;
+
+        return view('administrador.pagosMensuales', compact('ingresosMensuales', 'anioSeleccionado', 'anioMinimo'));
+    }
+
+    /**
+     * Descarga el formato CSV para la carga histórica de pagos.
+     */
+    public function descargarFormato()
+    {
+        $headers = [
+            'Content-Type' => 'text/csv; charset=UTF-8',
+            'Content-Disposition' => 'attachment; filename="formato_carga_pagos.csv"',
+        ];
+
+        $callback = function () {
+            $file = fopen('php://output', 'w');
+            fprintf($file, chr(0xEF) . chr(0xBB) . chr(0xBF)); // BOM para UTF-8 (Excel friendly)
+            fputcsv($file, ['Año', 'Mes', 'Fecha (DD/MM/YYYY)', 'Descripción', 'Comprobante', 'Monto (Bs)']);
+
+            // Ejemplo
+            fputcsv($file, ['2023', 'Enero', '31/01/2023', 'Ingresos Totales Enero', 'S/N', '15000.50']);
+            fputcsv($file, ['2023', 'Febrero', '28/02/2023', 'Ingresos Totales Febrero', 'S/N', '12500.00']);
+
+            fclose($file);
+        };
+
+        return response()->stream($callback, 200, $headers);
+    }
+
+    /**
+     * Importa los datos desde el archivo CSV.
+     */
+    public function importarDatos(Request $request)
+    {
+        $request->validate([
+            'archivo_csv' => 'required|file|mimes:csv,txt'
+        ]);
+
+        try {
+            $file = $request->file('archivo_csv');
+            $path = $file->getRealPath();
+            $handle = fopen($path, 'r');
+
+            // Ignorar la primera línea (cabeceras)
+            fgetcsv($handle);
+
+            $importados = 0;
+            \DB::beginTransaction();
+
+            while (($data = fgetcsv($handle, 1000, ",")) !== FALSE) {
+                // Mapeo: 0:Año, 1:Mes, 2:Fecha, 3:Descripción, 4:Comprobante, 5:Monto
+                if (count($data) < 6)
+                    continue;
+
+                $fechaRaw = $data[2];
+                try {
+                    $fecha = \Carbon\Carbon::createFromFormat('d/m/Y', $fechaRaw)->format('Y-m-d');
+                } catch (\Exception $e) {
+                    // Si falla el formato d/m/Y, intentar con el año y mes
+                    $mes = $this->obtenerMesNumero($data[1]);
+                    $fecha = $data[0] . '-' . sprintf('%02d', $mes) . '-01';
+                }
+
+                Pago::create([
+                    'Descripcion' => $data[3],
+                    'Comprobante' => $data[4],
+                    'Monto_pago' => (float) $data[5],
+                    'Fecha_pago' => $fecha,
+                    'Id_planes_pagos' => null, // Ingreso histórico/global
+                ]);
+
+                $importados++;
+            }
+
+            fclose($handle);
+            \DB::commit();
+
+            return back()->with('success', "Se han importado {$importados} registros de ingresos correctamente.");
+
+        } catch (\Exception $e) {
+            \DB::rollBack();
+            return back()->with('error', 'Error al importar archivo: ' . $e->getMessage());
+        }
+    }
+
+    private function obtenerMesNumero($nombre)
+    {
+        $meses = [
+            'Enero' => 1,
+            'Febrero' => 2,
+            'Marzo' => 3,
+            'Abril' => 4,
+            'Mayo' => 5,
+            'Junio' => 6,
+            'Julio' => 7,
+            'Agosto' => 8,
+            'Septiembre' => 9,
+            'Octubre' => 10,
+            'Noviembre' => 11,
+            'Diciembre' => 12
+        ];
+        return $meses[ucfirst(strtolower($nombre))] ?? 1;
     }
 }

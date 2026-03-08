@@ -27,7 +27,7 @@ new Chart(ctxDiarios, {
             y: {
                 beginAtZero: true,
                 ticks: {
-                    callback: function(value) {
+                    callback: function (value) {
                         return 'Bs ' + value.toLocaleString();
                     }
                 }
@@ -39,31 +39,43 @@ new Chart(ctxDiarios, {
     }
 });
 
-// Gráfico de ingresos mensuales
-const ctxMensuales = document.getElementById('ingresosMensuales').getContext('2d');
+// Gráfico de comparativa anual (Ingresos vs Egresos)
+const ctxMensuales = document.getElementById('comparativaAnual').getContext('2d');
 new Chart(ctxMensuales, {
     type: 'bar',
     data: {
-        labels: window.mesesPorMes,
-        datasets: [{
-            label: 'Ingresos Mensuales',
-            data: window.ingresosPorMes,
-            backgroundColor: 'rgba(40, 167, 69, 0.8)',
-            borderColor: 'rgba(40, 167, 69, 1)',
-            borderWidth: 1
-        }]
+        labels: window.graficoAnual.labels,
+        datasets: [
+            {
+                label: 'Ingresos',
+                data: window.graficoAnual.ingresos,
+                backgroundColor: 'rgba(40, 167, 69, 0.8)',
+                borderColor: 'rgba(40, 167, 69, 1)',
+                borderWidth: 1
+            },
+            {
+                label: 'Egresos',
+                data: window.graficoAnual.egresos,
+                backgroundColor: 'rgba(220, 53, 69, 0.8)',
+                borderColor: 'rgba(220, 53, 69, 1)',
+                borderWidth: 1
+            }
+        ]
     },
     options: {
         responsive: true,
         maintainAspectRatio: false,
         plugins: {
-            legend: { display: false }
+            legend: {
+                display: true,
+                position: 'top'
+            }
         },
         scales: {
             y: {
                 beginAtZero: true,
                 ticks: {
-                    callback: function(value) {
+                    callback: function (value) {
                         return 'Bs ' + value.toLocaleString();
                     }
                 }

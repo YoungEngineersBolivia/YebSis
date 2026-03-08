@@ -1,8 +1,6 @@
-@extends('administrador.baseAdministrador')
+<?php $__env->startSection('title', 'Gestión de Egresos'); ?>
 
-@section('title', 'Gestión de Egresos')
-
-@section('content')
+<?php $__env->startSection('content'); ?>
     <div class="page-header">
         <div class="row align-items-center">
             <div class="col-md-6">
@@ -10,25 +8,26 @@
                 <p class="text-muted">Administración y control de gastos del sistema</p>
             </div>
             <div class="col-md-6 d-flex justify-content-md-end gap-2 mt-3 mt-md-0">
-                <form action="{{ route('egresos.index') }}" method="GET" class="d-flex gap-2 me-2">
+                <form action="<?php echo e(route('egresos.index')); ?>" method="GET" class="d-flex gap-2 me-2">
                     <select name="mes" class="form-select form-select-sm" onchange="this.form.submit()"
                         style="min-width: 130px;">
-                        @for($m = 1; $m <= 12; $m++)
-                            <option value="{{ $m }}" {{ $estadisticasTiempo['mes_num'] == $m ? 'selected' : '' }}>
-                                {{ Carbon\Carbon::create()->month($m)->monthName }}
+                        <?php for($m = 1; $m <= 12; $m++): ?>
+                            <option value="<?php echo e($m); ?>" <?php echo e($estadisticasTiempo['mes_num'] == $m ? 'selected' : ''); ?>>
+                                <?php echo e(Carbon\Carbon::create()->month($m)->monthName); ?>
+
                             </option>
-                        @endfor
+                        <?php endfor; ?>
                     </select>
                     <input type="number" name="anio" class="form-control form-control-sm" style="width: 90px;" min="2000"
-                        value="{{ $estadisticasTiempo['anio_actual'] }}" onchange="this.form.submit()">
-                    <a href="{{ route('egresos.index') }}" class="btn btn-sm btn-outline-secondary"
+                        value="<?php echo e($estadisticasTiempo['anio_actual']); ?>" onchange="this.form.submit()">
+                    <a href="<?php echo e(route('egresos.index')); ?>" class="btn btn-sm btn-outline-secondary"
                         title="Reiniciar filtros">
                         <i class="bi bi-arrow-counterclockwise"></i>
                     </a>
                 </form>
 
                 <div class="btn-group shadow-sm">
-                    <a href="{{ route('egresos.formato') }}" class="btn btn-outline-success">
+                    <a href="<?php echo e(route('egresos.formato')); ?>" class="btn btn-outline-success">
                         <i class="bi bi-file-earmark-arrow-down"></i> Formato
                     </a>
                     <button type="button" class="btn btn-success" data-bs-toggle="modal"
@@ -45,7 +44,7 @@
         </div>
     </div>
 
-    {{-- Métricas Rápidas --}}
+    
     <div class="row mb-4">
         <div class="col-md-4">
             <div class="card border-0 shadow-sm bg-primary text-white">
@@ -53,9 +52,10 @@
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
                             <h6 class="text-white-50 mb-1 text-uppercase small fw-bold">Egresos en
-                                {{ $estadisticasTiempo['mes_nombre'] }}
+                                <?php echo e($estadisticasTiempo['mes_nombre']); ?>
+
                             </h6>
-                            <h2 class="mb-0">Bs. {{ number_format($totalMes, 2) }}</h2>
+                            <h2 class="mb-0">Bs. <?php echo e(number_format($totalMes, 2)); ?></h2>
                         </div>
                         <div class="bg-white bg-opacity-20 p-3 rounded-3">
                             <i class="bi bi-graph-down-arrow fs-2 text-white"></i>
@@ -79,14 +79,15 @@
         </div>
     </div>
 
-    {{-- Tabla de Detalles a Ancho Completo --}}
+    
     <div class="card border-0 shadow-sm">
         <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center border-0">
             <h5 class="mb-0 fw-bold text-dark">
                 <i class="bi bi-list-task me-2 text-primary"></i>
-                Detalles: {{ $estadisticasTiempo['mes_nombre'] }} {{ $estadisticasTiempo['anio_actual'] }}
+                Detalles: <?php echo e($estadisticasTiempo['mes_nombre']); ?> <?php echo e($estadisticasTiempo['anio_actual']); ?>
+
             </h5>
-            <span class="badge bg-primary rounded-pill">{{ count($egresos) }} registros</span>
+            <span class="badge bg-primary rounded-pill"><?php echo e(count($egresos)); ?> registros</span>
         </div>
         <div class="card-body p-0">
             <div class="table-responsive">
@@ -100,41 +101,43 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @forelse ($egresos as $egreso)
+                        <?php $__empty_1 = true; $__currentLoopData = $egresos; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $egreso): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
                             <tr>
                                 <td class="ps-4">
-                                    <div class="fw-bold text-dark">{{ $egreso->Descripcion_egreso }}</div>
+                                    <div class="fw-bold text-dark"><?php echo e($egreso->Descripcion_egreso); ?></div>
                                     <span class="badge bg-light text-muted border-0 p-0" style="font-size: 0.7rem;">
-                                        {{ $egreso->Tipo }}
+                                        <?php echo e($egreso->Tipo); ?>
+
                                     </span>
                                 </td>
                                 <td>
                                     <div class="text-muted small">
-                                        {{ \Carbon\Carbon::parse($egreso->Fecha_egreso)->format('d/m/Y') }}
+                                        <?php echo e(\Carbon\Carbon::parse($egreso->Fecha_egreso)->format('d/m/Y')); ?>
+
                                     </div>
                                 </td>
                                 <td class="text-center">
-                                    <span class="fw-bold text-danger">Bs. {{ number_format($egreso->Monto_egreso, 2) }}</span>
+                                    <span class="fw-bold text-danger">Bs. <?php echo e(number_format($egreso->Monto_egreso, 2)); ?></span>
                                 </td>
                                 <td class="pe-4 text-end">
                                     <div class="btn-group shadow-sm bg-white">
                                         <button class="btn btn-sm btn-white border-0 btn-editar" title="Editar"
                                             data-bs-toggle="modal" data-bs-target="#modalEditarEgreso"
-                                            data-id="{{ $egreso->Id_egreso }}" data-tipo="{{ $egreso->Tipo }}"
-                                            data-descripcion="{{ $egreso->Descripcion_egreso }}"
-                                            data-fecha="{{ $egreso->Fecha_egreso }}" data-monto="{{ $egreso->Monto_egreso }}">
+                                            data-id="<?php echo e($egreso->Id_egreso); ?>" data-tipo="<?php echo e($egreso->Tipo); ?>"
+                                            data-descripcion="<?php echo e($egreso->Descripcion_egreso); ?>"
+                                            data-fecha="<?php echo e($egreso->Fecha_egreso); ?>" data-monto="<?php echo e($egreso->Monto_egreso); ?>">
                                             <i class="bi bi-pencil-fill text-primary"></i>
                                         </button>
                                         <button class="btn btn-sm btn-white border-0 btn-eliminar" title="Eliminar"
                                             data-bs-toggle="modal" data-bs-target="#modalEliminarEgreso"
-                                            data-id="{{ $egreso->Id_egreso }}"
-                                            data-descripcion="{{ $egreso->Descripcion_egreso }}">
+                                            data-id="<?php echo e($egreso->Id_egreso); ?>"
+                                            data-descripcion="<?php echo e($egreso->Descripcion_egreso); ?>">
                                             <i class="bi bi-trash3-fill text-danger"></i>
                                         </button>
                                     </div>
                                 </td>
                             </tr>
-                        @empty
+                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
                             <tr>
                                 <td colspan="4" class="text-center py-5">
                                     <div class="text-muted">
@@ -143,7 +146,7 @@
                                     </div>
                                 </td>
                             </tr>
-                        @endforelse
+                        <?php endif; ?>
                     </tbody>
                 </table>
             </div>
@@ -154,8 +157,8 @@
     <div class="modal fade" id="modalRegistrarEgreso" tabindex="-1">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content border-0 shadow">
-                <form method="POST" action="{{ route('egresos.store') }}">
-                    @csrf
+                <form method="POST" action="<?php echo e(route('egresos.store')); ?>">
+                    <?php echo csrf_field(); ?>
                     <div class="modal-header bg-primary text-white border-0">
                         <h5 class="modal-title fw-bold"><i class="bi bi-plus-circle me-2"></i>Nuevo Egreso</h5>
                         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
@@ -190,7 +193,7 @@
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label class="form-label fw-semibold">Fecha</label>
-                                <input type="date" class="form-control" name="Fecha_egreso" value="{{ date('Y-m-d') }}"
+                                <input type="date" class="form-control" name="Fecha_egreso" value="<?php echo e(date('Y-m-d')); ?>"
                                     required>
                             </div>
                         </div>
@@ -210,8 +213,8 @@
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content border-0 shadow">
                 <form method="POST" action="#" id="formEditarEgreso">
-                    @csrf
-                    @method('PUT')
+                    <?php echo csrf_field(); ?>
+                    <?php echo method_field('PUT'); ?>
                     <div class="modal-header bg-dark text-white border-0">
                         <h5 class="modal-title fw-bold"><i class="bi bi-pencil-square me-2"></i>Editar Egreso</h5>
                         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
@@ -264,8 +267,8 @@
         <div class="modal-dialog modal-dialog-centered modal-sm">
             <div class="modal-content border-0 shadow">
                 <form method="POST" action="#" id="formEliminarEgreso">
-                    @csrf
-                    @method('DELETE')
+                    <?php echo csrf_field(); ?>
+                    <?php echo method_field('DELETE'); ?>
                     <div class="modal-body p-4 text-center">
                         <div class="bg-danger bg-opacity-10 text-danger rounded-circle p-3 d-inline-block mb-3">
                             <i class="bi bi-trash3-fill fs-2"></i>
@@ -288,9 +291,9 @@
     <div class="modal fade" id="modalImportarEgresos" tabindex="-1">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content border-0 shadow">
-                <form method="POST" action="{{ route('egresos.importar') }}" enctype="multipart/form-data"
+                <form method="POST" action="<?php echo e(route('egresos.importar')); ?>" enctype="multipart/form-data"
                     id="formImportarEgresos">
-                    @csrf
+                    <?php echo csrf_field(); ?>
                     <div class="modal-header bg-success text-white border-0">
                         <h5 class="modal-title fw-bold"><i class="bi bi-file-earmark-arrow-up me-2"></i>Carga Masiva de
                             Egresos</h5>
@@ -339,9 +342,9 @@
         </div>
     </div>
 
-@endsection
+<?php $__env->stopSection(); ?>
 
-@section('scripts')
+<?php $__env->startSection('scripts'); ?>
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             // MODAL EDITAR - Llenar con datos del egreso
@@ -360,7 +363,7 @@
                     document.getElementById('editMonto').value = monto;
 
                     const form = document.getElementById('formEditarEgreso');
-                    form.action = "{{ route('egresos.update', ':id') }}".replace(':id', id);
+                    form.action = "<?php echo e(route('egresos.update', ':id')); ?>".replace(':id', id);
                 });
             });
 
@@ -374,7 +377,7 @@
                     document.getElementById('egresoEliminarDescripcion').textContent = descripcion;
 
                     const form = document.getElementById('formEliminarEgreso');
-                    form.action = "{{ route('egresos.destroy', ':id') }}".replace(':id', id);
+                    form.action = "<?php echo e(route('egresos.destroy', ':id')); ?>".replace(':id', id);
                 });
             });
 
@@ -391,4 +394,5 @@
             }
         });
     </script>
-@endsection
+<?php $__env->stopSection(); ?>
+<?php echo $__env->make('administrador.baseAdministrador', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\Users\DANTE\Desktop\YebSis\resources\views/administrador/egresosAdministrador.blade.php ENDPATH**/ ?>

@@ -168,8 +168,13 @@ Route::middleware(['auth', 'role:administrador'])->prefix('administrador')->grou
     /* ----------------- GESTIÓN DE PAGOS ----------------- */
     Route::get('/pagosAdministrador', [PagosController::class, 'form'])->name('pagos.form');
     Route::get('/pagos', [PagosController::class, 'index'])->name('pagos.index');
+    Route::get('/pagos/mensuales', [PagosController::class, 'reporteMensual'])->name('pagos.mensuales');
     Route::post('/pagosAdministrador', [PagosController::class, 'registrarPago'])->name('pagos.registrar');
+    Route::put('/pagos/{id}', [PagosController::class, 'update'])->name('pagos.update');
+    Route::delete('/pagos/{id}', [PagosController::class, 'destroy'])->name('pagos.destroy');
     Route::post('/pagos/pagar-plan-completo', [PagosController::class, 'pagarPlanCompleto'])->name('pagos.pagarPlanCompleto');
+    Route::get('/pagos/formato', [PagosController::class, 'descargarFormato'])->name('pagos.formato');
+    Route::post('/pagos/importar', [PagosController::class, 'importarDatos'])->name('pagos.importar');
 
     /* ----------------- GESTIÓN DE SUCURSALES ----------------- */
     Route::get('/sucursalesAdministrador', [SucursalController::class, 'index'])->name('sucursales.index');
@@ -179,11 +184,12 @@ Route::middleware(['auth', 'role:administrador'])->prefix('administrador')->grou
 
     /* ----------------- GESTIÓN DE EGRESOS ----------------- */
     Route::get('/egresosAdministrador', [EgresosController::class, 'index'])->name('egresos.index');
-    Route::post('/egresosAdministrador', [EgresosController::class, 'store'])->name('egresos.store');
-    Route::get('/egresos/crear', [EgresosController::class, 'create'])->name('egresos.crear');
-    Route::post('/egresos/registrar', [EgresosController::class, 'store'])->name('egresos.registrar');
+    Route::get('/egresos/mensuales', [EgresosController::class, 'reporteMensual'])->name('egresos.mensuales');
+    Route::post('/egresos/registrar', [EgresosController::class, 'store'])->name('egresos.store');
     Route::put('/egresos/{Id_egreso}', [EgresosController::class, 'update'])->name('egresos.update');
     Route::delete('/egresos/{Id_egreso}', [EgresosController::class, 'destroy'])->name('egresos.destroy');
+    Route::get('/egresos/formato', [EgresosController::class, 'descargarFormato'])->name('egresos.formato');
+    Route::post('/egresos/importar', [EgresosController::class, 'importarDatos'])->name('egresos.importar');
 
     /* ----------------- PUBLICACIONES Y NOTIFICACIONES ----------------- */
     Route::get('/pubnotAdministrador', [PubNot::class, 'index'])->name('publicaciones.index');

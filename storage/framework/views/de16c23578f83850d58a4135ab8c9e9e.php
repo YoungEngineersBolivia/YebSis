@@ -194,23 +194,38 @@
 
                             <?php if($plan->pagos && $plan->pagos->count() > 0): ?>
                                 <?php
-                                    $pagosOrdenadosRecientes = $plan->pagos->sortByDesc('Fecha_pago');
+                                    $pagosOrdenadosRecientes = $plan->pagos->sortByDesc('Id_pagos');
                                     $totalPagos = $plan->pagos->count();
                                 ?>
                                 <div class="history-list">
                                     <?php $__currentLoopData = $pagosOrdenadosRecientes; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $index => $pago): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                         <?php
-                                            // Calculamos el número de pago (del más antiguo al más nuevo)
-                                            $nroPago = $totalPagos - $loop->index;
+                                            // Calculamos el número de pago para que el inicial sea #0
+                                            $nroPago = $totalPagos - $loop->index - 1;
                                         ?>
                                         <div class="p-3 mb-2 rounded-3 bg-white border shadow-sm">
                                             <div class="d-flex justify-content-between align-items-center mb-2">
-                                                <div>
+                                                <div class="d-flex align-items-center">
                                                     <span class="badge bg-dark text-white me-2">#<?php echo e($nroPago); ?></span>
-                                                    <span class="badge bg-primary-subtle text-primary fw-bold" style="font-size: 0.9rem;">
+                                                    <span class="badge bg-primary-subtle text-primary fw-bold me-2"
+                                                        style="font-size: 0.9rem;">
                                                         Bs. <?php echo e(number_format($pago->Monto_pago, 2)); ?>
 
                                                     </span>
+                                                    <div class="btn-group shadow-sm ms-2">
+                                                        <button class="btn btn-sm btn-white border py-0 px-2 btn-editar-pago"
+                                                            title="Editar Pago" data-id="<?php echo e($pago->Id_pagos); ?>"
+                                                            data-descripcion="<?php echo e($pago->Descripcion); ?>" data-monto="<?php echo e($pago->Monto_pago); ?>"
+                                                            data-fecha="<?php echo e($pago->Fecha_pago); ?>"
+                                                            data-comprobante="<?php echo e($pago->Comprobante); ?>">
+                                                            <i class="bi bi-pencil-fill text-primary small"></i>
+                                                        </button>
+                                                        <button class="btn btn-sm btn-white border py-0 px-2 btn-eliminar-pago"
+                                                            title="Eliminar Pago" data-id="<?php echo e($pago->Id_pagos); ?>"
+                                                            data-descripcion="<?php echo e($pago->Descripcion); ?>">
+                                                            <i class="bi bi-trash3-fill text-danger small"></i>
+                                                        </button>
+                                                    </div>
                                                 </div>
                                                 <small class="text-muted">
                                                     <i class="fas fa-calendar-alt me-1"></i>
@@ -221,14 +236,17 @@
                                             <?php
                                                 $comprobante = $pago->Comprobante ?? $pago->comprobante;
                                             ?>
-                                            <?php if($comprobante): ?>
-                                                <div class="mt-2 py-1 px-2 bg-light rounded text-muted font-monospace"
-                                                    style="font-size: 0.75rem;">
-                                                    <i class="fas fa-receipt me-1"></i>
-                                                    <?php echo e($comprobante); ?>
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <div class="small text-dark fw-semibold"><?php echo e($pago->Descripcion); ?></div>
+                                                <?php if($comprobante): ?>
+                                                    <div class="py-1 px-2 bg-light rounded text-muted font-monospace"
+                                                        style="font-size: 0.75rem;">
+                                                        <i class="fas fa-receipt me-1"></i>
+                                                        <?php echo e($comprobante); ?>
 
-                                                </div>
-                                            <?php endif; ?>
+                                                    </div>
+                                                <?php endif; ?>
+                                            </div>
                                         </div>
                                     <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                 </div>
@@ -256,4 +274,10 @@
 <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
 
 <!-- Input oculto para pasar el total a JS -->
-<input type="hidden" id="total-count-hidden" value="<?php echo e($estudiantes->total()); ?>"><?php /**PATH C:\Users\DANTE\Desktop\YebSis\resources\views/administrador/partials/pagos_lista.blade.php ENDPATH**/ ?>
+<input type="hidden" id="total-count-hidden" value="<?php echo e($estudiantes->total()); ?>">
+
+<!-- Enlaces de paginación -->
+<div id="pagination-links" class="mt-4">
+    <?php echo e($estudiantes->appends(request()->query())->links()); ?>
+
+</div><?php /**PATH C:\Users\DANTE\Desktop\YebSis\resources\views/administrador/partials/pagos_lista.blade.php ENDPATH**/ ?>

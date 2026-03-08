@@ -26,23 +26,24 @@ class RegistroCombinadoController extends Controller
         $programas = Programa::all();
         $sucursales = Sucursal::all();
         $profesores = Profesor::with('persona')
-            ->whereHas('persona', function ($q) {$q->where('Id_roles', 2); }) ->get();
+            ->whereHas('persona', function ($q) {
+                $q->where('Id_roles', 2);
+            })->get();
 
-        $tutores = Tutores::with('persona', 'usuario', 'estudiantes.persona')->get()->map(function($t){
+        $tutores = Tutores::with('persona', 'usuario', 'estudiantes.persona')->get()->map(function ($t) {
             return [
                 'Id_tutores' => $t->Id_tutores,
                 'Nombre' => $t->persona->Nombre,
                 'Apellido' => $t->persona->Apellido,
                 'Genero' => $t->persona->Genero,
                 'Direccion_domicilio' => $t->persona->Direccion_domicilio,
-                'Fecha_nacimiento' => $t->persona->Fecha_nacimiento,
                 'Celular' => $t->persona->Celular,
                 'Correo' => $t->usuario->Correo,
                 'Parentesco' => $t->Parentesco,
                 'Descuento' => $t->Descuento,
                 'Nit' => $t->Nit,
                 'Nombre_factura' => $t->Nombre_factura,
-                'estudiantes' => $t->estudiantes->map(function($e) {
+                'estudiantes' => $t->estudiantes->map(function ($e) {
                     return [
                         'Id_estudiantes' => $e->Id_estudiantes,
                         'Cod_estudiante' => $e->Cod_estudiante,
@@ -57,27 +58,26 @@ class RegistroCombinadoController extends Controller
             ];
         });
 
-        return view('administrador.tutorEstudianteAdministrador', compact('programas', 'sucursales', 'profesores', 'tutores')); 
+        return view('administrador.tutorEstudianteAdministrador', compact('programas', 'sucursales', 'profesores', 'tutores'));
     }
 
     // Registrar tutor y estudiante
     public function registrar(Request $request)
     {
         \Illuminate\Support\Facades\Log::info('Datos recibidos en registrar:', $request->all());
-        
+
         // Función helper para capitalizar nombres
-        $capitalizarNombre = function($texto) {
+        $capitalizarNombre = function ($texto) {
             return ucwords(strtolower(trim($texto)));
         };
         // Validación dinámica del código de estudiante
         $estudianteIdExistente = $request->input('estudiante_id_existente');
-        
+
         $validationRules = [
-            'tutor_email' => 'required|email',
+            'tutor_email' => 'nullable|email',
             'tutor_nombre' => 'required|string|max:255',
             'tutor_apellido' => 'required|string|max:255',
             'tutor_genero' => 'required|string',
-            'tutor_fecha_nacimiento' => 'required|date|after:1900-01-01|before:2100-01-01',
             'tutor_celular' => 'required|string|max:255',
             'tutor_direccion' => 'required|string',
             'tutor_parentesco' => 'required|string|max:255',
@@ -88,13 +88,13 @@ class RegistroCombinadoController extends Controller
             'estudiante_apellido' => 'required|string|max:255',
             'estudiante_genero' => 'required|string',
             'estudiante_fecha_nacimiento' => 'required|date|after:1900-01-01|before:2100-01-01',
-            'estudiante_celular' => 'required|string|max:255',
-            'estudiante_direccion' => 'required|string',
+            'estudiante_celular' => 'nullable|string|max:255',
+            'estudiante_direccion' => 'nullable|string',
             'programa' => 'required|exists:programas,Id_programas',
             'sucursal' => 'required|exists:sucursales,Id_sucursales',
             'profesor' => 'nullable|exists:profesores,Id_profesores',
         ];
-        
+
         // Si es estudiante existente, no validar código (ya existe)
         // Si es nuevo, validar que sea único
         if (!$estudianteIdExistente) {
@@ -102,14 +102,12 @@ class RegistroCombinadoController extends Controller
         } else {
             $validationRules['codigo_estudiante'] = 'required|string';
         }
-        
+
         $customMessages = [
-            'tutor_email.required' => 'El correo del tutor es obligatorio.',
             'tutor_email.email' => 'El correo del tutor no tiene un formato válido.',
             'tutor_nombre.required' => 'El nombre del tutor es obligatorio.',
             'tutor_apellido.required' => 'El apellido del tutor es obligatorio.',
             'tutor_genero.required' => 'Debe seleccionar el género del tutor.',
-            'tutor_fecha_nacimiento.required' => 'La fecha de nacimiento del tutor es obligatoria.',
             'tutor_celular.required' => 'El celular del tutor es obligatorio.',
             'tutor_direccion.required' => 'La dirección del tutor es obligatoria.',
             'tutor_parentesco.required' => 'El parentesco es obligatorio.',
@@ -117,8 +115,6 @@ class RegistroCombinadoController extends Controller
             'estudiante_apellido.required' => 'El apellido del estudiante es obligatorio.',
             'estudiante_genero.required' => 'Debe seleccionar el género del estudiante.',
             'estudiante_fecha_nacimiento.required' => 'La fecha de nacimiento del estudiante es obligatoria.',
-            'estudiante_celular.required' => 'El celular de referencia del estudiante es obligatorio.',
-            'estudiante_direccion.required' => 'La dirección del estudiante es obligatoria.',
             'codigo_estudiante.required' => 'El código del estudiante es obligatorio.',
             'codigo_estudiante.unique' => 'Este código de estudiante ya está registrado. Intente con otro.',
             'programa.required' => 'Debe seleccionar un programa.',
@@ -128,7 +124,7 @@ class RegistroCombinadoController extends Controller
             'estudiante_fecha_nacimiento.after' => 'La fecha de nacimiento del estudiante no es válida (muy antigua).',
             'estudiante_fecha_nacimiento.before' => 'La fecha de nacimiento del estudiante no es válida (futura).',
         ];
-        
+
         $request->validate($validationRules, $customMessages);
 
         try {
@@ -149,9 +145,10 @@ class RegistroCombinadoController extends Controller
                 $tutor = Tutores::find($tutorIdExistente);
                 $personaTutor = $tutor->persona;
             } else {
-                // Validar correo tutor
-                if (Usuario::where('Correo', $request->tutor_email)->exists()) {
-                    return back()->withErrors(['tutor_email' => 'El correo del tutor ya está en uso.'])->withInput();
+                if ($request->filled('tutor_email')) {
+                    if (Usuario::where('Correo', $request->tutor_email)->exists()) {
+                        return back()->withErrors(['tutor_email' => 'El correo del tutor ya está en uso.'])->withInput();
+                    }
                 }
 
                 // Crear persona y usuario tutor
@@ -160,7 +157,6 @@ class RegistroCombinadoController extends Controller
                     'Apellido' => $capitalizarNombre($request->tutor_apellido),
                     'Genero' => $request->tutor_genero,
                     'Direccion_domicilio' => $capitalizarNombre($request->tutor_direccion),
-                    'Fecha_nacimiento' => $request->tutor_fecha_nacimiento,
                     'Fecha_registro' => now()->format('Y-m-d'),
                     'Celular' => $request->tutor_celular,
                     'Id_roles' => $rolTutor->Id_roles,
@@ -174,11 +170,13 @@ class RegistroCombinadoController extends Controller
                     'Id_personas' => $personaTutor->Id_personas,
                 ]);
 
-                Mail::to($request->tutor_email)->send(new ClaveGeneradaAdmin(
-                    $request->tutor_nombre,
-                    $request->tutor_email,
-                    $contraseñaTemporal
-                ));
+                if ($request->filled('tutor_email')) {
+                    Mail::to($request->tutor_email)->send(new ClaveGeneradaAdmin(
+                        $request->tutor_nombre,
+                        $request->tutor_email,
+                        $contraseñaTemporal
+                    ));
+                }
 
                 $tutor = Tutores::create([
                     'Descuento' => $request->tutor_descuento ?? '0',
@@ -194,11 +192,11 @@ class RegistroCombinadoController extends Controller
             // Crear o usar estudiante existente
             // ---------------------------
             $estudianteIdExistente = $request->input('estudiante_id_existente');
-            
+
             if ($estudianteIdExistente) {
                 // Estudiante existente - solo actualizar programa y crear plan
                 $estudiante = Estudiante::find($estudianteIdExistente);
-                
+
                 // Actualizar programa si es diferente
                 // Actualizar programa, sucursal y profesor
                 $estudiante->Id_programas = $request->programa;
@@ -211,13 +209,13 @@ class RegistroCombinadoController extends Controller
                     'Nombre' => $capitalizarNombre($request->estudiante_nombre),
                     'Apellido' => $capitalizarNombre($request->estudiante_apellido),
                     'Genero' => $request->estudiante_genero,
-                    'Direccion_domicilio' => $capitalizarNombre($request->estudiante_direccion),
+                    'Direccion_domicilio' => $capitalizarNombre($request->estudiante_direccion ?? $request->tutor_direccion),
                     'Fecha_nacimiento' => $request->estudiante_fecha_nacimiento,
                     'Fecha_registro' => now()->format('Y-m-d'),
-                    'Celular' => $request->estudiante_celular,
+                    'Celular' => $request->estudiante_celular ?? $request->tutor_celular,
                     'Id_roles' => $rolEstudiante->Id_roles,
                 ]);
-                
+
                 \Illuminate\Support\Facades\Log::info('Creando estudiante nuevo con sucursal:', ['sucursal' => $request->sucursal]);
 
                 $estudiante = Estudiante::create([
@@ -247,15 +245,14 @@ class RegistroCombinadoController extends Controller
             // ---------------------------
             // Pagos y cuotas
             // ---------------------------
-            if ($request->filled('Descripcion') || $request->filled('Monto_pago') || $request->filled('Fecha_pago')) {
-                Pago::create([
-                    'Descripcion' => $request->Descripcion,
-                    'Monto_pago' => $request->Monto_pago,
-                    'Fecha_pago' => $request->Fecha_pago,
-                    'Comprobante' => $request->Comprobante,
-                    'Id_planes_pagos' => $planPago->Id_planes_pagos,
-                ]);
-            }
+            // Registrar siempre el pago inicial (aunque sea 0) para que figure en el historial
+            Pago::create([
+                'Descripcion' => $request->Descripcion ?? 'Registro Inicial',
+                'Monto_pago' => $request->Monto_pago ?? 0,
+                'Fecha_pago' => $request->Fecha_pago ?? now()->format('Y-m-d'),
+                'Comprobante' => $request->Comprobante ?? 'S/N',
+                'Id_planes_pagos' => $planPago->Id_planes_pagos,
+            ]);
 
             if ($request->has('cuotas_auto') && is_array($request->cuotas_auto)) {
                 foreach ($request->cuotas_auto as $cuota) {
@@ -279,7 +276,7 @@ class RegistroCombinadoController extends Controller
                 ]);
             }
 
-            return redirect()->back()->with('success', 'Estudiante, tutor y plan de pagos registrados correctamente.');
+            return redirect()->back()->with('success', '¡Excelente! El estudiante ha sido inscrito y vinculado al tutor correctamente.');
 
         } catch (\Exception $e) {
             return back()->withErrors(['error' => 'Error al registrar: ' . $e->getMessage()])->withInput();

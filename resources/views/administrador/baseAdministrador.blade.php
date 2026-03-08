@@ -634,13 +634,22 @@
                     <!-- Sección: Finanzas -->
                     <div class="nav-section-title">FINANZAS</div>
 
-                    <!-- Pagos -->
+                    <!-- Finanzas -->
                     <li>
-                        <a href="{{ route('pagos.form') }}"
-                            class="nav-link link-dark sidebar-link d-flex align-items-center gap-3">
+                        <a class="nav-link link-dark sidebar-link d-flex align-items-center gap-3"
+                            data-bs-toggle="collapse" href="#submenuFinanzas" role="button" aria-expanded="false">
                             <i class="bi bi-cash-coin"></i>
-                            <span>Pagos</span>
+                            <span>Finanzas (Pagos)</span>
+                            <i class="bi bi-chevron-down ms-auto" style="font-size: 0.8rem;"></i>
                         </a>
+                        <div class="collapse" id="submenuFinanzas">
+                            <ul class="nav flex-column gap-1 mt-1">
+                                <li><a class="nav-link link-dark submenu-item"
+                                        href="{{ route('pagos.form') }}">Registrar Pago</a></li>
+                                <li><a class="nav-link link-dark submenu-item"
+                                        href="{{ route('pagos.mensuales') }}">Historial Mensual</a></li>
+                            </ul>
+                        </div>
                     </li>
 
                     <!-- Egresos -->
