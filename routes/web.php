@@ -349,6 +349,7 @@ Route::middleware(['auth', 'role:administrador'])->prefix('comercial')->group(fu
 
     /* ----------------- ESTUDIANTES INACTIVOS ----------------- */
     Route::get('/estudiantesNoActivos', [EstudiantesInactivosController::class, 'index'])->name('estudiantesNoActivos');
+    Route::get('/estudiantesNoActivos/exportar', [EstudiantesInactivosController::class, 'exportar'])->name('estudiantesNoActivos.exportar');
     Route::put('/estudiantes/activar/{id}', [EstudiantesInactivosController::class, 'reactivar'])->name('estudiantes.reactivar');
 
     /* ----------------- REPORTES DE TALLERES ----------------- */
