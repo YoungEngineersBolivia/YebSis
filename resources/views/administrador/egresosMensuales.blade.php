@@ -3,48 +3,60 @@
 @section('title', 'Historial de Egresos')
 
 @section('content')
-    <div class="page-header d-flex flex-wrap justify-content-between align-items-center gap-3">
-        <div>
-            <h1><i class="bi bi-calendar3 text-primary"></i> Egresos Totales por Mes</h1>
-            <p class="text-muted mb-0">Resumen histórico de gastos mensuales</p>
-        </div>
-        <div class="d-flex align-items-center gap-3">
-            <form action="{{ route('egresos.mensuales') }}" method="GET" class="d-flex align-items-center gap-3">
-                <div class="d-flex align-items-center gap-2">
-                    <label class="text-muted small fw-bold text-uppercase mb-0">Año:</label>
-                    <input type="number" name="anio" class="form-control form-control-sm shadow-sm" style="width: 100px;"
-                        min="2000" value="{{ $anioSeleccionado }}" onchange="this.form.submit()">
-                </div>
-                <!-- Buscador de Tabla -->
-                <div class="input-group search-box border-0 shadow-sm" style="max-width: 250px;">
-                    <span class="input-group-text"><i class="bi bi-search py-0"></i></span>
-                    <input type="text" class="form-control form-control-sm" placeholder="Buscar mes..."
-                        data-table-filter="tablaEgresosMensuales">
-                </div>
-                <a href="{{ route('egresos.mensuales') }}" class="btn btn-sm btn-outline-secondary shadow-sm"
-                    title="Limpiar filtro">
-                    <i class="bi bi-arrow-counterclockwise"></i>
-                </a>
-            </form>
-
-            <div class="btn-group shadow-sm">
-                <a href="{{ route('egresos.formato') }}" class="btn btn-outline-success">
-                    <i class="bi bi-file-earmark-arrow-down"></i> Formato
-                </a>
-                <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#modalImportarEgresos">
-                    <i class="bi bi-file-earmark-arrow-up"></i> Importar
-                </button>
+    <div class="page-header">
+        <div class="row align-items-center">
+            <div class="col-xl-5 col-lg-6 mb-3 mb-lg-0">
+                <h1><i class="bi bi-calendar3 text-primary"></i> Egresos Totales por Mes</h1>
+                <p class="text-muted mb-0">Resumen histórico de gastos mensuales</p>
             </div>
+            <div class="col-xl-7 col-lg-6 d-flex flex-wrap justify-content-lg-end align-items-center gap-2">
+                <form action="{{ route('egresos.mensuales') }}" method="GET"
+                    class="d-flex flex-wrap gap-2 me-lg-2 w-100 w-lg-auto mb-2 mb-lg-0">
+                    <div class="d-flex align-items-center gap-2 flex-grow-1">
+                        <label class="text-muted small fw-bold text-uppercase mb-0 d-none d-sm-inline">Año:</label>
+                        <input type="number" name="anio" class="form-control form-control-sm shadow-sm" style="width: 85px;"
+                            min="2000" value="{{ $anioSeleccionado }}" onchange="this.form.submit()">
+                        <!-- Buscador de Tabla -->
+                        <div class="input-group search-box border-0 shadow-none m-0 flex-grow-1" style="min-width: 150px;">
+                            <span class="input-group-text bg-transparent border-0 pe-0"><i
+                                    class="bi bi-search text-primary"></i></span>
+                            <input type="text" class="form-control form-control-sm border-0 bg-transparent"
+                                placeholder="Buscar mes..." data-table-filter="tablaEgresosMensuales">
+                        </div>
+                    </div>
+                    <a href="{{ route('egresos.mensuales') }}" class="btn btn-sm btn-outline-secondary shadow-sm"
+                        title="Limpiar filtro">
+                        <i class="bi bi-arrow-counterclockwise"></i>
+                    </a>
+                </form>
 
-            <a href="{{ route('egresos.index') }}" class="btn btn-primary shadow-sm">
-                <i class="bi bi-plus-lg me-1"></i> Gestionar Egresos
-            </a>
+                <div class="d-flex flex-wrap gap-2 w-100 w-lg-auto justify-content-between justify-content-lg-end">
+                    <div class="btn-group shadow-sm flex-grow-1 flex-lg-grow-0">
+                        <a href="{{ route('egresos.formato') }}"
+                            class="btn btn-sm btn-outline-success d-flex align-items-center justify-content-center">
+                            <i class="bi bi-file-earmark-arrow-down me-1"></i> <span
+                                class="d-none d-sm-inline">Formato</span>
+                        </a>
+                        <button type="button"
+                            class="btn btn-sm btn-success d-flex align-items-center justify-content-center"
+                            data-bs-toggle="modal" data-bs-target="#modalImportarEgresos">
+                            <i class="bi bi-file-earmark-arrow-up me-1"></i> <span
+                                class="d-none d-sm-inline">Importar</span>
+                        </button>
+                    </div>
+
+                    <a href="{{ route('egresos.index') }}"
+                        class="btn btn-sm btn-primary shadow-sm flex-grow-1 flex-lg-grow-0 d-flex align-items-center justify-content-center">
+                        <i class="bi bi-plus-lg me-1"></i> <span class="">Gestionar Egresos</span>
+                    </a>
+                </div>
+            </div>
         </div>
     </div>
 
     @if(session('success'))
         <div class="alert alert-success alert-dismissible fade show shadow-sm border-0 mb-4" role="alert">
-            <i class="bi bi-check-circle-fill me-2"></i>
+            <i class="bi bi-check-circle-fill me-2 fs-5"></i>
             {{ session('success') }}
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
@@ -52,7 +64,7 @@
 
     @if(session('error'))
         <div class="alert alert-danger alert-dismissible fade show shadow-sm border-0 mb-4" role="alert">
-            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+            <i class="bi bi-exclamation-triangle-fill me-2 fs-5"></i>
             {{ session('error') }}
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
@@ -62,41 +74,50 @@
         <div class="card-body p-0">
             <div class="table-responsive">
                 <table class="table table-hover table-striped align-middle mb-0" id="tablaEgresosMensuales">
-                    <thead>
-                        <tr>
-                            <th class="ps-4">Periodo (Mes/Año)</th>
+                    <thead class="bg-light">
+                        <tr class="small text-uppercase text-muted">
+                            <th class="ps-3 ps-md-4">Periodo (Mes/Año)</th>
                             <th class="text-center">Cant. Egresos</th>
                             <th class="text-center">Total Gastado</th>
-                            <th class="pe-4 text-end">Último Registro</th>
+                            <th class="pe-3 pe-md-4 text-end d-none d-md-table-cell">Último Registro</th>
                         </tr>
                     </thead>
                     <tbody>
                         @forelse($egresosMensuales as $egreso)
                             <tr>
-                                <td class="ps-4">
+                                <td class="ps-3 ps-md-4">
                                     <div class="d-flex align-items-center">
-                                        <div class="bg-danger bg-opacity-10 text-danger rounded-3 p-2 me-3">
+                                        <div
+                                            class="bg-danger bg-opacity-10 text-danger rounded-3 p-2 me-2 me-md-3 d-none d-sm-block">
                                             <i class="bi bi-calendar-minus fs-5"></i>
                                         </div>
                                         <div>
-                                            <span class="fw-bold text-capitalize">{{ $egreso->nombre_mes }}</span>
-                                            <span class="text-muted ms-1">{{ $egreso->anio }}</span>
+                                            <span
+                                                class="fw-bold text-capitalize d-block d-sm-inline">{{ $egreso->nombre_mes }}</span>
+                                            <span class="text-muted ms-sm-1">{{ $egreso->anio }}</span>
+                                            <div class="d-md-none mt-1">
+                                                <small class="text-muted" style="font-size: 0.7rem;">
+                                                    <i class="bi bi-clock-history me-1"></i>
+                                                    {{ \Carbon\Carbon::parse($egreso->ultima_fecha)->format('d/m/Y') }}
+                                                </small>
+                                            </div>
                                         </div>
                                     </div>
                                 </td>
                                 <td class="text-center">
                                     <a href="{{ route('egresos.index', ['mes' => $egreso->mes, 'anio' => $egreso->anio]) }}"
-                                        class="badge bg-info text-white rounded-pill px-3 text-decoration-none hover-shadow"
-                                        title="Ver detalles de estos egresos">
-                                        {{ $egreso->cantidad_egresos }} registros <i class="bi bi-eye ms-1"></i>
+                                        class="badge bg-info text-white rounded-pill px-2 px-md-3 text-decoration-none hover-shadow"
+                                        title="Ver detalles de estos egresos" style="font-size: 0.75rem;">
+                                        {{ $egreso->cantidad_egresos }} <span class="d-none d-sm-inline">registros</span> <i
+                                            class="bi bi-eye ms-1"></i>
                                     </a>
                                 </td>
                                 <td class="text-center">
-                                    <span class="fw-bold text-danger fs-5">
+                                    <span class="fw-bold text-danger fs-6 fs-md-5">
                                         Bs. {{ number_format($egreso->total, 2, '.', ',') }}
                                     </span>
                                 </td>
-                                <td class="pe-4 text-end">
+                                <td class="pe-3 pe-md-4 text-end d-none d-md-table-cell">
                                     <small class="text-muted">
                                         <i class="bi bi-clock-history me-1"></i>
                                         {{ \Carbon\Carbon::parse($egreso->ultima_fecha)->format('d/m/Y H:i') }}
@@ -115,13 +136,13 @@
                     @if($egresosMensuales->isNotEmpty())
                         <tfoot class="table-light">
                             <tr>
-                                <td colspan="2" class="ps-4 fw-bold text-end">Total Histórico:</td>
+                                <td colspan="2" class="ps-3 ps-md-4 fw-bold text-end">Total Histórico:</td>
                                 <td class="text-center">
-                                    <span class="fw-bold text-danger fs-4">
+                                    <span class="fw-bold text-danger fs-5 fs-md-4">
                                         Bs. {{ number_format($egresosMensuales->sum('total'), 2, '.', ',') }}
                                     </span>
                                 </td>
-                                <td></td>
+                                <td class="d-none d-md-table-cell"></td>
                             </tr>
                         </tfoot>
                     @endif

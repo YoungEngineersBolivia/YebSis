@@ -854,11 +854,39 @@
                     });
                 });
             });
+
+            // --- NOTIFICACIONES GLOBALES CON SWEETALERT2 ---
+            <?php if(session('success')): ?>
+                Swal.fire({
+                    icon: 'success',
+                    title: '¡Operación Exitosa!',
+                    text: "<?php echo e(session('success')); ?>",
+                    toast: true,
+                    position: 'top-end',
+                    showConfirmButton: false,
+                    timer: 4000,
+                    timerProgressBar: true,
+                    didOpen: (toast) => {
+                        toast.addEventListener('mouseenter', Swal.stopTimer)
+                        toast.addEventListener('mouseleave', Swal.resumeTimer)
+                    }
+                });
+            <?php endif; ?>
+
+            <?php if(session('error')): ?>
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Hubo un problema',
+                    text: "<?php echo e(session('error')); ?>",
+                    confirmButtonColor: '#ef4444',
+                });
+            <?php endif; ?>
         });
     </script>
     <?php echo $__env->yieldContent('scripts'); ?>
     <?php echo $__env->yieldPushContent('scripts'); ?>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="<?php echo e(auto_asset('js/administrador/baseAdministrador.js')); ?>"></script>
 </body>
 

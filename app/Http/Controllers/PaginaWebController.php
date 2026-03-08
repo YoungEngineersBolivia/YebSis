@@ -14,15 +14,14 @@ class PaginaWebController extends Controller
         $programas = Programa::orderBy('Id_programas', 'desc')->get();
 
         // Trae todas las publicaciones activas, ordenadas por fecha y hora
-        $publicaciones = Publicacion::where('Estado', 1    )
-                                    ->orderBy('Fecha', 'desc')
-                                    ->orderBy('Hora', 'desc')
-                                    ->get();
+        $publicaciones = Publicacion::whereIn('Estado', ['Activa', '1', 'true', 1])
+            ->orderBy('Fecha', 'desc')
+            ->orderBy('Hora', 'desc')
+            ->get();
 
         // Pasa ambas variables a la vista
         return view('paginaWeb.home', compact('programas', 'publicaciones'));
     }
 }
 
-        
-    
+

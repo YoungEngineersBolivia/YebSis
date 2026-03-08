@@ -17,6 +17,22 @@
                 <p>Administra los pagos de los estudiantes</p>
             </div>
             <div class="d-flex align-items-center gap-3 flex-grow-1 justify-content-end" style="max-width: 800px;">
+                <!-- Leyenda de Colores -->
+                <div class="d-flex gap-2 me-3 d-none d-md-flex">
+                    <div class="d-flex align-items-center gap-1">
+                        <span class="badge rounded-pill"
+                            style="background-color: #E3F2FD; border: 1px solid #BBDEFB; width: 12px; height: 12px; display: inline-block;">
+                        </span>
+                        <small class="text-muted fw-bold" style="font-size: 0.7rem;">PROGRAMA</small>
+                    </div>
+                    <div class="d-flex align-items-center gap-1">
+                        <span class="badge rounded-pill"
+                            style="background-color: #FFF3E0; border: 1px solid #FFE0B2; width: 12px; height: 12px; display: inline-block;">
+                        </span>
+                        <small class="text-muted fw-bold" style="font-size: 0.7rem;">TALLER</small>
+                    </div>
+                </div>
+
                 <!-- Buscador AJAX -->
                 <div class="input-group search-box border-0 shadow-sm flex-grow-1" style="max-width: 400px;">
                     <span class="input-group-text"><i class="bi bi-search"></i></span>
@@ -48,19 +64,35 @@
             </div>
         @endif
 
-        @if(session('success'))
-            <div class="alert alert-success alert-dismissible fade show" role="alert">
-                <i class="fas fa-check-circle me-2"></i>
-                {{ session('success') }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        @if (session('success'))
+            <div class="alert alert-success alert-modern alert-dismissible fade show border-0 shadow-sm d-flex align-items-center p-3 mb-4"
+                role="alert"
+                style="background: linear-gradient(to right, #dcfce7, #f0fdf4); border-left: 5px solid #22c55e !important;">
+                <div class="alert-icon-circle bg-success text-white rounded-circle d-flex align-items-center justify-content-center me-3"
+                    style="width: 40px; height: 40px; min-width: 40px;">
+                    <i class="fas fa-check"></i>
+                </div>
+                <div class="flex-grow-1">
+                    <h6 class="alert-heading mb-1 fw-bold text-success" style="font-size: 0.95rem;">¡Operación Exitosa!</h6>
+                    <p class="mb-0 text-success-emphasis" style="font-size: 0.85rem;">{{ session('success') }}</p>
+                </div>
+                <button type="button" class="btn-close shadow-none" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
         @endif
 
-        @if(session('error'))
-            <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                <i class="fas fa-exclamation-circle me-2"></i>
-                {{ session('error') }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        @if (session('error'))
+            <div class="alert alert-danger alert-modern alert-dismissible fade show border-0 shadow-sm d-flex align-items-center p-3 mb-4"
+                role="alert"
+                style="background: linear-gradient(to right, #fee2e2, #fef2f2); border-left: 5px solid #ef4444 !important;">
+                <div class="alert-icon-circle bg-danger text-white rounded-circle d-flex align-items-center justify-content-center me-3"
+                    style="width: 40px; height: 40px; min-width: 40px;">
+                    <i class="fas fa-exclamation-triangle"></i>
+                </div>
+                <div class="flex-grow-1">
+                    <h6 class="alert-heading mb-1 fw-bold text-danger" style="font-size: 0.95rem;">Ha ocurrido un error</h6>
+                    <p class="mb-0 text-danger-emphasis" style="font-size: 0.85rem;">{{ session('error') }}</p>
+                </div>
+                <button type="button" class="btn-close shadow-none" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
         @endif
 
@@ -201,8 +233,8 @@
 
 @section('scripts')
     <script id="estudiantes-data" type="application/json">
-                                                                    {!! json_encode($estudiantes) !!}
-                                                                </script>
+                                                                            {!! json_encode($estudiantes) !!}
+                                                                        </script>
 
     <script>
         const estudiantes = JSON.parse(document.getElementById('estudiantes-data').textContent);

@@ -19,7 +19,9 @@ class PagosController extends Controller
             'tutor.persona',
             'planesPago.cuotas',
             'planesPago.programa',
-            'planesPago.pagos'
+            'planesPago.pagos',
+            'talleresInscritos.taller',
+            'talleresInscritos.pagosTaller'
         ]);
 
         if ($search) {
@@ -69,9 +71,10 @@ class PagosController extends Controller
                         if ($anioSeleccionado)
                             $pq->whereYear('Fecha_pago', $anioSeleccionado);
                     },
-                    'cuotas'
                 ]);
-            }
+            },
+            'talleresInscritos.taller',
+            'talleresInscritos.pagosTaller'
         ]);
 
         if ($request->has('nombre') && $request->nombre != '') {

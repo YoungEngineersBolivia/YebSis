@@ -5,40 +5,68 @@
             $tieneSaldo = false;
             $todosCompletados = true;
 
-            if ($planes && $planes->count() > 0) {
-                foreach ($planes as $plan) {
-                    $totalPagado = $plan->pagos->sum('Monto_pago');
-                    if ($totalPagado < $plan->Monto_total) {
-                        $tieneSaldo = true;
-                        $todosCompletados = false;
+            $talleresOld = $estudiante->talleresInscritos;
+            $tienePlanes = ($planes && $planes->count() > 0);
+            $tieneTalleres = ($talleresOld && $talleresOld->count() > 0);
+
+            if ($tienePlanes || $tieneTalleres) {
+                if ($tienePlanes) {
+                    foreach ($planes as $plan) {
+                        $totalPagado = $plan->pagos->sum('Monto_pago');
+                        if ($totalPagado < $plan->Monto_total) {
+                            $tieneSaldo = true;
+                            $todosCompletados = false;
+                        }
                     }
+                }
+                // Si tiene talleres pero no planes, no marcamos como 'completados' automáticamente
+                if (!$tienePlanes && $tieneTalleres) {
+                    $todosCompletados = false;
                 }
             } else {
                 $todosCompletados = false;
             }
 
             $estadoClase = $todosCompletados ? 'completado' : ($tieneSaldo ? 'pendiente' : 'pendiente');
+
+            // Determinar color de la ficha según el tipo (Programa o Taller)
+            $esTaller = false;
+            if ($tienePlanes) {
+                // Verificamos si alguno de los programas tiene "taller" en el tipo o en el nombre
+                foreach ($planes as $p) {
+                    $tipo = strtolower($p->programa->Tipo ?? '');
+                    $nombre = strtolower($p->programa->Nombre ?? '');
+                    if (str_contains($tipo, 'taller') || str_contains($nombre, 'taller')) {
+                        $esTaller = true;
+                        break;
+                    }
+                }
+            } elseif ($tieneTalleres) {
+                $esTaller = true;
+            }
+
+            $bgCard = $esTaller ? 'background: #FFF3E0;' : 'background: #E3F2FD;';
+            $bgHeader = $esTaller ? 'background: linear-gradient(135deg, #FFF3E0 0%, #FFE0B2 100%);' : 'background: linear-gradient(135deg, #E3F2FD 0%, #BBDEFB 100%);';
         @endphp
 
         <div class="col-lg-6 col-md-12 estudiante-card" data-estado="{{ $estadoClase }}"
             data-tutor="{{ $estudiante->tutor && $estudiante->tutor->persona ? strtolower($estudiante->tutor->persona->Nombre . ' ' . $estudiante->tutor->persona->Apellido) : '' }}"
             data-estudiante="{{ strtolower(($estudiante->persona->Nombre ?? '') . ' ' . ($estudiante->persona->Apellido ?? '')) }}">
-            <div class="card h-100 shadow-sm border-0 hover-card" style="transition: all 0.3s ease;">
-                <div class="card-header bg-gradient border-bottom pt-4 pb-3"
-                    style="background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);">
+            <div class="card h-100 shadow-sm border-0 hover-card" style="transition: all 0.3s ease; {{ $bgCard }}">
+                <div class="card-header bg-gradient border-bottom pt-4 pb-3" style="{{ $bgHeader }}">
                     <div class="d-flex justify-content-between align-items-start">
                         <div class="flex-grow-1">
-                            <div class="mb-2">
-                                <span class="badge bg-primary bg-opacity-10 text-primary px-3 py-2 me-2"
-                                    style="font-size: 0.85rem;">
-                                    <i class="fas fa-user-tie me-1"></i>Tutor
-                                </span>
-                                <span class="fw-bold text-dark" style="font-size: 1.05rem;">
-                                    {{ $estudiante->tutor && $estudiante->tutor->persona
-            ? $estudiante->tutor->persona->Nombre . ' ' . $estudiante->tutor->persona->Apellido
-            : 'Sin tutor asignado' }}
-                                </span>
-                            </div>
+                            @if($estudiante->tutor && $estudiante->tutor->persona)
+                                <div class="mb-2">
+                                    <span class="badge bg-primary bg-opacity-10 text-primary px-3 py-2 me-2"
+                                        style="font-size: 0.85rem;">
+                                        <i class="fas fa-user-tie me-1"></i>Tutor
+                                    </span>
+                                    <span class="fw-bold text-dark" style="font-size: 1.05rem;">
+                                        {{ $estudiante->tutor->persona->Nombre . ' ' . $estudiante->tutor->persona->Apellido }}
+                                    </span>
+                                </div>
+                            @endif
                             <div>
                                 <span class="badge bg-success bg-opacity-10 text-success px-3 py-2 me-2"
                                     style="font-size: 0.85rem;">
@@ -125,7 +153,9 @@
                                 </button>
                             </div>
                         @endforeach
-                    @else
+                    @endif
+
+                    @if(!$tienePlanes && !$tieneTalleres)
                         <div class="alert alert-warning py-2 mb-0">
                             <small><i class="fas fa-exclamation-triangle me-1"></i> Sin plan asignado</small>
                         </div>

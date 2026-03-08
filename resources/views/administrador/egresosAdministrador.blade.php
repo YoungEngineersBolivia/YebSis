@@ -5,73 +5,85 @@
 @section('content')
     <div class="page-header">
         <div class="row align-items-center">
-            <div class="col-md-6">
+            <div class="col-xl-5 col-lg-6 mb-3 mb-lg-0">
                 <h1><i class="bi bi-cash-stack text-primary"></i> Gestión de Egresos</h1>
                 <p class="text-muted">Administración y control de gastos del sistema</p>
             </div>
-            <div class="col-md-6 d-flex justify-content-md-end gap-2 mt-3 mt-md-0">
-                <form action="{{ route('egresos.index') }}" method="GET" class="d-flex gap-2 me-2">
-                    <select name="mes" class="form-select form-select-sm" onchange="this.form.submit()"
-                        style="min-width: 130px;">
-                        @for($m = 1; $m <= 12; $m++)
-                            <option value="{{ $m }}" {{ $estadisticasTiempo['mes_num'] == $m ? 'selected' : '' }}>
-                                {{ Carbon\Carbon::create()->month($m)->monthName }}
-                            </option>
-                        @endfor
-                    </select>
-                    <input type="number" name="anio" class="form-control form-control-sm" style="width: 90px;" min="2000"
-                        value="{{ $estadisticasTiempo['anio_actual'] }}" onchange="this.form.submit()">
+            <div class="col-xl-7 col-lg-6 d-flex flex-wrap justify-content-lg-end align-items-center gap-2">
+                <form action="{{ route('egresos.index') }}" method="GET"
+                    class="d-flex flex-wrap gap-2 me-lg-2 w-100 w-lg-auto mb-2 mb-lg-0">
+                    <div class="d-flex gap-2 flex-grow-1">
+                        <select name="mes" class="form-select form-select-sm" onchange="this.form.submit()"
+                            style="min-width: 120px;">
+                            @for($m = 1; $m <= 12; $m++)
+                                <option value="{{ $m }}" {{ $estadisticasTiempo['mes_num'] == $m ? 'selected' : '' }}>
+                                    {{ Carbon\Carbon::create()->month($m)->monthName }}
+                                </option>
+                            @endfor
+                        </select>
+                        <input type="number" name="anio" class="form-control form-control-sm" style="width: 85px;"
+                            min="2000" value="{{ $estadisticasTiempo['anio_actual'] }}" onchange="this.form.submit()">
+                    </div>
                     <a href="{{ route('egresos.index') }}" class="btn btn-sm btn-outline-secondary"
                         title="Reiniciar filtros">
                         <i class="bi bi-arrow-counterclockwise"></i>
                     </a>
                 </form>
 
-                <div class="btn-group shadow-sm">
-                    <a href="{{ route('egresos.formato') }}" class="btn btn-outline-success">
-                        <i class="bi bi-file-earmark-arrow-down"></i> Formato
-                    </a>
-                    <button type="button" class="btn btn-success" data-bs-toggle="modal"
-                        data-bs-target="#modalImportarEgresos">
-                        <i class="bi bi-file-earmark-arrow-up"></i> Importar
+                <div class="d-flex flex-wrap gap-2 w-100 w-lg-auto justify-content-between justify-content-lg-end">
+                    <div class="btn-group shadow-sm flex-grow-1 flex-lg-grow-0">
+                        <a href="{{ route('egresos.formato') }}"
+                            class="btn btn-sm btn-outline-success d-flex align-items-center justify-content-center">
+                            <i class="bi bi-file-earmark-arrow-down me-1"></i> <span
+                                class="d-none d-sm-inline">Formato</span>
+                        </a>
+                        <button type="button"
+                            class="btn btn-sm btn-success d-flex align-items-center justify-content-center"
+                            data-bs-toggle="modal" data-bs-target="#modalImportarEgresos">
+                            <i class="bi bi-file-earmark-arrow-up me-1"></i> <span
+                                class="d-none d-sm-inline">Importar</span>
+                        </button>
+                    </div>
+
+                    <button type="button"
+                        class="btn btn-sm btn-primary shadow-sm flex-grow-1 flex-lg-grow-0 d-flex align-items-center justify-content-center"
+                        data-bs-toggle="modal" data-bs-target="#modalRegistrarEgreso">
+                        <i class="bi bi-plus-lg me-1"></i> <span class="">Nuevo Egreso</span>
                     </button>
                 </div>
-
-                <button type="button" class="btn btn-primary shadow-sm" data-bs-toggle="modal"
-                    data-bs-target="#modalRegistrarEgreso">
-                    <i class="bi bi-plus-lg me-1"></i> Nuevo Egreso
-                </button>
             </div>
         </div>
     </div>
 
     {{-- Métricas Rápidas --}}
-    <div class="row mb-4">
-        <div class="col-md-4">
-            <div class="card border-0 shadow-sm bg-primary text-white">
+    <div class="row g-3 mb-4">
+        <div class="col-12 col-lg-4">
+            <div class="card border-0 shadow-sm bg-primary text-white h-100">
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
                             <h6 class="text-white-50 mb-1 text-uppercase small fw-bold">Egresos en
                                 {{ $estadisticasTiempo['mes_nombre'] }}
                             </h6>
-                            <h2 class="mb-0">Bs. {{ number_format($totalMes, 2) }}</h2>
+                            <h2 class="mb-0 fs-3 fw-bold">Bs. {{ number_format($totalMes, 2) }}</h2>
                         </div>
-                        <div class="bg-white bg-opacity-20 p-3 rounded-3">
-                            <i class="bi bi-graph-down-arrow fs-2 text-white"></i>
+                        <div class="bg-white bg-opacity-20 p-2 p-md-3 rounded-3">
+                            <i class="bi bi-graph-down-arrow fs-3 text-white"></i>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="col-md-8">
+        <div class="col-12 col-lg-8">
             <div class="card border-0 shadow-sm h-100">
-                <div class="card-body d-flex align-items-center">
+                <div class="card-body d-flex align-items-center p-2 p-md-3">
                     <div class="flex-grow-1">
-                        <div class="input-group search-box border-0">
-                            <span class="input-group-text"><i class="bi bi-search"></i></span>
-                            <input type="text" class="form-control" placeholder="Filtrar por descripción o tipo..."
-                                id="searchInput" data-table-filter="egresosTable">
+                        <div class="input-group search-box border-0 shadow-none m-0">
+                            <span class="input-group-text bg-transparent border-0"><i
+                                    class="bi bi-search text-primary"></i></span>
+                            <input type="text" class="form-control border-0 bg-transparent"
+                                placeholder="Filtrar por descripción o tipo..." id="searchInput"
+                                data-table-filter="egresosTable">
                         </div>
                     </div>
                 </div>
@@ -81,8 +93,9 @@
 
     {{-- Tabla de Detalles a Ancho Completo --}}
     <div class="card border-0 shadow-sm">
-        <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center border-0">
-            <h5 class="mb-0 fw-bold text-dark">
+        <div
+            class="card-header bg-white py-3 d-flex flex-column flex-sm-row justify-content-between align-items-center gap-2 border-0">
+            <h5 class="mb-0 fw-bold text-dark text-center text-sm-start">
                 <i class="bi bi-list-task me-2 text-primary"></i>
                 Detalles: {{ $estadisticasTiempo['mes_nombre'] }} {{ $estadisticasTiempo['anio_actual'] }}
             </h5>
@@ -93,22 +106,30 @@
                 <table class="table table-hover align-middle mb-0" id="egresosTable">
                     <thead class="bg-light">
                         <tr class="small text-uppercase text-muted">
-                            <th class="ps-4">Concepto</th>
-                            <th>Fecha</th>
+                            <th class="ps-3 ps-md-4">Concepto</th>
+                            <th class="d-none d-md-table-cell">Fecha</th>
                             <th class="text-center">Monto</th>
-                            <th class="pe-4 text-end">Acciones</th>
+                            <th class="pe-3 pe-md-4 text-end">Acciones</th>
                         </tr>
                     </thead>
                     <tbody>
                         @forelse ($egresos as $egreso)
                             <tr>
-                                <td class="ps-4">
-                                    <div class="fw-bold text-dark">{{ $egreso->Descripcion_egreso }}</div>
-                                    <span class="badge bg-light text-muted border-0 p-0" style="font-size: 0.7rem;">
-                                        {{ $egreso->Tipo }}
-                                    </span>
+                                <td class="ps-3 ps-md-4">
+                                    <div class="fw-bold text-dark text-wrap" style="max-width: 250px;">
+                                        {{ $egreso->Descripcion_egreso }}</div>
+                                    <div class="d-flex flex-wrap gap-1 mt-1">
+                                        <span class="badge bg-light text-primary border border-primary-subtle px-2 py-1"
+                                            style="font-size: 0.65rem;">
+                                            {{ $egreso->Tipo }}
+                                        </span>
+                                        <span class="d-md-none text-muted small" style="font-size: 0.65rem;">
+                                            <i
+                                                class="bi bi-calendar3 me-1"></i>{{ \Carbon\Carbon::parse($egreso->Fecha_egreso)->format('d/m/Y') }}
+                                        </span>
+                                    </div>
                                 </td>
-                                <td>
+                                <td class="d-none d-md-table-cell">
                                     <div class="text-muted small">
                                         {{ \Carbon\Carbon::parse($egreso->Fecha_egreso)->format('d/m/Y') }}
                                     </div>
@@ -116,8 +137,8 @@
                                 <td class="text-center">
                                     <span class="fw-bold text-danger">Bs. {{ number_format($egreso->Monto_egreso, 2) }}</span>
                                 </td>
-                                <td class="pe-4 text-end">
-                                    <div class="btn-group shadow-sm bg-white">
+                                <td class="pe-3 pe-md-4 text-end">
+                                    <div class="btn-group btn-group-sm shadow-sm bg-white">
                                         <button class="btn btn-sm btn-white border-0 btn-editar" title="Editar"
                                             data-bs-toggle="modal" data-bs-target="#modalEditarEgreso"
                                             data-id="{{ $egreso->Id_egreso }}" data-tipo="{{ $egreso->Tipo }}"

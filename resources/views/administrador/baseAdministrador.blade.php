@@ -852,11 +852,39 @@
                     });
                 });
             });
+
+            // --- NOTIFICACIONES GLOBALES CON SWEETALERT2 ---
+            @if(session('success'))
+                Swal.fire({
+                    icon: 'success',
+                    title: '¡Operación Exitosa!',
+                    text: "{{ session('success') }}",
+                    toast: true,
+                    position: 'top-end',
+                    showConfirmButton: false,
+                    timer: 4000,
+                    timerProgressBar: true,
+                    didOpen: (toast) => {
+                        toast.addEventListener('mouseenter', Swal.stopTimer)
+                        toast.addEventListener('mouseleave', Swal.resumeTimer)
+                    }
+                });
+            @endif
+
+            @if(session('error'))
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Hubo un problema',
+                    text: "{{ session('error') }}",
+                    confirmButtonColor: '#ef4444',
+                });
+            @endif
         });
     </script>
     @yield('scripts')
     @stack('scripts')
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="{{ auto_asset('js/administrador/baseAdministrador.js') }}"></script>
 </body>
 

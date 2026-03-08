@@ -113,7 +113,7 @@ unset($__errorArgs, $__bag); ?>
                                             <td><?php echo e(Str::limit($pub->Descripcion, 50)); ?></td>
                                             <td>
                                                 <?php if($pub->Imagen): ?>
-                                                    <a href="<?php echo e(auto_asset('storage/' . $pub->Imagen)); ?>" target="_blank"
+                                                    <a href="<?php echo e(asset('storage/' . $pub->Imagen)); ?>" target="_blank"
                                                         class="btn btn-sm btn-outline-info">
                                                         <i class="bi bi-file-earmark-arrow-down me-1"></i>Ver
                                                     </a>
@@ -121,13 +121,14 @@ unset($__errorArgs, $__bag); ?>
                                                     <span class="text-muted small">N/A</span>
                                                 <?php endif; ?>
                                             </td>
-                                            <td><?php echo e($pub->created_at->format('d/m/Y')); ?></td>
+                                            <td><?php echo e($pub->created_at ? $pub->created_at->format('d/m/Y') : 'N/A'); ?></td>
                                             <td class="pe-3 text-end">
                                                 <form action="<?php echo e(route('publicaciones.destroy', $pub->Id_publicaciones)); ?>"
-                                                    method="POST" onsubmit="return confirm('¿Eliminar publicación?');">
+                                                    method="POST" class="delete-form">
                                                     <?php echo csrf_field(); ?>
                                                     <?php echo method_field('DELETE'); ?>
-                                                    <button class="btn btn-sm btn-outline-danger" title="Eliminar">
+                                                    <button type="button" class="btn btn-sm btn-outline-danger btn-delete"
+                                                        title="Eliminar">
                                                         <i class="bi bi-trash-fill"></i>
                                                     </button>
                                                 </form>
@@ -209,6 +210,11 @@ unset($__errorArgs, $__bag); ?>
                                     <input type="radio" class="btn-check" name="filtroDestinatarios" id="filtroActivos"
                                         value="activos" <?php echo e(old('filtroDestinatarios') == 'activos' ? 'checked' : ''); ?>>
                                     <label class="btn btn-sm btn-outline-success" for="filtroActivos">Solo Activos</label>
+
+                                    <input type="radio" class="btn-check" name="filtroDestinatarios" id="filtroInactivos"
+                                        value="inactivos" <?php echo e(old('filtroDestinatarios') == 'inactivos' ? 'checked' : ''); ?>>
+                                    <label class="btn btn-sm btn-outline-danger" for="filtroInactivos">Solo
+                                        Inactivos</label>
                                 </div>
 
                                 <div class="input-group mb-2">
@@ -287,7 +293,7 @@ unset($__errorArgs, $__bag); ?>
                                     <p class="mb-0 text-muted small"><?php echo e($notif->Descripcion); ?></p>
                                     <?php if($notif->Imagen): ?>
                                         <div class="mt-2">
-                                            <a href="<?php echo e(auto_asset('storage/' . $notif->Imagen)); ?>" target="_blank"
+                                            <a href="<?php echo e(asset('storage/' . $notif->Imagen)); ?>" target="_blank"
                                                 class="badge bg-info text-decoration-none">
                                                 <i class="bi bi-paperclip"></i> Adjunto
                                             </a>
@@ -338,11 +344,13 @@ unset($__errorArgs, $__bag); ?>
             const selectAll = document.getElementById('select-all-tutores');
             const filtroTodos = document.getElementById('filtroTodos');
             const filtroActivos = document.getElementById('filtroActivos');
+            const filtroInactivos = document.getElementById('filtroInactivos');
             const contadorSeleccionados = document.getElementById('contador-seleccionados');
 
             function filtrarTutores() {
                 const textoBusqueda = buscador.value.toLowerCase();
                 const soloActivos = filtroActivos.checked;
+                const soloInactivos = filtroInactivos.checked;
                 let visibles = 0;
 
                 listaTutores.querySelectorAll('.tutor-item').forEach(function (item) {
@@ -351,10 +359,13 @@ unset($__errorArgs, $__bag); ?>
 
                     // Condición 1: Coincide con búsqueda
                     const matchBusqueda = label.includes(textoBusqueda);
-                    // Condición 2: Filtro de activos
-                    const matchActivo = !soloActivos || esActivo;
 
-                    if (matchBusqueda && matchActivo) {
+                    // Condición 2: Filtro de estado
+                    let matchEstado = true;
+                    if (soloActivos) matchEstado = esActivo;
+                    if (soloInactivos) matchEstado = !esActivo;
+
+                    if (matchBusqueda && matchEstado) {
                         item.style.display = 'flex'; // Use flex for tutor-item
                         visibles++;
                     } else {
@@ -374,6 +385,7 @@ unset($__errorArgs, $__bag); ?>
             if (buscador) buscador.addEventListener('input', filtrarTutores);
             if (filtroTodos) filtroTodos.addEventListener('change', filtrarTutores);
             if (filtroActivos) filtroActivos.addEventListener('change', filtrarTutores);
+            if (filtroInactivos) filtroInactivos.addEventListener('change', filtrarTutores);
 
             if (selectAll && listaTutores) {
                 selectAll.addEventListener('change', function () {
@@ -388,12 +400,64 @@ unset($__errorArgs, $__bag); ?>
                 });
             }
 
-            // Actualizar contador al cambiar manualmnete
-            listaTutores.querySelectorAll('.tutor-checkbox').forEach(cb => {
-                cb.addEventListener('change', actualizarContador);
+            // --- VALIDACIÓN DE TAMAÑO DE ARCHIVOS ---
+            const maxSize = 10 * 1024 * 1024; // 10MB
+            const fileInputs = ['imagen', 'imagen_notif'];
+
+            fileInputs.forEach(id => {
+                const input = document.getElementById(id);
+                if (input) {
+                    input.addEventListener('change', function () {
+                        if (this.files && this.files[0]) {
+                            if (this.files[0].size > maxSize) {
+                                Swal.fire({
+                                    icon: 'warning',
+                                    title: 'Archivo muy pesado',
+                                    text: 'El tamaño máximo permitido es de 10MB. Por favor, elige un archivo más liviano.',
+                                    confirmButtonColor: '#6366f1',
+                                });
+                                this.value = ''; // Limpiar el input
+                            }
+                        }
+                    });
+                }
+            });
+
+            // --- PROTECCIÓN CONTRA DOBLE ENVÍO ---
+            const forms = document.querySelectorAll('form:not(.delete-form)');
+            forms.forEach(form => {
+                form.addEventListener('submit', function () {
+                    const button = this.querySelector('button[type="submit"]');
+                    if (button) {
+                        button.disabled = true;
+                        button.innerHTML = `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Procesando...`;
+                    }
+                });
+            });
+
+            // --- CONFIRMACIÓN DE ELIMINACIÓN CON SWEETALERT2 ---
+            const deleteButtons = document.querySelectorAll('.btn-delete');
+            deleteButtons.forEach(button => {
+                button.addEventListener('click', function () {
+                    const form = this.closest('form');
+                    Swal.fire({
+                        title: '¿Estás seguro?',
+                        text: "¡No podrás revertir esta acción!",
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#ef4444',
+                        cancelButtonColor: '#6b7280',
+                        confirmButtonText: 'Sí, eliminar',
+                        cancelButtonText: 'Cancelar'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            form.submit();
+                        }
+                    });
+                });
             });
 
         });
     </script>
 <?php $__env->stopSection(); ?>
-<?php echo $__env->make('/administrador/baseAdministrador', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\Users\DANTE\Desktop\YebSis\resources\views/administrador/pubnotAdministrador.blade.php ENDPATH**/ ?>
+<?php echo $__env->make('administrador.baseAdministrador', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\Users\DANTE\Desktop\YebSis\resources\views/administrador/pubnotAdministrador.blade.php ENDPATH**/ ?>

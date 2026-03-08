@@ -15,6 +15,22 @@
                 <p>Administra los pagos de los estudiantes</p>
             </div>
             <div class="d-flex align-items-center gap-3 flex-grow-1 justify-content-end" style="max-width: 800px;">
+                <!-- Leyenda de Colores -->
+                <div class="d-flex gap-2 me-3 d-none d-md-flex">
+                    <div class="d-flex align-items-center gap-1">
+                        <span class="badge rounded-pill"
+                            style="background-color: #E3F2FD; border: 1px solid #BBDEFB; width: 12px; height: 12px; display: inline-block;">
+                        </span>
+                        <small class="text-muted fw-bold" style="font-size: 0.7rem;">PROGRAMA</small>
+                    </div>
+                    <div class="d-flex align-items-center gap-1">
+                        <span class="badge rounded-pill"
+                            style="background-color: #FFF3E0; border: 1px solid #FFE0B2; width: 12px; height: 12px; display: inline-block;">
+                        </span>
+                        <small class="text-muted fw-bold" style="font-size: 0.7rem;">TALLER</small>
+                    </div>
+                </div>
+
                 <!-- Buscador AJAX -->
                 <div class="input-group search-box border-0 shadow-sm flex-grow-1" style="max-width: 400px;">
                     <span class="input-group-text"><i class="bi bi-search"></i></span>
@@ -203,9 +219,9 @@
 
 <?php $__env->startSection('scripts'); ?>
     <script id="estudiantes-data" type="application/json">
-                                                                    <?php echo json_encode($estudiantes); ?>
+                                                                        <?php echo json_encode($estudiantes); ?>
 
-                                                                </script>
+                                                                    </script>
 
     <script>
         const estudiantes = JSON.parse(document.getElementById('estudiantes-data').textContent);

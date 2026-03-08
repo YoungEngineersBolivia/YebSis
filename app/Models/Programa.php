@@ -9,9 +9,9 @@ class Programa extends Model
 {
     use HasFactory;
 
-    protected $table = 'programas'; 
+    protected $table = 'programas';
     protected $primaryKey = 'Id_programas';
-    
+
     protected $fillable = [
         'Nombre',
         'Costo',
@@ -52,7 +52,7 @@ class Programa extends Model
         }
         return $query;
     }
-    
+
     public function inscripcionesTalleres()
     {
         return $this->hasMany(EstudianteTaller::class, 'Id_programas', 'Id_programas');
@@ -61,7 +61,7 @@ class Programa extends Model
     // Scope para obtener solo talleres
     public function scopeTalleres($query)
     {
-        return $query->whereIn('Tipo', ['taller_invierno', 'taller_verano']);
+        return $query->whereIn('Tipo', ['taller', 'taller_invierno', 'taller_verano']);
     }
 
     // Scope para obtener solo programas regulares
