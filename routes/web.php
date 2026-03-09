@@ -287,10 +287,6 @@ Route::middleware(['auth', 'role:administrador'])->prefix('administrador')->grou
     Route::get('/evaluaciones/estudiante/{id}', [EvaluacionesEstudiantesController::class, 'show'])
         ->name('evaluaciones.estudiante.show');
 
-    // Cambiar estado del estudiante
-    Route::put('/estudiantes/{id}/cambiar-estado', [EstudianteController::class, 'cambiarEstado'])
-        ->name('estudiantes.cambiarEstado');
-
     /*------CITAS------- */
     Route::get('/citas', [CitasController::class, 'index'])->name('citas.index');
     Route::post('/citas', [CitasController::class, 'store'])->name('citas.store');
@@ -343,28 +339,28 @@ Route::middleware(['auth', 'role:administrador'])->prefix('administrador')->grou
 Route::middleware(['auth', 'role:administrador'])->prefix('comercial')->group(function () {
 
     /* ----------------- ESTUDIANTES ACTIVOS ----------------- */
-    Route::get('/estudiantesActivos', [EstudiantesActivosController::class, 'index'])->name('estudiantesActivos');
-    Route::get('/estudiantesActivos/exportar', [EstudiantesActivosController::class, 'exportar'])->name('estudiantesActivos.exportar');
-    Route::put('/estudiantes/desactivar/{id}', [EstudiantesActivosController::class, 'desactivar'])->name('estudiantes.desactivar');
+    Route::get('/estudiantesActivos', [EstudiantesActivosController::class, 'index'])->name('comercial.estudiantesActivos');
+    Route::get('/estudiantesActivos/exportar', [EstudiantesActivosController::class, 'exportar'])->name('comercial.estudiantesActivos.exportar');
+    Route::put('/estudiantes/desactivar/{id}', [EstudiantesActivosController::class, 'desactivar'])->name('comercial.estudiantes.desactivar');
     Route::get('/estudianteActivoComercial', fn() => view('comercial.estudianteActivoComercial'))->name('comercial.estudianteActivoComercial');
 
     /* ----------------- ESTUDIANTES INACTIVOS ----------------- */
-    Route::get('/estudiantesNoActivos', [EstudiantesInactivosController::class, 'index'])->name('estudiantesNoActivos');
-    Route::get('/estudiantesNoActivos/exportar', [EstudiantesInactivosController::class, 'exportar'])->name('estudiantesNoActivos.exportar');
-    Route::put('/estudiantes/activar/{id}', [EstudiantesInactivosController::class, 'reactivar'])->name('estudiantes.reactivar');
+    Route::get('/estudiantesNoActivos', [EstudiantesInactivosController::class, 'index'])->name('comercial.estudiantesNoActivos');
+    Route::get('/estudiantesNoActivos/exportar', [EstudiantesInactivosController::class, 'exportar'])->name('comercial.estudiantesNoActivos.exportar');
+    Route::put('/estudiantes/activar/{id}', [EstudiantesInactivosController::class, 'reactivar'])->name('comercial.estudiantes.reactivar');
 
     /* ----------------- REPORTES DE TALLERES ----------------- */
-    Route::get('/talleresComercial', [ReporteTalleresController::class, 'index'])->name('reportes.talleres');
-    Route::get('/reportes/talleres/exportar', [ReporteTalleresController::class, 'exportar'])->name('reportes.talleres.exportar');
-    Route::get('/api/reportes/talleres/datos', [ReporteTalleresController::class, 'obtenerDatos'])->name('api.reportes.talleres.datos');
+    Route::get('/talleresComercial', [ReporteTalleresController::class, 'index'])->name('comercial.reportes.talleres');
+    Route::get('/reportes/talleres/exportar', [ReporteTalleresController::class, 'exportar'])->name('comercial.reportes.talleres.exportar');
+    Route::get('/api/reportes/talleres/datos', [ReporteTalleresController::class, 'obtenerDatos'])->name('comercial.api.reportes.talleres.datos');
 
     /* ----------------- PROSPECTOS ----------------- */
-    Route::get('/prospectosComercial', [ProspectoController::class, 'index'])->name('prospectos.comercial');
-    Route::put('/prospectos/{id}/estado', [ProspectoController::class, 'updateEstado'])->name('prospectos.updateEstado');
+    Route::get('/prospectosComercial', [ProspectoController::class, 'index'])->name('comercial.prospectos.comercial');
+    Route::put('/prospectos/{id}/estado', [ProspectoController::class, 'updateEstado'])->name('comercial.prospectos.updateEstado');
 
     /* ----------------- CLASES DE PRUEBA ----------------- */
-    Route::post('/claseprueba/store', [ClasePruebaController::class, 'store'])->name('claseprueba.store');
-    Route::put('/claseprueba/{id}', [ClasePruebaController::class, 'update'])->name('claseprueba.update');
+    Route::post('/claseprueba/store', [ClasePruebaController::class, 'store'])->name('comercial.claseprueba.store');
+    Route::put('/claseprueba/{id}', [ClasePruebaController::class, 'update'])->name('comercial.claseprueba.update');
 });
 
 
