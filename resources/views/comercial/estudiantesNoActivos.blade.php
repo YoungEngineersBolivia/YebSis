@@ -195,7 +195,7 @@
                                     </span>
                                 </td>
                                 <td class="text-center">
-                                    <form action="{{ route('comercial.estudiantes.activar', $estudiante->id) }}" method="POST"
+                                    <form action="{{ route('comercial.estudiantes.reactivar', $estudiante->id) }}" method="POST"
                                         onsubmit="return confirm('¿Está seguro que desea reactivar a {{ $estudiante->nombre }} {{ $estudiante->apellido }}?')"
                                         style="display: inline;">
                                         @csrf
