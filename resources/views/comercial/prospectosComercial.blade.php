@@ -138,7 +138,7 @@
                                             </td>
                                             <td class="py-3">
                                                 <form method="POST"
-                                                    action="{{ route('prospectos.updateEstado', $prospecto->Id_prospectos) }}"
+                                                    action="{{ route('comercial.prospectos.updateEstado', $prospecto->Id_prospectos) }}"
                                                     class="d-inline">
                                                     @csrf
                                                     @method('PUT')
@@ -249,7 +249,7 @@
                         aria-label="Close"></button>
                 </div>
                 <div class="modal-body p-4">
-                    <form method="POST" action="{{ route('claseprueba.store') }}">
+                    <form method="POST" action="{{ route('comercial.claseprueba.store') }}">
                         @csrf
                         <div class="row mb-3">
                             <div class="col-12">

@@ -66,7 +66,7 @@ function verClasePrueba(nombre, fecha, hora, comentarios) {
 
 // Función para actualizar automáticamente el estado cuando se asigna una clase
 function actualizarEstadoAClaseAsignada(prospectoId) {
-    fetch(`/prospectos/${prospectoId}/updateEstado`, {
+    fetch(`/comercial/prospectos/${prospectoId}/estado`, {
         method: 'PUT',
         headers: {
             'Content-Type': 'application/json',

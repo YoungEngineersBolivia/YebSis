@@ -47,7 +47,7 @@
                             @foreach($mesesDisponibles as $mes)
                                 <li>
                                     <a class="dropdown-item"
-                                        href="{{ route('estudiantesActivos', ['from' => $mes->mes . '-01', 'to' => date('Y-m-t', strtotime($mes->mes . '-01'))]) }}">
+                                        href="{{ route('comercial.estudiantesActivos', ['from' => $mes->mes . '-01', 'to' => date('Y-m-t', strtotime($mes->mes . '-01'))]) }}">
                                         {{ $mes->mes_nombre }}
                                         <span class="badge bg-primary rounded-pill float-end">{{ $mes->total }}</span>
                                     </a>
@@ -57,7 +57,7 @@
                                 <hr class="dropdown-divider">
                             </li>
                             <li>
-                                <a class="dropdown-item text-danger" href="{{ route('estudiantesActivos') }}">
+                                <a class="dropdown-item text-danger" href="{{ route('comercial.estudiantesActivos') }}">
                                     <i class="bi bi-x-circle"></i> Limpiar filtros
                                 </a>
                             </li>
@@ -83,7 +83,7 @@
         <!-- Filtros + tabla -->
         <div class="card-soft p-3">
             <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
-                <form class="d-flex gap-2 flex-wrap" method="GET" action="{{ route('estudiantesActivos') }}">
+                <form class="d-flex gap-2 flex-wrap" method="GET" action="{{ route('comercial.estudiantesActivos') }}">
                     <div class="input-group" style="max-width: 250px;">
                         <span class="input-group-text"><i class="bi bi-search"></i></span>
                         <input type="text" name="search" value="{{ $search }}" class="form-control"
@@ -123,7 +123,7 @@
                         <i class="bi bi-funnel"></i> Aplicar
                     </button>
                     @if($from || $to || $programa || $sucursal || $search)
-                        <a class="btn btn-outline-secondary" href="{{ route('estudiantesActivos') }}">
+                        <a class="btn btn-outline-secondary" href="{{ route('comercial.estudiantesActivos') }}">
                             <i class="bi bi-arrow-clockwise"></i> Limpiar
                         </a>
                     @endif
@@ -131,7 +131,7 @@
 
                 <!-- Botón de exportar (opcional) -->
                 <div class="btn-group gap-2">
-                    <a href="{{ route('estudiantesActivos.exportar', request()->all()) }}" class="btn btn-success btn-sm">
+                    <a href="{{ route('comercial.estudiantesActivos.exportar', request()->all()) }}" class="btn btn-success btn-sm">
                         <i class="bi bi-file-earmark-spreadsheet"></i> Exportar Excel
                     </a>
                     <button type="button" class="btn btn-outline-secondary btn-sm" onclick="window.print()">
@@ -195,7 +195,7 @@
                                     </span>
                                 </td>
                                 <td class="text-center">
-                                    <form action="{{ route('estudiantes.desactivar', $estudiante->id) }}" method="POST"
+                                    <form action="{{ route('comercial.estudiantes.desactivar', $estudiante->id) }}" method="POST"
                                         onsubmit="return confirm('¿Está seguro que desea desactivar a {{ $estudiante->nombre }} {{ $estudiante->apellido }}?')"
                                         style="display: inline;">
                                         @csrf
@@ -213,7 +213,7 @@
                                     <i class="bi bi-inbox" style="font-size: 2rem;"></i>
                                     <p class="mb-0 mt-2">No hay estudiantes activos en el período seleccionado.</p>
                                     @if($from || $to || $programa || $sucursal || $search)
-                                        <a href="{{ route('estudiantesActivos') }}" class="btn btn-sm btn-primary mt-2">
+                                        <a href="{{ route('comercial.estudiantesActivos') }}" class="btn btn-sm btn-primary mt-2">
                                             Ver todos los estudiantes
                                         </a>
                                     @endif

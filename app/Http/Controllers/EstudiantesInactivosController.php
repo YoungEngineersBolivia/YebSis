@@ -224,8 +224,7 @@ class EstudiantesInactivosController extends Controller
             return back()->withErrors(['error' => 'Estudiante no encontrado o ya estaba activo.']);
         }
 
-        return redirect()
-            ->route('estudiantesNoActivos')
+        return back()
             ->with('success', 'Estudiante reactivado correctamente.');
     }
 }
