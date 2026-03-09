@@ -18,6 +18,8 @@ class ClasePrueba extends Model
         'Id_prospectos',
         'Id_profesores',
         'Asistencia',
+        'Visto_admin',
+        'Id_usuario_asistencia',
     ];
 
     /**
@@ -26,6 +28,14 @@ class ClasePrueba extends Model
     public function profesor()
     {
         return $this->belongsTo(Profesor::class, 'Id_profesores', 'Id_profesores');
+    }
+
+    /**
+     * Relación con el Usuario que marcó asistencia
+     */
+    public function usuarioAsistencia()
+    {
+        return $this->belongsTo(Usuario::class, 'Id_usuario_asistencia', 'Id_usuarios');
     }
 
     /**

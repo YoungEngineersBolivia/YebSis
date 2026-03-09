@@ -16,11 +16,11 @@ class DashboardController extends Controller
         // Configurar Carbon en español (opcional)
         Carbon::setLocale('es');
 
-        // Obtener clases de prueba pendientes (para notificación)
-        $clasesPruebaPendientes = ClasePrueba::with('prospecto')
-            ->where('Asistencia', 'pendiente')
-            ->orderBy('Fecha_clase', 'asc')
-            ->orderBy('Hora_clase', 'asc')
+        // Obtener clases de prueba pendientes o no vistas por el admin
+        $clasesPruebaPendientes = ClasePrueba::with(['prospecto', 'usuarioAsistencia.persona'])
+            ->where('Visto_admin', false)
+            ->orderBy('Fecha_clase', 'desc')
+            ->orderBy('Hora_clase', 'desc')
             ->take(5)
             ->get();
 

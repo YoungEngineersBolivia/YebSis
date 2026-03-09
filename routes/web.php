@@ -69,6 +69,7 @@ Route::middleware(['auth', 'role:administrador'])->prefix('administrador')->grou
     // Rutas para marcar asistencia desde el Dashboard (Admin)
     Route::put('/clases-prueba/{id}/asistencia', [App\Http\Controllers\ProfesorTrialClassController::class, 'updateAttendance'])->name('admin.clases-prueba.asistencia');
     Route::put('/clases-prueba/{id}/comentarios', [App\Http\Controllers\ProfesorTrialClassController::class, 'updateComments'])->name('admin.clases-prueba.comentarios');
+    Route::put('/clases-prueba/{id}/dismiss', [App\Http\Controllers\ProfesorTrialClassController::class, 'dismissNotification'])->name('admin.clases-prueba.dismiss');
 
     // Vistas base
     Route::get('/inicioAdministrador', fn() => view('/administrador/inicioAdministrador'));

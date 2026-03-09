@@ -26,14 +26,8 @@
                             </option>
                         <?php endfor; ?>
                     </select>
-                    <select name="anio" class="form-select form-select-sm" onchange="this.form.submit()">
-                        <?php for($a = 2023; $a <= Carbon\Carbon::now()->year + 1; $a++): ?>
-                            <option value="<?php echo e($a); ?>" <?php echo e($estadisticasTiempo['anio_actual'] == $a ? 'selected' : ''); ?>>
-                                <?php echo e($a); ?>
-
-                            </option>
-                        <?php endfor; ?>
-                    </select>
+                    <input type="number" name="anio" class="form-control form-control-sm" min="2000"
+                        value="<?php echo e($estadisticasTiempo['anio_actual']); ?>" onchange="this.form.submit()">
                     <a href="<?php echo e(route('admin.dashboard')); ?>" class="btn btn-sm btn-outline-secondary"
                         title="Reiniciar filtros">
                         <i class="fas fa-sync-alt"></i>
@@ -118,10 +112,18 @@
                         <div class="card-body p-0">
                             <div class="list-group list-group-flush">
                                 <?php $__currentLoopData = $clasesPruebaPendientes; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $clase): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                                    <div class="list-group-item">
+                                    <?php
+                                        $fechaHoraClase = \Carbon\Carbon::parse($clase->Fecha_clase . ' ' . $clase->Hora_clase);
+                                        $esPasada = $fechaHoraClase->isPast();
+                                    ?>
+                                    <div class="list-group-item <?php echo e($esPasada ? 'bg-danger-subtle' : ''); ?>">
                                         <div class="d-flex justify-content-between align-items-center mb-2">
                                             <div>
                                                 <strong><?php echo e($clase->Nombre_Estudiante); ?></strong>
+                                                <?php if($esPasada && $clase->Asistencia === 'pendiente'): ?>
+                                                    <i class="bi bi-exclamation-triangle-fill text-danger ms-1"
+                                                        title="Clase atrasada"></i>
+                                                <?php endif; ?>
                                                 <div class="small text-muted">
                                                     <i
                                                         class="bi bi-calendar-event me-1"></i><?php echo e(\Carbon\Carbon::parse($clase->Fecha_clase)->format('d/m/Y')); ?>
@@ -130,29 +132,51 @@
                                                         class="bi bi-clock ms-2 me-1"></i><?php echo e(\Carbon\Carbon::parse($clase->Hora_clase)->format('H:i')); ?>
 
                                                 </div>
+                                                <?php if($clase->Asistencia !== 'pendiente'): ?>
+                                                    <div class="mt-1">
+                                                        <span
+                                                            class="badge <?php echo e($clase->Asistencia === 'asistio' ? 'bg-success' : 'bg-danger'); ?>">
+                                                            <?php echo e($clase->Asistencia === 'asistio' ? 'Asistió' : 'No asistió'); ?>
+
+                                                        </span>
+                                                        <small class="text-muted ms-1">
+                                                            Marcado por:
+                                                            <strong><?php echo e($clase->usuarioAsistencia->persona->nombre_completo ?? 'Sistema'); ?></strong>
+                                                        </small>
+                                                    </div>
+                                                <?php endif; ?>
                                             </div>
                                             <div class="btn-group btn-group-sm">
-                                                <button onclick="confirmarAsistenciaAdmin(<?php echo e($clase->Id_clasePrueba); ?>, 'asistio')"
-                                                    class="btn btn-outline-success" title="Marcar como Asistió">
-                                                    <i class="bi bi-check-lg me-1"></i> Asistió
-                                                </button>
-                                                <button
-                                                    onclick="confirmarAsistenciaAdmin(<?php echo e($clase->Id_clasePrueba); ?>, 'no_asistio')"
-                                                    class="btn btn-outline-danger" title="Marcar como Falta">
-                                                    <i class="bi bi-x-lg me-1"></i> No Asistió
-                                                </button>
+                                                <?php if($clase->Asistencia === 'pendiente'): ?>
+                                                    <button onclick="confirmarAsistenciaAdmin(<?php echo e($clase->Id_clasePrueba); ?>, 'asistio')"
+                                                        class="btn btn-outline-success" title="Marcar como Asistió">
+                                                        <i class="bi bi-check-lg me-1"></i> Asistió
+                                                    </button>
+                                                    <button
+                                                        onclick="confirmarAsistenciaAdmin(<?php echo e($clase->Id_clasePrueba); ?>, 'no_asistio')"
+                                                        class="btn btn-outline-danger" title="Marcar como Falta">
+                                                        <i class="bi bi-x-lg me-1"></i> No Asistió
+                                                    </button>
+                                                <?php else: ?>
+                                                    <button onclick="descartarNotificacion(<?php echo e($clase->Id_clasePrueba); ?>)"
+                                                        class="btn btn-primary btn-sm px-3" title="Quitar del dashboard">
+                                                        <i class="bi bi-check-circle me-1"></i> OK
+                                                    </button>
+                                                <?php endif; ?>
                                             </div>
                                         </div>
-                                        <div class="input-group input-group-sm">
-                                            <input type="text" class="form-control"
-                                                id="comentario_admin_<?php echo e($clase->Id_clasePrueba); ?>" value="<?php echo e($clase->Comentarios); ?>"
-                                                placeholder="Añadir comentario (Recomendado)">
-                                            <button class="btn btn-outline-secondary"
-                                                onclick="guardarComentarioAdmin(<?php echo e($clase->Id_clasePrueba); ?>)"
-                                                title="Guardar comentario solo">
-                                                <i class="bi bi-save"></i>
-                                            </button>
-                                        </div>
+                                        <?php if($clase->Asistencia === 'pendiente'): ?>
+                                            <div class="input-group input-group-sm">
+                                                <input type="text" class="form-control"
+                                                    id="comentario_admin_<?php echo e($clase->Id_clasePrueba); ?>" value="<?php echo e($clase->Comentarios); ?>"
+                                                    placeholder="Añadir comentario (Recomendado)">
+                                                <button class="btn btn-outline-secondary"
+                                                    onclick="guardarComentarioAdmin(<?php echo e($clase->Id_clasePrueba); ?>)"
+                                                    title="Guardar comentario solo">
+                                                    <i class="bi bi-save"></i>
+                                                </button>
+                                            </div>
+                                        <?php endif; ?>
                                     </div>
                                 <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                             </div>
@@ -373,27 +397,9 @@
                                         icon: 'success',
                                         timer: 1500,
                                         showConfirmButton: false
+                                    }).then(() => {
+                                        location.reload(); // Recargar para mostrar quién lo marcó y el botón OK
                                     });
-
-                                    // Eliminar el elemento de la lista visualmente
-                                    const row = commentInput.closest('.list-group-item');
-                                    if (row) {
-                                        row.remove();
-
-                                        // Actualizar el contador
-                                        const badge = document.querySelector('.card-header .badge');
-                                        if (badge) {
-                                            let count = parseInt(badge.innerText);
-                                            if (!isNaN(count)) {
-                                                badge.innerText = Math.max(0, count - 1);
-                                                if (count - 1 === 0) {
-                                                    // Ocultar todo el widget si ya no hay
-                                                    const widget = document.querySelector('.card.border-warning').closest('.row');
-                                                    if (widget) widget.remove();
-                                                }
-                                            }
-                                        }
-                                    }
                                 } else {
                                     Swal.fire('Error', data.message || 'Error desconocido al guardar.', 'error');
                                 }
@@ -405,6 +411,36 @@
                             });
                     }
                 });
+            }
+
+            function descartarNotificacion(id) {
+                fetch(`/administrador/clases-prueba/${id}/dismiss`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '<?php echo e(csrf_token()); ?>' }
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            // Buscar el elemento y removerlo con una animación simple
+                            const item = document.querySelector(`button[onclick="descartarNotificacion(${id})"]`).closest('.list-group-item');
+                            if (item) {
+                                item.style.transition = 'all 0.3s ease';
+                                item.style.opacity = '0';
+                                setTimeout(() => {
+                                    item.remove();
+                                    // Actualizar contador
+                                    const badge = document.querySelector('.card-header .badge');
+                                    if (badge) {
+                                        let count = parseInt(badge.innerText);
+                                        badge.innerText = Math.max(0, count - 1);
+                                        if (count - 1 === 0) {
+                                            location.reload(); // Recargar si es el último para limpiar el widget
+                                        }
+                                    }
+                                }, 300);
+                            }
+                        }
+                    });
             }
         </script>
         <script src="<?php echo e(auto_asset('js/administrador/dashboard.js')); ?>"></script>
