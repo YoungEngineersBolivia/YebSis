@@ -21,7 +21,6 @@ class DashboardController extends Controller
             ->where('Visto_admin', false)
             ->orderBy('Fecha_clase', 'desc')
             ->orderBy('Hora_clase', 'desc')
-            ->take(5)
             ->get();
 
         $sucursales = Sucursal::all();
