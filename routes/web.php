@@ -460,14 +460,7 @@ Route::middleware(['auth', 'role:tutor'])->prefix('tutor')->name('tutor.')->grou
    RUTAS ANTIGUAS (mantener por compatibilidad)
    ============================================ */
 
-// Rutas comercial antiguas (redirigen a administrador)
-Route::middleware(['auth', 'role:administrador'])->prefix('comercial')->group(function () {
-    Route::get('/estudiantesActivos', fn() => redirect('/administrador/estudiantesActivos'));
-    Route::get('/estudiantesNoActivos', fn() => redirect('/administrador/estudiantesNoActivos'));
-    Route::get('/talleresComercial', fn() => redirect('/administrador/talleresComercial'));
-    Route::get('/prospectosComercial', fn() => redirect('/administrador/prospectosComercial'));
-    Route::get('/estudianteActivoComercial', fn() => redirect('/administrador/estudiantesActivos'));
-});
+// Bloque de rutas comercial duplicadas removido para evitar conflictos de nombres.
 
 // Rutas sin prefijo para profesores (acceso directo)
 Route::middleware(['auth', 'role:administrador'])->group(function () {

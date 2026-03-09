@@ -142,7 +142,7 @@
                                             </td>
                                             <td class="py-3">
                                                 <form method="POST"
-                                                    action="<?php echo e(route('prospectos.updateEstado', $prospecto->Id_prospectos)); ?>"
+                                                    action="<?php echo e(route('comercial.prospectos.updateEstado', $prospecto->Id_prospectos)); ?>"
                                                     class="d-inline">
                                                     <?php echo csrf_field(); ?>
                                                     <?php echo method_field('PUT'); ?>
@@ -256,7 +256,7 @@
                         aria-label="Close"></button>
                 </div>
                 <div class="modal-body p-4">
-                    <form method="POST" action="<?php echo e(route('claseprueba.store')); ?>">
+                    <form method="POST" action="<?php echo e(route('comercial.claseprueba.store')); ?>">
                         <?php echo csrf_field(); ?>
                         <div class="row mb-3">
                             <div class="col-12">

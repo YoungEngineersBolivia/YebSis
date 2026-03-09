@@ -1,0 +1,31 @@
+
+  Dropping all tables  543.29ms DONE
+
+   INFO  Preparing database.  
+
+  Creating migration table  18.91ms DONE
+
+   INFO  Running migrations.  
+
+  2023_08_18_000000_add_columns_to_cuotas_table  1.87ms DONE
+  2023_08_18_add_timestamps_to_egresos  0.76ms DONE
+  2025_07_18_194158_persona  2s DONE
+  2025_07_21_200734_create_sessions_table  43.90ms DONE
+  2025_07_31_204809_crear_tabla_ejemplo  0.06ms DONE
+  2025_08_12_220646_create_cache_table  32.81ms DONE
+  2025_10_09_193751_add_rol_componentes_to_profesores  43.58ms DONE
+  2025_10_27_030942_create_password_reset_tokens_table  27.63ms DONE
+  2025_12_04_122808_rename_id_sucursales_column_in_sucursales_table  8.56ms DONE
+  2025_12_08_100000_componentes_table  471.06ms DONE
+  2025_12_08_191404_motores_asignaciones_activas ✓ Tabla motores_asignaciones_activas creada exitosamente.
+ 197.50ms DONE
+  2025_12_08_204714_fix_timestamps_motores_asignaciones_activas  6.78ms DONE
+  2025_12_09_201103_reportes_progreso_table  77.02ms DONE
+  2025_12_12_125755_ajustar_tabla_citas  235.36ms DONE
+  2025_12_14_190640_create_asistencias_table  16.94ms DONE
+  2025_12_15_005720_add_profesor_and_asistencia_to_clase_prueba_table  132.20ms DONE
+  2026_03_08_181839_make_id_planes_pagos_nullable_in_pagos_table  42.49ms DONE
+  2026_03_08_214602_make_tutor_and_programa_nullable_in_estudiantes_table  144.99ms DONE
+  2026_03_08_215845_add_columns_to_talleres_tables  150.49ms DONE
+  2026_03_09_000558_add_visto_and_user_to_clase_prueba_table  154.09ms DONE
+

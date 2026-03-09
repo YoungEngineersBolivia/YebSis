@@ -48,7 +48,7 @@
                             <?php $__currentLoopData = $mesesDisponibles; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $mes): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                 <li>
                                     <a class="dropdown-item"
-                                        href="<?php echo e(route('estudiantesNoActivos', ['from' => $mes->mes . '-01', 'to' => date('Y-m-t', strtotime($mes->mes . '-01'))])); ?>">
+                                        href="<?php echo e(route('comercial.estudiantesNoActivos', ['from' => $mes->mes . '-01', 'to' => date('Y-m-t', strtotime($mes->mes . '-01'))])); ?>">
                                         <?php echo e($mes->mes_nombre); ?>
 
                                         <span class="badge bg-danger rounded-pill float-end"><?php echo e($mes->total); ?></span>
@@ -59,7 +59,7 @@
                                 <hr class="dropdown-divider">
                             </li>
                             <li>
-                                <a class="dropdown-item text-danger" href="<?php echo e(route('estudiantesNoActivos')); ?>">
+                                <a class="dropdown-item text-danger" href="<?php echo e(route('comercial.estudiantesNoActivos')); ?>">
                                     <i class="bi bi-x-circle"></i> Limpiar filtros
                                 </a>
                             </li>
@@ -85,7 +85,7 @@
         <!-- Filtros + tabla -->
         <div class="card-soft p-3">
             <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
-                <form class="d-flex gap-2 flex-wrap" method="GET" action="<?php echo e(route('estudiantesNoActivos')); ?>">
+                <form class="d-flex gap-2 flex-wrap" method="GET" action="<?php echo e(route('comercial.estudiantesNoActivos')); ?>">
                     <div class="input-group" style="max-width: 250px;">
                         <span class="input-group-text"><i class="bi bi-search"></i></span>
                         <input type="text" name="search" value="<?php echo e($search); ?>" class="form-control"
@@ -127,7 +127,7 @@
                         <i class="bi bi-funnel"></i> Aplicar
                     </button>
                     <?php if($from || $to || $programa || $sucursal || $search): ?>
-                        <a class="btn btn-outline-secondary" href="<?php echo e(route('estudiantesNoActivos')); ?>">
+                        <a class="btn btn-outline-secondary" href="<?php echo e(route('comercial.estudiantesNoActivos')); ?>">
                             <i class="bi bi-arrow-clockwise"></i> Limpiar
                         </a>
                     <?php endif; ?>
@@ -135,7 +135,7 @@
 
                 <!-- Botón de exportar (opcional) -->
                 <div class="btn-group gap-2">
-                    <a href="<?php echo e(route('estudiantesNoActivos.exportar', request()->all())); ?>" class="btn btn-success btn-sm">
+                    <a href="<?php echo e(route('comercial.estudiantesNoActivos.exportar', request()->all())); ?>" class="btn btn-success btn-sm">
                         <i class="bi bi-file-earmark-spreadsheet"></i> Exportar Excel
                     </a>
                     <button type="button" class="btn btn-outline-secondary btn-sm" onclick="window.print()">
@@ -204,7 +204,7 @@
                                     </span>
                                 </td>
                                 <td class="text-center">
-                                    <form action="<?php echo e(route('estudiantes.reactivar', $estudiante->id)); ?>" method="POST"
+                                    <form action="<?php echo e(route('comercial.estudiantes.activar', $estudiante->id)); ?>" method="POST"
                                         onsubmit="return confirm('¿Está seguro que desea reactivar a <?php echo e($estudiante->nombre); ?> <?php echo e($estudiante->apellido); ?>?')"
                                         style="display: inline;">
                                         <?php echo csrf_field(); ?>
@@ -222,7 +222,7 @@
                                     <i class="bi bi-emoji-smile" style="font-size: 2rem;"></i>
                                     <p class="mb-0 mt-2">No hay estudiantes inactivos en el período seleccionado.</p>
                                     <?php if($from || $to || $programa || $sucursal || $search): ?>
-                                        <a href="<?php echo e(route('estudiantesNoActivos')); ?>" class="btn btn-sm btn-primary mt-2">
+                                        <a href="<?php echo e(route('comercial.estudiantesNoActivos')); ?>" class="btn btn-sm btn-primary mt-2">
                                             Ver todos los estudiantes
                                         </a>
                                     <?php endif; ?>
