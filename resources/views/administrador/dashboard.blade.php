@@ -137,7 +137,12 @@
                                                         </span>
                                                         <small class="text-muted ms-1">
                                                             Marcado por:
-                                                            <strong>{{ $clase->usuarioAsistencia->persona->nombre_completo ?? 'Sistema' }}</strong>
+                                                            @php
+                                                                $marcadoPor = $clase->usuarioAsistencia?->persona?->nombre_completo
+                                                                    ?? $clase->usuarioAsistencia?->Correo
+                                                                    ?? 'Sistema';
+                                                             @endphp
+                                                            <strong>{{ $marcadoPor }}</strong>
                                                         </small>
                                                     </div>
                                                 @endif
@@ -178,7 +183,7 @@
                             </div>
                         </div>
                         <div class="card-footer bg-light text-center">
-                            <small class="text-muted">Mostrando las 5 más próximas</small>
+                            <small class="text-muted">Mostrando todas las clases de prueba pendientes</small>
                         </div>
                     </div>
                 </div>

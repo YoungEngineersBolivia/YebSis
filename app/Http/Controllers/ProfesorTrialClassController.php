@@ -39,11 +39,11 @@ class ProfesorTrialClassController extends Controller
             $user = auth()->user();
             $profesorId = $user->profesor?->Id_profesores;
 
-            // Asignar el profesor que está tomando la asistencia (solo si es profesor)
+            // Asignar el usuario que está tomando la asistencia
             $updateData = [
                 'Asistencia' => $request->asistencia,
-                'Id_usuario_asistencia' => $user->Id_usuarios,
-                'Visto_admin' => false // Asegurar que sea visible para el admin si se actualiza
+                'Id_usuario_asistencia' => auth()->id(), // Usar auth()->id() para mayor seguridad
+                'Visto_admin' => false
             ];
             if ($profesorId) {
                 $updateData['Id_profesores'] = $profesorId;
