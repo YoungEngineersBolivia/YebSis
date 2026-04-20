@@ -25,12 +25,18 @@ class DashboardController extends Controller
 
         $sucursales = Sucursal::all();
 
-        // Alumnos por programa por sucursal
+        // ── Alumnos por programa por sucursal (con activos e inactivos) ──────────
+        // ⚠️  Ajusta 'Estado', 'activo', 'inactivo' según los valores reales de tu BD
         $alumnosPorSucursal = [];
         foreach ($sucursales as $sucursal) {
             $alumnosPorSucursal[$sucursal->Id_sucursales] = DB::table('estudiantes')
                 ->join('programas', 'estudiantes.Id_programas', '=', 'programas.Id_programas')
-                ->select('programas.Nombre as programa', DB::raw('COUNT(*) as total'))
+                ->select(
+                    'programas.Nombre as programa',
+                    DB::raw('COUNT(*) as total'),
+                    DB::raw("SUM(CASE WHEN estudiantes.Estado = 'activo' THEN 1 ELSE 0 END) as activos"),
+                    DB::raw("SUM(CASE WHEN estudiantes.Estado = 'inactivo' THEN 1 ELSE 0 END) as inactivos")
+                )
                 ->where('estudiantes.Id_sucursales', $sucursal->Id_sucursales)
                 ->groupBy('programas.Nombre')
                 ->get();
@@ -141,7 +147,6 @@ class DashboardController extends Controller
 
         $estadisticasTiempo['dias_restantes_mes'] = $estadisticasTiempo['dias_totales_mes'] - $estadisticasTiempo['dias_transcurridos_mes'];
 
-
         // Egresos del mes actual
         $egresosMesActual = Egreso::whereBetween('Fecha_egreso', [$inicioMes, $finMes])
             ->sum('Monto_egreso') ?? 0;
@@ -177,7 +182,6 @@ class DashboardController extends Controller
             return $item ? $item->total : 0;
         });
 
-        // Reemplazar ingresosPorMes con una estructura más completa si es necesario o mantener compact
         $graficoMensual = [
             'labels' => $meses,
             'ingresos' => $ingresosData,
