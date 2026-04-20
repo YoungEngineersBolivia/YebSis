@@ -87,8 +87,8 @@ class DashboardController extends Controller
             DB::raw('SUM(Monto_pago) as total')
         )
             ->whereBetween('Fecha_pago', [$inicioMes, $finMes])
-            ->groupBy('fecha')
-            ->orderBy('fecha')
+            ->groupBy(DB::raw('DATE(Fecha_pago)'))
+            ->orderBy(DB::raw('DATE(Fecha_pago)'))
             ->get()
             ->map(function ($item) {
                 return [
@@ -121,15 +121,15 @@ class DashboardController extends Controller
             DB::raw('SUM(Monto_pago) as total')
         )
             ->whereBetween('Fecha_pago', [$inicioMes, $finMes])
-            ->groupBy('fecha')
-            ->orderBy('total', 'desc')
+            ->groupBy(DB::raw('DATE(Fecha_pago)'))
+            ->orderByRaw('SUM(Monto_pago) DESC')
             ->limit(5)
             ->get()
             ->map(function ($item) {
                 return [
-                    'fecha' => Carbon::parse($item->fecha)->format('d M Y'),
+                    'fecha'      => Carbon::parse($item->fecha)->format('d M Y'),
                     'dia_semana' => Carbon::parse($item->fecha)->dayName,
-                    'total' => $item->total
+                    'total'      => $item->total,
                 ];
             });
 
