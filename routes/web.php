@@ -32,7 +32,7 @@ use App\Http\Controllers\MotoresAsignadosController;
 use App\Http\Controllers\ForgotPasswordController;
 use App\Http\Controllers\ResetPasswordController;
 use App\Http\Controllers\ModeloController;
-use App\Http\Controllers\CuotaController;
+use App\Http\Controllers\EvaluacionesEstudiantesController;
 use App\Http\Controllers\ProfesorInventarioController;
 use App\Http\Controllers\MotorMovimientosController;
 use App\Http\Controllers\PreguntasController;
@@ -49,7 +49,7 @@ use App\Http\Controllers\CaptchaController;
 Route::get('/', [PaginaWebController::class, 'home'])->name('home');
 
 // Registro de prospectos (formulario público)
-Route::post('/prospectos', [ProspectoController::class, 'store'])->name('prospectos.store');
+Route::post('/prospectos', [ProspectoController::class, 'store'])->middleware('throttle:5,1')->name('prospectos.store');
 
 // Autenticación
 Route::get('/login', fn() => view('paginaWeb.login'))->name('login');
@@ -69,6 +69,7 @@ Route::middleware(['auth', 'role:administrador'])->prefix('administrador')->grou
     // Rutas para marcar asistencia desde el Dashboard (Admin)
     Route::put('/clases-prueba/{id}/asistencia', [App\Http\Controllers\ProfesorTrialClassController::class, 'updateAttendance'])->name('admin.clases-prueba.asistencia');
     Route::put('/clases-prueba/{id}/comentarios', [App\Http\Controllers\ProfesorTrialClassController::class, 'updateComments'])->name('admin.clases-prueba.comentarios');
+    Route::put('/clases-prueba/{id}/dismiss', [App\Http\Controllers\ProfesorTrialClassController::class, 'dismissNotification'])->name('admin.clases-prueba.dismiss');
 
     // Vistas base
     Route::get('/inicioAdministrador', fn() => view('/administrador/inicioAdministrador'));
@@ -133,7 +134,7 @@ Route::middleware(['auth', 'role:administrador'])->prefix('administrador')->grou
     Route::get('/estudiantes/{id}/evaluaciones', [EstudianteController::class, 'evaluaciones'])->name('estudiantes.evaluaciones');
     Route::get('/estudiantes/{id}/horarios', [EstudianteController::class, 'horarios'])->name('estudiantes.horarios');
     Route::get('/estudiantes/exportar-pdf', [EstudianteController::class, 'exportarPDF'])->name('estudiantes.exportarPDF');
-    Route::put('/cuotas/{id}/registrar-pago', [CuotaController::class, 'registrarPago'])->name('cuotas.registrarPago');
+    Route::put('/cuotas/{id}/registrar-pago', [PagosController::class, 'registrarPago'])->name('cuotas.registrarPago');
 
     // Estudiantes Activos
     Route::get('/estudiantesActivos', [EstudiantesActivosController::class, 'index'])->name('estudiantesActivos');
@@ -168,8 +169,13 @@ Route::middleware(['auth', 'role:administrador'])->prefix('administrador')->grou
     /* ----------------- GESTIÓN DE PAGOS ----------------- */
     Route::get('/pagosAdministrador', [PagosController::class, 'form'])->name('pagos.form');
     Route::get('/pagos', [PagosController::class, 'index'])->name('pagos.index');
+    Route::get('/pagos/mensuales', [PagosController::class, 'reporteMensual'])->name('pagos.mensuales');
     Route::post('/pagosAdministrador', [PagosController::class, 'registrarPago'])->name('pagos.registrar');
+    Route::put('/pagos/{id}', [PagosController::class, 'update'])->name('pagos.update');
+    Route::delete('/pagos/{id}', [PagosController::class, 'destroy'])->name('pagos.destroy');
     Route::post('/pagos/pagar-plan-completo', [PagosController::class, 'pagarPlanCompleto'])->name('pagos.pagarPlanCompleto');
+    Route::get('/pagos/formato', [PagosController::class, 'descargarFormato'])->name('pagos.formato');
+    Route::post('/pagos/importar', [PagosController::class, 'importarDatos'])->name('pagos.importar');
 
     /* ----------------- GESTIÓN DE SUCURSALES ----------------- */
     Route::get('/sucursalesAdministrador', [SucursalController::class, 'index'])->name('sucursales.index');
@@ -179,11 +185,12 @@ Route::middleware(['auth', 'role:administrador'])->prefix('administrador')->grou
 
     /* ----------------- GESTIÓN DE EGRESOS ----------------- */
     Route::get('/egresosAdministrador', [EgresosController::class, 'index'])->name('egresos.index');
-    Route::post('/egresosAdministrador', [EgresosController::class, 'store'])->name('egresos.store');
-    Route::get('/egresos/crear', [EgresosController::class, 'create'])->name('egresos.crear');
-    Route::post('/egresos/registrar', [EgresosController::class, 'store'])->name('egresos.registrar');
+    Route::get('/egresos/mensuales', [EgresosController::class, 'reporteMensual'])->name('egresos.mensuales');
+    Route::post('/egresos/registrar', [EgresosController::class, 'store'])->name('egresos.store');
     Route::put('/egresos/{Id_egreso}', [EgresosController::class, 'update'])->name('egresos.update');
     Route::delete('/egresos/{Id_egreso}', [EgresosController::class, 'destroy'])->name('egresos.destroy');
+    Route::get('/egresos/formato', [EgresosController::class, 'descargarFormato'])->name('egresos.formato');
+    Route::post('/egresos/importar', [EgresosController::class, 'importarDatos'])->name('egresos.importar');
 
     /* ----------------- PUBLICACIONES Y NOTIFICACIONES ----------------- */
     Route::get('/pubnotAdministrador', [PubNot::class, 'index'])->name('publicaciones.index');
@@ -273,16 +280,12 @@ Route::middleware(['auth', 'role:administrador'])->prefix('administrador')->grou
 
     /*-------------EVALUACIONES------------ */
     // Ruta para ver TODAS las evaluaciones (con buscador)
-    Route::get('/evaluaciones', [EvaluacionesEstudianteController::class, 'index'])
+    Route::get('/evaluaciones', [EvaluacionesEstudiantesController::class, 'index'])
         ->name('evaluaciones.index');
 
     // Ruta para ver evaluaciones de UN estudiante específico
-    Route::get('/evaluaciones/estudiante/{id}', [EvaluacionesEstudianteController::class, 'show'])
+    Route::get('/evaluaciones/estudiante/{id}', [EvaluacionesEstudiantesController::class, 'show'])
         ->name('evaluaciones.estudiante.show');
-
-    // Cambiar estado del estudiante
-    Route::put('/estudiantes/{id}/cambiar-estado', [EstudianteController::class, 'cambiarEstado'])
-        ->name('estudiantes.cambiarEstado');
 
     /*------CITAS------- */
     Route::get('/citas', [CitasController::class, 'index'])->name('citas.index');
@@ -336,27 +339,28 @@ Route::middleware(['auth', 'role:administrador'])->prefix('administrador')->grou
 Route::middleware(['auth', 'role:administrador'])->prefix('comercial')->group(function () {
 
     /* ----------------- ESTUDIANTES ACTIVOS ----------------- */
-    Route::get('/estudiantesActivos', [EstudiantesActivosController::class, 'index'])->name('estudiantesActivos');
-    Route::get('/estudiantesActivos/exportar', [EstudiantesActivosController::class, 'exportar'])->name('estudiantesActivos.exportar');
-    Route::put('/estudiantes/desactivar/{id}', [EstudiantesActivosController::class, 'desactivar'])->name('estudiantes.desactivar');
+    Route::get('/estudiantesActivos', [EstudiantesActivosController::class, 'index'])->name('comercial.estudiantesActivos');
+    Route::get('/estudiantesActivos/exportar', [EstudiantesActivosController::class, 'exportar'])->name('comercial.estudiantesActivos.exportar');
+    Route::put('/estudiantes/desactivar/{id}', [EstudiantesActivosController::class, 'desactivar'])->name('comercial.estudiantes.desactivar');
     Route::get('/estudianteActivoComercial', fn() => view('comercial.estudianteActivoComercial'))->name('comercial.estudianteActivoComercial');
 
     /* ----------------- ESTUDIANTES INACTIVOS ----------------- */
-    Route::get('/estudiantesNoActivos', [EstudiantesInactivosController::class, 'index'])->name('estudiantesNoActivos');
-    Route::put('/estudiantes/activar/{id}', [EstudiantesInactivosController::class, 'reactivar'])->name('estudiantes.reactivar');
+    Route::get('/estudiantesNoActivos', [EstudiantesInactivosController::class, 'index'])->name('comercial.estudiantesNoActivos');
+    Route::get('/estudiantesNoActivos/exportar', [EstudiantesInactivosController::class, 'exportar'])->name('comercial.estudiantesNoActivos.exportar');
+    Route::put('/estudiantes/activar/{id}', [EstudiantesInactivosController::class, 'reactivar'])->name('comercial.estudiantes.reactivar');
 
     /* ----------------- REPORTES DE TALLERES ----------------- */
-    Route::get('/talleresComercial', [ReporteTalleresController::class, 'index'])->name('reportes.talleres');
-    Route::get('/reportes/talleres/exportar', [ReporteTalleresController::class, 'exportar'])->name('reportes.talleres.exportar');
-    Route::get('/api/reportes/talleres/datos', [ReporteTalleresController::class, 'obtenerDatos'])->name('api.reportes.talleres.datos');
+    Route::get('/talleresComercial', [ReporteTalleresController::class, 'index'])->name('comercial.reportes.talleres');
+    Route::get('/reportes/talleres/exportar', [ReporteTalleresController::class, 'exportar'])->name('comercial.reportes.talleres.exportar');
+    Route::get('/api/reportes/talleres/datos', [ReporteTalleresController::class, 'obtenerDatos'])->name('comercial.api.reportes.talleres.datos');
 
     /* ----------------- PROSPECTOS ----------------- */
-    Route::get('/prospectosComercial', [ProspectoController::class, 'index'])->name('prospectos.comercial');
-    Route::put('/prospectos/{id}/estado', [ProspectoController::class, 'updateEstado'])->name('prospectos.updateEstado');
+    Route::get('/prospectosComercial', [ProspectoController::class, 'index'])->name('comercial.prospectos.comercial');
+    Route::put('/prospectos/{id}/estado', [ProspectoController::class, 'updateEstado'])->name('comercial.prospectos.updateEstado');
 
     /* ----------------- CLASES DE PRUEBA ----------------- */
-    Route::post('/claseprueba/store', [ClasePruebaController::class, 'store'])->name('claseprueba.store');
-    Route::put('/claseprueba/{id}', [ClasePruebaController::class, 'update'])->name('claseprueba.update');
+    Route::post('/claseprueba/store', [ClasePruebaController::class, 'store'])->name('comercial.claseprueba.store');
+    Route::put('/claseprueba/{id}', [ClasePruebaController::class, 'update'])->name('comercial.claseprueba.update');
 });
 
 
@@ -412,7 +416,10 @@ Route::middleware(['auth', 'role:profesor'])->prefix('profesor')->name('profesor
 
     /* ----------------- ASISTENCIA - PROFESOR ----------------- */
     Route::get('/asistencia', [\App\Http\Controllers\AsistenciaProfesorController::class, 'index'])->name('asistencia.index');
+    Route::get('/asistencia/historial', [\App\Http\Controllers\AsistenciaProfesorController::class, 'historial'])->name('asistencia.historial');
     Route::post('/asistencia', [\App\Http\Controllers\AsistenciaProfesorController::class, 'store'])->name('asistencia.store');
+    Route::get('/buscar-estudiantes-asistencia', [\App\Http\Controllers\AsistenciaProfesorController::class, 'buscarEstudiantes'])->name('asistencia.buscarEstudiantes');
+    Route::get('/cargar-asistencia-fecha', [\App\Http\Controllers\AsistenciaProfesorController::class, 'obtenerAsistenciaPorFecha'])->name('asistencia.cargar');
 
     /* ----------------- CLASES DE PRUEBA - PROFESOR ----------------- */
     Route::get('/clases-prueba', [\App\Http\Controllers\ProfesorTrialClassController::class, 'index'])->name('clases-prueba.index');
@@ -453,14 +460,7 @@ Route::middleware(['auth', 'role:tutor'])->prefix('tutor')->name('tutor.')->grou
    RUTAS ANTIGUAS (mantener por compatibilidad)
    ============================================ */
 
-// Rutas comercial antiguas (redirigen a administrador)
-Route::middleware(['auth', 'role:administrador'])->prefix('comercial')->group(function () {
-    Route::get('/estudiantesActivos', fn() => redirect('/administrador/estudiantesActivos'));
-    Route::get('/estudiantesNoActivos', fn() => redirect('/administrador/estudiantesNoActivos'));
-    Route::get('/talleresComercial', fn() => redirect('/administrador/talleresComercial'));
-    Route::get('/prospectosComercial', fn() => redirect('/administrador/prospectosComercial'));
-    Route::get('/estudianteActivoComercial', fn() => redirect('/administrador/estudiantesActivos'));
-});
+// Bloque de rutas comercial duplicadas removido para evitar conflictos de nombres.
 
 // Rutas sin prefijo para profesores (acceso directo)
 Route::middleware(['auth', 'role:administrador'])->group(function () {

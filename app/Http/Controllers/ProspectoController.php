@@ -63,24 +63,30 @@ class ProspectoController extends Controller
 
     public function store(Request $request)
     {
-        // Validación básica
+        // Honeypot: si el campo oculto está lleno, es un bot
+        if ($request->filled('website')) {
+            return redirect()->back()->with('status', '¡Muchas gracias! Lo contactaremos a la brevedad.');
+        }
+
         $request->validate([
-            'nombres' => 'required|string|max:255',
-            'apellidos' => 'required|string|max:255',
-            'telefono' => 'required|string|max:20',
+            'nombres'   => ['required', 'string', 'max:100', 'regex:/^[\pL\s\-\.]+$/u'],
+            'apellidos' => ['required', 'string', 'max:100', 'regex:/^[\pL\s\-\.]+$/u'],
+            'telefono'  => ['required', 'string', 'max:20', 'regex:/^[0-9\+\-\s\(\)]{7,20}$/'],
+        ], [
+            'nombres.regex'   => 'El nombre solo puede contener letras y espacios.',
+            'apellidos.regex' => 'El apellido solo puede contener letras y espacios.',
+            'telefono.regex'  => 'El teléfono solo puede contener números y los caracteres + - ( ).',
         ]);
 
-        // Crear prospecto
         Prospecto::create([
-            'Nombre' => $request->nombres,
-            'Apellido' => $request->apellidos,
-            'Celular' => $request->telefono,
-            'Estado_prospecto' => 'nuevo', // por defecto
-            'Id_roles' => 5, // ejemplo, puedes ajustar
+            'Nombre'            => strip_tags(trim($request->nombres)),
+            'Apellido'          => strip_tags(trim($request->apellidos)),
+            'Celular'           => preg_replace('/[^\d\+\-\s\(\)]/', '', $request->telefono),
+            'Estado_prospecto'  => 'nuevo',
+            'Id_roles'          => 5,
         ]);
 
-        // Redirigir con mensaje de éxito
-        return redirect()->back()->with('status', 'Prospecto registrado correctamente.');
+        return redirect()->back()->with('status', '¡Muchas gracias! Lo contactaremos a la brevedad.');
     }
     public function updateEstado(Request $request, $id)
     {

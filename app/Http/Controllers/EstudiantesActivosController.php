@@ -14,7 +14,7 @@ class EstudiantesActivosController extends Controller
     public function index(Request $request)
     {
         $from = $request->input('from'); // YYYY-MM-DD
-        $to   = $request->input('to');   // YYYY-MM-DD
+        $to = $request->input('to');   // YYYY-MM-DD
         $programa = $request->input('programa');
         $sucursal = $request->input('sucursal');
         $search = $request->input('search');
@@ -24,6 +24,8 @@ class EstudiantesActivosController extends Controller
             ->join('personas', 'estudiantes.Id_personas', '=', 'personas.Id_personas')
             ->leftJoin('sucursales', 'estudiantes.Id_sucursales', '=', 'sucursales.Id_sucursales')
             ->leftJoin('programas', 'estudiantes.Id_programas', '=', 'programas.Id_programas')
+            ->leftJoin('tutores', 'estudiantes.Id_tutores', '=', 'tutores.Id_tutores')
+            ->leftJoin('personas as tutor_persona', 'tutores.Id_personas', '=', 'tutor_persona.Id_personas')
             ->where('estudiantes.Estado', 'Activo');
 
         // Filtros de fecha
@@ -47,10 +49,10 @@ class EstudiantesActivosController extends Controller
 
         // Filtro de búsqueda por nombre y apellido
         if ($search) {
-            $activosQuery->where(function($query) use ($search) {
+            $activosQuery->where(function ($query) use ($search) {
                 $query->where('personas.Nombre', 'LIKE', '%' . $search . '%')
-                      ->orWhere('personas.Apellido', 'LIKE', '%' . $search . '%')
-                      ->orWhereRaw("CONCAT(personas.Nombre, ' ', personas.Apellido) LIKE ?", ['%' . $search . '%']);
+                    ->orWhere('personas.Apellido', 'LIKE', '%' . $search . '%')
+                    ->orWhereRaw("CONCAT(personas.Nombre, ' ', personas.Apellido) LIKE ?", ['%' . $search . '%']);
             });
         }
 
@@ -59,6 +61,10 @@ class EstudiantesActivosController extends Controller
                 estudiantes.Id_estudiantes                                         AS id,
                 personas.Nombre                                                     AS nombre,
                 personas.Apellido                                                   AS apellido,
+                personas.Celular                                                    AS celular_estudiante,
+                COALESCE(tutor_persona.Celular, "Sin celular")                     AS celular_tutor,
+                COALESCE(tutor_persona.Nombre, "")                                 AS nombre_tutor,
+                COALESCE(tutor_persona.Apellido, "")                               AS apellido_tutor,
                 COALESCE(sucursales.Nombre, "Sin asignar")                         AS sucursal,
                 COALESCE(programas.Nombre, "Sin asignar")                          AS programa,
                 estudiantes.Fecha_estado                                            AS fecha_activacion_iso,
@@ -130,16 +136,75 @@ class EstudiantesActivosController extends Controller
 
         return view('comercial.estudiantesActivosComercial', [
             'estudiantesActivos' => $estudiantesActivos,
-            'fechasActivacion'   => $fechasActivacion,
-            'mesesDisponibles'   => $mesesDisponibles,
-            'programas'          => $programas,
-            'sucursales'         => $sucursales,
-            'from'               => $from,
-            'to'                 => $to,
-            'programa'           => $programa,
-            'sucursal'           => $sucursal,
-            'search'             => $search,
+            'fechasActivacion' => $fechasActivacion,
+            'mesesDisponibles' => $mesesDisponibles,
+            'programas' => $programas,
+            'sucursales' => $sucursales,
+            'from' => $from,
+            'to' => $to,
+            'programa' => $programa,
+            'sucursal' => $sucursal,
+            'search' => $search,
         ]);
+    }
+
+    public function exportar(Request $request)
+    {
+        $from = $request->input('from');
+        $to = $request->input('to');
+        $programa = $request->input('programa');
+        $sucursal = $request->input('sucursal');
+        $search = $request->input('search');
+
+        $activosQuery = DB::table('estudiantes')
+            ->join('personas', 'estudiantes.Id_personas', '=', 'personas.Id_personas')
+            ->leftJoin('sucursales', 'estudiantes.Id_sucursales', '=', 'sucursales.Id_sucursales')
+            ->leftJoin('programas', 'estudiantes.Id_programas', '=', 'programas.Id_programas')
+            ->leftJoin('tutores', 'estudiantes.Id_tutores', '=', 'tutores.Id_tutores')
+            ->leftJoin('personas as tutor_persona', 'tutores.Id_personas', '=', 'tutor_persona.Id_personas')
+            ->where('estudiantes.Estado', 'Activo');
+
+        if ($from && $to)
+            $activosQuery->whereBetween('estudiantes.Fecha_estado', [$from, $to]);
+        if ($programa)
+            $activosQuery->where('estudiantes.Id_programas', $programa);
+        if ($sucursal)
+            $activosQuery->where('estudiantes.Id_sucursales', $sucursal);
+        if ($search) {
+            $activosQuery->where(function ($query) use ($search) {
+                $query->where('personas.Nombre', 'LIKE', '%' . $search . '%')
+                    ->orWhere('personas.Apellido', 'LIKE', '%' . $search . '%');
+            });
+        }
+
+        $datos = $activosQuery->selectRaw('
+            personas.Nombre, personas.Apellido, personas.Celular as celular_estudiante,
+            tutor_persona.Nombre as nombre_tutor, tutor_persona.Celular as celular_tutor,
+            sucursales.Nombre as sucursal, programas.Nombre as programa,
+            DATE_FORMAT(estudiantes.Fecha_estado, "%d/%m/%Y") as fecha_activacion
+        ')->get();
+
+        $filename = "estudiantes_activos_" . date('Y-m-d') . ".csv";
+        $headers = [
+            "Content-type" => "text/csv; charset=UTF-8",
+            "Content-Disposition" => "attachment; filename=$filename",
+        ];
+
+        $callback = function () use ($datos) {
+            $file = fopen('php://output', 'w');
+            fputs($file, "\xEF\xBB\xBF");
+            fputcsv($file, ['Nombre', 'Apellido', 'Celular Padres/Alumno', 'Contacto Ref.', 'Programa', 'Sucursal', 'Fecha Activacion']);
+
+            foreach ($datos as $row) {
+                $celular = ($row->celular_tutor && $row->celular_tutor != 'Sin celular') ? $row->celular_tutor : ($row->celular_estudiante ?? 'No registrado');
+                $ref = ($row->celular_tutor && $row->celular_tutor != 'Sin celular') ? 'Tutor: ' . $row->nombre_tutor : 'Estudiante';
+
+                fputcsv($file, [$row->Nombre, $row->Apellido, $celular, $ref, $row->programa, $row->sucursal, $row->fecha_activacion]);
+            }
+            fclose($file);
+        };
+
+        return response()->stream($callback, 200, $headers);
     }
 
     /**
@@ -151,7 +216,7 @@ class EstudiantesActivosController extends Controller
             ->where('Id_estudiantes', $id)
             ->where('Estado', 'Activo') // Solo desactivar si está activo
             ->update([
-                'Estado'       => 'Inactivo',
+                'Estado' => 'Inactivo',
                 'Fecha_estado' => now()->format('Y-m-d'),
             ]);
 
@@ -159,8 +224,7 @@ class EstudiantesActivosController extends Controller
             return back()->withErrors(['error' => 'Estudiante no encontrado o ya estaba inactivo.']);
         }
 
-        return redirect()
-            ->route('estudiantesActivos')
+        return back()
             ->with('success', 'Estudiante desactivado correctamente.');
     }
 }

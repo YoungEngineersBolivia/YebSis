@@ -39,12 +39,16 @@ class ProfesorTrialClassController extends Controller
             $user = auth()->user();
             $profesorId = $user->profesor?->Id_profesores;
 
-            // Asignar el profesor que está tomando la asistencia (solo si es profesor)
-            $updateData = ['Asistencia' => $request->asistencia];
+            // Asignar el usuario que está tomando la asistencia
+            $updateData = [
+                'Asistencia' => $request->asistencia,
+                'Id_usuario_asistencia' => auth()->id(), // Usar auth()->id() para mayor seguridad
+                'Visto_admin' => false
+            ];
             if ($profesorId) {
                 $updateData['Id_profesores'] = $profesorId;
             }
-            
+
             $clase->update($updateData);
 
             // Actualizar estado del prospecto automáticamente
@@ -80,6 +84,17 @@ class ProfesorTrialClassController extends Controller
         } catch (\Exception $e) {
             Log::error('Error al actualizar comentarios: ' . $e->getMessage());
             return response()->json(['success' => false, 'message' => 'Error del servidor: ' . $e->getMessage()], 500);
+        }
+    }
+
+    public function dismissNotification($id)
+    {
+        try {
+            $clase = ClasePrueba::findOrFail($id);
+            $clase->update(['Visto_admin' => true]);
+            return response()->json(['success' => true]);
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
         }
     }
 }

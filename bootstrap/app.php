@@ -22,5 +22,8 @@ return Application::configure(basePath: dirname(__DIR__))
         // Si tienes otros middleware personalizados, agrégalos aquí
     })
     ->withExceptions(function (Exceptions $exceptions) {
-        //
+        // Si el CSRF expira (sesión caducada), redirigir al login en vez de mostrar 419
+        $exceptions->render(function (\Illuminate\Session\TokenMismatchException $e, \Illuminate\Http\Request $request) {
+            return redirect()->route('login')->with('status', 'Tu sesión expiró. Por favor inicia sesión nuevamente.');
+        });
     })->create();

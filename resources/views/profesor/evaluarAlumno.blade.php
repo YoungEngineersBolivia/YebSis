@@ -75,7 +75,7 @@
                     @foreach($modelos as $modelo)
                         <option value="{{ $modelo->Id_modelos }}" 
                                 {{ $modeloSeleccionado == $modelo->Id_modelos ? 'selected' : '' }}>
-                            {{ $modelo->Nombre_modelo }}
+                            {{ $modelo->Nombre_modelo }} @if(isset($modelosEvaluados) && in_array($modelo->Id_modelos, $modelosEvaluados)) ✅ @endif
                         </option>
                     @endforeach
                 </select>

@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 use App\Models\Persona;
 use App\Models\Usuario;
 use App\Models\Tutores;
-use App\Models\Rol;  
+use App\Models\Rol;
 use App\Models\Profesor;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -98,7 +98,7 @@ class AdministradorController extends Controller
 
         Usuario::create([
             'Correo' => $request->correo,
-            'Contrasania' => bcrypt($clave),
+            'Contrasenia' => bcrypt($clave),
             'Id_personas' => $persona->Id_personas,
         ]);
 
@@ -172,7 +172,7 @@ class AdministradorController extends Controller
             ));
 
             return redirect()->back()->with('success', 'Tutor registrado correctamente. La contraseña fue enviada al correo.');
-            
+
         } catch (\Illuminate\Validation\ValidationException $e) {
             \Log::error('Error de validación: ', $e->errors());
             return back()->withErrors($e->errors())->withInput();
@@ -212,7 +212,7 @@ class AdministradorController extends Controller
             'Fecha_nacimiento' => $request->fecha_nacimiento,
             'Fecha_registro' => now(),
             'Celular' => $request->celular,
-            'Id_roles' => $rolProfesor->Id_roles, 
+            'Id_roles' => $rolProfesor->Id_roles,
         ]);
 
         $usuario = Usuario::create([

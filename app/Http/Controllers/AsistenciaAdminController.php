@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class AsistenciaAdminController extends Controller
 {
@@ -21,29 +22,29 @@ class AsistenciaAdminController extends Controller
     public function exportarPDF(Request $request)
     {
         $asistencias = $this->obtenerAsistenciasFiltradas($request)->get();
-        
-        $pdf = \PDF::loadView('administrador.pdf.asistenciaReporte', compact('asistencias'));
+
+        $pdf = Pdf::loadView('administrador.pdf.asistenciaReporte', compact('asistencias'));
         return $pdf->download('reporte_asistencia_' . date('Y-m-d_H-i') . '.pdf');
     }
 
-    public function exportarExcel(Request $request) 
+    public function exportarExcel(Request $request)
     {
         $asistencias = $this->obtenerAsistenciasFiltradas($request)->get();
         $filename = "reporte_asistencia_" . date('Y-m-d_H-i') . ".csv";
 
         $headers = [
-            "Content-type"        => "text/csv; charset=UTF-8",
+            "Content-type" => "text/csv; charset=UTF-8",
             "Content-Disposition" => "attachment; filename=$filename",
-            "Pragma"              => "no-cache",
-            "Cache-Control"       => "must-revalidate, post-check=0, pre-check=0",
-            "Expires"             => "0"
+            "Pragma" => "no-cache",
+            "Cache-Control" => "must-revalidate, post-check=0, pre-check=0",
+            "Expires" => "0"
         ];
 
-        $callback = function() use ($asistencias) {
+        $callback = function () use ($asistencias) {
             $file = fopen('php://output', 'w');
             // Add BOM for Excel UTF-8 compatibility
             fputs($file, "\xEF\xBB\xBF");
-            
+
             // Header
             fputcsv($file, ['Fecha', 'Estudiante', 'Código', 'Profesor', 'Programa', 'Estado', 'Observación', 'Reprogramado Para']);
 
@@ -82,12 +83,14 @@ class AsistenciaAdminController extends Controller
             $query->where('Id_programas', $request->programa_id);
         }
         if ($request->filled('estudiante_nombre')) {
-            $query->whereHas('estudiante.persona', function($q) use ($request) {
-                $q->where('Nombre', 'like', '%' . $request->estudiante_nombre . '%')
-                  ->orWhere('Apellido', 'like', '%' . $request->estudiante_nombre . '%');
+            $search = $request->estudiante_nombre;
+            $query->whereHas('estudiante.persona', function ($q) use ($search) {
+                $q->where('Nombre', 'like', '%' . $search . '%')
+                    ->orWhere('Apellido', 'like', '%' . $search . '%')
+                    ->orWhereRaw("CONCAT(Nombre, ' ', Apellido) LIKE ?", ["%$search%"]);
             });
         }
-        
+
         return $query->orderBy('Fecha', 'desc');
     }
 }

@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\Programa; 
+use App\Models\Programa;
 use App\Models\Modelo;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -13,9 +13,9 @@ class ProgramaController extends Controller
     public function index()
     {
         $programas = Programa::with('modelos')
-                            ->withCount('modelos')
-                            ->orderBy('Id_programas', 'desc')
-                            ->paginate(10);
+            ->withCount('modelos')
+            ->orderBy('Id_programas', 'desc')
+            ->paginate(10);
         return view('administrador.programasAdministrador', compact('programas'));
     }
 
@@ -28,7 +28,7 @@ class ProgramaController extends Controller
             'duracion' => 'required|string|max:100',
             'descripcion' => 'required|string',
             'imagen' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'tipo' => 'required|string|in:programa,taller'
+            'tipo' => 'required|string|in:programa,taller,taller_invierno,taller_verano'
         ]);
 
         try {
@@ -61,20 +61,20 @@ class ProgramaController extends Controller
         try {
             $programa = Programa::findOrFail($id);
             $modelos = Modelo::where('Id_programa', $id)
-                            ->orderBy('created_at', 'desc')
-                            ->get();
-            
+                ->orderBy('created_at', 'desc')
+                ->get();
+
             return view('administrador.modelosPrograma', compact('programa', 'modelos'));
         } catch (\Exception $e) {
             return redirect()->route('programas.index')->with('error', 'Programa no encontrado');
         }
     }
 
-  public function edit($id)
-{
-    $programa = Programa::findOrFail($id);
-    return response()->json($programa);
-}
+    public function edit($id)
+    {
+        $programa = Programa::findOrFail($id);
+        return response()->json($programa);
+    }
 
 
 
@@ -86,7 +86,7 @@ class ProgramaController extends Controller
             'rango_edad' => 'required|string|max:100',
             'duracion' => 'required|string|max:100',
             'descripcion' => 'required|string',
-            'tipo' => 'required|string|in:programa,taller',
+            'tipo' => 'required|string|in:programa,taller,taller_invierno,taller_verano',
             'imagen' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048'
         ]);
 
@@ -119,19 +119,19 @@ class ProgramaController extends Controller
     }
 
     public function destroy($id)
-        {
-            $programa = Programa::findOrFail($id);
+    {
+        $programa = Programa::findOrFail($id);
 
-            // Si tiene imagen, eliminarla
-            if ($programa->Imagen) {
-                Storage::delete($programa->Imagen);
-            }
-
-            $programa->delete();
-
-            // Redirigir con mensaje de sesión
-            return redirect()->route('programas.index')
-                            ->with('success', 'Programa eliminado exitosamente');
+        // Si tiene imagen, eliminarla
+        if ($programa->Imagen) {
+            Storage::delete($programa->Imagen);
         }
+
+        $programa->delete();
+
+        // Redirigir con mensaje de sesión
+        return redirect()->route('programas.index')
+            ->with('success', 'Programa eliminado exitosamente');
+    }
 
 }

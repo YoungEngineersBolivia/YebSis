@@ -5,40 +5,68 @@
             $tieneSaldo = false;
             $todosCompletados = true;
 
-            if ($planes && $planes->count() > 0) {
-                foreach ($planes as $plan) {
-                    $totalPagado = $plan->pagos->sum('Monto_pago');
-                    if ($totalPagado < $plan->Monto_total) {
-                        $tieneSaldo = true;
-                        $todosCompletados = false;
+            $talleresOld = $estudiante->talleresInscritos;
+            $tienePlanes = ($planes && $planes->count() > 0);
+            $tieneTalleres = ($talleresOld && $talleresOld->count() > 0);
+
+            if ($tienePlanes || $tieneTalleres) {
+                if ($tienePlanes) {
+                    foreach ($planes as $plan) {
+                        $totalPagado = $plan->pagos->sum('Monto_pago');
+                        if ($totalPagado < $plan->Monto_total) {
+                            $tieneSaldo = true;
+                            $todosCompletados = false;
+                        }
                     }
+                }
+                // Si tiene talleres pero no planes, no marcamos como 'completados' automáticamente
+                if (!$tienePlanes && $tieneTalleres) {
+                    $todosCompletados = false;
                 }
             } else {
                 $todosCompletados = false;
             }
 
             $estadoClase = $todosCompletados ? 'completado' : ($tieneSaldo ? 'pendiente' : 'pendiente');
+
+            // Determinar color de la ficha según el tipo (Programa o Taller)
+            $esTaller = false;
+            if ($tienePlanes) {
+                // Verificamos si alguno de los programas tiene "taller" en el tipo o en el nombre
+                foreach ($planes as $p) {
+                    $tipo = strtolower($p->programa->Tipo ?? '');
+                    $nombre = strtolower($p->programa->Nombre ?? '');
+                    if (str_contains($tipo, 'taller') || str_contains($nombre, 'taller')) {
+                        $esTaller = true;
+                        break;
+                    }
+                }
+            } elseif ($tieneTalleres) {
+                $esTaller = true;
+            }
+
+            $bgCard = $esTaller ? 'background: #FFF3E0;' : 'background: #E3F2FD;';
+            $bgHeader = $esTaller ? 'background: linear-gradient(135deg, #FFF3E0 0%, #FFE0B2 100%);' : 'background: linear-gradient(135deg, #E3F2FD 0%, #BBDEFB 100%);';
         @endphp
 
         <div class="col-lg-6 col-md-12 estudiante-card" data-estado="{{ $estadoClase }}"
             data-tutor="{{ $estudiante->tutor && $estudiante->tutor->persona ? strtolower($estudiante->tutor->persona->Nombre . ' ' . $estudiante->tutor->persona->Apellido) : '' }}"
             data-estudiante="{{ strtolower(($estudiante->persona->Nombre ?? '') . ' ' . ($estudiante->persona->Apellido ?? '')) }}">
-            <div class="card h-100 shadow-sm border-0 hover-card" style="transition: all 0.3s ease;">
-                <div class="card-header bg-gradient border-bottom pt-4 pb-3"
-                    style="background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);">
+            <div class="card h-100 shadow-sm border-0 hover-card" style="transition: all 0.3s ease; {{ $bgCard }}">
+                <div class="card-header bg-gradient border-bottom pt-4 pb-3" style="{{ $bgHeader }}">
                     <div class="d-flex justify-content-between align-items-start">
                         <div class="flex-grow-1">
-                            <div class="mb-2">
-                                <span class="badge bg-primary bg-opacity-10 text-primary px-3 py-2 me-2"
-                                    style="font-size: 0.85rem;">
-                                    <i class="fas fa-user-tie me-1"></i>Tutor
-                                </span>
-                                <span class="fw-bold text-dark" style="font-size: 1.05rem;">
-                                    {{ $estudiante->tutor && $estudiante->tutor->persona
-            ? $estudiante->tutor->persona->Nombre . ' ' . $estudiante->tutor->persona->Apellido
-            : 'Sin tutor asignado' }}
-                                </span>
-                            </div>
+                            @if($estudiante->tutor && $estudiante->tutor->persona)
+                                <div class="mb-2">
+                                    <span class="badge bg-primary bg-opacity-10 text-primary px-3 py-2 me-2"
+                                        style="font-size: 0.85rem;">
+                                        <i class="fas fa-user-tie me-1"></i>Tutor
+                                    </span>
+                                    <span class="fw-bold text-dark" style="font-size: 1.05rem;">
+                                        {{ $estudiante->tutor->persona->Nombre . ' ' . $estudiante->tutor->persona->Apellido }}
+                                    </span>
+                                </div>
+                            @endif
                             <div>
                                 <span class="badge bg-success bg-opacity-10 text-success px-3 py-2 me-2"
                                     style="font-size: 0.85rem;">
@@ -125,7 +153,9 @@
                                 </button>
                             </div>
                         @endforeach
-                    @else
+                    @endif
+
+                    @if(!$tienePlanes && !$tieneTalleres)
                         <div class="alert alert-warning py-2 mb-0">
                             <small><i class="fas fa-exclamation-triangle me-1"></i> Sin plan asignado</small>
                         </div>
@@ -144,10 +174,6 @@
     </div>
 @endif
 
-<!-- Paginación -->
-<div class="d-flex justify-content-center mt-4" id="pagination-links">
-    {{ $estudiantes->links('pagination::bootstrap-5') }}
-</div>
 
 <!-- Modales fuera de las tarjetas para evitar conflictos de posicionamiento (Centrado) -->
 @foreach($estudiantes as $estudiante)
@@ -185,22 +211,37 @@
 
                             @if($plan->pagos && $plan->pagos->count() > 0)
                                 @php
-                                    $pagosOrdenadosRecientes = $plan->pagos->sortByDesc('Fecha_pago');
+                                    $pagosOrdenadosRecientes = $plan->pagos->sortByDesc('Id_pagos');
                                     $totalPagos = $plan->pagos->count();
                                 @endphp
                                 <div class="history-list">
                                     @foreach($pagosOrdenadosRecientes as $index => $pago)
                                         @php
-                                            // Calculamos el número de pago (del más antiguo al más nuevo)
-                                            $nroPago = $totalPagos - $loop->index;
+                                            // Calculamos el número de pago para que el inicial sea #0
+                                            $nroPago = $totalPagos - $loop->index - 1;
                                         @endphp
                                         <div class="p-3 mb-2 rounded-3 bg-white border shadow-sm">
                                             <div class="d-flex justify-content-between align-items-center mb-2">
-                                                <div>
+                                                <div class="d-flex align-items-center">
                                                     <span class="badge bg-dark text-white me-2">#{{ $nroPago }}</span>
-                                                    <span class="badge bg-primary-subtle text-primary fw-bold" style="font-size: 0.9rem;">
+                                                    <span class="badge bg-primary-subtle text-primary fw-bold me-2"
+                                                        style="font-size: 0.9rem;">
                                                         Bs. {{ number_format($pago->Monto_pago, 2) }}
                                                     </span>
+                                                    <div class="btn-group shadow-sm ms-2">
+                                                        <button class="btn btn-sm btn-white border py-0 px-2 btn-editar-pago"
+                                                            title="Editar Pago" data-id="{{ $pago->Id_pagos }}"
+                                                            data-descripcion="{{ $pago->Descripcion }}" data-monto="{{ $pago->Monto_pago }}"
+                                                            data-fecha="{{ $pago->Fecha_pago }}"
+                                                            data-comprobante="{{ $pago->Comprobante }}">
+                                                            <i class="bi bi-pencil-fill text-primary small"></i>
+                                                        </button>
+                                                        <button class="btn btn-sm btn-white border py-0 px-2 btn-eliminar-pago"
+                                                            title="Eliminar Pago" data-id="{{ $pago->Id_pagos }}"
+                                                            data-descripcion="{{ $pago->Descripcion }}">
+                                                            <i class="bi bi-trash3-fill text-danger small"></i>
+                                                        </button>
+                                                    </div>
                                                 </div>
                                                 <small class="text-muted">
                                                     <i class="fas fa-calendar-alt me-1"></i>
@@ -210,13 +251,16 @@
                                             @php
                                                 $comprobante = $pago->Comprobante ?? $pago->comprobante;
                                             @endphp
-                                            @if($comprobante)
-                                                <div class="mt-2 py-1 px-2 bg-light rounded text-muted font-monospace"
-                                                    style="font-size: 0.75rem;">
-                                                    <i class="fas fa-receipt me-1"></i>
-                                                    {{ $comprobante }}
-                                                </div>
-                                            @endif
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <div class="small text-dark fw-semibold">{{ $pago->Descripcion }}</div>
+                                                @if($comprobante)
+                                                    <div class="py-1 px-2 bg-light rounded text-muted font-monospace"
+                                                        style="font-size: 0.75rem;">
+                                                        <i class="fas fa-receipt me-1"></i>
+                                                        {{ $comprobante }}
+                                                    </div>
+                                                @endif
+                                            </div>
                                         </div>
                                     @endforeach
                                 </div>
@@ -245,3 +289,14 @@
 
 <!-- Input oculto para pasar el total a JS -->
 <input type="hidden" id="total-count-hidden" value="{{ $estudiantes->total() }}">
+
+<!-- Paginación -->
+<div id="pagination-links" class="d-flex justify-content-between align-items-center mt-4 flex-wrap gap-2">
+    <small class="text-muted">
+        Mostrando {{ $estudiantes->firstItem() ?? 0 }}–{{ $estudiantes->lastItem() ?? 0 }}
+        de {{ $estudiantes->total() }} estudiantes
+    </small>
+    <nav>
+        {{ $estudiantes->appends(request()->query())->links('pagination::bootstrap-5') }}
+    </nav>
+</div>

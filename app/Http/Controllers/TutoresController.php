@@ -15,9 +15,9 @@ class TutoresController extends Controller
                 $q->where(function ($sub) use ($search) {
                     $sub->whereHas('persona', function ($p) use ($search) {
                         $p->where('Nombre', 'like', "%{$search}%")
-                          ->orWhere('Apellido', 'like', "%{$search}%")
-                          ->orWhere('Celular', 'like', "%{$search}%")
-                          ->orWhere('Direccion_domicilio', 'like', "%{$search}%");
+                            ->orWhere('Apellido', 'like', "%{$search}%")
+                            ->orWhere('Celular', 'like', "%{$search}%")
+                            ->orWhere('Direccion_domicilio', 'like', "%{$search}%");
                     })->orWhereHas('usuario', function ($u) use ($search) {
                         $u->where('Correo', 'like', "%{$search}%");
                     });
@@ -33,7 +33,17 @@ class TutoresController extends Controller
     // Nuevo método para mostrar la vista de detalles
     public function detalles($id)
     {
-        $tutor = Tutores::with(['persona', 'usuario'])->findOrFail($id);
+        $tutor = Tutores::with([
+            'persona',
+            'usuario',
+            'estudiantes.persona',
+            'estudiantes.programa',
+            'estudiantes.sucursal',
+            'estudiantes.planesPago.cuotas',
+            'estudiantes.planesPago.pagos',
+            'estudiantes.planesPago.programa'
+        ])->findOrFail($id);
+
         return view('administrador.detallesTutor', compact('tutor'));
     }
 
@@ -42,17 +52,17 @@ class TutoresController extends Controller
         $tutor = Tutores::with(['persona', 'usuario'])->findOrFail($id);
 
         return response()->json([
-            'Id_tutores'  => $tutor->Id_tutores,
-            'Parentesco'  => $tutor->Parentesco,
-            'Descuento'   => $tutor->Descuento,
-            'Nit'         => $tutor->Nit,
-            'persona'     => [
-                'Nombre'              => $tutor->persona->Nombre ?? '',
-                'Apellido'            => $tutor->persona->Apellido ?? '',
-                'Celular'             => $tutor->persona->Celular ?? '',
+            'Id_tutores' => $tutor->Id_tutores,
+            'Parentesco' => $tutor->Parentesco,
+            'Descuento' => $tutor->Descuento,
+            'Nit' => $tutor->Nit,
+            'persona' => [
+                'Nombre' => $tutor->persona->Nombre ?? '',
+                'Apellido' => $tutor->persona->Apellido ?? '',
+                'Celular' => $tutor->persona->Celular ?? '',
                 'Direccion_domicilio' => $tutor->persona->Direccion_domicilio ?? '',
             ],
-            'usuario'     => [
+            'usuario' => [
                 'Correo' => $tutor->usuario->Correo ?? '',
             ],
         ]);
@@ -64,21 +74,21 @@ class TutoresController extends Controller
 
         // Validación básica
         $validated = $request->validate([
-            'nombre'             => 'required|string|max:255',
-            'apellido'           => 'required|string|max:255',
-            'celular'            => 'nullable|string|max:50',
-            'direccion_domicilio'=> 'nullable|string|max:255',
-            'correo'             => 'required|email|max:255',
-            'parentezco'         => 'required|string|max:100',
-            'descuento'          => 'nullable|numeric|min:0|max:100',
-            'nit'                => 'nullable|string|max:50',
+            'nombre' => 'required|string|max:255',
+            'apellido' => 'required|string|max:255',
+            'celular' => 'nullable|string|max:50',
+            'direccion_domicilio' => 'nullable|string|max:255',
+            'correo' => 'required|email|max:255',
+            'parentezco' => 'required|string|max:100',
+            'descuento' => 'nullable|numeric|min:0|max:100',
+            'nit' => 'nullable|string|max:50',
         ]);
 
         // Actualizar persona
-        $tutor->persona->Nombre               = $validated['nombre'];
-        $tutor->persona->Apellido             = $validated['apellido'];
-        $tutor->persona->Celular              = $validated['celular'] ?? null;
-        $tutor->persona->Direccion_domicilio  = $validated['direccion_domicilio'] ?? null;
+        $tutor->persona->Nombre = $validated['nombre'];
+        $tutor->persona->Apellido = $validated['apellido'];
+        $tutor->persona->Celular = $validated['celular'] ?? null;
+        $tutor->persona->Direccion_domicilio = $validated['direccion_domicilio'] ?? null;
         $tutor->persona->save();
 
         // Actualizar usuario
@@ -87,8 +97,8 @@ class TutoresController extends Controller
 
         // Actualizar tutor
         $tutor->Parentesco = $validated['parentezco'];
-        $tutor->Descuento  = $validated['descuento'] ?? null;
-        $tutor->Nit        = $validated['nit'] ?? null;
+        $tutor->Descuento = $validated['descuento'] ?? null;
+        $tutor->Nit = $validated['nit'] ?? null;
         $tutor->save();
 
         // Redirigir de vuelta a la vista de detalles con mensaje de éxito

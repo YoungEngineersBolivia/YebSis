@@ -1,1 +1,31 @@
-/* CSS Limpiado para usar Bootstrap Grid en la vista */
+/* Responsive styles for small screens (320px) */
+@media (max-width: 400px) {
+    .student-card {
+        padding: 0.75rem !important;
+    }
+
+    .student-card .gap-3 {
+        gap: 0.5rem !important;
+    }
+
+    .student-card img {
+        width: 45px !important;
+        height: 45px !important;
+    }
+
+    .student-name {
+        font-size: 0.95rem;
+    }
+
+    .student-program,
+    .student-card .small {
+        font-size: 0.75rem;
+        white-space: normal !important;
+        overflow: visible !important;
+        word-break: break-word;
+    }
+
+    .student-card .d-flex {
+        align-items: flex-start !important;
+    }
+}

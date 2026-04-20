@@ -134,4 +134,45 @@ document.addEventListener('DOMContentLoaded', () => {
             return true;
         });
     }
+
+    // --- Lógica para Editar y Eliminar Pagos (Delegación de eventos) ---
+
+    // Evento para abrir modal de edición
+    document.addEventListener('click', function (e) {
+        if (e.target.closest('.btn-editar-pago')) {
+            const btn = e.target.closest('.btn-editar-pago');
+            const id = btn.dataset.id;
+            const descripcion = btn.dataset.descripcion;
+            const monto = btn.dataset.monto;
+            const fecha = btn.dataset.fecha;
+            const comprobante = btn.dataset.comprobante;
+
+            document.getElementById('edit-descripcion').value = descripcion;
+            document.getElementById('edit-monto').value = monto;
+            document.getElementById('edit-fecha').value = fecha;
+            document.getElementById('edit-comprobante').value = comprobante || '';
+
+            const form = document.getElementById('formEditarPago');
+            // Usamos una ruta base y reemplazamos el ID
+            form.action = `/administrador/pagos/${id}`;
+
+            const modal = new bootstrap.Modal(document.getElementById('modalEditarPago'));
+            modal.show();
+        }
+
+        if (e.target.closest('.btn-eliminar-pago')) {
+            const btn = e.target.closest('.btn-eliminar-pago');
+            const id = btn.dataset.id;
+            const descripcion = btn.dataset.descripcion;
+
+            document.getElementById('pago-eliminar-desc').textContent = descripcion;
+
+            const form = document.getElementById('formEliminarPago');
+            form.action = `/administrador/pagos/${id}`;
+
+            const modal = new bootstrap.Modal(document.getElementById('modalEliminarPago'));
+            modal.show();
+        }
+    });
+
 });

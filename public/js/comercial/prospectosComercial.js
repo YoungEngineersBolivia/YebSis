@@ -66,7 +66,7 @@ function verClasePrueba(nombre, fecha, hora, comentarios) {
 
 // Función para actualizar automáticamente el estado cuando se asigna una clase
 function actualizarEstadoAClaseAsignada(prospectoId) {
-    fetch(`/prospectos/${prospectoId}/updateEstado`, {
+    fetch(`/comercial/prospectos/${prospectoId}/estado`, {
         method: 'PUT',
         headers: {
             'Content-Type': 'application/json',
@@ -120,15 +120,18 @@ function cambiarRango(direccion) {
 document.addEventListener('DOMContentLoaded', function () {
     const selects = document.querySelectorAll('.estado-select');
     selects.forEach(function (select) {
-        const estado = select.value.replace(/\s+/g, '.');
-        select.classList.remove('estado-nuevo', 'estado-contactado', 'estado-clase.de.prueba');
-        select.classList.add('estado-' + estado);
+        const actualizarColores = (el) => {
+            const estado = el.value.replace(/\s+/g, '-');
+            el.classList.remove('estado-nuevo', 'estado-contactado', 'estado-clase-de-prueba');
+            el.classList.add('estado-' + estado);
+        };
+
+        // Inicializar
+        actualizarColores(select);
 
         // Cambiar colores al seleccionar
         select.addEventListener('change', function () {
-            const nuevoEstado = this.value.replace(/\s+/g, '.');
-            this.classList.remove('estado-nuevo', 'estado-contactado', 'estado-clase.de.prueba');
-            this.classList.add('estado-' + nuevoEstado);
+            actualizarColores(this);
         });
     });
 });

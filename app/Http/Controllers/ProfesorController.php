@@ -7,6 +7,12 @@ use Illuminate\Http\Request;
 use App\Models\Estudiante;
 use App\Models\Profesor;
 use App\Models\ClasePrueba;
+use App\Models\Horario;
+use App\Models\Evaluacion;
+use App\Models\Asistencia;
+use App\Models\Pregunta;
+use App\Models\Respuesta;
+use Illuminate\Support\Facades\DB;
 
 class ProfesorController extends Controller
 {
@@ -67,37 +73,37 @@ class ProfesorController extends Controller
         return view('profesor.edit', compact('profesor'));
     }
 
-   public function update(Request $request, $id)
-{
-    $request->validate([
-        'nombre' => 'required',
-        'apellido' => 'required',
-        'correo' => 'required|email',
-    ]);
+    public function update(Request $request, $id)
+    {
+        $request->validate([
+            'nombre' => 'required',
+            'apellido' => 'required',
+            'correo' => 'required|email',
+        ]);
 
-    $profesor = Profesor::with(['persona', 'usuario'])->findOrFail($id);
+        $profesor = Profesor::with(['persona', 'usuario'])->findOrFail($id);
 
-    // Actualizar persona
-    $profesor->persona->Nombre = $request->nombre;
-    $profesor->persona->Apellido = $request->apellido;
-    $profesor->persona->Celular = $request->celular;
-    $profesor->persona->save();
+        // Actualizar persona
+        $profesor->persona->Nombre = $request->nombre;
+        $profesor->persona->Apellido = $request->apellido;
+        $profesor->persona->Celular = $request->celular;
+        $profesor->persona->save();
 
-    // Actualizar usuario
-    $profesor->usuario->Correo = $request->correo;
-    if ($request->contrasenia) {
-        $profesor->usuario->Contrasenia = bcrypt($request->contrasenia);
+        // Actualizar usuario
+        $profesor->usuario->Correo = $request->correo;
+        if ($request->contrasenia) {
+            $profesor->usuario->Contrasenia = bcrypt($request->contrasenia);
+        }
+        $profesor->usuario->save();
+
+        // Actualizar campos propios de Profesor
+        $profesor->Profesion = $request->profesion;
+        $profesor->Rol_componentes = $request->rol_componentes;
+        $profesor->save();
+
+        return redirect()->route('profesores.index')
+            ->with('success', 'Profesor actualizado correctamente');
     }
-    $profesor->usuario->save();
-
-    // Actualizar campos propios de Profesor
-    $profesor->Profesion = $request->profesion;
-    $profesor->Rol_componentes = $request->rol_componentes;
-    $profesor->save();
-
-    return redirect()->route('profesores.index')
-        ->with('success', 'Profesor actualizado correctamente');
-}
 
 
     public function destroy($id)
@@ -137,14 +143,15 @@ class ProfesorController extends Controller
         }
 
         // Obtener IDs únicos de estudiantes que tienen horarios con este profesor
-        $estudiantesIds = \App\Models\Horario::where('Id_profesores', $profesorId)
+        $estudiantesIds = Horario::where('Id_profesores', $profesorId)
             ->distinct()
             ->pluck('Id_estudiantes')
             ->toArray();
 
         // Construir query base con estudiantes que tienen horarios con este profesor
+        // Usamos whereIn para evitar problemas de capitalización (activo vs Activo)
         $estudiantesQuery = Estudiante::with(['persona', 'programa', 'horarios'])
-            ->where('Estado', 'activo')
+            ->whereIn('Estado', ['activo', 'Activo'])
             ->whereIn('Id_estudiantes', $estudiantesIds)
             ->whereHas('persona', function ($query) {
                 $query->where('Id_roles', 4);
@@ -152,15 +159,12 @@ class ProfesorController extends Controller
 
         $titulo = '';
 
-        if ($tipo === 'asistencia') {
-            $titulo = 'Registrar Asistencia';
-        } elseif ($tipo === 'asignados') {
+        if ($tipo === 'asignados') {
             $titulo = 'Alumnos Asignados';
         } elseif ($tipo === 'recuperatoria') {
-            $estudiantesQuery->whereHas('asistencias', function($q) use ($profesorId) {
+            $estudiantesQuery->whereHas('asistencias', function ($q) use ($profesorId) {
                 $q->where('Estado', 'Reprogramado');
             });
-            $titulo = 'Alumnos con Clases Reprogramadas';
             $titulo = 'Clase Recuperatoria';
         } else {
             return redirect()->route('profesor.menu-alumnos');
@@ -175,9 +179,9 @@ class ProfesorController extends Controller
     public function detalleEstudiante($id)
     {
         $estudiante = Estudiante::with(['persona', 'programa.modelos', 'horarios'])->findOrFail($id);
-        
+
         // Obtener IDs de modelos ya evaluados
-        $modelosEvaluados = \App\Models\Evaluacion::where('Id_estudiantes', $estudiante->Id_estudiantes)
+        $modelosEvaluados = Evaluacion::where('Id_estudiantes', $estudiante->Id_estudiantes)
             ->pluck('Id_modelos')
             ->unique()
             ->toArray();
@@ -185,9 +189,9 @@ class ProfesorController extends Controller
         // Verificar si el estudiante tiene una clase reprogramada (Recuperatoria)
         $esRecuperatoria = false;
         $profesorId = auth()->user()->persona->profesor->Id_profesores ?? null;
-        
+
         if ($profesorId) {
-            $esRecuperatoria = \App\Models\Asistencia::where('Id_estudiantes', $estudiante->Id_estudiantes)
+            $esRecuperatoria = Asistencia::where('Id_estudiantes', $estudiante->Id_estudiantes)
                 ->where('Id_profesores', $profesorId)
                 ->where('Estado', 'Reprogramado')
                 ->exists();
@@ -208,12 +212,12 @@ class ProfesorController extends Controller
             ->findOrFail($id);
 
         // Obtener preguntas del programa
-        $preguntas = \App\Models\Pregunta::porPrograma($estudiante->Id_programas)
+        $preguntas = Pregunta::porPrograma($estudiante->Id_programas)
             ->ordenadas()
             ->get();
 
         // Obtener opciones de respuesta (Sí, No, En proceso)
-        $respuestas = \App\Models\Respuesta::all();
+        $respuestas = Respuesta::all();
 
         // Obtener modelos del programa
         $modelos = $estudiante->programa->modelos;
@@ -222,9 +226,9 @@ class ProfesorController extends Controller
         $modeloSolicitado = request('modelo_id');
 
         // Cargar evaluaciones existentes (filtrando por modelo si se especificó, o todas)
-        $evaluacionesQuery = \App\Models\Evaluacion::where('Id_estudiantes', $estudiante->Id_estudiantes)
+        $evaluacionesQuery = Evaluacion::where('Id_estudiantes', $estudiante->Id_estudiantes)
             ->with(['pregunta', 'respuesta', 'modelo']);
-            
+
         if ($modeloSolicitado) {
             $evaluacionesQuery->where('Id_modelos', $modeloSolicitado);
         }
@@ -232,10 +236,16 @@ class ProfesorController extends Controller
         $evaluacionesExistentes = $evaluacionesQuery->get()->keyBy('Id_preguntas');
 
         // Modelo seleccionado: Usar el solicitado, o el de la primera evaluación encontrada (si existe), o null
-        $modeloSeleccionado = $modeloSolicitado 
+        $modeloSeleccionado = $modeloSolicitado
             ?? ($evaluacionesExistentes->first()->Id_modelos ?? null);
 
-        return view('profesor.evaluarAlumno', compact('estudiante', 'preguntas', 'respuestas', 'modelos', 'evaluacionesExistentes', 'modeloSeleccionado'));
+        // Obtener IDs de modelos ya evaluados
+        $modelosEvaluados = Evaluacion::where('Id_estudiantes', $estudiante->Id_estudiantes)
+            ->pluck('Id_modelos')
+            ->unique()
+            ->toArray();
+
+        return view('profesor.evaluarAlumno', compact('estudiante', 'preguntas', 'respuestas', 'modelos', 'evaluacionesExistentes', 'modeloSeleccionado', 'modelosEvaluados'));
     }
 
     public function guardarEvaluacion(Request $request)
@@ -254,68 +264,57 @@ class ProfesorController extends Controller
         ]);
 
         try {
-            \DB::beginTransaction();
+            DB::beginTransaction();
 
-            $estudiante = \App\Models\Estudiante::findOrFail($request->estudiante_id);
-            $profesorId = auth()->user()->persona->profesor->Id_profesores;
+            $estudiante = Estudiante::findOrFail($request->estudiante_id);
 
-            // Verificar si ya existen evaluaciones para este estudiante Y este modelo
-            $evaluacionesExistentes = \App\Models\Evaluacion::where('Id_estudiantes', $estudiante->Id_estudiantes)
-                ->where('Id_modelos', $request->modelo_id)
-                ->get();
+            // Obtener ID del profesor de forma segura
+            $profesor = auth()->user()->profesor ?? auth()->user()->persona->profesor;
+            $profesorId = $profesor ? $profesor->Id_profesores : null;
 
-            if ($evaluacionesExistentes->count() > 0) {
-                // MODO EDICIÓN: Actualizar evaluaciones existentes
-                foreach ($request->respuestas as $preguntaId => $respuestaId) {
-                    \App\Models\Evaluacion::updateOrCreate(
-                        [
-                            'Id_estudiantes' => $estudiante->Id_estudiantes,
-                            'Id_preguntas' => $preguntaId,
-                            'Id_modelos' => $request->modelo_id, // IMPORTANTE: Incluir modelo en la clave única
-                        ],
-                        [
-                            'fecha_evaluacion' => now(),
-                            'Id_respuestas' => $respuestaId,
-                            'Id_profesores' => $profesorId,
-                            'Id_programas' => $estudiante->Id_programas,
-                        ]
-                    );
-                }
-                $mensaje = 'Evaluación actualizada correctamente';
-            } else {
-                // MODO CREACIÓN: Crear nuevas evaluaciones
-                foreach ($request->respuestas as $preguntaId => $respuestaId) {
-                    \App\Models\Evaluacion::create([
-                        'fecha_evaluacion' => now(),
-                        'Id_estudiantes' => $estudiante->Id_estudiantes,
-                        'Id_preguntas' => $preguntaId,
-                        'Id_respuestas' => $respuestaId,
-                        'Id_modelos' => $request->modelo_id,
-                        'Id_profesores' => $profesorId,
-                        'Id_programas' => $estudiante->Id_programas,
-                    ]);
-                }
-                
-                // Si el estudiante tenía una clase REPROGRAMADA, la marcamos como ASISTIÓ y FINALIZADA
-                \App\Models\Asistencia::where('Id_estudiantes', $estudiante->Id_estudiantes)
-                    ->where('Id_profesores', $profesorId)
-                    ->where('Estado', 'Reprogramado')
-                    ->update(['Estado' => 'Asistio', 'Observacion' => 'Clase recuperatoria completada mediante evaluación']);
-
-                $mensaje = 'Evaluación guardada y clase recuperatoria completada correctamente';
+            if (!$profesorId) {
+                return back()->with('error', 'No se pudo identificar tu perfil de profesor. Por favor, reasocia tu cuenta.');
             }
 
-            \DB::commit();
+            // MODO EDICIÓN/ACTUALIZACIÓN: Usamos updateOrCreate para permitir editar evaluaciones existentes por modelo y pregunta
+            foreach ($request->respuestas as $preguntaId => $respuestaId) {
+                Evaluacion::updateOrCreate(
+                    [
+                        'Id_estudiantes' => $estudiante->Id_estudiantes,
+                        'Id_preguntas' => $preguntaId,
+                        'Id_modelos' => $request->modelo_id,
+                    ],
+                    [
+                        'fecha_evaluacion' => now(),
+                        'Id_respuestas' => $respuestaId,
+                        'Id_profesores' => $profesorId,
+                        'Id_programas' => $estudiante->Id_programas,
+                    ]
+                );
+            }
 
-            // Redirigir agregando el modelo para que la vista de detalle sepa qué pasó, si es necesario
+            $mensaje = 'Evaluación guardada exitosamente';
+
+            // Si el estudiante tenía una clase REPROGRAMADA, la marcamos como ASISTIÓ y FINALIZADA
+            $actualizado = Asistencia::where('Id_estudiantes', $estudiante->Id_estudiantes)
+                ->where('Id_profesores', $profesorId)
+                ->where('Estado', 'Reprogramado')
+                ->update(['Estado' => 'Asistio', 'Observacion' => 'Clase recuperatoria completada mediante evaluación']);
+
+            if ($actualizado > 0) {
+                $mensaje .= ' y clase recuperatoria finalizada';
+            }
+
+            DB::commit();
+
             return redirect()
                 ->route('profesor.detalle-estudiante', ['id' => $request->estudiante_id])
                 ->with('success', $mensaje);
 
         } catch (\Exception $e) {
-            \DB::rollBack();
+            DB::rollBack();
             return back()
-                ->with('error', 'Error al guardar la evaluación: ' . $e->getMessage())
+                ->with('error', 'Error al procesar la evaluación: ' . $e->getMessage())
                 ->withInput();
         }
     }

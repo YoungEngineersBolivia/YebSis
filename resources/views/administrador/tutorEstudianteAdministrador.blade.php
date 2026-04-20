@@ -19,23 +19,25 @@
 <div class="container mt-4">
     <h2>Registro Combinado</h2>
 
-    {{-- Mostrar errores de validación --}}
+    {{-- Mostrar errores de validación con estilo premium --}}
     @if ($errors->any())
-        <div class="alert alert-danger">
-            <ul class="mb-0">
-                @foreach ($errors->all() as $error)
-                    <li>{{ $error }}</li>
-                @endforeach
-            </ul>
+        <div class="alert alert-danger alert-dismissible fade show shadow-sm border-0 mb-4" role="alert">
+            <div class="d-flex align-items-center">
+                <i class="bi bi-exclamation-triangle-fill me-3 fs-4"></i>
+                <div>
+                    <strong class="d-block">¡Atención! Por favor verifica los siguientes campos:</strong>
+                    <ul class="mb-0 mt-1 small">
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            </div>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
     @endif
 
-    {{-- Mensaje de éxito --}}
-    @if (session('success'))
-        <div class="alert alert-success">
-            {{ session('success') }}
-        </div>
-    @endif
+    {{-- El mensaje de éxito lo maneja la baseAdministrador con estilo premium --}}
 
     <form action="{{ route('registroCombinado.registrar') }}" method="POST" id="formRegistroCombinado">
         @csrf
@@ -60,10 +62,6 @@
                 </select>
             </div>
             <div class="col-md-4">
-                <label>Fecha de Nacimiento</label>
-                <input type="date" name="tutor_fecha_nacimiento" class="form-control" value="{{ old('tutor_fecha_nacimiento') }}" required>
-            </div>
-            <div class="col-md-4">
                 <label>Celular</label>
                 <input type="text" name="tutor_celular" class="form-control" value="{{ old('tutor_celular') }}" placeholder="Ej: 70123456" required>
             </div>
@@ -85,21 +83,21 @@
                 </div>
          
             <div class="col-md-4">
-                <label>NIT</label>
-                <input type="text" name="tutor_nit" class="form-control" value="{{ old('tutor_nit') }}" placeholder="Ej: 1234567 (Opcional)">
+                <label>NIT <small class="text-primary fw-normal">(Opcional)</small></label>
+                <input type="text" name="tutor_nit" class="form-control" value="{{ old('tutor_nit') }}" placeholder="Ej: 1234567">
             </div>
             <div class="col-md-6">
-                <label>Nombre Factura</label>
-                <input type="text" name="tutor_nombre_factura" class="form-control" value="{{ old('tutor_nombre_factura') }}" placeholder="Ej: Juan Pérez García (Opcional)">
+                <label>Nombre Factura <small class="text-primary fw-normal">(Opcional)</small></label>
+                <input type="text" name="tutor_nombre_factura" class="form-control" value="{{ old('tutor_nombre_factura') }}" placeholder="Ej: Juan Pérez García">
             </div>
 
         <div class="row">
             <div class="col-md-6">
-                <label>Correo</label>
-                <input type="email" name="tutor_email" class="form-control" value="{{ old('tutor_email') }}" placeholder="Ej: juan.perez@gmail.com" required>
+                <label>Correo <small class="text-primary fw-normal">(Opcional)</small></label>
+                <input type="email" name="tutor_email" class="form-control" value="{{ old('tutor_email') }}" placeholder="Ej: juan.perez@gmail.com">
             </div>
              <div class="col-md-6">
-                <label>Descuento Especial (%)</label>
+                <label>Descuento Especial (%) <small class="text-primary fw-normal">(Opcional)</small></label>
                 <input type="number" step="0.01" name="tutor_descuento" id="tutor_descuento" class="form-control" value="{{ old('tutor_descuento') }}" placeholder="0 - 100">
             </div>
 
@@ -134,14 +132,8 @@
                 <label>Fecha de Nacimiento</label>
                 <input type="date" name="estudiante_fecha_nacimiento" class="form-control" value="{{ old('estudiante_fecha_nacimiento') }}" required>
             </div>
-            <div class="col-md-4">
-                <label>Número de referencia</label>
-                <input type="text" name="estudiante_celular" class="form-control" value="{{ old('estudiante_celular') }}" placeholder="Ej: 70987654" required>
-            </div>
-            <div class="col-md-12">
-                <label>Dirección</label>
-                <input type="text" name="estudiante_direccion" class="form-control" value="{{ old('estudiante_direccion') }}" placeholder="Ej: Calle Los Pinos #456, Zona Norte" required>
-            </div>
+            {{-- Se eliminan Celular y Dirección del estudiante para evitar redundancia, 
+                 el controlador usará automáticamente los del tutor --}}
             <div class="col-md-6">
                 <label>Código de Estudiante</label>
                 <input type="text" name="codigo_estudiante" class="form-control" value="{{ old('codigo_estudiante') }}" placeholder="Ej: EST-2024-001" required>
@@ -188,36 +180,32 @@
     </div>
 
         <hr>
-        {{-- ================= PAGO ================= --}}
-        <h4>Pago</h4>
-        <div class="row">
-            {{-- Campos ocultos para compatibilidad con el controlador --}}
-            <input type="hidden" name="Nro_cuotas" value="1">
-            <input type="hidden" name="Estado_plan" value="Completado">
-            {{-- El Monto_total será igual al Monto_pago --}}
-            <input type="hidden" name="Monto_total" id="hidden_monto_total">
-            
-            <div class="col-md-6">
-                <label>Descripción</label>
-                <input type="text" name="Descripcion" class="form-control" placeholder="Ej: Pago de Matrícula" value="{{ old('Descripcion', 'Pago del Curso') }}">
-            </div>
-            <div class="col-md-6">
-                <label>Comprobante</label>
-                <div class="input-group">
-                    <input type="text" name="Comprobante" id="input_comprobante" class="form-control" placeholder="Se llena con Nombre Factura" value="{{ old('Comprobante') }}">
-                    <button class="btn btn-outline-secondary" type="button" id="btn-copy-factura">
-                        <i class="fas fa-sync"></i>
-                    </button>
+        {{-- ================= PAGO (OCULTO POR SOLICITUD) ================= --}}
+        <div class="d-none">
+            <h4>Pago</h4>
+            <div class="row">
+                {{-- Campos ocultos para compatibilidad con el controlador --}}
+                <input type="hidden" name="Nro_cuotas" value="1">
+                <input type="hidden" name="Estado_plan" value="Completado">
+                {{-- El Monto_total será igual al Monto_pago --}}
+                <input type="hidden" name="Monto_total" id="hidden_monto_total" value="0">
+                
+                <div class="col-md-6">
+                    <label>Descripción</label>
+                    <input type="text" name="Descripcion" class="form-control" value="Registro Inicial">
                 </div>
-                <small class="text-muted">Se llena automáticamente con el Nombre de Factura</small>
-            </div>
-            <div class="col-md-6 mt-3">
-                <label>Monto (Bs)</label>
-                <input type="number" step="0.01" name="Monto_pago" id="input_monto_pago" class="form-control" required placeholder="0.00" value="{{ old('Monto_pago') }}">
-            </div>
-            <div class="col-md-6 mt-3">
-                <label>Fecha</label>
-                <input type="date" name="Fecha_pago" class="form-control" value="{{ old('Fecha_pago', \Carbon\Carbon::now()->format('Y-m-d')) }}" required>
+                <div class="col-md-6">
+                    <label>Comprobante</label>
+                    <input type="text" name="Comprobante" id="input_comprobante" class="form-control" value="S/N">
+                </div>
+                <div class="col-md-6 mt-3">
+                    <label>Monto (Bs)</label>
+                    <input type="number" step="0.01" name="Monto_pago" id="input_monto_pago" class="form-control" value="0">
+                </div>
+                <div class="col-md-6 mt-3">
+                    <label>Fecha</label>
+                    <input type="date" name="Fecha_pago" class="form-control" value="{{ \Carbon\Carbon::now()->format('Y-m-d') }}">
+                </div>
             </div>
         </div>
         
@@ -619,7 +607,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 document.querySelector('input[name="tutor_nombre"]').value = t.Nombre || '';
                 document.querySelector('input[name="tutor_apellido"]').value = t.Apellido || '';
                 document.querySelector('select[name="tutor_genero"]').value = t.Genero || '';
-                document.querySelector('input[name="tutor_fecha_nacimiento"]').value = t.Fecha_nacimiento ? t.Fecha_nacimiento.substring(0, 10) : '';
                 document.querySelector('input[name="tutor_celular"]').value = t.Celular || '';
                 document.querySelector('input[name="tutor_direccion"]').value = t.Direccion_domicilio || '';
                 document.querySelector('input[name="tutor_email"]').value = t.Correo || '';
@@ -702,8 +689,6 @@ document.addEventListener('DOMContentLoaded', function() {
         document.querySelector('input[name="estudiante_apellido"]').value = hijo.Apellido || '';
         document.querySelector('select[name="estudiante_genero"]').value = hijo.Genero || '';
         document.querySelector('input[name="estudiante_fecha_nacimiento"]').value = hijo.Fecha_nacimiento ? hijo.Fecha_nacimiento.substring(0, 10) : '';
-        document.querySelector('input[name="estudiante_celular"]').value = hijo.Celular || '';
-        document.querySelector('input[name="estudiante_direccion"]').value = hijo.Direccion_domicilio || '';
         document.querySelector('input[name="codigo_estudiante"]').value = hijo.Cod_estudiante || '';
         
         // Deshabilitar campos para que no se puedan editar (género con estilo visual)
@@ -713,8 +698,6 @@ document.addEventListener('DOMContentLoaded', function() {
         generoSelect.style.pointerEvents = 'none';
         generoSelect.style.backgroundColor = '#e9ecef';
         document.querySelector('input[name="estudiante_fecha_nacimiento"]').readOnly = true;
-        document.querySelector('input[name="estudiante_celular"]').readOnly = true;
-        document.querySelector('input[name="estudiante_direccion"]').readOnly = true;
         document.querySelector('input[name="codigo_estudiante"]').readOnly = true;
         
         // Mostrar formulario
@@ -734,8 +717,6 @@ document.addEventListener('DOMContentLoaded', function() {
         document.querySelector('input[name="estudiante_apellido"]').value = '';
         document.querySelector('select[name="estudiante_genero"]').value = '';
         document.querySelector('input[name="estudiante_fecha_nacimiento"]').value = '';
-        document.querySelector('input[name="estudiante_celular"]').value = '';
-        document.querySelector('input[name="estudiante_direccion"]').value = '';
         document.querySelector('input[name="codigo_estudiante"]').value = '';
         
         // Habilitar campos
@@ -745,8 +726,6 @@ document.addEventListener('DOMContentLoaded', function() {
         generoSelect.style.pointerEvents = '';
         generoSelect.style.backgroundColor = '';
         document.querySelector('input[name="estudiante_fecha_nacimiento"]').readOnly = false;
-        document.querySelector('input[name="estudiante_celular"]').readOnly = false;
-        document.querySelector('input[name="estudiante_direccion"]').readOnly = false;
         document.querySelector('input[name="codigo_estudiante"]').readOnly = false;
     }
     

@@ -1,23 +1,26 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title', 'Panel del Profesor')</title>
 
     {{-- Bootstrap CSS --}}
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    
+
     {{-- Bootstrap Icons --}}
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
 
     {{-- Estilos propios de cada vista --}}
     <link rel="stylesheet" href="{{ auto_asset('css/profesor/baseProfesor.css') }}">
-    
+
     {{-- Estilos adicionales de cada vista --}}
     @yield('styles')
     @stack('styles')
 </head>
+
 <body>
     <div class="container">
         <header class="header">
@@ -25,7 +28,7 @@
                 <div class="logo-icon">e</div>
                 {{-- Correo del profesor (sin invitados) --}}
                 <span class="username">
-                   {{ Auth::user()->Correo }}
+                    {{ Auth::user()->Correo }}
                 </span>
             </div>
 
@@ -40,6 +43,9 @@
                 <a href="{{ route('profesor.asistencia.index') }}" class="menu-item">
                     <i class="bi bi-calendar-check"></i> Registro de Asistencia
                 </a>
+                <a href="{{ route('profesor.asistencia.historial') }}" class="menu-item">
+                    <i class="bi bi-clock-history"></i> Historial de Asistencias
+                </a>
                 <a href="{{ route('profesor.listado-alumnos', 'asignados') }}" class="menu-item">
                     <i class="bi bi-people-fill"></i> Alumnos Asignados
                 </a>
@@ -47,7 +53,7 @@
                     <i class="bi bi-calendar-event"></i> Clase Recuperatoria
                 </a>
                 <a href="#" class="menu-item menu-item-logout"
-                   onclick="document.getElementById('logout-form').submit(); return false;">
+                    onclick="document.getElementById('logout-form').submit(); return false;">
                     <i class="bi bi-box-arrow-right"></i> Cerrar Sesión
                 </a>
             </div>
@@ -76,7 +82,7 @@
         }
 
         // Cerrar el menú si se hace clic fuera de él
-        window.onclick = function(event) {
+        window.onclick = function (event) {
             if (!event.target.matches('.menu-icon') && !event.target.matches('.menu-line')) {
                 const dropdown = document.getElementById('menuDropdown');
                 if (dropdown.classList.contains('show')) {
@@ -90,4 +96,5 @@
     @yield('scripts')
     @stack('scripts')
 </body>
+
 </html>

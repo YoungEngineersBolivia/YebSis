@@ -1,5 +1,12 @@
 @extends('administrador.baseAdministrador')
 
+@section('styles')
+<style>
+    nav .pagination { margin-bottom: 0; }
+    nav .pagination .page-link { padding: 4px 10px; font-size: 0.8rem; }
+</style>
+@endsection
+
 @section('content')
 <div class="row mb-4">
     <div class="col-md-6">
@@ -133,8 +140,14 @@
             </table>
         </div>
     </div>
-    <div class="card-footer bg-white border-0">
-        {{ $asistencias->links() }}
+    <div class="card-footer bg-white border-0 d-flex justify-content-between align-items-center flex-wrap gap-2 py-2">
+        <small class="text-muted">
+            Mostrando {{ $asistencias->firstItem() ?? 0 }}–{{ $asistencias->lastItem() ?? 0 }}
+            de {{ $asistencias->total() }} registros
+        </small>
+        <nav>
+            {{ $asistencias->links('pagination::bootstrap-5') }}
+        </nav>
     </div>
 </div>
 @endsection
