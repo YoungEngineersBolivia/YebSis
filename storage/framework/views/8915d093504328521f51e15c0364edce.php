@@ -1,9 +1,9 @@
-<?php $__env->startPush('styles'); ?>
+<?php $__env->startSection('styles'); ?>
 <style>
     nav .pagination { margin-bottom: 0; }
     nav .pagination .page-link { padding: 4px 10px; font-size: 0.8rem; }
 </style>
-<?php $__env->stopPush(); ?>
+<?php $__env->stopSection(); ?>
 
 <?php $__env->startSection('content'); ?>
 <div class="row mb-4">
