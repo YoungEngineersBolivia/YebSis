@@ -7,16 +7,16 @@
 <?php $__env->stopSection(); ?>
 
 <?php $__env->startSection('content'); ?>
-<div class="container-fluid mt-4">
+<div class="mt-2">
 
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2 class="mb-0 fw-bold"><i class="bi bi-people-fill me-2"></i>Lista de Estudiantes</h2>
-        <div class="d-flex gap-2">
-            <a href="<?php echo e(route('estudiantes.exportarPDF')); ?>" class="btn btn-danger">
-                <i class="fas fa-file-pdf me-2"></i>Exportar PDF
+    <div class="d-flex flex-wrap gap-2 justify-content-between align-items-center mb-4">
+        <h2 class="mb-0 fw-bold fs-4"><i class="bi bi-people-fill me-2"></i>Lista de Estudiantes</h2>
+        <div class="d-flex flex-wrap gap-2">
+            <a href="<?php echo e(route('estudiantes.exportarPDF')); ?>" class="btn btn-sm btn-danger">
+                <i class="fas fa-file-pdf me-2"></i>PDF
             </a>
-            <a href="<?php echo e(route('registroCombinado.registrar')); ?>" class="btn btn-primary">
-                <i class="fas fa-plus me-2"></i>Registrar Estudiante
+            <a href="<?php echo e(route('registroCombinado.registrar')); ?>" class="btn btn-sm btn-primary">
+                <i class="fas fa-plus me-2"></i>Registrar
             </a>
         </div>
     </div>
@@ -56,24 +56,24 @@
             <form action="<?php echo e(route('estudiantes.index')); ?>" method="GET" id="filtrosForm">
                 <div class="row g-3">
                     
-                    <div class="col-md-4">
-                        <label for="searchInput" class="form-label mb-1 fw-semibold text-muted">
-                            <i class="fas fa-search me-1"></i>Buscar Estudiante
+                    <div class="col-md-3">
+                        <label for="searchInput" class="form-label mb-1 fw-semibold text-muted small">
+                            <i class="fas fa-search me-1"></i>Buscador
                         </label>
                         <input type="text" 
                                id="searchInput" 
-                               class="form-control" 
-                               placeholder="Código, nombre o apellido..." 
+                               class="form-control form-control-sm" 
+                               placeholder="Buscar..." 
                                name="search" 
                                value="<?php echo e(request()->search); ?>">
                     </div>
 
                     
                     <div class="col-md-2">
-                        <label for="estadoFilter" class="form-label mb-1 fw-semibold text-muted">
+                        <label for="estadoFilter" class="form-label mb-1 fw-semibold text-muted small">
                             <i class="fas fa-toggle-on me-1"></i>Estado
                         </label>
-                        <select class="form-select" id="estadoFilter" name="estado">
+                        <select class="form-select form-select-sm" id="estadoFilter" name="estado">
                             <option value="">Todos</option>
                             <option value="Activo" <?php echo e(request()->estado == 'Activo' ? 'selected' : ''); ?>>Activo</option>
                             <option value="Inactivo" <?php echo e(request()->estado == 'Inactivo' ? 'selected' : ''); ?>>Inactivo</option>
@@ -82,11 +82,11 @@
 
                     
                     <div class="col-md-3">
-                        <label for="programaFilter" class="form-label mb-1 fw-semibold text-muted">
+                        <label for="programaFilter" class="form-label mb-1 fw-semibold text-muted small">
                             <i class="fas fa-book me-1"></i>Programa
                         </label>
-                        <select class="form-select" id="programaFilter" name="programa">
-                            <option value="">Todos los programas</option>
+                        <select class="form-select form-select-sm" id="programaFilter" name="programa">
+                            <option value="">Todos</option>
                             <?php $__currentLoopData = $programas; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $prog): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                 <option value="<?php echo e($prog->Id_programas); ?>" 
                                         <?php echo e(request()->programa == $prog->Id_programas ? 'selected' : ''); ?>>
@@ -98,12 +98,12 @@
                     </div>
 
                     
-                    <div class="col-md-3">
-                        <label for="sucursalFilter" class="form-label mb-1 fw-semibold text-muted">
+                    <div class="col-md-2">
+                        <label for="sucursalFilter" class="form-label mb-1 fw-semibold text-muted small">
                             <i class="fas fa-map-marker-alt me-1"></i>Sucursal
                         </label>
-                        <select class="form-select" id="sucursalFilter" name="sucursal">
-                            <option value="">Todas las sucursales</option>
+                        <select class="form-select form-select-sm" id="sucursalFilter" name="sucursal">
+                            <option value="">Todas</option>
                             <?php $__currentLoopData = $sucursales; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $suc): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                 <option value="<?php echo e($suc->Id_sucursales); ?>" 
                                         <?php echo e(request()->sucursal == $suc->Id_sucursales ? 'selected' : ''); ?>>
@@ -114,22 +114,13 @@
                         </select>
                     </div>
 
-                    
-                    <div class="col-12">
-                        <div class="d-flex gap-2 align-items-center">
-                            <button type="submit" class="btn btn-primary">
-                                <i class="fas fa-filter me-2"></i>Aplicar Filtros
-                            </button>
-                            <a href="<?php echo e(route('estudiantes.index')); ?>" class="btn btn-outline-secondary">
-                                <i class="fas fa-redo me-2"></i>Limpiar Filtros
-                            </a>
-                            <?php if(request()->hasAny(['search', 'estado', 'programa', 'sucursal'])): ?>
-                                <span class="badge bg-info text-white px-3 py-2">
-                                    <i class="fas fa-check-circle me-1"></i>Filtros activos
-                                </span>
-                            <?php endif; ?>
-                        </div>
+                    <div class="col-md-2 d-flex align-items-end">
+                        <button type="submit" class="btn btn-sm btn-primary w-100">
+                            <i class="fas fa-filter"></i>
+                        </button>
                     </div>
+
+                    
                 </div>
             </form>
         </div>
@@ -157,18 +148,18 @@
             </div>
         </div>
     <?php else: ?>
-        <div class="card shadow-sm border-0 overflow-hidden">
+        <div class="card shadow-sm border-0">
             <div class="card-body p-0">
                 <div class="table-responsive">
                     <table class="table table-striped table-hover align-middle mb-0" id="studentsTable">
                         <thead class="bg-primary text-white">
                             <tr>
-                                <th class="ps-3 py-3" style="min-width:120px;">Código</th>
-                                <th class="py-3" style="min-width:220px;">Nombre</th>
-                                <th class="py-3" style="min-width:180px;">Programa</th>
-                                <th class="py-3" style="min-width:160px;">Sucursal</th>
-                                <th class="py-3" style="min-width:120px;">Estado</th>
-                                <th class="pe-3 py-3 text-end" style="min-width:140px;">Acciones</th>
+                                <th class="ps-3 py-3" style="width: 100px;">Código</th>
+                                <th class="py-3">Nombre</th>
+                                <th class="py-3" style="width: 150px;">Programa</th>
+                                <th class="py-3" style="width: 130px;">Sucursal</th>
+                                <th class="py-3" style="width: 100px;">Estado</th>
+                                <th class="pe-3 py-3 text-end" style="width: 100px;"></th>
                             </tr>
                         </thead>
                         <tbody>

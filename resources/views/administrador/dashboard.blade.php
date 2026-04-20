@@ -9,7 +9,6 @@
 @section('content')
     <div class="mt-2 text-start">
 
-        {{-- Header con información temporal --}}
         {{-- Header con filtros --}}
         <div class="row mb-4 align-items-center">
             <div class="col-md-6">
@@ -36,8 +35,7 @@
             </div>
         </div>
 
-
-        {{-- Métricas principales mejoradas --}}
+        {{-- Métricas principales --}}
         <div class="row mb-4">
             <div class="col-md-4 mb-3">
                 <div class="card metric-card shadow-sm">
@@ -68,7 +66,7 @@
                             <div>
                                 <h6 class="text-muted"><i class="fas fa-minus-circle"></i> Egresos Este Mes</h6>
                                 <h3 class="text-danger">Bs {{ number_format($egresosMesActual, 2, '.', ',') }}</h3>
-                                <small class="text-muted">Gatos registrados</small>
+                                <small class="text-muted">Gastos registrados</small>
                             </div>
                             <div class="text-danger">
                                 <i class="fas fa-receipt fa-2x"></i>
@@ -96,7 +94,6 @@
                     </div>
                 </div>
             </div>
-
         </div>
 
         {{-- Notificación de Clases de Prueba Pendientes --}}
@@ -124,15 +121,12 @@
                                                         title="Clase atrasada"></i>
                                                 @endif
                                                 <div class="small text-muted">
-                                                    <i
-                                                        class="bi bi-calendar-event me-1"></i>{{ \Carbon\Carbon::parse($clase->Fecha_clase)->format('d/m/Y') }}
-                                                    <i
-                                                        class="bi bi-clock ms-2 me-1"></i>{{ \Carbon\Carbon::parse($clase->Hora_clase)->format('H:i') }}
+                                                    <i class="bi bi-calendar-event me-1"></i>{{ \Carbon\Carbon::parse($clase->Fecha_clase)->format('d/m/Y') }}
+                                                    <i class="bi bi-clock ms-2 me-1"></i>{{ \Carbon\Carbon::parse($clase->Hora_clase)->format('H:i') }}
                                                 </div>
                                                 @if($clase->Asistencia !== 'pendiente')
                                                     <div class="mt-1">
-                                                        <span
-                                                            class="badge {{ $clase->Asistencia === 'asistio' ? 'bg-success' : 'bg-danger' }}">
+                                                        <span class="badge {{ $clase->Asistencia === 'asistio' ? 'bg-success' : 'bg-danger' }}">
                                                             {{ $clase->Asistencia === 'asistio' ? 'Asistió' : 'No asistió' }}
                                                         </span>
                                                         <small class="text-muted ms-1">
@@ -141,7 +135,7 @@
                                                                 $marcadoPor = $clase->usuarioAsistencia?->persona?->nombre_completo
                                                                     ?? $clase->usuarioAsistencia?->Correo
                                                                     ?? 'Sistema';
-                                                             @endphp
+                                                            @endphp
                                                             <strong>{{ $marcadoPor }}</strong>
                                                         </small>
                                                     </div>
@@ -153,8 +147,7 @@
                                                         class="btn btn-outline-success" title="Marcar como Asistió">
                                                         <i class="bi bi-check-lg me-1"></i> Asistió
                                                     </button>
-                                                    <button
-                                                        onclick="confirmarAsistenciaAdmin({{ $clase->Id_clasePrueba }}, 'no_asistio')"
+                                                    <button onclick="confirmarAsistenciaAdmin({{ $clase->Id_clasePrueba }}, 'no_asistio')"
                                                         class="btn btn-outline-danger" title="Marcar como Falta">
                                                         <i class="bi bi-x-lg me-1"></i> No Asistió
                                                     </button>
@@ -234,7 +227,7 @@
             </div>
         </div>
 
-        {{-- Gráfico mensual y información temporal --}}
+        {{-- Gráfico mensual e información temporal --}}
         <div class="row mb-4">
             <div class="col-lg-8 mb-3">
                 <div class="card shadow-sm">
@@ -284,39 +277,164 @@
             </div>
         </div>
 
-        {{-- Alumnos por programa (manteniendo tu estructura original) --}}
-        @foreach($sucursales as $sucursal)
-            <div class="card mt-3 shadow-sm">
-                <div class="card-header bg-primary text-white">
-                    <i class="fas fa-users"></i> Alumnos por programa en {{ $sucursal->Nombre }}
-                </div>
-                <div class="card-body p-0">
-                    <div class="table-responsive">
-                        <table class="table table-striped table-hover align-middle mb-0">
-                            <thead class="bg-primary text-white">
-                                <tr>
-                                    <th>Programa</th>
-                                    <th>Total de Alumnos</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @forelse($alumnosPorSucursal[$sucursal->Id_sucursales] as $row)
-                                    <tr>
-                                        <td>{{ $row->programa }}</td>
-                                        <td><strong>{{ $row->total }}</strong></td>
-                                    </tr>
-                                @empty
-                                    <tr>
-                                        <td colspan="2" class="text-center text-muted">No hay datos disponibles</td>
-                                    </tr>
-                                @endforelse
-                            </tbody>
-                        </table>
+        {{-- ══════════════════════════════════════════════════════════
+             Alumnos por programa — con filtros de estado y sucursal
+             ══════════════════════════════════════════════════════════ --}}
+        <div class="row mb-4">
+            <div class="col-12">
+
+                {{-- Cabecera de sección --}}
+                <div class="d-flex align-items-center justify-content-between mb-3 flex-wrap gap-2">
+                    <h5 class="mb-0"><i class="fas fa-users text-primary me-2"></i>Alumnos por Programa</h5>
+
+                    <div class="d-flex flex-wrap gap-2 align-items-center">
+
+                        {{-- Filtro por estado --}}
+                        <div class="btn-group btn-group-sm" role="group" id="filtroEstado">
+                            <button type="button" class="btn btn-primary active" data-estado="todos">
+                                <i class="fas fa-users me-1"></i>Total
+                            </button>
+                            <button type="button" class="btn btn-outline-success" data-estado="activo">
+                                <i class="fas fa-check-circle me-1"></i>Activos
+                            </button>
+                            <button type="button" class="btn btn-outline-danger" data-estado="inactivo">
+                                <i class="fas fa-times-circle me-1"></i>Inactivos
+                            </button>
+                        </div>
+
+                        {{-- Filtro por sucursal --}}
+                        <div class="btn-group btn-group-sm" role="group" id="filtroSucursal">
+                            <button type="button" class="btn btn-secondary active" data-sucursal="todas">
+                                <i class="fas fa-globe me-1"></i>Todas
+                            </button>
+                            @foreach($sucursales as $sucursal)
+                                <button type="button" class="btn btn-outline-secondary"
+                                    data-sucursal="{{ $sucursal->Id_sucursales }}">
+                                    {{ $sucursal->Nombre }}
+                                </button>
+                            @endforeach
+                        </div>
+
                     </div>
                 </div>
-        @endforeach
 
+                {{-- Resumen global (se actualiza con JS) --}}
+                <div class="row mb-3" id="resumenGlobal">
+                    <div class="col-4">
+                        <div class="card border-0 bg-primary bg-opacity-10 text-center py-2">
+                            <div class="fw-bold fs-5 text-primary" id="resumenTotal">
+                                {{ $sucursales->sum(fn($s) => $alumnosPorSucursal[$s->Id_sucursales]->sum('total')) }}
+                            </div>
+                            <small class="text-muted">Total</small>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div class="card border-0 bg-success bg-opacity-10 text-center py-2">
+                            <div class="fw-bold fs-5 text-success" id="resumenActivos">
+                                {{ $sucursales->sum(fn($s) => $alumnosPorSucursal[$s->Id_sucursales]->sum('activos')) }}
+                            </div>
+                            <small class="text-muted">Activos</small>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div class="card border-0 bg-danger bg-opacity-10 text-center py-2">
+                            <div class="fw-bold fs-5 text-danger" id="resumenInactivos">
+                                {{ $sucursales->sum(fn($s) => $alumnosPorSucursal[$s->Id_sucursales]->sum('inactivos')) }}
+                            </div>
+                            <small class="text-muted">Inactivos</small>
+                        </div>
+                    </div>
+                </div>
+
+                {{-- Tabla por sucursal --}}
+                @foreach($sucursales as $sucursal)
+                    <div class="card mt-3 shadow-sm sucursal-card" data-sucursal-id="{{ $sucursal->Id_sucursales }}">
+                        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                            <span>
+                                <i class="fas fa-map-marker-alt me-1"></i>{{ $sucursal->Nombre }}
+                            </span>
+                            <span class="badge bg-white text-primary" id="badge-suc-{{ $sucursal->Id_sucursales }}">
+                                {{ $alumnosPorSucursal[$sucursal->Id_sucursales]->sum('total') }} alumnos
+                            </span>
+                        </div>
+                        <div class="card-body p-0">
+                            <div class="table-responsive">
+                                <table class="table table-striped table-hover align-middle mb-0">
+                                    <thead class="table-primary">
+                                        <tr>
+                                            <th>Programa</th>
+                                            <th class="text-center">
+                                                <span class="badge bg-primary">Total</span>
+                                            </th>
+                                            <th class="text-center">
+                                                <span class="badge bg-success">Activos</span>
+                                            </th>
+                                            <th class="text-center">
+                                                <span class="badge bg-danger">Inactivos</span>
+                                            </th>
+                                            <th class="text-center col-filtrado">
+                                                <span class="badge bg-dark">Filtrado</span>
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @forelse($alumnosPorSucursal[$sucursal->Id_sucursales] as $row)
+                                            <tr
+                                                data-total="{{ $row->total ?? 0 }}"
+                                                data-activos="{{ $row->activos ?? 0 }}"
+                                                data-inactivos="{{ $row->inactivos ?? 0 }}"
+                                            >
+                                                <td>{{ $row->programa }}</td>
+                                                <td class="text-center">
+                                                    <strong>{{ $row->total ?? 0 }}</strong>
+                                                </td>
+                                                <td class="text-center">
+                                                    <span class="text-success fw-semibold">{{ $row->activos ?? 0 }}</span>
+                                                </td>
+                                                <td class="text-center">
+                                                    <span class="text-danger fw-semibold">{{ $row->inactivos ?? 0 }}</span>
+                                                </td>
+                                                <td class="text-center col-filtrado">
+                                                    <span class="badge bg-secondary fila-filtrada">{{ $row->total ?? 0 }}</span>
+                                                </td>
+                                            </tr>
+                                        @empty
+                                            <tr>
+                                                <td colspan="5" class="text-center text-muted py-3">
+                                                    <i class="fas fa-inbox me-1"></i>No hay datos disponibles
+                                                </td>
+                                            </tr>
+                                        @endforelse
+                                    </tbody>
+                                    <tfoot class="table-light fw-bold border-top">
+                                        <tr>
+                                            <td>Subtotal</td>
+                                            <td class="text-center">
+                                                {{ $alumnosPorSucursal[$sucursal->Id_sucursales]->sum('total') }}
+                                            </td>
+                                            <td class="text-center text-success">
+                                                {{ $alumnosPorSucursal[$sucursal->Id_sucursales]->sum('activos') }}
+                                            </td>
+                                            <td class="text-center text-danger">
+                                                {{ $alumnosPorSucursal[$sucursal->Id_sucursales]->sum('inactivos') }}
+                                            </td>
+                                            <td class="text-center col-filtrado">
+                                                <span class="badge bg-dark pie-filtrado"
+                                                    id="pie-suc-{{ $sucursal->Id_sucursales }}">
+                                                    {{ $alumnosPorSucursal[$sucursal->Id_sucursales]->sum('total') }}
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                @endforeach
+
+            </div>
         </div>
+        {{-- ═══════════════ Fin sección alumnos ═══════════════ --}}
 
         <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
         <script>
@@ -324,6 +442,113 @@
             window.fechasPorDia = @json($ingresosPorDia->pluck('fecha'));
             window.graficoAnual = @json($graficoMensual);
 
+            // ── Totales globales originales para el resumen ──────────────
+            const TOTALES_GLOBALES = {
+                todos:    @json($sucursales->sum(fn($s) => $alumnosPorSucursal[$s->Id_sucursales]->sum('total'))),
+                activos:  @json($sucursales->sum(fn($s) => $alumnosPorSucursal[$s->Id_sucursales]->sum('activos'))),
+                inactivos:@json($sucursales->sum(fn($s) => $alumnosPorSucursal[$s->Id_sucursales]->sum('inactivos'))),
+            };
+
+            // ── Filtros ──────────────────────────────────────────────────
+            let estadoActivo   = 'todos';
+            let sucursalActiva = 'todas';
+
+            const campoEstado = { todos: 'total', activo: 'activos', inactivo: 'inactivos' };
+            const colorEstado = { todos: 'primary', activo: 'success', inactivo: 'danger' };
+
+            // Botones de estado
+            document.querySelectorAll('#filtroEstado button').forEach(btn => {
+                btn.addEventListener('click', function () {
+                    estadoActivo = this.dataset.estado;
+                    document.querySelectorAll('#filtroEstado button').forEach(b => {
+                        const c = colorEstado[b.dataset.estado];
+                        b.className = b.dataset.estado === estadoActivo
+                            ? `btn btn-${c} active`
+                            : `btn btn-outline-${c}`;
+                    });
+                    aplicarFiltros();
+                });
+            });
+
+            // Botones de sucursal
+            document.querySelectorAll('#filtroSucursal button').forEach(btn => {
+                btn.addEventListener('click', function () {
+                    sucursalActiva = this.dataset.sucursal;
+                    document.querySelectorAll('#filtroSucursal button').forEach(b => {
+                        b.className = b.dataset.sucursal === sucursalActiva
+                            ? 'btn btn-secondary active'
+                            : 'btn btn-outline-secondary';
+                    });
+                    aplicarFiltros();
+                });
+            });
+
+            function aplicarFiltros() {
+                const campo = campoEstado[estadoActivo];
+                let totalGlobal = 0;
+
+                document.querySelectorAll('.sucursal-card').forEach(card => {
+                    const idSuc = card.dataset.sucursalId;
+
+                    // Visibilidad de la tarjeta
+                    const mostrarCard = sucursalActiva === 'todas' || sucursalActiva === idSuc;
+                    card.style.display = mostrarCard ? '' : 'none';
+                    if (!mostrarCard) return;
+
+                    let subtotal = 0;
+
+                    card.querySelectorAll('tbody tr[data-total]').forEach(fila => {
+                        const valor = parseInt(fila.dataset[campo] ?? 0);
+                        // En filtros activo/inactivo, ocultar filas con valor 0
+                        const mostrarFila = estadoActivo === 'todos' || valor > 0;
+                        fila.style.display = mostrarFila ? '' : 'none';
+                        if (mostrarFila) {
+                            subtotal += valor;
+                            fila.querySelector('.fila-filtrada').textContent = valor;
+
+                            // Colorear badge según estado activo
+                            fila.querySelector('.fila-filtrada').className =
+                                'badge fila-filtrada bg-' + (colorEstado[estadoActivo] ?? 'secondary');
+                        }
+                    });
+
+                    totalGlobal += subtotal;
+
+                    // Actualizar badge del header de la tarjeta
+                    const badgeSuc = document.getElementById(`badge-suc-${idSuc}`);
+                    if (badgeSuc) badgeSuc.textContent = subtotal + ' alumnos';
+
+                    // Actualizar badge del pie de tabla
+                    const pieSuc = document.getElementById(`pie-suc-${idSuc}`);
+                    if (pieSuc) pieSuc.textContent = subtotal;
+                });
+
+                // Actualizar resumen global
+                actualizarResumen(campo, totalGlobal);
+            }
+
+            function actualizarResumen(campo, totalVisible) {
+                // Si hay filtro de sucursal, recalcular sumando solo las visibles
+                let sumTotal = 0, sumActivos = 0, sumInactivos = 0;
+
+                document.querySelectorAll('.sucursal-card').forEach(card => {
+                    if (card.style.display === 'none') return;
+                    card.querySelectorAll('tbody tr[data-total]').forEach(fila => {
+                        sumTotal    += parseInt(fila.dataset.total    ?? 0);
+                        sumActivos  += parseInt(fila.dataset.activos  ?? 0);
+                        sumInactivos+= parseInt(fila.dataset.inactivos?? 0);
+                    });
+                });
+
+                document.getElementById('resumenTotal').textContent    = sumTotal;
+                document.getElementById('resumenActivos').textContent   = sumActivos;
+                document.getElementById('resumenInactivos').textContent = sumInactivos;
+            }
+
+            // Inicializar
+            aplicarFiltros();
+
+            // ── Funciones clases de prueba ───────────────────────────────
             function guardarComentarioAdmin(id) {
                 const comment = document.getElementById(`comentario_admin_${id}`).value;
                 fetch(`/administrador/clases-prueba/${id}/comentarios`, {
@@ -334,27 +559,22 @@
                     },
                     body: JSON.stringify({ comentarios: comment })
                 })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            const toast = Swal.mixin({
-                                toast: true,
-                                position: 'top-end',
-                                showConfirmButton: false,
-                                timer: 3000
-                            });
-                            toast.fire({
-                                icon: 'success',
-                                title: 'Comentario guardado'
-                            });
-                        }
-                    });
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        const toast = Swal.mixin({
+                            toast: true, position: 'top-end',
+                            showConfirmButton: false, timer: 3000
+                        });
+                        toast.fire({ icon: 'success', title: 'Comentario guardado' });
+                    }
+                });
             }
 
             function confirmarAsistenciaAdmin(id, estado) {
                 const commentInput = document.getElementById(`comentario_admin_${id}`);
-                const comentario = commentInput.value.trim();
-                const textoAccion = estado === 'asistio' ? 'marcar como ASISTIÓ' : 'marcar como FALTA';
+                const comentario   = commentInput.value.trim();
+                const textoAccion  = estado === 'asistio' ? 'marcar como ASISTIÓ' : 'marcar como FALTA';
 
                 let confirmOptions = {
                     title: '¿Confirmar asistencia?',
@@ -367,48 +587,35 @@
 
                 if (comentario === '') {
                     confirmOptions.title = '¡Atención!';
-                    confirmOptions.text = `Estás a punto de ${textoAccion} SIN COMENTARIOS. ¿Estás seguro? Es recomendable añadir una observación.`;
-                    confirmOptions.icon = 'warning';
+                    confirmOptions.text  = `Estás a punto de ${textoAccion} SIN COMENTARIOS. ¿Estás seguro? Es recomendable añadir una observación.`;
+                    confirmOptions.icon  = 'warning';
                     confirmOptions.confirmButtonColor = '#d33';
                 }
 
                 Swal.fire(confirmOptions).then((result) => {
                     if (result.isConfirmed) {
-                        // Paso 1: Guardar comentario
                         fetch(`/administrador/clases-prueba/${id}/comentarios`, {
                             method: 'PUT',
                             headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
                             body: JSON.stringify({ comentarios: commentInput.value })
                         })
-                            .then(() => {
-                                // Paso 2: Guardar asistencia
-                                return fetch(`/administrador/clases-prueba/${id}/asistencia`, {
-                                    method: 'PUT',
-                                    headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
-                                    body: JSON.stringify({ asistencia: estado })
-                                });
-                            })
-                            .then(response => response.json())
-                            .then(data => {
-                                if (data.success) {
-                                    Swal.fire({
-                                        title: '¡Listo!',
-                                        text: 'La asistencia ha sido registrada.',
-                                        icon: 'success',
-                                        timer: 1500,
-                                        showConfirmButton: false
-                                    }).then(() => {
-                                        location.reload(); // Recargar para mostrar quién lo marcó y el botón OK
-                                    });
-                                } else {
-                                    Swal.fire('Error', data.message || 'Error desconocido al guardar.', 'error');
-                                }
-                            })
-                            .catch(error => {
-                                console.error('Error:', error);
-                                // Intentar leer el mensaje de error de la respuesta si es posible, sino genérico
-                                Swal.fire('Error', 'Hubo un problema de conexión o del servidor.', 'error');
-                            });
+                        .then(() => fetch(`/administrador/clases-prueba/${id}/asistencia`, {
+                            method: 'PUT',
+                            headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
+                            body: JSON.stringify({ asistencia: estado })
+                        }))
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                Swal.fire({
+                                    title: '¡Listo!', text: 'La asistencia ha sido registrada.',
+                                    icon: 'success', timer: 1500, showConfirmButton: false
+                                }).then(() => location.reload());
+                            } else {
+                                Swal.fire('Error', data.message || 'Error desconocido al guardar.', 'error');
+                            }
+                        })
+                        .catch(() => Swal.fire('Error', 'Hubo un problema de conexión o del servidor.', 'error'));
                     }
                 });
             }
@@ -418,29 +625,25 @@
                     method: 'PUT',
                     headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' }
                 })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            // Buscar el elemento y removerlo con una animación simple
-                            const item = document.querySelector(`button[onclick="descartarNotificacion(${id})"]`).closest('.list-group-item');
-                            if (item) {
-                                item.style.transition = 'all 0.3s ease';
-                                item.style.opacity = '0';
-                                setTimeout(() => {
-                                    item.remove();
-                                    // Actualizar contador
-                                    const badge = document.querySelector('.card-header .badge');
-                                    if (badge) {
-                                        let count = parseInt(badge.innerText);
-                                        badge.innerText = Math.max(0, count - 1);
-                                        if (count - 1 === 0) {
-                                            location.reload(); // Recargar si es el último para limpiar el widget
-                                        }
-                                    }
-                                }, 300);
-                            }
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        const item = document.querySelector(`button[onclick="descartarNotificacion(${id})"]`).closest('.list-group-item');
+                        if (item) {
+                            item.style.transition = 'all 0.3s ease';
+                            item.style.opacity = '0';
+                            setTimeout(() => {
+                                item.remove();
+                                const badge = document.querySelector('.card-header .badge');
+                                if (badge) {
+                                    let count = parseInt(badge.innerText);
+                                    badge.innerText = Math.max(0, count - 1);
+                                    if (count - 1 === 0) location.reload();
+                                }
+                            }, 300);
                         }
-                    });
+                    }
+                });
             }
         </script>
         <script src="{{ auto_asset('js/administrador/dashboard.js') }}"></script>
