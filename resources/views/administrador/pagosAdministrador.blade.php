@@ -5,6 +5,10 @@
 @section('styles')
     <link rel="stylesheet" href="{{ auto_asset('css/administrador/pagosAdministrador.css') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        #pagination-links nav .pagination { margin-bottom: 0; }
+        #pagination-links nav .pagination .page-link { padding: 4px 10px; font-size: 0.8rem; }
+    </style>
 @endsection
 
 @section('content')

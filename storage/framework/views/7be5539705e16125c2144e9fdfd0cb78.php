@@ -1,5 +1,3 @@
-
-
 <?php $__env->startSection('title', 'Ingresos Mensuales'); ?>
 
 <?php $__env->startSection('content'); ?>
@@ -9,10 +7,18 @@
             <p class="text-muted mb-0">Resumen histórico de recaudación mensual</p>
         </div>
         <div class="d-flex align-items-center gap-3">
-            <form action="<?php echo e(route('pagos.mensuales')); ?>" method="GET" class="d-flex align-items-center gap-2">
-                <label class="text-muted small fw-bold text-uppercase mb-0">Filtrar Año:</label>
-                <input type="number" name="anio" class="form-control form-control-sm shadow-sm" style="width: 100px;"
-                    min="2000" value="<?php echo e($anioSeleccionado); ?>" onchange="this.form.submit()">
+            <form action="<?php echo e(route('pagos.mensuales')); ?>" method="GET" class="d-flex align-items-center gap-3">
+                <div class="d-flex align-items-center gap-2">
+                    <label class="text-muted small fw-bold text-uppercase mb-0">Año:</label>
+                    <input type="number" name="anio" class="form-control form-control-sm shadow-sm" style="width: 100px;"
+                        min="2000" value="<?php echo e($anioSeleccionado); ?>" onchange="this.form.submit()">
+                </div>
+                <!-- Buscador de Tabla -->
+                <div class="input-group search-box border-0 shadow-sm" style="max-width: 250px;">
+                    <span class="input-group-text"><i class="bi bi-search py-0"></i></span>
+                    <input type="text" class="form-control form-control-sm" placeholder="Buscar mes..."
+                        data-table-filter="tablaPagosMensuales">
+                </div>
                 <a href="<?php echo e(route('pagos.mensuales')); ?>" class="btn btn-sm btn-outline-secondary shadow-sm"
                     title="Limpiar filtro">
                     <i class="bi bi-arrow-counterclockwise"></i>
@@ -55,7 +61,7 @@
     <div class="card shadow-sm border-0">
         <div class="card-body p-0">
             <div class="table-responsive">
-                <table class="table table-hover table-striped align-middle mb-0">
+                <table class="table table-hover table-striped align-middle mb-0" id="tablaPagosMensuales">
                     <thead>
                         <tr>
                             <th class="ps-4">Periodo (Mes/Año)</th>

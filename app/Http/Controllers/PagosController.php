@@ -96,6 +96,10 @@ class PagosController extends Controller
 
         $estudiantes = $query->orderBy('Id_estudiantes', 'desc')->paginate(10);
 
+        if ($request->ajax()) {
+            return view('administrador.partials.pagos_lista', compact('estudiantes'))->render();
+        }
+
         return view('administrador.pagosAdministrador', compact('estudiantes', 'mesSeleccionado', 'anioSeleccionado'));
     }
 

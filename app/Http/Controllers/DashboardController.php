@@ -60,11 +60,11 @@ class DashboardController extends Controller
         $ingresosTotales = Pago::sum('Monto_pago') ?? 0;
 
         // Ingresos del mes actual
-        $ingresosMesActual = Pago::whereBetween('created_at', [$inicioMes, $finMes])
+        $ingresosMesActual = Pago::whereBetween('Fecha_pago', [$inicioMes, $finMes])
             ->sum('Monto_pago') ?? 0;
 
         // Ingresos del mes anterior
-        $ingresosMesAnterior = Pago::whereBetween('created_at', [
+        $ingresosMesAnterior = Pago::whereBetween('Fecha_pago', [
             $mesAnterior->copy()->startOfMonth(),
             $mesAnterior->copy()->endOfMonth()
         ])->sum('Monto_pago') ?? 0;
@@ -77,10 +77,10 @@ class DashboardController extends Controller
 
         // Ingresos por día del mes seleccionado
         $ingresosPorDia = Pago::select(
-            DB::raw('DATE(created_at) as fecha'),
+            DB::raw('DATE(Fecha_pago) as fecha'),
             DB::raw('SUM(Monto_pago) as total')
         )
-            ->whereBetween('created_at', [$inicioMes, $finMes])
+            ->whereBetween('Fecha_pago', [$inicioMes, $finMes])
             ->groupBy('fecha')
             ->orderBy('fecha')
             ->get()
@@ -94,10 +94,10 @@ class DashboardController extends Controller
 
         // Ingresos por mes en el año seleccionado
         $ingresosPorMes = Pago::select(
-            DB::raw('MONTH(created_at) as mes'),
+            DB::raw('MONTH(Fecha_pago) as mes'),
             DB::raw('SUM(Monto_pago) as total')
         )
-            ->whereYear('created_at', $anioSeleccionado)
+            ->whereYear('Fecha_pago', $anioSeleccionado)
             ->groupBy('mes')
             ->orderBy('mes')
             ->get()
@@ -111,10 +111,10 @@ class DashboardController extends Controller
 
         // Top 5 días con más ingresos este mes
         $topDiasIngresos = Pago::select(
-            DB::raw('DATE(created_at) as fecha'),
+            DB::raw('DATE(Fecha_pago) as fecha'),
             DB::raw('SUM(Monto_pago) as total')
         )
-            ->whereBetween('created_at', [$inicioMes, $finMes])
+            ->whereBetween('Fecha_pago', [$inicioMes, $finMes])
             ->groupBy('fecha')
             ->orderBy('total', 'desc')
             ->limit(5)
@@ -143,7 +143,7 @@ class DashboardController extends Controller
 
 
         // Egresos del mes actual
-        $egresosMesActual = Egreso::whereBetween('created_at', [$inicioMes, $finMes])
+        $egresosMesActual = Egreso::whereBetween('Fecha_egreso', [$inicioMes, $finMes])
             ->sum('Monto_egreso') ?? 0;
 
         // Egresos totales históricos
@@ -154,10 +154,10 @@ class DashboardController extends Controller
 
         // Egresos por mes en el año seleccionado
         $egresosPorMesRaw = Egreso::select(
-            DB::raw('MONTH(created_at) as mes'),
+            DB::raw('MONTH(Fecha_egreso) as mes'),
             DB::raw('SUM(Monto_egreso) as total')
         )
-            ->whereYear('created_at', $anioSeleccionado)
+            ->whereYear('Fecha_egreso', $anioSeleccionado)
             ->groupBy('mes')
             ->orderBy('mes')
             ->get();

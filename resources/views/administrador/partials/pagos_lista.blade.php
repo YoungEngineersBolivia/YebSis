@@ -174,10 +174,6 @@
     </div>
 @endif
 
-<!-- Paginación -->
-<div class="d-flex justify-content-center mt-4" id="pagination-links">
-    {{ $estudiantes->links('pagination::bootstrap-5') }}
-</div>
 
 <!-- Modales fuera de las tarjetas para evitar conflictos de posicionamiento (Centrado) -->
 @foreach($estudiantes as $estudiante)
@@ -294,7 +290,13 @@
 <!-- Input oculto para pasar el total a JS -->
 <input type="hidden" id="total-count-hidden" value="{{ $estudiantes->total() }}">
 
-<!-- Enlaces de paginación -->
-<div id="pagination-links" class="mt-4">
-    {{ $estudiantes->appends(request()->query())->links() }}
+<!-- Paginación -->
+<div id="pagination-links" class="d-flex justify-content-between align-items-center mt-4 flex-wrap gap-2">
+    <small class="text-muted">
+        Mostrando {{ $estudiantes->firstItem() ?? 0 }}–{{ $estudiantes->lastItem() ?? 0 }}
+        de {{ $estudiantes->total() }} estudiantes
+    </small>
+    <nav>
+        {{ $estudiantes->appends(request()->query())->links('pagination::bootstrap-5') }}
+    </nav>
 </div>
