@@ -89,45 +89,113 @@
 
                         <!-- MODAL DE CONTACTO -->
                         <div class="modal-overlay" id="contactModal" onclick="closeContactModalOnOverlay(event)">
-                            <div class="modal-container">
-                                <div class="modal-header">
-                                    <button class="close-btn" onclick="closeContactModal()">&times;</button>
-                                    <h2 class="modal-title">CONTÁCTANOS</h2>
-                                    <p class="modal-subtitle">
-                                        Por favor llene sus datos y nosotros nos contactaremos con usted a la brevedad
-                                        posible
-                                    </p>
+                            <div class="modal-container contact-modal">
+
+                                
+                                <div class="cmodal-header">
+                                    <div class="cmodal-header__icon">🚀</div>
+                                    <div class="cmodal-header__titles">
+                                        <h2>¡CONTÁCTANOS!</h2>
+                                        <p>Déjanos tus datos y te llamamos a la brevedad</p>
+                                    </div>
+                                    <button class="cmodal-close" onclick="closeContactModal()" aria-label="Cerrar">&times;</button>
                                 </div>
 
-                                <?php if(session('success')): ?>
-                                    <div style="color:green; font-weight:bold; margin-bottom:10px;">
-                                        <?php echo e(session('success')); ?>
+                                <div class="cmodal-body">
 
-                                    </div>
-                                <?php endif; ?>
+                                    <?php if($errors->any()): ?>
+                                        <div class="cmodal-alert cmodal-alert--error">
+                                            <?php $__currentLoopData = $errors->all(); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $error): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                                <div class="cmodal-alert__item">⚠ <?php echo e($error); ?></div>
+                                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                                        </div>
+                                    <?php endif; ?>
 
-                                <div class="modal-body">
-                                    <form id="contactForm" action="<?php echo e(route('prospectos.store')); ?>" method="POST">
+                                    <?php if(session('status')): ?>
+                                        <div class="cmodal-alert cmodal-alert--success">
+                                            ✓ <?php echo e(session('status')); ?>
+
+                                        </div>
+                                    <?php endif; ?>
+
+                                    <form id="contactForm" action="<?php echo e(route('prospectos.store')); ?>" method="POST" novalidate>
                                         <?php echo csrf_field(); ?>
-                                        <div class="form-group">
-                                            <label>Nombres</label>
-                                            <span class="input-icon">👤</span>
-                                            <input type="text" name="nombres" placeholder="Ingrese sus nombres"
-                                                required>
+
+                                        
+                                        <div style="display:none;" aria-hidden="true">
+                                            <input type="text" name="website" value="" tabindex="-1" autocomplete="off">
                                         </div>
-                                        <div class="form-group">
-                                            <label>Apellidos</label>
-                                            <span class="input-icon">👥</span>
-                                            <input type="text" name="apellidos" placeholder="Ingrese sus apellidos"
-                                                required>
+
+                                        <div class="cfield">
+                                            <span class="cfield__icon">👤</span>
+                                            <div class="cfield__wrap">
+                                                <input id="cf-nombres" type="text" name="nombres"
+                                                    class="cfield__input <?php $__errorArgs = ['nombres'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?> cfield__input--err <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>"
+                                                    maxlength="100"
+                                                    pattern="^[A-Za-záéíóúÁÉÍÓÚñÑüÜ\s\-\.]+$"
+                                                    title="Solo letras y espacios"
+                                                    value="<?php echo e(old('nombres')); ?>"
+                                                    placeholder=" "
+                                                    required>
+                                                <label for="cf-nombres" class="cfield__label">Nombres</label>
+                                            </div>
                                         </div>
-                                        <div class="form-group">
-                                            <label>Teléfono</label>
-                                            <span class="input-icon">📱</span>
-                                            <input type="tel" name="telefono"
-                                                placeholder="Ingrese su número de teléfono" required>
+
+                                        <div class="cfield">
+                                            <span class="cfield__icon">👥</span>
+                                            <div class="cfield__wrap">
+                                                <input id="cf-apellidos" type="text" name="apellidos"
+                                                    class="cfield__input <?php $__errorArgs = ['apellidos'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?> cfield__input--err <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>"
+                                                    maxlength="100"
+                                                    pattern="^[A-Za-záéíóúÁÉÍÓÚñÑüÜ\s\-\.]+$"
+                                                    title="Solo letras y espacios"
+                                                    value="<?php echo e(old('apellidos')); ?>"
+                                                    placeholder=" "
+                                                    required>
+                                                <label for="cf-apellidos" class="cfield__label">Apellidos</label>
+                                            </div>
                                         </div>
-                                        <button type="submit">ENVIAR INFORMACIÓN</button>
+
+                                        <div class="cfield">
+                                            <span class="cfield__icon">📱</span>
+                                            <div class="cfield__wrap">
+                                                <input id="cf-telefono" type="tel" name="telefono"
+                                                    class="cfield__input <?php $__errorArgs = ['telefono'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?> cfield__input--err <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>"
+                                                    maxlength="20"
+                                                    pattern="^[0-9\+\-\s\(\)]{7,20}$"
+                                                    title="Solo números y los caracteres + - ( )"
+                                                    value="<?php echo e(old('telefono')); ?>"
+                                                    placeholder=" "
+                                                    required>
+                                                <label for="cf-telefono" class="cfield__label">Teléfono</label>
+                                            </div>
+                                        </div>
+
+                                        <button type="submit" class="cmodal-submit" id="submitBtn">
+                                            <span class="cmodal-submit__label">ENVIAR INFORMACIÓN</span>
+                                            <span class="cmodal-submit__arrow">→</span>
+                                        </button>
                                     </form>
                                 </div>
                             </div>
@@ -366,6 +434,21 @@
             loop: true,
             autoplay: true,
             path: "<?php echo e(auto_asset('animaciones/whatsapp.json')); ?>"
+        });
+
+        // Reabrir modal si hay errores de validación
+        <?php if($errors->any() || session('status')): ?>
+        document.addEventListener('DOMContentLoaded', function () {
+            openContactModal();
+        });
+        <?php endif; ?>
+
+        // ========== BOTÓN LOADING ==========
+        document.getElementById('contactForm')?.addEventListener('submit', function () {
+            const btn = document.getElementById('submitBtn');
+            btn.classList.add('is-loading');
+            btn.querySelector('.cmodal-submit__label').textContent = 'Enviando...';
+            btn.querySelector('.cmodal-submit__arrow').textContent = '⏳';
         });
 
         // ========== MODAL DE CONTACTO ==========

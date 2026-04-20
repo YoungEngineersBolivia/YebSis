@@ -141,7 +141,12 @@
                                                         </span>
                                                         <small class="text-muted ms-1">
                                                             Marcado por:
-                                                            <strong><?php echo e($clase->usuarioAsistencia->persona->nombre_completo ?? 'Sistema'); ?></strong>
+                                                            <?php
+                                                                $marcadoPor = $clase->usuarioAsistencia?->persona?->nombre_completo
+                                                                    ?? $clase->usuarioAsistencia?->Correo
+                                                                    ?? 'Sistema';
+                                                             ?>
+                                                            <strong><?php echo e($marcadoPor); ?></strong>
                                                         </small>
                                                     </div>
                                                 <?php endif; ?>
@@ -182,7 +187,7 @@
                             </div>
                         </div>
                         <div class="card-footer bg-light text-center">
-                            <small class="text-muted">Mostrando las 5 más próximas</small>
+                            <small class="text-muted">Mostrando todas las clases de prueba pendientes</small>
                         </div>
                     </div>
                 </div>
