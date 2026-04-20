@@ -52,21 +52,25 @@ class AsistenciaProfesorController extends Controller
     {
         $request->validate([
             'fecha' => 'required|date',
-            'asistencia' => 'required|array',
+            'asistencia' => 'nullable|array',
             'asistencia.*' => 'required|in:Asistio,Falta,Licencia,Reprogramado',
         ]);
 
         $fecha = $request->fecha;
         $profesorId = $request->profesor_id;
-        $estudianteIds = array_keys($request->asistencia);
+        $estudianteIds = array_keys($request->asistencia ?? []);
 
-        // Eliminar registros de alumnos que fueron quitados de la lista para esta fecha
-        \App\Models\Asistencia::where('Id_profesores', $profesorId)
-            ->where('Fecha', $fecha)
-            ->whereNotIn('Id_estudiantes', $estudianteIds)
-            ->delete();
+        // Eliminar registros que ya no están en la lista (o todos si la lista quedó vacía)
+        $deleteQuery = \App\Models\Asistencia::where('Id_profesores', $profesorId)
+            ->where('Fecha', $fecha);
 
-        foreach ($request->asistencia as $estudianteId => $estado) {
+        if (!empty($estudianteIds)) {
+            $deleteQuery->whereNotIn('Id_estudiantes', $estudianteIds);
+        }
+
+        $deleteQuery->delete();
+
+        foreach ($request->asistencia ?? [] as $estudianteId => $estado) {
             $data = [
                 'Id_estudiantes' => $estudianteId,
                 'Id_profesores' => $profesorId,
