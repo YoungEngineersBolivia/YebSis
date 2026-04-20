@@ -1,3 +1,10 @@
+<?php $__env->startPush('styles'); ?>
+<style>
+    nav .pagination { margin-bottom: 0; }
+    nav .pagination .page-link { padding: 4px 10px; font-size: 0.8rem; }
+</style>
+<?php $__env->stopPush(); ?>
+
 <?php $__env->startSection('content'); ?>
 <div class="row mb-4">
     <div class="col-md-6">
@@ -134,9 +141,16 @@
             </table>
         </div>
     </div>
-    <div class="card-footer bg-white border-0">
-        <?php echo e($asistencias->links()); ?>
+    <div class="card-footer bg-white border-0 d-flex justify-content-between align-items-center flex-wrap gap-2 py-2">
+        <small class="text-muted">
+            Mostrando <?php echo e($asistencias->firstItem() ?? 0); ?>–<?php echo e($asistencias->lastItem() ?? 0); ?>
 
+            de <?php echo e($asistencias->total()); ?> registros
+        </small>
+        <nav>
+            <?php echo e($asistencias->links('pagination::bootstrap-5')); ?>
+
+        </nav>
     </div>
 </div>
 <?php $__env->stopSection(); ?>

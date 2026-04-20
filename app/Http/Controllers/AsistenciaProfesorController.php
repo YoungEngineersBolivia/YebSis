@@ -58,12 +58,19 @@ class AsistenciaProfesorController extends Controller
 
         $fecha = $request->fecha;
         $profesorId = $request->profesor_id;
+        $estudianteIds = array_keys($request->asistencia);
+
+        // Eliminar registros de alumnos que fueron quitados de la lista para esta fecha
+        \App\Models\Asistencia::where('Id_profesores', $profesorId)
+            ->where('Fecha', $fecha)
+            ->whereNotIn('Id_estudiantes', $estudianteIds)
+            ->delete();
 
         foreach ($request->asistencia as $estudianteId => $estado) {
             $data = [
                 'Id_estudiantes' => $estudianteId,
                 'Id_profesores' => $profesorId,
-                'Id_programas' => $request->programa_id[$estudianteId] ?? null, // Asumimos que viene del form
+                'Id_programas' => $request->programa_id[$estudianteId] ?? null,
                 'Fecha' => $fecha,
                 'Estado' => $estado,
                 'Observacion' => $request->observacion[$estudianteId] ?? null,

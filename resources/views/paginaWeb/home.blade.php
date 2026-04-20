@@ -89,44 +89,91 @@
 
                         <!-- MODAL DE CONTACTO -->
                         <div class="modal-overlay" id="contactModal" onclick="closeContactModalOnOverlay(event)">
-                            <div class="modal-container">
-                                <div class="modal-header">
-                                    <button class="close-btn" onclick="closeContactModal()">&times;</button>
-                                    <h2 class="modal-title">CONTÁCTANOS</h2>
-                                    <p class="modal-subtitle">
-                                        Por favor llene sus datos y nosotros nos contactaremos con usted a la brevedad
-                                        posible
-                                    </p>
+                            <div class="modal-container contact-modal">
+
+                                {{-- Cabecera de marca --}}
+                                <div class="cmodal-header">
+                                    <div class="cmodal-header__icon">🚀</div>
+                                    <div class="cmodal-header__titles">
+                                        <h2>¡CONTÁCTANOS!</h2>
+                                        <p>Déjanos tus datos y te llamamos a la brevedad</p>
+                                    </div>
+                                    <button class="cmodal-close" onclick="closeContactModal()" aria-label="Cerrar">&times;</button>
                                 </div>
 
-                                @if(session('success'))
-                                    <div style="color:green; font-weight:bold; margin-bottom:10px;">
-                                        {{ session('success') }}
-                                    </div>
-                                @endif
+                                <div class="cmodal-body">
 
-                                <div class="modal-body">
-                                    <form id="contactForm" action="{{ route('prospectos.store') }}" method="POST">
+                                    @if($errors->any())
+                                        <div class="cmodal-alert cmodal-alert--error">
+                                            @foreach($errors->all() as $error)
+                                                <div class="cmodal-alert__item">⚠ {{ $error }}</div>
+                                            @endforeach
+                                        </div>
+                                    @endif
+
+                                    @if(session('status'))
+                                        <div class="cmodal-alert cmodal-alert--success">
+                                            ✓ {{ session('status') }}
+                                        </div>
+                                    @endif
+
+                                    <form id="contactForm" action="{{ route('prospectos.store') }}" method="POST" novalidate>
                                         @csrf
-                                        <div class="form-group">
-                                            <label>Nombres</label>
-                                            <span class="input-icon">👤</span>
-                                            <input type="text" name="nombres" placeholder="Ingrese sus nombres"
-                                                required>
+
+                                        {{-- Honeypot --}}
+                                        <div style="display:none;" aria-hidden="true">
+                                            <input type="text" name="website" value="" tabindex="-1" autocomplete="off">
                                         </div>
-                                        <div class="form-group">
-                                            <label>Apellidos</label>
-                                            <span class="input-icon">👥</span>
-                                            <input type="text" name="apellidos" placeholder="Ingrese sus apellidos"
-                                                required>
+
+                                        <div class="cfield">
+                                            <span class="cfield__icon">👤</span>
+                                            <div class="cfield__wrap">
+                                                <input id="cf-nombres" type="text" name="nombres"
+                                                    class="cfield__input @error('nombres') cfield__input--err @enderror"
+                                                    maxlength="100"
+                                                    pattern="^[A-Za-záéíóúÁÉÍÓÚñÑüÜ\s\-\.]+$"
+                                                    title="Solo letras y espacios"
+                                                    value="{{ old('nombres') }}"
+                                                    placeholder=" "
+                                                    required>
+                                                <label for="cf-nombres" class="cfield__label">Nombres</label>
+                                            </div>
                                         </div>
-                                        <div class="form-group">
-                                            <label>Teléfono</label>
-                                            <span class="input-icon">📱</span>
-                                            <input type="tel" name="telefono"
-                                                placeholder="Ingrese su número de teléfono" required>
+
+                                        <div class="cfield">
+                                            <span class="cfield__icon">👥</span>
+                                            <div class="cfield__wrap">
+                                                <input id="cf-apellidos" type="text" name="apellidos"
+                                                    class="cfield__input @error('apellidos') cfield__input--err @enderror"
+                                                    maxlength="100"
+                                                    pattern="^[A-Za-záéíóúÁÉÍÓÚñÑüÜ\s\-\.]+$"
+                                                    title="Solo letras y espacios"
+                                                    value="{{ old('apellidos') }}"
+                                                    placeholder=" "
+                                                    required>
+                                                <label for="cf-apellidos" class="cfield__label">Apellidos</label>
+                                            </div>
                                         </div>
-                                        <button type="submit">ENVIAR INFORMACIÓN</button>
+
+                                        <div class="cfield">
+                                            <span class="cfield__icon">📱</span>
+                                            <div class="cfield__wrap">
+                                                <input id="cf-telefono" type="tel" name="telefono"
+                                                    class="cfield__input @error('telefono') cfield__input--err @enderror"
+                                                    maxlength="20"
+                                                    pattern="^[0-9\+\-\s\(\)]{7,20}$"
+                                                    title="Solo números y los caracteres + - ( )"
+                                                    value="{{ old('telefono') }}"
+                                                    placeholder=" "
+                                                    required>
+                                                <label for="cf-telefono" class="cfield__label">Teléfono</label>
+                                            </div>
+                                        </div>
+
+                                        <button type="submit" class="cmodal-submit" id="submitBtn">
+                                            <span class="cmodal-submit__label">ENVIAR INFORMACIÓN</span>
+                                            <span class="cmodal-submit__arrow">→</span>
+                                        </button>
                                     </form>
                                 </div>
                             </div>
@@ -364,6 +411,21 @@
             loop: true,
             autoplay: true,
             path: "{{ auto_asset('animaciones/whatsapp.json') }}"
+        });
+
+        // Reabrir modal si hay errores de validación
+        @if($errors->any() || session('status'))
+        document.addEventListener('DOMContentLoaded', function () {
+            openContactModal();
+        });
+        @endif
+
+        // ========== BOTÓN LOADING ==========
+        document.getElementById('contactForm')?.addEventListener('submit', function () {
+            const btn = document.getElementById('submitBtn');
+            btn.classList.add('is-loading');
+            btn.querySelector('.cmodal-submit__label').textContent = 'Enviando...';
+            btn.querySelector('.cmodal-submit__arrow').textContent = '⏳';
         });
 
         // ========== MODAL DE CONTACTO ==========

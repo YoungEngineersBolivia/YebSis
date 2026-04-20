@@ -180,11 +180,6 @@
     </div>
 <?php endif; ?>
 
-<!-- Paginación -->
-<div class="d-flex justify-content-center mt-4" id="pagination-links">
-    <?php echo e($estudiantes->links('pagination::bootstrap-5')); ?>
-
-</div>
 
 <!-- Modales fuera de las tarjetas para evitar conflictos de posicionamiento (Centrado) -->
 <?php $__currentLoopData = $estudiantes; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $estudiante): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
@@ -306,8 +301,15 @@
 <!-- Input oculto para pasar el total a JS -->
 <input type="hidden" id="total-count-hidden" value="<?php echo e($estudiantes->total()); ?>">
 
-<!-- Enlaces de paginación -->
-<div id="pagination-links" class="mt-4">
-    <?php echo e($estudiantes->appends(request()->query())->links()); ?>
+<!-- Paginación -->
+<div id="pagination-links" class="d-flex justify-content-between align-items-center mt-4 flex-wrap gap-2">
+    <small class="text-muted">
+        Mostrando <?php echo e($estudiantes->firstItem() ?? 0); ?>–<?php echo e($estudiantes->lastItem() ?? 0); ?>
 
+        de <?php echo e($estudiantes->total()); ?> estudiantes
+    </small>
+    <nav>
+        <?php echo e($estudiantes->appends(request()->query())->links('pagination::bootstrap-5')); ?>
+
+    </nav>
 </div><?php /**PATH C:\Users\DANTE\Desktop\YebSis\resources\views/administrador/partials/pagos_lista.blade.php ENDPATH**/ ?>

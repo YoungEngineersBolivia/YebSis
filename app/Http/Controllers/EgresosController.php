@@ -12,17 +12,10 @@ class EgresosController extends Controller
         $mesSeleccionado = $request->input('mes', \Carbon\Carbon::now()->month);
         $anioSeleccionado = $request->input('anio', \Carbon\Carbon::now()->year);
 
-        $query = Egreso::query();
-
-        if ($request->filled('mes')) {
-            $query->whereMonth('Fecha_egreso', (int) $mesSeleccionado);
-        }
-
-        if ($request->filled('anio')) {
-            $query->whereYear('Fecha_egreso', (int) $anioSeleccionado);
-        }
-
-        $egresos = $query->orderBy('Fecha_egreso', 'desc')->get();
+        $egresos = Egreso::whereMonth('Fecha_egreso', (int) $mesSeleccionado)
+            ->whereYear('Fecha_egreso', (int) $anioSeleccionado)
+            ->orderBy('Fecha_egreso', 'desc')
+            ->get();
         $totalMes = $egresos->sum('Monto_egreso');
 
         // Resumen mensual para el año seleccionado (Unificación)

@@ -49,7 +49,7 @@ use App\Http\Controllers\CaptchaController;
 Route::get('/', [PaginaWebController::class, 'home'])->name('home');
 
 // Registro de prospectos (formulario público)
-Route::post('/prospectos', [ProspectoController::class, 'store'])->name('prospectos.store');
+Route::post('/prospectos', [ProspectoController::class, 'store'])->middleware('throttle:5,1')->name('prospectos.store');
 
 // Autenticación
 Route::get('/login', fn() => view('paginaWeb.login'))->name('login');

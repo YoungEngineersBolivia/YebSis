@@ -605,31 +605,54 @@
 
         
         <?php if(session('success')): ?>
-            <div class="alert alert-success alert-dismissible fade show" role="alert">
-                <i class="fas fa-check-circle me-2"></i><?php echo e(session('success')); ?>
-
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            <div class="alert alert-success alert-modern alert-dismissible fade show border-0 shadow-sm d-flex align-items-center p-3 mb-4"
+                role="alert"
+                style="background: linear-gradient(to right, #dcfce7, #f0fdf4); border-left: 5px solid #22c55e !important;">
+                <div class="alert-icon-circle bg-success text-white rounded-circle d-flex align-items-center justify-content-center me-3"
+                    style="width: 40px; height: 40px; min-width: 40px;">
+                    <i class="fas fa-check"></i>
+                </div>
+                <div class="flex-grow-1">
+                    <h6 class="alert-heading mb-1 fw-bold text-success" style="font-size: 0.95rem;">¡Operación Exitosa!</h6>
+                    <p class="mb-0 text-success-emphasis" style="font-size: 0.85rem;"><?php echo e(session('success')); ?></p>
+                </div>
+                <button type="button" class="btn-close shadow-none" data-bs-dismiss="alert"></button>
             </div>
         <?php endif; ?>
 
         <?php if(session('error')): ?>
-            <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                <i class="fas fa-exclamation-circle me-2"></i><?php echo e(session('error')); ?>
-
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            <div class="alert alert-danger alert-modern alert-dismissible fade show border-0 shadow-sm d-flex align-items-center p-3 mb-4"
+                role="alert"
+                style="background: linear-gradient(to right, #fee2e2, #fef2f2); border-left: 5px solid #ef4444 !important;">
+                <div class="alert-icon-circle bg-danger text-white rounded-circle d-flex align-items-center justify-content-center me-3"
+                    style="width: 40px; height: 40px; min-width: 40px;">
+                    <i class="fas fa-exclamation-triangle"></i>
+                </div>
+                <div class="flex-grow-1">
+                    <h6 class="alert-heading mb-1 fw-bold text-danger" style="font-size: 0.95rem;">Error del Sistema</h6>
+                    <p class="mb-0 text-danger-emphasis" style="font-size: 0.85rem;"><?php echo e(session('error')); ?></p>
+                </div>
+                <button type="button" class="btn-close shadow-none" data-bs-dismiss="alert"></button>
             </div>
         <?php endif; ?>
 
         <?php if($errors->any()): ?>
-            <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                <i class="fas fa-exclamation-triangle me-2"></i>
-                <strong>Errores de validación:</strong>
-                <ul class="mb-0 mt-2">
-                    <?php $__currentLoopData = $errors->all(); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $error): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                        <li><?php echo e($error); ?></li>
-                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-                </ul>
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            <div class="alert alert-danger alert-modern alert-dismissible fade show border-0 shadow-sm d-flex align-items-start p-3 mb-4"
+                role="alert"
+                style="background: linear-gradient(to right, #fee2e2, #fef2f2); border-left: 5px solid #f97316 !important;">
+                <div class="alert-icon-circle bg-warning text-white rounded-circle d-flex align-items-center justify-content-center me-3"
+                    style="width: 40px; height: 40px; min-width: 40px;">
+                    <i class="fas fa-exclamation-triangle"></i>
+                </div>
+                <div class="flex-grow-1">
+                    <h6 class="alert-heading mb-1 fw-bold text-danger" style="font-size: 0.95rem;">Corrija lo siguiente:</h6>
+                    <ul class="mb-0 ps-3 text-danger-emphasis" style="font-size: 0.85rem;">
+                        <?php $__currentLoopData = $errors->all(); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $error): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                            <li><?php echo e($error); ?></li>
+                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                    </ul>
+                </div>
+                <button type="button" class="btn-close shadow-none" data-bs-dismiss="alert"></button>
             </div>
         <?php endif; ?>
 

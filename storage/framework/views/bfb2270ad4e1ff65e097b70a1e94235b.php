@@ -481,28 +481,67 @@
             border-color: #dee2e6 !important;
         }
 
+        /* ── Pantallas pequeñas (≤480px) ── */
+        @media (max-width: 480px) {
+            h2.text-uppercase { font-size: 1.1rem; }
+            .card-body.p-4 { padding: 1rem !important; }
+        }
+
+        /* ── Pantallas muy pequeñas (≤350px) ── */
         @media (max-width: 350px) {
-            .card-body {
-                padding: 0.75rem !important;
+            .container-fluid { padding-left: 8px !important; padding-right: 8px !important; }
+            .card-body, .card-body.p-4 { padding: 0.6rem !important; }
+            h2.text-uppercase { font-size: 0.95rem !important; }
+            .form-label { font-size: 0.78rem; margin-bottom: 2px; }
+            .form-control, input[type="date"], .form-select { font-size: 0.8rem; padding: 0.3rem 0.45rem; }
+            .input-group-text { padding: 0.3rem 0.45rem; font-size: 0.8rem; }
+            .btn-outline-secondary { font-size: 0.78rem; padding: 0.25rem 0.5rem; }
+            .alert { font-size: 0.78rem; padding: 0.5rem 0.6rem; }
+            #search_results .list-group-item { padding: 0.4rem 0.5rem !important; font-size: 0.8rem; }
+            /* Cards de alumnos */
+            #attendance-cards .card-body { padding: 0.55rem !important; }
+            #attendance-cards h6 { font-size: 0.82rem; }
+            #attendance-cards small { font-size: 0.68rem; }
+            #attendance-cards .form-control-sm { font-size: 0.75rem; padding: 0.25rem 0.4rem; }
+            /* Botones de estado: 2 columnas en lugar de 4 seguidos */
+            #attendance-cards .btn-group {
+                display: grid !important;
+                grid-template-columns: 1fr 1fr;
+                gap: 3px;
             }
+            #attendance-cards .btn-group .btn {
+                border-radius: 6px !important;
+                font-size: 0.72rem !important;
+                padding: 0.28rem 0.2rem !important;
+                border-width: 1px !important;
+            }
+            /* Botón guardar */
+            #btn-submit-asistencia { font-size: 0.8rem; padding: 0.35rem 0.4rem; }
+        }
 
-            .fw-bold {
-                font-size: 0.85em;
-            }
-
-            .btn-sm {
-                padding: 0.25rem 0.35rem;
-                font-size: 0.7rem;
-            }
-
-            #search_results .list-group-item {
-                padding: 0.5rem !important;
-            }
-
-            .input-group-text,
-            .form-control {
-                font-size: 0.8em;
-            }
+        /* ── Pantallas mínimas (<320px) ── */
+        @media (max-width: 319px) {
+            .container-fluid { padding-left: 6px !important; padding-right: 6px !important; }
+            .card-body, .card-body.p-4 { padding: 0.45rem !important; }
+            h2.text-uppercase { font-size: 0.82rem !important; }
+            p.text-muted.mb-0 { font-size: 0.72rem; }
+            .form-label { font-size: 0.72rem; }
+            .form-control, input[type="date"] { font-size: 0.74rem; padding: 0.25rem 0.35rem; }
+            .input-group-text { font-size: 0.74rem; padding: 0.25rem 0.35rem; }
+            .d-flex.align-items-center.gap-3 { gap: 0.35rem !important; }
+            /* Cards de alumnos */
+            #attendance-cards .card-body { padding: 0.4rem !important; }
+            #attendance-cards h6 { font-size: 0.76rem; }
+            #attendance-cards small { font-size: 0.63rem; }
+            #attendance-cards .badge { font-size: 0.6rem; padding: 0.2em 0.4em; }
+            #attendance-cards .btn-group .btn { font-size: 0.65rem !important; padding: 0.22rem 0.1rem !important; }
+            #attendance-cards .form-control-sm { font-size: 0.7rem; }
+            /* Mensaje vacío */
+            #no-students-msg .lead { font-size: 0.82rem; }
+            #no-students-msg .display-4 { font-size: 2rem; }
+            /* Botón guardar */
+            #btn-submit-asistencia { font-size: 0.74rem; padding: 0.28rem 0.35rem; }
+            #btn-submit-asistencia .bi { display: none; }
         }
     </style>
 <?php $__env->stopSection(); ?>
