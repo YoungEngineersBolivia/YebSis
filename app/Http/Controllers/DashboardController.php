@@ -94,11 +94,12 @@ class DashboardController extends Controller
                 return [
                     'fecha' => Carbon::parse($item->fecha)->format('d/m'),
                     'fecha_completa' => Carbon::parse($item->fecha)->format('d M Y'),
-                    'total' => $item->total
+                    'total' => (float) $item->total
                 ];
             });
 
         // Ingresos por mes en el año seleccionado
+        // ⚠️ Mantenemos 'mes' como número entero para poder hacer firstWhere('mes', $m) más abajo
         $ingresosPorMes = Pago::select(
             DB::raw('MONTH(Fecha_pago) as mes'),
             DB::raw('SUM(Monto_pago) as total')
@@ -106,14 +107,7 @@ class DashboardController extends Controller
             ->whereYear('Fecha_pago', $anioSeleccionado)
             ->groupBy('mes')
             ->orderBy('mes')
-            ->get()
-            ->map(function ($item) {
-                return [
-                    'mes' => Carbon::create()->month($item->mes)->format('M'),
-                    'mes_nombre' => Carbon::create()->month($item->mes)->monthName,
-                    'total' => $item->total
-                ];
-            });
+            ->get();
 
         // Top 5 días con más ingresos este mes
         $topDiasIngresos = Pago::select(
@@ -173,13 +167,13 @@ class DashboardController extends Controller
         });
 
         $ingresosData = collect(range(1, 12))->map(function ($m) use ($ingresosPorMes) {
-            $item = collect($ingresosPorMes)->firstWhere('mes', $m);
-            return $item ? $item['total'] : 0;
+            $item = $ingresosPorMes->firstWhere('mes', $m);
+            return $item ? (float) $item->total : 0;
         });
 
         $egresosData = collect(range(1, 12))->map(function ($m) use ($egresosPorMesRaw) {
             $item = $egresosPorMesRaw->firstWhere('mes', $m);
-            return $item ? $item->total : 0;
+            return $item ? (float) $item->total : 0;
         });
 
         $graficoMensual = [
