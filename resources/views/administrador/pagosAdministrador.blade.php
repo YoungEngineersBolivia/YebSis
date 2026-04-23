@@ -84,6 +84,21 @@
             </div>
         @endif
 
+        @if ($errors->any())
+            <div class="alert alert-danger alert-dismissible fade show border-0 shadow-sm d-flex align-items-center p-3 mb-4" role="alert"
+                style="background: linear-gradient(to right, #fee2e2, #fef2f2); border-left: 5px solid #ef4444 !important;">
+                <div class="flex-grow-1">
+                    <h6 class="alert-heading mb-1 fw-bold text-danger" style="font-size: 0.95rem;">Error de validación</h6>
+                    <ul class="mb-0 ps-3" style="font-size: 0.85rem;">
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+                <button type="button" class="btn-close shadow-none" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        @endif
+
         @if (session('error'))
             <div class="alert alert-danger alert-modern alert-dismissible fade show border-0 shadow-sm d-flex align-items-center p-3 mb-4"
                 role="alert"

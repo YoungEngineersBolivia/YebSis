@@ -92,17 +92,21 @@ document.addEventListener('DOMContentLoaded', () => {
             const restante = parseFloat(button.getAttribute('data-restante'));
             const programaNombre = button.getAttribute('data-programa');
 
-            // Verificar que tenemos los datos
-            if (!planId || isNaN(montoTotal) || isNaN(restante)) {
-                console.error('Faltan datos del plan:', { planId, montoTotal, montoPagado, restante });
+            // Verificar que tenemos el plan_id (mínimo requerido)
+            if (!planId) {
+                console.error('Falta plan_id en el botón.');
                 return;
+            }
+
+            if (isNaN(montoTotal) || isNaN(restante)) {
+                console.warn('Monto_total o restante inválido, se usarán valores por defecto:', { montoTotal, restante });
             }
 
             // Llenar información del modal
             document.getElementById('modal-plan-id').value = planId;
             document.getElementById('modal-programa-nombre').textContent = programaNombre;
-            document.getElementById('modal-monto-total-display').textContent = montoTotal.toFixed(2);
-            document.getElementById('modal-restante-display').textContent = restante.toFixed(2);
+            document.getElementById('modal-monto-total-display').textContent = isNaN(montoTotal) ? '0.00' : montoTotal.toFixed(2);
+            document.getElementById('modal-restante-display').textContent = isNaN(restante) ? '0.00' : restante.toFixed(2);
             // document.getElementById('modal-max-monto').textContent = restante.toFixed(2); // Ya no se usa
 
             // Configurar input de monto
