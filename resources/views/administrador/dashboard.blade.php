@@ -438,25 +438,134 @@
 
         <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
         <script>
-            window.ingresosPorDia = @json($ingresosPorDia->pluck('total'));
-            window.fechasPorDia = @json($ingresosPorDia->pluck('fecha'));
-            window.graficoAnual = @json($graficoMensual);
-
-            // ── Totales globales originales para el resumen ──────────────
-            const TOTALES_GLOBALES = {
-                todos:    @json($sucursales->sum(fn($s) => $alumnosPorSucursal[$s->Id_sucursales]->sum('total'))),
-                activos:  @json($sucursales->sum(fn($s) => $alumnosPorSucursal[$s->Id_sucursales]->sum('activos'))),
-                inactivos:@json($sucursales->sum(fn($s) => $alumnosPorSucursal[$s->Id_sucursales]->sum('inactivos'))),
+            // ── Datos desde PHP ──────────────────────────────────────────
+            window.ingresosPorDia  = @json($ingresosPorDia->pluck('total')->map(fn($v) => (float)$v)->values());
+            window.fechasPorDia    = @json($ingresosPorDia->pluck('fecha')->values());
+            window.graficoAnual    = {
+                labels:   @json(collect(range(1,12))->map(fn($m) => \Carbon\Carbon::create()->month($m)->isoFormat('MMM'))->values()),
+                ingresos: @json($graficoMensual['ingresos']->values()),
+                egresos:  @json($graficoMensual['egresos']->values()),
             };
 
-            // ── Filtros ──────────────────────────────────────────────────
+            // ── Gráfica: Ingresos últimos 30 días ────────────────────────
+            (function () {
+                const ctx = document.getElementById('ingresosDiarios');
+                if (!ctx) return;
+
+                const labels = window.fechasPorDia;
+                const datos  = window.ingresosPorDia;
+
+                if (!labels.length) {
+                    ctx.parentElement.innerHTML =
+                        '<p class="text-center text-muted py-4"><i class="fas fa-inbox me-1"></i>Sin ingresos en este período</p>';
+                    return;
+                }
+
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels,
+                        datasets: [{
+                            label: 'Ingresos (Bs)',
+                            data: datos,
+                            borderColor: '#0d6efd',
+                            backgroundColor: 'rgba(13,110,253,0.12)',
+                            borderWidth: 2,
+                            pointRadius: 4,
+                            pointBackgroundColor: '#0d6efd',
+                            fill: true,
+                            tension: 0.3,
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: true,
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: {
+                                callbacks: {
+                                    label: ctx => ' Bs ' + parseFloat(ctx.parsed.y).toLocaleString('es-BO', {minimumFractionDigits:2})
+                                }
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    callback: v => 'Bs ' + v.toLocaleString('es-BO')
+                                }
+                            }
+                        }
+                    }
+                });
+            })();
+
+            // ── Gráfica: Comparativa anual Ingresos vs Egresos ──────────
+            (function () {
+                const ctx = document.getElementById('comparativaAnual');
+                if (!ctx) return;
+
+                const { labels, ingresos, egresos } = window.graficoAnual;
+
+                new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels,
+                        datasets: [
+                            {
+                                label: 'Ingresos (Bs)',
+                                data: ingresos,
+                                backgroundColor: 'rgba(13,110,253,0.75)',
+                                borderColor: '#0d6efd',
+                                borderWidth: 1,
+                                borderRadius: 4,
+                            },
+                            {
+                                label: 'Egresos (Bs)',
+                                data: egresos,
+                                backgroundColor: 'rgba(220,53,69,0.75)',
+                                borderColor: '#dc3545',
+                                borderWidth: 1,
+                                borderRadius: 4,
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: true,
+                        plugins: {
+                            legend: { position: 'top' },
+                            tooltip: {
+                                callbacks: {
+                                    label: ctx => ' Bs ' + parseFloat(ctx.parsed.y).toLocaleString('es-BO', {minimumFractionDigits:2})
+                                }
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    callback: v => 'Bs ' + v.toLocaleString('es-BO')
+                                }
+                            }
+                        }
+                    }
+                });
+            })();
+
+            // ── Filtros alumnos ──────────────────────────────────────────
+            const TOTALES_GLOBALES = {
+                todos:    @json((int)$sucursales->sum(fn($s) => $alumnosPorSucursal[$s->Id_sucursales]->sum('total'))),
+                activos:  @json((int)$sucursales->sum(fn($s) => $alumnosPorSucursal[$s->Id_sucursales]->sum('activos'))),
+                inactivos:@json((int)$sucursales->sum(fn($s) => $alumnosPorSucursal[$s->Id_sucursales]->sum('inactivos'))),
+            };
+
             let estadoActivo   = 'todos';
             let sucursalActiva = 'todas';
 
             const campoEstado = { todos: 'total', activo: 'activos', inactivo: 'inactivos' };
             const colorEstado = { todos: 'primary', activo: 'success', inactivo: 'danger' };
 
-            // Botones de estado
             document.querySelectorAll('#filtroEstado button').forEach(btn => {
                 btn.addEventListener('click', function () {
                     estadoActivo = this.dataset.estado;
@@ -470,7 +579,6 @@
                 });
             });
 
-            // Botones de sucursal
             document.querySelectorAll('#filtroSucursal button').forEach(btn => {
                 btn.addEventListener('click', function () {
                     sucursalActiva = this.dataset.sucursal;
@@ -485,88 +593,63 @@
 
             function aplicarFiltros() {
                 const campo = campoEstado[estadoActivo];
-                let totalGlobal = 0;
 
                 document.querySelectorAll('.sucursal-card').forEach(card => {
                     const idSuc = card.dataset.sucursalId;
-
-                    // Visibilidad de la tarjeta
                     const mostrarCard = sucursalActiva === 'todas' || sucursalActiva === idSuc;
                     card.style.display = mostrarCard ? '' : 'none';
                     if (!mostrarCard) return;
 
                     let subtotal = 0;
-
                     card.querySelectorAll('tbody tr[data-total]').forEach(fila => {
                         const valor = parseInt(fila.dataset[campo] ?? 0);
-                        // En filtros activo/inactivo, ocultar filas con valor 0
                         const mostrarFila = estadoActivo === 'todos' || valor > 0;
                         fila.style.display = mostrarFila ? '' : 'none';
                         if (mostrarFila) {
                             subtotal += valor;
-                            fila.querySelector('.fila-filtrada').textContent = valor;
-
-                            // Colorear badge según estado activo
-                            fila.querySelector('.fila-filtrada').className =
-                                'badge fila-filtrada bg-' + (colorEstado[estadoActivo] ?? 'secondary');
+                            const badge = fila.querySelector('.fila-filtrada');
+                            badge.textContent = valor;
+                            badge.className = 'badge fila-filtrada bg-' + (colorEstado[estadoActivo] ?? 'secondary');
                         }
                     });
 
-                    totalGlobal += subtotal;
-
-                    // Actualizar badge del header de la tarjeta
                     const badgeSuc = document.getElementById(`badge-suc-${idSuc}`);
                     if (badgeSuc) badgeSuc.textContent = subtotal + ' alumnos';
-
-                    // Actualizar badge del pie de tabla
                     const pieSuc = document.getElementById(`pie-suc-${idSuc}`);
                     if (pieSuc) pieSuc.textContent = subtotal;
                 });
 
-                // Actualizar resumen global
-                actualizarResumen(campo, totalGlobal);
-            }
-
-            function actualizarResumen(campo, totalVisible) {
-                // Si hay filtro de sucursal, recalcular sumando solo las visibles
+                // Recalcular resumen global solo con tarjetas visibles
                 let sumTotal = 0, sumActivos = 0, sumInactivos = 0;
-
                 document.querySelectorAll('.sucursal-card').forEach(card => {
                     if (card.style.display === 'none') return;
                     card.querySelectorAll('tbody tr[data-total]').forEach(fila => {
-                        sumTotal    += parseInt(fila.dataset.total    ?? 0);
-                        sumActivos  += parseInt(fila.dataset.activos  ?? 0);
-                        sumInactivos+= parseInt(fila.dataset.inactivos?? 0);
+                        sumTotal     += parseInt(fila.dataset.total     ?? 0);
+                        sumActivos   += parseInt(fila.dataset.activos   ?? 0);
+                        sumInactivos += parseInt(fila.dataset.inactivos ?? 0);
                     });
                 });
-
-                document.getElementById('resumenTotal').textContent    = sumTotal;
+                document.getElementById('resumenTotal').textContent     = sumTotal;
                 document.getElementById('resumenActivos').textContent   = sumActivos;
                 document.getElementById('resumenInactivos').textContent = sumInactivos;
             }
 
-            // Inicializar
-            aplicarFiltros();
+            // ── Guard para dashboard.js ──────────────────────────────────
+            // Evita que dashboard.js vuelva a inicializar los canvas si lo hace
+            window.__chartsInitialized = true;
 
-            // ── Funciones clases de prueba ───────────────────────────────
             function guardarComentarioAdmin(id) {
                 const comment = document.getElementById(`comentario_admin_${id}`).value;
                 fetch(`/administrador/clases-prueba/${id}/comentarios`, {
                     method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                    },
+                    headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
                     body: JSON.stringify({ comentarios: comment })
                 })
-                .then(response => response.json())
+                .then(r => r.json())
                 .then(data => {
                     if (data.success) {
-                        const toast = Swal.mixin({
-                            toast: true, position: 'top-end',
-                            showConfirmButton: false, timer: 3000
-                        });
-                        toast.fire({ icon: 'success', title: 'Comentario guardado' });
+                        Swal.mixin({ toast: true, position: 'top-end', showConfirmButton: false, timer: 3000 })
+                            .fire({ icon: 'success', title: 'Comentario guardado' });
                     }
                 });
             }
@@ -576,47 +659,42 @@
                 const comentario   = commentInput.value.trim();
                 const textoAccion  = estado === 'asistio' ? 'marcar como ASISTIÓ' : 'marcar como FALTA';
 
-                let confirmOptions = {
-                    title: '¿Confirmar asistencia?',
-                    text: `Vas a ${textoAccion}.`,
-                    icon: 'question',
-                    showCancelButton: true,
-                    confirmButtonText: 'Sí, enviar',
-                    cancelButtonText: 'Cancelar'
+                let opts = {
+                    title: '¿Confirmar asistencia?', text: `Vas a ${textoAccion}.`,
+                    icon: 'question', showCancelButton: true,
+                    confirmButtonText: 'Sí, enviar', cancelButtonText: 'Cancelar'
                 };
-
                 if (comentario === '') {
-                    confirmOptions.title = '¡Atención!';
-                    confirmOptions.text  = `Estás a punto de ${textoAccion} SIN COMENTARIOS. ¿Estás seguro? Es recomendable añadir una observación.`;
-                    confirmOptions.icon  = 'warning';
-                    confirmOptions.confirmButtonColor = '#d33';
+                    opts = { ...opts,
+                        title: '¡Atención!',
+                        text: `Estás a punto de ${textoAccion} SIN COMENTARIOS. ¿Estás seguro?`,
+                        icon: 'warning', confirmButtonColor: '#d33'
+                    };
                 }
 
-                Swal.fire(confirmOptions).then((result) => {
-                    if (result.isConfirmed) {
-                        fetch(`/administrador/clases-prueba/${id}/comentarios`, {
-                            method: 'PUT',
-                            headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
-                            body: JSON.stringify({ comentarios: commentInput.value })
-                        })
-                        .then(() => fetch(`/administrador/clases-prueba/${id}/asistencia`, {
-                            method: 'PUT',
-                            headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
-                            body: JSON.stringify({ asistencia: estado })
-                        }))
-                        .then(response => response.json())
-                        .then(data => {
-                            if (data.success) {
-                                Swal.fire({
-                                    title: '¡Listo!', text: 'La asistencia ha sido registrada.',
-                                    icon: 'success', timer: 1500, showConfirmButton: false
-                                }).then(() => location.reload());
-                            } else {
-                                Swal.fire('Error', data.message || 'Error desconocido al guardar.', 'error');
-                            }
-                        })
-                        .catch(() => Swal.fire('Error', 'Hubo un problema de conexión o del servidor.', 'error'));
-                    }
+                Swal.fire(opts).then(result => {
+                    if (!result.isConfirmed) return;
+                    fetch(`/administrador/clases-prueba/${id}/comentarios`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
+                        body: JSON.stringify({ comentarios: commentInput.value })
+                    })
+                    .then(() => fetch(`/administrador/clases-prueba/${id}/asistencia`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
+                        body: JSON.stringify({ asistencia: estado })
+                    }))
+                    .then(r => r.json())
+                    .then(data => {
+                        if (data.success) {
+                            Swal.fire({ title: '¡Listo!', text: 'Asistencia registrada.',
+                                icon: 'success', timer: 1500, showConfirmButton: false
+                            }).then(() => location.reload());
+                        } else {
+                            Swal.fire('Error', data.message || 'Error desconocido.', 'error');
+                        }
+                    })
+                    .catch(() => Swal.fire('Error', 'Problema de conexión con el servidor.', 'error'));
                 });
             }
 
@@ -625,26 +703,25 @@
                     method: 'PUT',
                     headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' }
                 })
-                .then(response => response.json())
+                .then(r => r.json())
                 .then(data => {
-                    if (data.success) {
-                        const item = document.querySelector(`button[onclick="descartarNotificacion(${id})"]`).closest('.list-group-item');
-                        if (item) {
-                            item.style.transition = 'all 0.3s ease';
-                            item.style.opacity = '0';
-                            setTimeout(() => {
-                                item.remove();
-                                const badge = document.querySelector('.card-header .badge');
-                                if (badge) {
-                                    let count = parseInt(badge.innerText);
-                                    badge.innerText = Math.max(0, count - 1);
-                                    if (count - 1 === 0) location.reload();
-                                }
-                            }, 300);
+                    if (!data.success) return;
+                    const item = document.querySelector(`button[onclick="descartarNotificacion(${id})"]`)?.closest('.list-group-item');
+                    if (!item) return;
+                    item.style.transition = 'all 0.3s ease';
+                    item.style.opacity = '0';
+                    setTimeout(() => {
+                        item.remove();
+                        const badge = document.querySelector('.card-header .badge');
+                        if (badge) {
+                            const count = parseInt(badge.innerText) - 1;
+                            badge.innerText = Math.max(0, count);
+                            if (count <= 0) location.reload();
                         }
-                    }
+                    }, 300);
                 });
             }
         </script>
+        {{-- dashboard.js solo maneja lógica que NO sea las gráficas (ya están arriba) --}}
         <script src="{{ auto_asset('js/administrador/dashboard.js') }}"></script>
 @endsection
