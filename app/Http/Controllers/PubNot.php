@@ -97,6 +97,30 @@ class PubNot extends Controller
         }
     }
 
+    // Eliminar notificación
+    public function destroyNotificacion($id)
+    {
+        try {
+            $notificacion = Notificacion::findOrFail($id);
+
+            if ($notificacion->Imagen) {
+                $otraUsa = Notificacion::where('Imagen', $notificacion->Imagen)
+                    ->where('Id_notificaciones', '!=', $id)
+                    ->exists();
+
+                if (!$otraUsa && \Illuminate\Support\Facades\Storage::disk('public')->exists($notificacion->Imagen)) {
+                    \Illuminate\Support\Facades\Storage::disk('public')->delete($notificacion->Imagen);
+                }
+            }
+
+            $notificacion->delete();
+
+            return redirect()->route('publicaciones.index')->with('success', 'Notificación eliminada correctamente.');
+        } catch (\Exception $e) {
+            return redirect()->route('publicaciones.index')->with('error', 'Error al eliminar: ' . $e->getMessage());
+        }
+    }
+
     // Eliminar publicación
     public function destroy($id)
     {

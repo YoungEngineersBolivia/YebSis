@@ -197,6 +197,7 @@ Route::middleware(['auth', 'role:administrador'])->prefix('administrador')->grou
     Route::post('/pubnotAdministrador', [PubNot::class, 'store'])->name('publicaciones.store');
     Route::delete('/pubnotAdministrador/{id}', [PubNot::class, 'destroy'])->name('publicaciones.destroy');
     Route::post('/notificaciones', [PubNot::class, 'storeNotificacion'])->name('notificaciones.store');
+    Route::delete('/notificaciones/{id}', [PubNot::class, 'destroyNotificacion'])->name('notificaciones.destroy');
 
     /* ----------------- REGISTRO COMBINADO (TUTOR + ESTUDIANTE) ----------------- */
     Route::get('/tutorEstudianteAdministrador', [RegistroCombinadoController::class, 'mostrarFormulario'])->name('registroCombinado.form');
