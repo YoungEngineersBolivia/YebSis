@@ -4,13 +4,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@yield('title', 'YE Bolivia - Administrador')</title>
-    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <title><?php echo $__env->yieldContent('title', 'YE Bolivia - Administrador'); ?></title>
+    <meta name="csrf-token" content="<?php echo e(csrf_token()); ?>">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
-    @yield('styles')
+    <?php echo $__env->yieldContent('styles'); ?>
     <style>
         /* Variables Globales (Estilo Programas) */
         :root {
@@ -519,9 +519,9 @@
         <!-- Sidebar -->
         <div class="sidebar-container">
             <!-- Logo -->
-            <a href="{{ route('admin.dashboard') }}"
+            <a href="<?php echo e(route('admin.dashboard')); ?>"
                 class="d-flex align-items-center mb-4 mb-md-0 me-md-auto link-dark text-decoration-none px-2">
-                <img src="{{ auto_asset('img/ES_logo-02.webp') }}" alt="Logo YE Bolivia" width="200" class="img-fluid">
+                <img src="<?php echo e(auto_asset('img/ES_logo-02.webp')); ?>" alt="Logo YE Bolivia" width="200" class="img-fluid">
             </a>
 
             <!-- Menú con Scroll -->
@@ -530,7 +530,7 @@
 
                     <!-- Dashboard -->
                     <li>
-                        <a href="{{ route('admin.dashboard') }}"
+                        <a href="<?php echo e(route('admin.dashboard')); ?>"
                             class="nav-link link-dark sidebar-link d-flex align-items-center gap-3">
                             <i class="bi bi-speedometer2"></i>
                             <span>Dashboard</span>
@@ -551,14 +551,14 @@
                         <div class="collapse" id="submenuPersonal">
                             <ul class="nav flex-column gap-1 mt-1">
                                 <li><a class="nav-link link-dark submenu-item"
-                                        href="{{ url('administrador/registrosAdministrador') }}">Administradores</a>
+                                        href="<?php echo e(url('administrador/registrosAdministrador')); ?>">Administradores</a>
                                 </li>
                                 <li><a class="nav-link link-dark submenu-item"
-                                        href="{{ url('administrador/profesores') }}">Profesores</a></li>
+                                        href="<?php echo e(url('administrador/profesores')); ?>">Profesores</a></li>
                                 <li><a class="nav-link link-dark submenu-item"
-                                        href="{{ url('administrador/tutoresAdministrador') }}">Tutores</a></li>
+                                        href="<?php echo e(url('administrador/tutoresAdministrador')); ?>">Tutores</a></li>
                                 <li><a class="nav-link link-dark submenu-item"
-                                        href="{{ route('usuarios.index') }}">Todos los Usuarios</a></li>
+                                        href="<?php echo e(route('usuarios.index')); ?>">Todos los Usuarios</a></li>
                             </ul>
                         </div>
                     </li>
@@ -574,17 +574,17 @@
                         <div class="collapse" id="submenuEstudiantes">
                             <ul class="nav flex-column gap-1 mt-1">
                                 <li><a class="nav-link link-dark submenu-item"
-                                        href="{{ route('admin.estudiantes') }}">Ver Todos</a></li>
+                                        href="<?php echo e(route('admin.estudiantes')); ?>">Ver Todos</a></li>
                                 <li><a class="nav-link link-dark submenu-item"
-                                        href="{{ route('registroCombinado.form') }}">Registrar Nuevo</a></li>
+                                        href="<?php echo e(route('registroCombinado.form')); ?>">Registrar Nuevo</a></li>
                                 <li><a class="nav-link link-dark submenu-item"
-                                        href="{{ route('inscripcionEstudiante.mostrar') }}">Inscribir a Taller</a></li>
+                                        href="<?php echo e(route('inscripcionEstudiante.mostrar')); ?>">Inscribir a Taller</a></li>
                                 <li><a class="nav-link link-dark submenu-item"
-                                        href="{{ route('estudiantesActivos') }}">Estudiantes Activos</a></li>
+                                        href="<?php echo e(route('estudiantesActivos')); ?>">Estudiantes Activos</a></li>
                                 <li><a class="nav-link link-dark submenu-item"
-                                        href="{{ route('estudiantesNoActivos') }}">Estudiantes Inactivos</a></li>
+                                        href="<?php echo e(route('estudiantesNoActivos')); ?>">Estudiantes Inactivos</a></li>
                                 <li><a class="nav-link link-dark submenu-item"
-                                        href="{{ route('graduados.mostrar') }}">Graduados</a></li>
+                                        href="<?php echo e(route('graduados.mostrar')); ?>">Graduados</a></li>
                             </ul>
                         </div>
                     </li>
@@ -603,14 +603,14 @@
                         <div class="collapse" id="submenuProgramas">
                             <ul class="nav flex-column gap-1 mt-1">
                                 <li><a class="nav-link link-dark submenu-item"
-                                        href="{{ url('administrador/programasAdministrador') }}">Ver Programas</a></li>
+                                        href="<?php echo e(url('administrador/programasAdministrador')); ?>">Ver Programas</a></li>
                             </ul>
                         </div>
                     </li>
 
                     <!-- Horarios -->
                     <li>
-                        <a href="{{ route('asistencia.admin.index') }}"
+                        <a href="<?php echo e(route('asistencia.admin.index')); ?>"
                             class="nav-link link-dark sidebar-link d-flex align-items-center gap-3">
                             <i class="bi bi-calendar-check-fill"></i>
                             <span>Asistencia</span>
@@ -618,14 +618,14 @@
                     </li>
 
                     <li>
-                        <a href="{{ route('horarios.index') }}"
+                        <a href="<?php echo e(route('horarios.index')); ?>"
                             class="nav-link link-dark sidebar-link d-flex align-items-center gap-3">
                             <i class="bi bi-calendar-week"></i>
                             <span>Horarios</span>
                         </a>
                     </li>
                     <li>
-                        <a href="{{ route('citas.index') }}"
+                        <a href="<?php echo e(route('citas.index')); ?>"
                             class="nav-link link-dark sidebar-link d-flex align-items-center gap-3">
                             <i class="bi bi-calendar-week"></i>
                             <span>Citas</span>
@@ -645,16 +645,16 @@
                         <div class="collapse" id="submenuFinanzas">
                             <ul class="nav flex-column gap-1 mt-1">
                                 <li><a class="nav-link link-dark submenu-item"
-                                        href="{{ route('pagos.form') }}">Registrar Pago</a></li>
+                                        href="<?php echo e(route('pagos.form')); ?>">Registrar Pago</a></li>
                                 <li><a class="nav-link link-dark submenu-item"
-                                        href="{{ route('pagos.mensuales') }}">Historial Mensual</a></li>
+                                        href="<?php echo e(route('pagos.mensuales')); ?>">Historial Mensual</a></li>
                             </ul>
                         </div>
                     </li>
 
                     <!-- Egresos -->
                     <li>
-                        <a href="{{ route('egresos.index') }}"
+                        <a href="<?php echo e(route('egresos.index')); ?>"
                             class="nav-link link-dark sidebar-link d-flex align-items-center gap-3">
                             <i class="bi bi-arrow-down-circle"></i>
                             <span>Egresos</span>
@@ -676,25 +676,25 @@
                             <ul class="nav flex-column gap-1 mt-1">
                                 <li>
                                     <a class="nav-link link-dark submenu-item"
-                                        href="{{ route('admin.componentes.inventario') }}">
+                                        href="<?php echo e(route('admin.componentes.inventario')); ?>">
                                         <i class="bi bi-list-ul me-2"></i>Ver Inventario
                                     </a>
                                 </li>
                                 <li>
                                     <a class="nav-link link-dark submenu-item"
-                                        href="{{ route('admin.componentes.salida') }}">
+                                        href="<?php echo e(route('admin.componentes.salida')); ?>">
                                         <i class="bi bi-box-arrow-right me-2"></i>Salida Componentes
                                     </a>
                                 </li>
                                 <li>
                                     <a class="nav-link link-dark submenu-item"
-                                        href="{{ route('admin.componentes.entrada') }}">
+                                        href="<?php echo e(route('admin.componentes.entrada')); ?>">
                                         <i class="bi bi-box-arrow-in-left me-2"></i>Entrada Componentes
                                     </a>
                                 </li>
                                 <li>
                                     <a class="nav-link link-dark submenu-item"
-                                        href="{{ route('admin.componentes.historial-general') }}">
+                                        href="<?php echo e(route('admin.componentes.historial-general')); ?>">
                                         <i class="bi bi-clock-history me-2"></i>Historial de Movimientos
                                     </a>
                                 </li>
@@ -704,7 +704,7 @@
 
                     <!-- Sucursales -->
                     <li>
-                        <a href="{{ route('sucursales.index') }}"
+                        <a href="<?php echo e(route('sucursales.index')); ?>"
                             class="nav-link link-dark sidebar-link d-flex align-items-center gap-3">
                             <i class="bi bi-building"></i>
                             <span>Sucursales</span>
@@ -716,7 +716,7 @@
 
                     <!-- Publicar -->
                     <li>
-                        <a href="{{ route('publicaciones.index') }}"
+                        <a href="<?php echo e(route('publicaciones.index')); ?>"
                             class="nav-link link-dark sidebar-link d-flex align-items-center gap-3">
                             <i class="bi bi-megaphone"></i>
                             <span>Publicar y Notificar</span>
@@ -734,11 +734,11 @@
                         <div class="collapse" id="submenuComercial">
                             <ul class="nav flex-column gap-1 mt-1">
                                 <li><a class="nav-link link-dark submenu-item"
-                                        href="{{ route('prospectos.comercial') }}">Prospectos</a></li>
+                                        href="<?php echo e(route('prospectos.comercial')); ?>">Prospectos</a></li>
                                 <li><a class="nav-link link-dark submenu-item"
-                                        href="{{ route('estudiantesActivos') }}">Est. Activos</a></li>
+                                        href="<?php echo e(route('estudiantesActivos')); ?>">Est. Activos</a></li>
                                 <li><a class="nav-link link-dark submenu-item"
-                                        href="{{ route('estudiantesNoActivos') }}">Est. Inactivos</a></li>
+                                        href="<?php echo e(route('estudiantesNoActivos')); ?>">Est. Inactivos</a></li>
                             </ul>
                         </div>
                     </li>
@@ -750,17 +750,17 @@
             <div class="sidebar-footer">
                 <div class="d-flex align-items-center justify-content-between p-2 rounded-3 bg-light">
                     <div class="d-flex align-items-center gap-3 flex-grow-1 overflow-hidden">
-                        <img src="https://ui-avatars.com/api/?name={{ auth()->user()->persona->Nombre ?? 'Usuario' }}&background=6366f1&color=fff"
+                        <img src="https://ui-avatars.com/api/?name=<?php echo e(auth()->user()->persona->Nombre ?? 'Usuario'); ?>&background=6366f1&color=fff"
                             alt="perfil" width="40" height="40" class="rounded-circle flex-shrink-0 shadow-sm">
                         <div class="d-flex flex-column overflow-hidden" style="line-height: 1.3;">
                             <span class="fw-bold text-dark text-truncate"
-                                style="font-size: 0.9rem;">{{ auth()->user()->persona->Nombre ?? 'Usuario' }}</span>
+                                style="font-size: 0.9rem;"><?php echo e(auth()->user()->persona->Nombre ?? 'Usuario'); ?></span>
                             <span class="text-muted text-truncate"
-                                style="font-size: 0.75rem;">{{ ucfirst(auth()->user()->rol ?? 'Admin') }}</span>
+                                style="font-size: 0.75rem;"><?php echo e(ucfirst(auth()->user()->rol ?? 'Admin')); ?></span>
                         </div>
                     </div>
-                    <form action="{{ route('logout') }}" method="POST" class="m-0 flex-shrink-0 ms-2">
-                        @csrf
+                    <form action="<?php echo e(route('logout')); ?>" method="POST" class="m-0 flex-shrink-0 ms-2">
+                        <?php echo csrf_field(); ?>
                         <button type="submit" class="btn btn-sm btn-outline-danger border-0 p-2" title="Cerrar sesión">
                             <i class="bi bi-box-arrow-right fs-6"></i>
                         </button>
@@ -772,23 +772,25 @@
         <!-- Contenido Principal -->
         <div class="main-content">
             <div class="container-fluid p-2 p-md-3 p-lg-4">
-                @if(session('success'))
+                <?php if(session('success')): ?>
                     <div class="alert alert-success alert-dismissible fade show shadow-sm border-0 mb-4" role="alert">
                         <i class="bi bi-check-circle-fill me-2 fs-5"></i>
-                        {{ session('success') }}
+                        <?php echo e(session('success')); ?>
+
                         <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                     </div>
-                @endif
+                <?php endif; ?>
 
-                @if(session('error'))
+                <?php if(session('error')): ?>
                     <div class="alert alert-danger alert-dismissible fade show shadow-sm border-0 mb-4" role="alert">
                         <i class="bi bi-exclamation-triangle-fill me-2 fs-5"></i>
-                        {{ session('error') }}
+                        <?php echo e(session('error')); ?>
+
                         <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                     </div>
-                @endif
+                <?php endif; ?>
 
-                @yield('content')
+                <?php echo $__env->yieldContent('content'); ?>
             </div>
         </div>
     </div>
@@ -860,11 +862,11 @@
             });
 
             // --- NOTIFICACIONES GLOBALES CON SWEETALERT2 ---
-            @if(session('success'))
+            <?php if(session('success')): ?>
                 Swal.fire({
                     icon: 'success',
                     title: '¡Operación Exitosa!',
-                    text: "{{ session('success') }}",
+                    text: "<?php echo e(session('success')); ?>",
                     toast: true,
                     position: 'top-end',
                     showConfirmButton: false,
@@ -875,23 +877,23 @@
                         toast.addEventListener('mouseleave', Swal.resumeTimer)
                     }
                 });
-            @endif
+            <?php endif; ?>
 
-            @if(session('error'))
+            <?php if(session('error')): ?>
                 Swal.fire({
                     icon: 'error',
                     title: 'Hubo un problema',
-                    text: "{{ session('error') }}",
+                    text: "<?php echo e(session('error')); ?>",
                     confirmButtonColor: '#ef4444',
                 });
-            @endif
+            <?php endif; ?>
         });
     </script>
-    @yield('scripts')
-    @stack('scripts')
+    <?php echo $__env->yieldContent('scripts'); ?>
+    <?php echo $__env->yieldPushContent('scripts'); ?>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script src="{{ auto_asset('js/administrador/baseAdministrador.js') }}"></script>
+    <script src="<?php echo e(auto_asset('js/administrador/baseAdministrador.js')); ?>"></script>
 </body>
 
-</html>
+</html><?php /**PATH C:\Users\danil\Desktop\Laravel\Yebolivia\resources\views/administrador/baseAdministrador.blade.php ENDPATH**/ ?>

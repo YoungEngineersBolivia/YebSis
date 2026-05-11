@@ -197,6 +197,7 @@ Route::middleware(['auth', 'role:administrador'])->prefix('administrador')->grou
     Route::post('/pubnotAdministrador', [PubNot::class, 'store'])->name('publicaciones.store');
     Route::delete('/pubnotAdministrador/{id}', [PubNot::class, 'destroy'])->name('publicaciones.destroy');
     Route::post('/notificaciones', [PubNot::class, 'storeNotificacion'])->name('notificaciones.store');
+    Route::delete('/notificaciones/{id}', [PubNot::class, 'destroyNotificacion'])->name('notificaciones.destroy');
 
     /* ----------------- REGISTRO COMBINADO (TUTOR + ESTUDIANTE) ----------------- */
     Route::get('/tutorEstudianteAdministrador', [RegistroCombinadoController::class, 'mostrarFormulario'])->name('registroCombinado.form');
@@ -244,6 +245,8 @@ Route::middleware(['auth', 'role:administrador'])->prefix('administrador')->grou
             ->name('registrar-entrada');
 
         // Historial y Reportes
+        Route::get('/historial', [ComponentesController::class, 'historialGeneral'])
+            ->name('historial-general');
         Route::get('/{id}/historial', [ComponentesController::class, 'historialMovimientos'])
             ->name('historial');
         Route::get('/historial-salidas', [ComponentesController::class, 'historialSalidas'])

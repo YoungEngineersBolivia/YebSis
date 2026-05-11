@@ -5,8 +5,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Young Engineers La Paz - STEM para Niños</title>
-    <link href="{{ auto_asset('css/paginaWeb/home.css') }}" rel="stylesheet">
-    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <link href="<?php echo e(auto_asset('css/paginaWeb/home.css')); ?>" rel="stylesheet">
+    <meta name="csrf-token" content="<?php echo e(csrf_token()); ?>">
 </head>
 
 <body>
@@ -16,24 +16,24 @@
         <div class="container">
             <div class="header-content">
                 <div class="logo">
-                    <img src="{{ auto_asset('img/ES_logo-02.webp') }}" alt="Logo YE Bolivia" width="250px" class="me-2">
+                    <img src="<?php echo e(auto_asset('img/ES_logo-02.webp')); ?>" alt="Logo YE Bolivia" width="250px" class="me-2">
                 </div>
                 <button class="navbar-toggle" onclick="toggleNavbar()">&#9776;</button>
                 <nav class="nav-links" id="mainNavLinks">
                     <span>RECONOCIDO POR:</span>
-                    <img src="{{auto_asset('img/recognized_by.png')}}" alt="Reconocimiento" width="200px" class="me-2">
+                    <img src="<?php echo e(auto_asset('img/recognized_by.png')); ?>" alt="Reconocimiento" width="200px" class="me-2">
                     <div class="social-icons" style="margin-top: -10px;">
                         <a href="https://www.facebook.com/youngengineerszonasurlapaz/" class="social-icon"
                             target="_blank">
-                            <img src="{{ asset('img/facebook.svg') }}" alt="Facebook" width="54" height="54">
+                            <img src="<?php echo e(asset('img/facebook.svg')); ?>" alt="Facebook" width="54" height="54">
                         </a>
                         <a href="https://www.tiktok.com/@youngengineersbolivia" class="social-icon" target="_blank">
-                            <img src="{{ asset('img/tiktok.svg') }}" alt="tiktok" width="45" height="45">
+                            <img src="<?php echo e(asset('img/tiktok.svg')); ?>" alt="tiktok" width="45" height="45">
 
                         </a>
                     </div>
 
-                    <a href="{{ route('login') }}" class="btn-iniciar">Iniciar Sesión</a>
+                    <a href="<?php echo e(route('login')); ?>" class="btn-iniciar">Iniciar Sesión</a>
                 </nav>
             </div>
         </div>
@@ -69,7 +69,7 @@
 
                 <!-- Columna 2: Imagen -->
                 <div class="hero-visual">
-                    <img src="{{ auto_asset('img/Logo_sign.png') }}" alt="Logo YE Bolivia" width="250px" class="me-2">
+                    <img src="<?php echo e(auto_asset('img/Logo_sign.png')); ?>" alt="Logo YE Bolivia" width="250px" class="me-2">
                 </div>
 
                 <!-- Columna 3: Contáctanos -->
@@ -83,7 +83,7 @@
                         </a>
                         <p><b>O</b></p>
                         <a href="#" class="btn-contact btn-register" onclick="openContactModal()">
-                            <img src="{{ auto_asset('img/registro.png') }}" alt="Registro">
+                            <img src="<?php echo e(auto_asset('img/registro.png')); ?>" alt="Registro">
                             <span>Estoy interesado</span>
                         </a>
 
@@ -91,7 +91,7 @@
                         <div class="modal-overlay" id="contactModal" onclick="closeContactModalOnOverlay(event)">
                             <div class="modal-container contact-modal">
 
-                                {{-- Cabecera de marca --}}
+                                
                                 <div class="cmodal-header">
                                     <div class="cmodal-header__icon">🚀</div>
                                     <div class="cmodal-header__titles">
@@ -103,24 +103,25 @@
 
                                 <div class="cmodal-body">
 
-                                    @if($errors->any())
+                                    <?php if($errors->any()): ?>
                                         <div class="cmodal-alert cmodal-alert--error">
-                                            @foreach($errors->all() as $error)
-                                                <div class="cmodal-alert__item">⚠ {{ $error }}</div>
-                                            @endforeach
+                                            <?php $__currentLoopData = $errors->all(); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $error): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                                <div class="cmodal-alert__item">⚠ <?php echo e($error); ?></div>
+                                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                         </div>
-                                    @endif
+                                    <?php endif; ?>
 
-                                    @if(session('status'))
+                                    <?php if(session('status')): ?>
                                         <div class="cmodal-alert cmodal-alert--success">
-                                            ✓ {{ session('status') }}
+                                            ✓ <?php echo e(session('status')); ?>
+
                                         </div>
-                                    @endif
+                                    <?php endif; ?>
 
-                                    <form id="contactForm" action="{{ route('prospectos.store') }}" method="POST" novalidate>
-                                        @csrf
+                                    <form id="contactForm" action="<?php echo e(route('prospectos.store')); ?>" method="POST" novalidate>
+                                        <?php echo csrf_field(); ?>
 
-                                        {{-- Honeypot --}}
+                                        
                                         <div style="display:none;" aria-hidden="true">
                                             <input type="text" name="website" value="" tabindex="-1" autocomplete="off">
                                         </div>
@@ -129,11 +130,18 @@
                                             <span class="cfield__icon">👤</span>
                                             <div class="cfield__wrap">
                                                 <input id="cf-nombres" type="text" name="nombres"
-                                                    class="cfield__input @error('nombres') cfield__input--err @enderror"
+                                                    class="cfield__input <?php $__errorArgs = ['nombres'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?> cfield__input--err <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>"
                                                     maxlength="100"
                                                     pattern="^[A-Za-záéíóúÁÉÍÓÚñÑüÜ\s\-\.]+$"
                                                     title="Solo letras y espacios"
-                                                    value="{{ old('nombres') }}"
+                                                    value="<?php echo e(old('nombres')); ?>"
                                                     placeholder=" "
                                                     required>
                                                 <label for="cf-nombres" class="cfield__label">Nombres</label>
@@ -144,11 +152,18 @@
                                             <span class="cfield__icon">👥</span>
                                             <div class="cfield__wrap">
                                                 <input id="cf-apellidos" type="text" name="apellidos"
-                                                    class="cfield__input @error('apellidos') cfield__input--err @enderror"
+                                                    class="cfield__input <?php $__errorArgs = ['apellidos'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?> cfield__input--err <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>"
                                                     maxlength="100"
                                                     pattern="^[A-Za-záéíóúÁÉÍÓÚñÑüÜ\s\-\.]+$"
                                                     title="Solo letras y espacios"
-                                                    value="{{ old('apellidos') }}"
+                                                    value="<?php echo e(old('apellidos')); ?>"
                                                     placeholder=" "
                                                     required>
                                                 <label for="cf-apellidos" class="cfield__label">Apellidos</label>
@@ -159,11 +174,18 @@
                                             <span class="cfield__icon">📱</span>
                                             <div class="cfield__wrap">
                                                 <input id="cf-telefono" type="tel" name="telefono"
-                                                    class="cfield__input @error('telefono') cfield__input--err @enderror"
+                                                    class="cfield__input <?php $__errorArgs = ['telefono'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?> cfield__input--err <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>"
                                                     maxlength="20"
                                                     pattern="^[0-9\+\-\s\(\)]{7,20}$"
                                                     title="Solo números y los caracteres + - ( )"
-                                                    value="{{ old('telefono') }}"
+                                                    value="<?php echo e(old('telefono')); ?>"
                                                     placeholder=" "
                                                     required>
                                                 <label for="cf-telefono" class="cfield__label">Teléfono</label>
@@ -187,32 +209,32 @@
         <section class="programs">
             <h2 class="section-title programas">PROGRAMAS</h2>
             <div class="programs-grid">
-                @php $colors = ['#e74c3c', '#f9ca24', '#0984e3', '#00b894'];
-                $i = 0; @endphp
-                @foreach($programas as $programa)
-                    @if($programa->Tipo === 'programa')
-                        @php $bgColor = $colors[$i % 4];
-                        $i++; @endphp
+                <?php $colors = ['#e74c3c', '#f9ca24', '#0984e3', '#00b894'];
+                $i = 0; ?>
+                <?php $__currentLoopData = $programas; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $programa): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                    <?php if($programa->Tipo === 'programa'): ?>
+                        <?php $bgColor = $colors[$i % 4];
+                        $i++; ?>
                         <div class="program-card"
-                            style="background: #ffffff; border-radius: 18px; box-shadow: 0 2px 12px rgba(0,0,0,0.08); border-top: 6px solid {{ $bgColor }};">
+                            style="background: #ffffff; border-radius: 18px; box-shadow: 0 2px 12px rgba(0,0,0,0.08); border-top: 6px solid <?php echo e($bgColor); ?>;">
                             <div class="program-icon" style="text-align:center; margin-bottom:10px;">
-                                @if($programa->Imagen)
-                                    <img src="{{ auto_asset('storage/' . $programa->Imagen) }}" alt="{{ $programa->Nombre }}"
+                                <?php if($programa->Imagen): ?>
+                                    <img src="<?php echo e(auto_asset('storage/' . $programa->Imagen)); ?>" alt="<?php echo e($programa->Nombre); ?>"
                                         style="max-width:150px; height:auto;">
-                                @else
-                                    <img src="{{ auto_asset('img/Logo_sign.png') }}" alt="Imagen por defecto"
+                                <?php else: ?>
+                                    <img src="<?php echo e(auto_asset('img/Logo_sign.png')); ?>" alt="Imagen por defecto"
                                         style="max-width:80px; height:auto; margin:12px 0;">
-                                @endif
+                                <?php endif; ?>
                             </div>
-                            <h3 class="program-title" style="color: {{ $bgColor }};">{{ $programa->Nombre }}</h3>
+                            <h3 class="program-title" style="color: <?php echo e($bgColor); ?>;"><?php echo e($programa->Nombre); ?></h3>
                             <div class="program-details">
-                                <div class="age-badge">Edad: {{ $programa->Rango_edad }}</div>
-                                <div class="duration-badge">Duración: {{ $programa->Duracion }}</div>
-                                <div class="cost-badge">Costo: Bs{{ $programa->Costo }}</div>
+                                <div class="age-badge">Edad: <?php echo e($programa->Rango_edad); ?></div>
+                                <div class="duration-badge">Duración: <?php echo e($programa->Duracion); ?></div>
+                                <div class="cost-badge">Costo: Bs<?php echo e($programa->Costo); ?></div>
                             </div>
                         </div>
-                    @endif
-                @endforeach
+                    <?php endif; ?>
+                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
             </div>
         </section>
 
@@ -221,32 +243,32 @@
         <section class="programs" style="margin-top: 32px;">
             <h2 class="section-title talleres">TALLERES</h2>
             <div class="programs-grid">
-                @php $colors = ['#e74c3c', '#f9ca24', '#0984e3', '#00b894', '#8e44ad', '#fd79a8', '#00bfff'];
-                $j = 0; @endphp
-                @foreach($programas as $programa)
-                    @if($programa->Tipo === 'taller')
-                        @php $bgColor = $colors[$j % count($colors)];
-                        $j++; @endphp
+                <?php $colors = ['#e74c3c', '#f9ca24', '#0984e3', '#00b894', '#8e44ad', '#fd79a8', '#00bfff'];
+                $j = 0; ?>
+                <?php $__currentLoopData = $programas; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $programa): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                    <?php if($programa->Tipo === 'taller'): ?>
+                        <?php $bgColor = $colors[$j % count($colors)];
+                        $j++; ?>
                         <div class="program-card"
-                            style="background: #ffffff; border-radius: 18px; box-shadow: 0 2px 12px rgba(0,0,0,0.08); border-top: 6px solid {{ $bgColor }};">
+                            style="background: #ffffff; border-radius: 18px; box-shadow: 0 2px 12px rgba(0,0,0,0.08); border-top: 6px solid <?php echo e($bgColor); ?>;">
                             <div class="program-icon" style="text-align:center; margin-bottom:10px;">
-                                @if($programa->Imagen)
-                                    <img src="{{ auto_asset('storage/' . $programa->Imagen) }}" alt="{{ $programa->Nombre }}"
+                                <?php if($programa->Imagen): ?>
+                                    <img src="<?php echo e(auto_asset('storage/' . $programa->Imagen)); ?>" alt="<?php echo e($programa->Nombre); ?>"
                                         style="max-width:150px; height:auto;">
-                                @else
-                                    <img src="{{ auto_asset('img/Logo_sign.png') }}" alt="Imagen por defecto"
+                                <?php else: ?>
+                                    <img src="<?php echo e(auto_asset('img/Logo_sign.png')); ?>" alt="Imagen por defecto"
                                         style="max-width:80px; height:auto; margin:12px 0;">
-                                @endif
+                                <?php endif; ?>
                             </div>
-                            <h3 class="program-title" style="color: {{ $bgColor }};">{{ $programa->Nombre }}</h3>
+                            <h3 class="program-title" style="color: <?php echo e($bgColor); ?>;"><?php echo e($programa->Nombre); ?></h3>
                             <div class="program-details">
-                                <div class="age-badge">Edad: {{ $programa->Rango_edad }}</div>
-                                <div class="duration-badge">Duración: {{ $programa->Duracion }}</div>
-                                <div class="cost-badge">Costo: Bs{{ $programa->Costo }}</div>
+                                <div class="age-badge">Edad: <?php echo e($programa->Rango_edad); ?></div>
+                                <div class="duration-badge">Duración: <?php echo e($programa->Duracion); ?></div>
+                                <div class="cost-badge">Costo: Bs<?php echo e($programa->Costo); ?></div>
                             </div>
                         </div>
-                    @endif
-                @endforeach
+                    <?php endif; ?>
+                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
             </div>
         </section>
         </section>
@@ -293,31 +315,31 @@
                 <h2 class="modal-title"></h2>
             </div>
             <div class="modal-body" style="max-height:80%; overflow-y:auto;">
-                @if(isset($publicaciones) && $publicaciones->count() > 0)
-                    @foreach($publicaciones as $publicacion)
+                <?php if(isset($publicaciones) && $publicaciones->count() > 0): ?>
+                    <?php $__currentLoopData = $publicaciones; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $publicacion): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                         <div class="card"
                             style="margin-bottom:15px; border:1px solid #ddd; border-radius:8px; padding:15px; background: #f9f9f9;">
-                            @if($publicacion->Imagen)
-                                <img src="{{ auto_asset('storage/' . $publicacion->Imagen) }}"
-                                    alt="Imagen de {{ $publicacion->Nombre }}"
-                                    style="width:100%; max-height:400px; object-fit:cover; border-radius:8px; margin-bottom:10px;">
-                            @endif
-                            @if($publicacion->Descripcion)
-                                <p style="margin:0; font-size:15px; color:#444; line-height:1.6;">{{ $publicacion->Descripcion }}</p>
-                            @endif
+                            <?php if($publicacion->Imagen): ?>
+                                <img src="<?php echo e(auto_asset('storage/' . $publicacion->Imagen)); ?>"
+                                    alt="Imagen de <?php echo e($publicacion->Nombre); ?>"
+                                    style="width:100%; max-height:500px; object-fit:cover; border-radius:8px;">
+                            <?php else: ?>
+                                <p>No hay imagen disponible</p>
+                            <?php endif; ?>
                         </div>
-                    @endforeach
-                @else
+                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                <?php else: ?>
                     <div style="text-align: center; padding: 40px;">
                         <h3>📭 No hay publicaciones disponibles</h3>
                         <p>Por el momento no tenemos novedades que mostrar.</p>
                         <p style="font-size: 12px; color: #666; margin-top: 20px;">
                             <strong>Info para desarrollador:</strong><br>
-                            Variable $publicaciones: {{ isset($publicaciones) ? 'Existe' : 'No existe' }}<br>
-                            Cantidad: {{ $publicaciones->count() ?? 0 }}
+                            Variable $publicaciones: <?php echo e(isset($publicaciones) ? 'Existe' : 'No existe'); ?><br>
+                            Cantidad: <?php echo e($publicaciones->count() ?? 0); ?>
+
                         </p>
                     </div>
-                @endif
+                <?php endif; ?>
             </div>
         </div>
     </div>
@@ -328,7 +350,7 @@
             <div class="footer-content">
                 <div class="footer-logo">
                     <div>
-                        <img src="{{ auto_asset('img/logo_blanco.png') }}" alt="Logo YE Bolivia" width="250px"
+                        <img src="<?php echo e(auto_asset('img/logo_blanco.png')); ?>" alt="Logo YE Bolivia" width="250px"
                             class="me-2">
                         <p>© Copyright 2020 e Square Young Engineers Franchising Ltd. Todos los derechos reservados.</p>
                         <p>LEGO® es una marca registrada de empresas que no patrocinan, autorizan ni respaldan estos
@@ -337,10 +359,10 @@
                     <div class="footer-text">
                         <div class="social-icons">
                             <a href="https://www.facebook.com/youngengineerszonasurlapaz/" class="social-icon">
-                                <img src="{{ asset('img/facebook.svg') }}" alt="Facebook" width="54" height="54">
+                                <img src="<?php echo e(asset('img/facebook.svg')); ?>" alt="Facebook" width="54" height="54">
                             </a>
                             <a href="#" class="social-icon">
-                                <img src="{{ asset('img/tiktok.svg') }}" alt="tiktok" width="45" height="45">
+                                <img src="<?php echo e(asset('img/tiktok.svg')); ?>" alt="tiktok" width="45" height="45">
 
                             </a>
                         </div>
@@ -411,15 +433,15 @@
             renderer: 'svg',
             loop: true,
             autoplay: true,
-            path: "{{ auto_asset('animaciones/whatsapp.json') }}"
+            path: "<?php echo e(auto_asset('animaciones/whatsapp.json')); ?>"
         });
 
         // Reabrir modal si hay errores de validación
-        @if($errors->any() || session('status'))
+        <?php if($errors->any() || session('status')): ?>
         document.addEventListener('DOMContentLoaded', function () {
             openContactModal();
         });
-        @endif
+        <?php endif; ?>
 
         // ========== BOTÓN LOADING ==========
         document.getElementById('contactForm')?.addEventListener('submit', function () {
@@ -449,7 +471,7 @@
         }
 
         // ================= MODAL DE PUBLICACIONES SECUENCIAL =================
-        let publicaciones = @json($publicaciones ?? []);
+        let publicaciones = <?php echo json_encode($publicaciones ?? [], 15, 512) ?>;
 
         // Invertir array para que se muestre primero la publicación más antigua
         publicaciones = publicaciones.reverse();
@@ -492,27 +514,15 @@
                 modal.id = 'publicacionesModal' + index;
                 modal.className = 'modal-overlay';
                 modal.setAttribute('onclick', 'closeOnOverlay(event)');
-
-                const tieneImagen = !!pub.Imagen;
-
-                const imagenHTML = tieneImagen
-                    ? `<img src="{{ asset('storage') }}/${pub.Imagen}" style="width:100%; max-height:380px; object-fit:cover; border-radius:10px; margin-bottom:16px; display:block;">`
-                    : '';
-
-                const descripcionHTML = pub.Descripcion
-                    ? `<p style="margin:0; font-size:15px; color:#444; line-height:1.8; white-space:pre-wrap; text-align:justify;">${pub.Descripcion}</p>`
-                    : '';
-
                 modal.innerHTML = `
-                <div class="modal-container" style="border-radius:18px; overflow:hidden; padding:0; box-shadow:0 20px 60px rgba(0,0,0,0.35);">
-                    <div style="background:linear-gradient(135deg, #c0392b, #e74c3c); padding:22px 50px; position:relative; text-align:center;">
-                        <button onclick="closeCurrentModal()" style="position:absolute; right:16px; top:50%; transform:translateY(-50%); font-size:24px; color:rgba(255,255,255,0.75); background:none; border:none; cursor:pointer; line-height:1;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,0.75)'">&times;</button>
-                        <h2 style="margin:0; font-size:24px; font-weight:800; color:#fff; letter-spacing:0.5px; text-shadow:0 2px 6px rgba(0,0,0,0.25); text-transform:uppercase;">${pub.Nombre ?? ''}</h2>
+                <div class="modal-container">
+                    <div class="modal-header">
+                        <button class="close-btn" onclick="closeCurrentModal()">&times;</button>
+            
                     </div>
-                    <div style="padding:24px 26px 28px; overflow-y:auto; max-height:62vh; background:#fafafa;">
-                        ${imagenHTML}
-                        ${tieneImagen && pub.Descripcion ? `<div style="margin-top:14px; padding:16px 18px; background:#fff; border-left:4px solid #e74c3c; border-radius:6px; box-shadow:0 1px 4px rgba(0,0,0,0.06);"><p style="margin:0; font-size:15px; color:#3d3d3d; line-height:1.85; text-align:justify; white-space:pre-wrap;">${pub.Descripcion}</p></div>` : descripcionHTML ? `<div style="padding:6px 4px;"><p style="margin:0; font-size:15.5px; color:#3d3d3d; line-height:1.9; text-align:justify; white-space:pre-wrap;">${pub.Descripcion}</p></div>` : ''}
-                        ${!imagenHTML && !descripcionHTML ? '<p style="color:#aaa; text-align:center; margin:20px 0;">Sin contenido disponible.</p>' : ''}
+                    <div class="modal-body" style="max-height:80%; overflow-y:auto;">
+                        ${pub.Imagen ? `<img src="<?php echo e(asset('storage')); ?>/${pub.Imagen}" style="width:100%; max-height:500px; object-fit:cover; border-radius:8px;">` : '<p>No hay imagen disponible</p>'}
+        
                     </div>
                 </div>
             `;
@@ -535,8 +545,8 @@
             });
         });
     </script>
-    <script src="{{ asset('js/paginaWeb/home.js') }}"></script>
+    <script src="<?php echo e(asset('js/paginaWeb/home.js')); ?>"></script>
 
 </body>
 
-</html>
+</html><?php /**PATH C:\Users\danil\Desktop\Laravel\Yebolivia\resources\views/paginaWeb/home.blade.php ENDPATH**/ ?>
