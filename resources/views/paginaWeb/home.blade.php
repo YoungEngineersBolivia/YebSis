@@ -300,9 +300,10 @@
                             @if($publicacion->Imagen)
                                 <img src="{{ auto_asset('storage/' . $publicacion->Imagen) }}"
                                     alt="Imagen de {{ $publicacion->Nombre }}"
-                                    style="width:100%; max-height:500px; object-fit:cover; border-radius:8px;">
-                            @else
-                                <p>No hay imagen disponible</p>
+                                    style="width:100%; max-height:400px; object-fit:cover; border-radius:8px; margin-bottom:10px;">
+                            @endif
+                            @if($publicacion->Descripcion)
+                                <p style="margin:0; font-size:15px; color:#444; line-height:1.6;">{{ $publicacion->Descripcion }}</p>
                             @endif
                         </div>
                     @endforeach
@@ -491,15 +492,27 @@
                 modal.id = 'publicacionesModal' + index;
                 modal.className = 'modal-overlay';
                 modal.setAttribute('onclick', 'closeOnOverlay(event)');
+
+                const tieneImagen = !!pub.Imagen;
+
+                const imagenHTML = tieneImagen
+                    ? `<img src="{{ asset('storage') }}/${pub.Imagen}" style="width:100%; max-height:380px; object-fit:cover; border-radius:10px; margin-bottom:16px; display:block;">`
+                    : '';
+
+                const descripcionHTML = pub.Descripcion
+                    ? `<p style="margin:0; font-size:15px; color:#444; line-height:1.8; white-space:pre-wrap; text-align:justify;">${pub.Descripcion}</p>`
+                    : '';
+
                 modal.innerHTML = `
-                <div class="modal-container">
-                    <div class="modal-header">
-                        <button class="close-btn" onclick="closeCurrentModal()">&times;</button>
-            
+                <div class="modal-container" style="border-radius:18px; overflow:hidden; padding:0; box-shadow:0 20px 60px rgba(0,0,0,0.35);">
+                    <div style="background:linear-gradient(135deg, #c0392b, #e74c3c); padding:22px 50px; position:relative; text-align:center;">
+                        <button onclick="closeCurrentModal()" style="position:absolute; right:16px; top:50%; transform:translateY(-50%); font-size:24px; color:rgba(255,255,255,0.75); background:none; border:none; cursor:pointer; line-height:1;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,0.75)'">&times;</button>
+                        <h2 style="margin:0; font-size:24px; font-weight:800; color:#fff; letter-spacing:0.5px; text-shadow:0 2px 6px rgba(0,0,0,0.25); text-transform:uppercase;">${pub.Nombre ?? ''}</h2>
                     </div>
-                    <div class="modal-body" style="max-height:80%; overflow-y:auto;">
-                        ${pub.Imagen ? `<img src="{{ asset('storage') }}/${pub.Imagen}" style="width:100%; max-height:500px; object-fit:cover; border-radius:8px;">` : '<p>No hay imagen disponible</p>'}
-        
+                    <div style="padding:24px 26px 28px; overflow-y:auto; max-height:62vh; background:#fafafa;">
+                        ${imagenHTML}
+                        ${tieneImagen && pub.Descripcion ? `<div style="margin-top:14px; padding:16px 18px; background:#fff; border-left:4px solid #e74c3c; border-radius:6px; box-shadow:0 1px 4px rgba(0,0,0,0.06);"><p style="margin:0; font-size:15px; color:#3d3d3d; line-height:1.85; text-align:justify; white-space:pre-wrap;">${pub.Descripcion}</p></div>` : descripcionHTML ? `<div style="padding:6px 4px;"><p style="margin:0; font-size:15.5px; color:#3d3d3d; line-height:1.9; text-align:justify; white-space:pre-wrap;">${pub.Descripcion}</p></div>` : ''}
+                        ${!imagenHTML && !descripcionHTML ? '<p style="color:#aaa; text-align:center; margin:20px 0;">Sin contenido disponible.</p>' : ''}
                     </div>
                 </div>
             `;

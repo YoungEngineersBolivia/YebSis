@@ -90,7 +90,7 @@
                                     @forelse($publicaciones as $pub)
                                         <tr>
                                             <td class="ps-3 fw-semibold">{{ $pub->Nombre }}</td>
-                                            <td>{{ Str::limit($pub->Descripcion, 50) }}</td>
+                                            <td>{{ strlen($pub->Descripcion ?? '') > 50 ? substr($pub->Descripcion, 0, 50) . '...' : ($pub->Descripcion ?? '') }}</td>
                                             <td>
                                                 @if($pub->Imagen)
                                                     <a href="{{ asset('storage/' . $pub->Imagen) }}" target="_blank"
@@ -238,8 +238,17 @@
                                 <li class="list-group-item p-3">
                                     <div class="d-flex justify-content-between mb-1">
                                         <h6 class="mb-0 fw-bold text-dark">{{ $notif->Nombre }}</h6>
-                                        <span
-                                            class="badge bg-light text-muted border">{{ \Carbon\Carbon::parse($notif->Fecha)->format('d/m/Y') }}</span>
+                                        <div class="d-flex align-items-center gap-2">
+                                            <span class="badge bg-light text-muted border">{{ \Carbon\Carbon::parse($notif->Fecha)->format('d/m/Y') }}</span>
+                                            <form action="{{ route('notificaciones.destroy', $notif->Id_notificaciones) }}"
+                                                method="POST" class="delete-form">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="button" class="btn btn-sm btn-outline-danger btn-delete" title="Eliminar">
+                                                    <i class="bi bi-trash-fill"></i>
+                                                </button>
+                                            </form>
+                                        </div>
                                     </div>
                                     <p class="mb-0 text-muted small">{{ $notif->Descripcion }}</p>
                                     @if($notif->Imagen)
