@@ -350,6 +350,53 @@ class ComponentesController extends Controller
     }
     
     /**
+     * Historial general de movimientos de motores
+     * Muestra todas las salidas/entradas con filtros (técnico, sucursal, tipo, fecha, motor)
+     */
+    public function historialGeneral(Request $request)
+    {
+        $query = MotorMovimiento::with(['motor', 'profesor.persona', 'sucursal'])
+            ->where('Nombre_tecnico', '!=', 'Solicitud Pendiente')
+            ->orderBy('Fecha_movimiento', 'desc');
+
+        if ($request->filled('tipo')) {
+            $query->where('Tipo_movimiento', $request->tipo);
+        }
+
+        if ($request->filled('sucursal')) {
+            $query->where('Id_sucursales', $request->sucursal);
+        }
+
+        if ($request->filled('tecnico')) {
+            $query->where('Id_profesores', $request->tecnico);
+        }
+
+        if ($request->filled('motor')) {
+            $motorBusqueda = $request->motor;
+            $query->whereHas('motor', function ($q) use ($motorBusqueda) {
+                $q->where('Id_motor', 'like', "%{$motorBusqueda}%");
+            });
+        }
+
+        if ($request->filled('fecha_desde')) {
+            $query->whereDate('Fecha_movimiento', '>=', $request->fecha_desde);
+        }
+
+        if ($request->filled('fecha_hasta')) {
+            $query->whereDate('Fecha_movimiento', '<=', $request->fecha_hasta);
+        }
+
+        $movimientos = $query->paginate(25)->withQueryString();
+
+        $sucursales = Sucursal::all();
+        $tecnicos = Profesor::where('Rol_componentes', 'Tecnico')
+            ->with('persona')
+            ->get();
+
+        return view('componentes.historialMovimientos', compact('movimientos', 'sucursales', 'tecnicos'));
+    }
+
+    /**
      * Historial de salidas
      */
     public function historialSalidas()
