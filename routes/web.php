@@ -244,6 +244,8 @@ Route::middleware(['auth', 'role:administrador'])->prefix('administrador')->grou
             ->name('registrar-entrada');
 
         // Historial y Reportes
+        Route::get('/historial', [ComponentesController::class, 'historialGeneral'])
+            ->name('historial-general');
         Route::get('/{id}/historial', [ComponentesController::class, 'historialMovimientos'])
             ->name('historial');
         Route::get('/historial-salidas', [ComponentesController::class, 'historialSalidas'])

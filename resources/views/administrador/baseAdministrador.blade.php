@@ -692,6 +692,12 @@
                                         <i class="bi bi-box-arrow-in-left me-2"></i>Entrada Componentes
                                     </a>
                                 </li>
+                                <li>
+                                    <a class="nav-link link-dark submenu-item"
+                                        href="{{ route('admin.componentes.historial-general') }}">
+                                        <i class="bi bi-clock-history me-2"></i>Historial de Movimientos
+                                    </a>
+                                </li>
                             </ul>
                         </div>
                     </li>
