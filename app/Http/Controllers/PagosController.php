@@ -181,7 +181,7 @@ class PagosController extends Controller
                 // Registrar pago
                 Pago::create([
                     'Descripcion' => 'Pago Completo Plan - Cuota #' . $cuota->Nro_de_cuota,
-                    'Comprobante' => 'AUTO-PLAN-' . $request->plan_id . '-' . time(),
+                    'Comprobante' => 'AUTO-PLAN-' . $request->plan_id . '-C' . $cuota->Id_cuotas . '-' . uniqid(),
                     'Monto_pago' => $montoPendiente,
                     'Fecha_pago' => now(),
                     'Id_planes_pagos' => $request->plan_id,
@@ -211,16 +211,20 @@ class PagosController extends Controller
         ]);
 
         try {
+            \DB::beginTransaction();
+
             $pago = Pago::findOrFail($id);
             $pago->update([
                 'Descripcion' => $request->descripcion,
-                'Monto_pago' => $request->monto_pago,
-                'Fecha_pago' => $request->fecha_pago,
+                'Monto_pago'  => $request->monto_pago,
+                'Fecha_pago'  => $request->fecha_pago,
                 'Comprobante' => $request->comprobante,
             ]);
 
+            \DB::commit();
             return back()->with('success', 'Pago actualizado correctamente.');
         } catch (\Exception $e) {
+            \DB::rollBack();
             return back()->with('error', 'Error al actualizar el pago: ' . $e->getMessage());
         }
     }

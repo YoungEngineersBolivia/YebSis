@@ -1,5 +1,4 @@
 // Función para editar detalles de la clase de prueba
-// Función para editar detalles de la clase de prueba
 function editarClasePrueba(id, nombreEstudiante, fecha, hora, comentarios, idProfesor) {
     const modal = new bootstrap.Modal(document.getElementById('modalClasePrueba'));
     const form = document.querySelector('#modalClasePrueba form');
