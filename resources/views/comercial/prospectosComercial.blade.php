@@ -134,7 +134,12 @@
                                                 </span>
                                             </td>
                                             <td class="py-3">
-                                                {{ $prospecto->created_at ? $prospecto->created_at->format('d-m-Y') : '' }}
+                                                @if($prospecto->updated_at && $prospecto->updated_at->ne($prospecto->created_at))
+                                                    {{ $prospecto->updated_at->format('d-m-Y') }}
+                                                    <div class="small text-muted" style="font-size:0.72rem;">actualizado</div>
+                                                @else
+                                                    {{ $prospecto->created_at ? $prospecto->created_at->format('d-m-Y') : '' }}
+                                                @endif
                                             </td>
                                             <td class="py-3">
                                                 <form method="POST"
@@ -180,7 +185,7 @@
                                                         <div class="small text-secondary mt-1 fst-italic"
                                                             style="font-size: 0.7rem; max-width: 150px; white-space: normal;">
                                                             <i class="fas fa-comment ms-1"></i>
-                                                            {{ Str::limit($clase->Comentarios, 50) }}
+                                                            {{ mb_strlen($clase->Comentarios) > 50 ? mb_substr($clase->Comentarios, 0, 50) . '...' : $clase->Comentarios }}
                                                         </div>
                                                     @endif
                                                 @else

@@ -12,12 +12,12 @@ class PlanesPagoController extends Controller
     public function registrar(Request $request)
     {
         $request->validate([
-            'Monto_total' => 'required|numeric',
-            'Nro_cuotas' => 'required|integer',
+            'Monto_total'      => 'required|numeric|min:0.01',
+            'Nro_cuotas'       => 'required|integer|min:1',
             'fecha_plan_pagos' => 'required|date',
-            'Estado_plan' => 'required|string',
-            'Id_estudiantes' => 'required|integer',
-            'Id_programas' => 'required|integer',
+            'Estado_plan'      => 'required|string',
+            'Id_estudiantes'   => 'required|integer',
+            'Id_programas'     => 'required|integer',
         ]);
 
         \DB::beginTransaction();
