@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Young Engineers La Paz - STEM para Niños</title>
     <link href="{{ auto_asset('css/paginaWeb/home.css') }}" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 </head>
 
@@ -77,8 +78,7 @@
                     <h3 style="color: black; margin-bottom: 10px;">¡CONTÁCTANOS!</h3>
                     <div class="contact-buttons">
                         <a href="https://wa.me/59177788398" target="_blank" class="btn-contact btn-whatsapp">
-                            <div id="whatsapp-animation"
-                                style="width:40px; height:40px; display:inline-block; vertical-align:middle;"></div>
+                            <i class="fab fa-whatsapp whatsapp-icon-anim" style="font-size:32px;"></i>
                             <span style="vertical-align:middle; margin-left:8px;">WHATSAPP</span>
                         </a>
                         <p><b>O</b></p>
@@ -405,14 +405,6 @@
 
         setInterval(createFloatingElement, 3000);
 
-        // Animación WhatsApp
-        lottie.loadAnimation({
-            container: document.getElementById('whatsapp-animation'),
-            renderer: 'svg',
-            loop: true,
-            autoplay: true,
-            path: "{{ auto_asset('animaciones/whatsapp.json') }}"
-        });
 
         // Reabrir modal si hay errores de validación
         @if($errors->any() || session('status'))

@@ -31,14 +31,6 @@ function createFloatingElement() {
 }
 setInterval(createFloatingElement, 3000);
 
-// Animación WhatsApp
-lottie.loadAnimation({
-    container: document.getElementById('whatsapp-animation'),
-    renderer: 'svg',
-    loop: true,
-    autoplay: true,
-    path: "/js/animaciones/whatsapp.json" // Ajusta la ruta según tu estructura
-});
 
 // ========== MODAL DE CONTACTO ==========
 function openContactModal() {
@@ -98,7 +90,6 @@ function updateDebugInfo(message, publicacionesCount, hayPublicaciones) {
 }
 
 document.addEventListener('DOMContentLoaded', function() {
-    console.log("🚀 DOM cargado - Iniciando verificaciones...");
 
     const publicacionesCount = window.publicacionesCount || 0; // Define esta variable en blade
     const hayPublicaciones = publicacionesCount > 0;
