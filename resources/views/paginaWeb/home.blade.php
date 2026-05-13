@@ -331,7 +331,7 @@
                     <div>
                         <img src="{{ auto_asset('img/logo_blanco.png') }}" alt="Logo YE Bolivia" width="250px"
                             class="me-2">
-                        <p>© Copyright 2020 e Square Young Engineers Franchising Ltd. Todos los derechos reservados.</p>
+                        <p>© Copyright 2025 Young Engineers. Todos los derechos reservados.</p>
                     </div>
                     <div class="footer-text">
                         <div class="social-icons">
