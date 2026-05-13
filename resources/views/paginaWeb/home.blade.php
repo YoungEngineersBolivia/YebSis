@@ -332,8 +332,6 @@
                         <img src="{{ auto_asset('img/logo_blanco.png') }}" alt="Logo YE Bolivia" width="250px"
                             class="me-2">
                         <p>© Copyright 2020 e Square Young Engineers Franchising Ltd. Todos los derechos reservados.</p>
-                        <p>LEGO® es una marca registrada de empresas que no patrocinan, autorizan ni respaldan estos
-                            programas o este sitio web.</p>
                     </div>
                     <div class="footer-text">
                         <div class="social-icons">
