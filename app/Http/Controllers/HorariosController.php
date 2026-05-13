@@ -12,7 +12,12 @@ class HorariosController extends Controller
 {
     public function index(Request $request)
     {
-        $search = $request->input('search');
+        $search          = $request->input('search');
+        $filtroDia       = $request->input('dia');
+        $filtroProfesor  = $request->input('profesor');
+        $filtroPrograma  = $request->input('programa');
+        $filtroHoraDesde = $request->input('hora_desde');
+        $filtroHoraHasta = $request->input('hora_hasta');
 
         $query = Horario::with(['estudiante.persona', 'profesor.persona', 'programa'])
             ->when($search, function ($q) use ($search) {
@@ -22,12 +27,16 @@ class HorariosController extends Controller
                         ->orWhereRaw("CONCAT_WS(' ', Nombre, Apellido) LIKE ?", ["%{$search}%"]);
                 });
             })
+            ->when($filtroDia,       fn($q) => $q->where('Dia', $filtroDia))
+            ->when($filtroProfesor,  fn($q) => $q->where('Id_profesores', $filtroProfesor))
+            ->when($filtroPrograma,  fn($q) => $q->where('Id_programas', $filtroPrograma))
+            ->when($filtroHoraDesde, fn($q) => $q->where('Hora', '>=', $filtroHoraDesde))
+            ->when($filtroHoraHasta, fn($q) => $q->where('Hora', '<=', $filtroHoraHasta))
             ->orderBy('Dia')
             ->orderBy('Hora');
 
-        $horarios = $query->paginate(6);
+        $horarios = $query->paginate(6)->withQueryString();
 
-        // Si es petición AJAX, devolvemos solo la tabla
         if ($request->ajax()) {
             return view('administrador.partials.horarios_table', compact('horarios'))->render();
         }
@@ -38,18 +47,22 @@ class HorariosController extends Controller
             ->get();
 
         $profesores = Profesor::with('persona')->get();
+        $programas  = Programa::all();
 
-        return view('administrador.horariosAdministrador', compact('horarios', 'estudiantes', 'profesores', 'search'));
+        return view('administrador.horariosAdministrador', compact(
+            'horarios', 'estudiantes', 'profesores', 'programas', 'search',
+            'filtroDia', 'filtroProfesor', 'filtroPrograma', 'filtroHoraDesde', 'filtroHoraHasta'
+        ));
     }
 
     public function store(Request $request)
     {
         $request->validate([
-            'Id_estudiantes' => 'required|exists:estudiantes,Id_estudiantes',
-            'Id_profesores' => 'required|exists:profesores,Id_profesores',
-            'horarios' => 'required|array|min:1',
-            'horarios.*.dia' => 'required|string',
-            'horarios.*.hora' => 'required'
+            'Id_estudiantes'     => 'required|exists:estudiantes,Id_estudiantes',
+            'Id_profesores'      => 'required|exists:profesores,Id_profesores',
+            'horarios'           => 'required|array|min:1',
+            'horarios.*.dia'     => 'required|string',
+            'horarios.*.hora'    => 'required'
         ]);
 
         $estudiante = Estudiante::findOrFail($request->Id_estudiantes);
@@ -69,10 +82,10 @@ class HorariosController extends Controller
         foreach ($request->horarios as $horario) {
             Horario::create([
                 'Id_estudiantes' => $request->Id_estudiantes,
-                'Id_profesores' => $request->Id_profesores,
-                'Id_programas' => $estudiante->Id_programas,
-                'Dia' => $horario['dia'],
-                'Hora' => $horario['hora']
+                'Id_profesores'  => $request->Id_profesores,
+                'Id_programas'   => $estudiante->Id_programas,
+                'Dia'            => $horario['dia'],
+                'Hora'           => $horario['hora']
             ]);
             $horariosCreados++;
         }
@@ -85,9 +98,9 @@ class HorariosController extends Controller
     {
         $request->validate([
             'Id_estudiantes' => 'required|exists:estudiantes,Id_estudiantes',
-            'Id_profesores' => 'required|exists:profesores,Id_profesores',
-            'Dia' => 'required|string',
-            'Hora' => 'required'
+            'Id_profesores'  => 'required|exists:profesores,Id_profesores',
+            'Dia'            => 'required|string',
+            'Hora'           => 'required'
         ]);
 
         $estudiante = Estudiante::findOrFail($request->Id_estudiantes);
@@ -106,13 +119,14 @@ class HorariosController extends Controller
         $horario = Horario::findOrFail($id);
         $horario->update([
             'Id_estudiantes' => $request->Id_estudiantes,
-            'Id_profesores' => $request->Id_profesores,
-            'Id_programas' => $estudiante->Id_programas,
-            'Dia' => $request->Dia,
-            'Hora' => $request->Hora
+            'Id_profesores'  => $request->Id_profesores,
+            'Id_programas'   => $estudiante->Id_programas,
+            'Dia'            => $request->Dia,
+            'Hora'           => $request->Hora
         ]);
 
-        return redirect()->route('horarios.index')->with('success', 'Horario actualizado correctamente.');
+        return redirect()->route('horarios.index')
+            ->with('success', 'Horario actualizado correctamente.');
     }
 
     public function destroy($id)
@@ -120,7 +134,8 @@ class HorariosController extends Controller
         $horario = Horario::findOrFail($id);
         $horario->delete();
 
-        return redirect()->route('horarios.index')->with('success', 'Horario eliminado correctamente.');
+        return redirect()->route('horarios.index')
+            ->with('success', 'Horario eliminado correctamente.');
     }
 
     public function buscarEstudiante($idEstudiante)
@@ -132,12 +147,14 @@ class HorariosController extends Controller
         }
 
         return response()->json([
-            'Id_profesores' => $estudiante->Id_profesores,
-            'Id_programas' => $estudiante->Id_programas,
-            'profesor_nombre' => $estudiante->profesor ?
-                $estudiante->profesor->persona->Nombre . ' ' . $estudiante->profesor->persona->Apellido :
-                'Sin profesor',
-            'programa_nombre' => $estudiante->programa ? $estudiante->programa->Nombre : 'Sin programa'
+            'Id_profesores'   => $estudiante->Id_profesores,
+            'Id_programas'    => $estudiante->Id_programas,
+            'profesor_nombre' => $estudiante->profesor
+                ? $estudiante->profesor->persona->Nombre . ' ' . $estudiante->profesor->persona->Apellido
+                : 'Sin profesor',
+            'programa_nombre' => $estudiante->programa
+                ? $estudiante->programa->Nombre
+                : 'Sin programa'
         ]);
     }
 }
