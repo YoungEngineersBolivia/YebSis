@@ -107,7 +107,7 @@
             </div>
 
             {{-- Filtro Programa --}}
-            <div class="col-12 col-md-4">
+            <div class="col-12 col-md-3">
               <label class="form-label small fw-semibold">Programa</label>
               <select class="form-select" name="programa">
                 <option value="">Todos los programas</option>
@@ -115,6 +115,20 @@
                   <option value="{{ $prog->Id_programas }}"
                     {{ ($filtroPrograma ?? '') == $prog->Id_programas ? 'selected' : '' }}>
                     {{ $prog->Nombre }}
+                  </option>
+                @endforeach
+              </select>
+            </div>
+
+            {{-- Filtro Sucursal --}}
+            <div class="col-12 col-md-3">
+              <label class="form-label small fw-semibold">Sucursal</label>
+              <select class="form-select" name="sucursal">
+                <option value="">Todas las sucursales</option>
+                @foreach($sucursales as $suc)
+                  <option value="{{ $suc->Id_sucursales }}"
+                    {{ ($filtroSucursal ?? '') == $suc->Id_sucursales ? 'selected' : '' }}>
+                    {{ $suc->Nombre }}
                   </option>
                 @endforeach
               </select>
@@ -149,7 +163,8 @@
           {{-- Contador de resultados --}}
           @php
             $hayFiltros = ($search ?? '') || ($filtroDia ?? '') || ($filtroProfesor ?? '')
-                        || ($filtroPrograma ?? '') || ($filtroHoraDesde ?? '') || ($filtroHoraHasta ?? '');
+                        || ($filtroPrograma ?? '') || ($filtroHoraDesde ?? '')
+                        || ($filtroHoraHasta ?? '') || ($filtroSucursal ?? '');
           @endphp
           <small class="text-muted mt-2 d-block">
             @if($hayFiltros)
@@ -229,7 +244,7 @@
               </div>
             </div>
 
-            <div class="mb-3" id="div_profesor_crear">
+            <div class="mb-3">
               <label for="Id_profesores_crear" class="form-label">Profesor</label>
               <select class="form-select" id="Id_profesores_crear" name="Id_profesores" required>
                 <option value="" disabled selected>Seleccione un estudiante primero</option>
@@ -245,6 +260,13 @@
             <div class="mb-3">
               <label for="programa_info_crear" class="form-label">Programa Inscrito</label>
               <input type="text" class="form-control" id="programa_info_crear" readonly
+                placeholder="Seleccione un estudiante primero">
+            </div>
+
+            {{-- Sucursal (solo lectura, se llena automáticamente) --}}
+            <div class="mb-3">
+              <label for="sucursal_info_crear" class="form-label">Sucursal</label>
+              <input type="text" class="form-control" id="sucursal_info_crear" readonly
                 placeholder="Seleccione un estudiante primero">
             </div>
 
@@ -315,7 +337,7 @@
               </div>
             </div>
 
-            <div class="mb-3" id="div_profesor_editar">
+            <div class="mb-3">
               <label for="Id_profesores_editar" class="form-label">Profesor</label>
               <select class="form-select" id="Id_profesores_editar" name="Id_profesores" required>
                 @foreach($profesores as $p)
@@ -330,6 +352,12 @@
             <div class="mb-3">
               <label for="programa_info_editar" class="form-label">Programa Inscrito</label>
               <input type="text" class="form-control" id="programa_info_editar" readonly>
+            </div>
+
+            {{-- Sucursal (solo lectura, se llena automáticamente) --}}
+            <div class="mb-3">
+              <label for="sucursal_info_editar" class="form-label">Sucursal</label>
+              <input type="text" class="form-control" id="sucursal_info_editar" readonly>
             </div>
 
             <div class="mb-3">
@@ -363,21 +391,22 @@
       @php
         $datosEstudiantes = $estudiantes->map(function ($e) {
           return [
-            'id'             => $e->Id_estudiantes,
-            'nombre'         => $e->persona ? ($e->persona->Nombre . ' ' . $e->persona->Apellido) : 'Sin nombre',
-            'profesor_id'    => $e->Id_profesores,
-            'profesor_nombre'=> $e->profesor ? ($e->profesor->persona->Nombre . ' ' . $e->profesor->persona->Apellido) : 'Sin profesor',
-            'programa_id'    => $e->Id_programas,
-            'programa_nombre'=> $e->programa ? $e->programa->Nombre : 'Sin programa',
-            'codigo'         => $e->Cod_estudiante,
-            'tiene_horario'  => $e->horarios_count > 0
+            'id'              => $e->Id_estudiantes,
+            'nombre'          => $e->persona ? ($e->persona->Nombre . ' ' . $e->persona->Apellido) : 'Sin nombre',
+            'profesor_id'     => $e->Id_profesores,
+            'profesor_nombre' => $e->profesor ? ($e->profesor->persona->Nombre . ' ' . $e->profesor->persona->Apellido) : 'Sin profesor',
+            'programa_id'     => $e->Id_programas,
+            'programa_nombre' => $e->programa ? $e->programa->Nombre : 'Sin programa',
+            'sucursal_nombre' => $e->sucursal ? $e->sucursal->Nombre : 'Sin sucursal',
+            'codigo'          => $e->Cod_estudiante,
+            'tiene_horario'   => $e->horarios_count > 0
           ];
         });
       @endphp
       const estudiantesData = @json($datosEstudiantes);
 
       // ---- Búsqueda dinámica dentro de los modales ----
-      function setupDynamicSearch(inputId, resultsId, hiddenId, profesorSelect, programaInput, helpText) {
+      function setupDynamicSearch(inputId, resultsId, hiddenId, profesorSelect, programaInput, sucursalInput, helpText) {
         const searchInput      = document.getElementById(inputId);
         const resultsContainer = document.getElementById(resultsId);
         const hiddenInput      = document.getElementById(hiddenId);
@@ -385,7 +414,7 @@
         if (!searchInput || !resultsContainer) return;
 
         searchInput.addEventListener('input', function () {
-          const term             = this.value.toLowerCase().trim();
+          const term              = this.value.toLowerCase().trim();
           const currentSelectedId = hiddenInput.value;
           resultsContainer.innerHTML = '';
 
@@ -413,8 +442,8 @@
                 </div>
               `;
               item.addEventListener('click', function () {
-                searchInput.value  = e.nombre;
-                hiddenInput.value  = e.id;
+                searchInput.value = e.nombre;
+                hiddenInput.value = e.id;
                 resultsContainer.classList.add('d-none');
 
                 const fakeOption = {
@@ -423,10 +452,11 @@
                     if (attr === 'data-profesor')        return e.profesor_id;
                     if (attr === 'data-programa-nombre') return e.programa_nombre;
                     if (attr === 'data-profesor-nombre') return e.profesor_nombre;
+                    if (attr === 'data-sucursal-nombre') return e.sucursal_nombre;
                     return null;
                   }
                 };
-                actualizarInfoEstudianteDesdeData(fakeOption, profesorSelect, programaInput, helpText);
+                actualizarInfoEstudianteDesdeData(fakeOption, profesorSelect, programaInput, sucursalInput, helpText);
               });
               resultsContainer.appendChild(item);
             });
@@ -444,17 +474,22 @@
         });
       }
 
-      function actualizarInfoEstudianteDesdeData(dataObj, profesorSelect, programaInput, helpText) {
+      function actualizarInfoEstudianteDesdeData(dataObj, profesorSelect, programaInput, sucursalInput, helpText) {
         if (dataObj && dataObj.value) {
           const profesorId     = dataObj.getAttribute('data-profesor');
           const programaNombre = dataObj.getAttribute('data-programa-nombre') || 'Sin programa asignado';
           const profesorNombre = dataObj.getAttribute('data-profesor-nombre') || 'Sin profesor';
+          const sucursalNombre = dataObj.getAttribute('data-sucursal-nombre') || 'Sin sucursal';
 
           if (programaInput) {
             programaInput.value = programaNombre;
             programaNombre === 'Sin programa asignado'
               ? programaInput.classList.add('is-invalid')
               : programaInput.classList.remove('is-invalid');
+          }
+
+          if (sucursalInput) {
+            sucursalInput.value = sucursalNombre;
           }
 
           if (profesorSelect) {
@@ -486,6 +521,7 @@
         'estudiante_search_crear', 'results_crear', 'Id_estudiantes_crear_hidden',
         document.getElementById('Id_profesores_crear'),
         document.getElementById('programa_info_crear'),
+        document.getElementById('sucursal_info_crear'),
         document.getElementById('profesor_help_crear')
       );
 
@@ -493,6 +529,7 @@
         'estudiante_search_editar', 'results_editar', 'Id_estudiantes_editar_hidden',
         document.getElementById('Id_profesores_editar'),
         document.getElementById('programa_info_editar'),
+        document.getElementById('sucursal_info_editar'),
         document.getElementById('profesor_help_editar')
       );
 
@@ -541,17 +578,17 @@
       const modalEditar = document.getElementById('modalEditar');
       if (modalEditar) {
         modalEditar.addEventListener('show.bs.modal', function (event) {
-          const button      = event.relatedTarget;
-          const id          = button.getAttribute('data-id');
+          const button       = event.relatedTarget;
+          const id           = button.getAttribute('data-id');
           const estudianteId = button.getAttribute('data-estudiante');
-          const profesorId  = button.getAttribute('data-profesor');
-          const dia         = button.getAttribute('data-dia');
-          const hora        = button.getAttribute('data-hora');
+          const profesorId   = button.getAttribute('data-profesor');
+          const dia          = button.getAttribute('data-dia');
+          const hora         = button.getAttribute('data-hora');
 
           document.getElementById('formEditar').action =
             "{{ route('horarios.update', ':id') }}".replace(':id', id);
 
-          const estudianteIdHidden   = document.getElementById('Id_estudiantes_editar_hidden');
+          const estudianteIdHidden    = document.getElementById('Id_estudiantes_editar_hidden');
           const estudianteSearchInput = document.getElementById('estudiante_search_editar');
 
           estudianteIdHidden.value = estudianteId;
@@ -568,6 +605,7 @@
                 if (attr === 'data-profesor')        return est.profesor_id;
                 if (attr === 'data-programa-nombre') return est.programa_nombre;
                 if (attr === 'data-profesor-nombre') return est.profesor_nombre;
+                if (attr === 'data-sucursal-nombre') return est.sucursal_nombre;
                 return null;
               }
             };
@@ -575,6 +613,7 @@
               fakeOption,
               document.getElementById('Id_profesores_editar'),
               document.getElementById('programa_info_editar'),
+              document.getElementById('sucursal_info_editar'),
               document.getElementById('profesor_help_editar')
             );
           }
