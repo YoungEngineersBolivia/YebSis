@@ -7,19 +7,21 @@ use App\Models\Horario;
 use App\Models\Estudiante;
 use App\Models\Profesor;
 use App\Models\Programa;
+use App\Models\Sucursal;
 
 class HorariosController extends Controller
 {
     public function index(Request $request)
     {
-        $search          = $request->input('search');
-        $filtroDia       = $request->input('dia');
-        $filtroProfesor  = $request->input('profesor');
-        $filtroPrograma  = $request->input('programa');
-        $filtroHoraDesde = $request->input('hora_desde');
-        $filtroHoraHasta = $request->input('hora_hasta');
+        $search           = $request->input('search');
+        $filtroDia        = $request->input('dia');
+        $filtroProfesor   = $request->input('profesor');
+        $filtroPrograma   = $request->input('programa');
+        $filtroHoraDesde  = $request->input('hora_desde');
+        $filtroHoraHasta  = $request->input('hora_hasta');
+        $filtroSucursal   = $request->input('sucursal');
 
-        $query = Horario::with(['estudiante.persona', 'profesor.persona', 'programa'])
+        $query = Horario::with(['estudiante.persona', 'estudiante.sucursal', 'profesor.persona', 'programa'])
             ->when($search, function ($q) use ($search) {
                 $q->whereHas('estudiante.persona', function ($qp) use ($search) {
                     $qp->where('Nombre', 'like', "%{$search}%")
@@ -32,6 +34,11 @@ class HorariosController extends Controller
             ->when($filtroPrograma,  fn($q) => $q->where('Id_programas', $filtroPrograma))
             ->when($filtroHoraDesde, fn($q) => $q->where('Hora', '>=', $filtroHoraDesde))
             ->when($filtroHoraHasta, fn($q) => $q->where('Hora', '<=', $filtroHoraHasta))
+            ->when($filtroSucursal,  function ($q) use ($filtroSucursal) {
+                $q->whereHas('estudiante', function ($qe) use ($filtroSucursal) {
+                    $qe->where('Id_sucursales', $filtroSucursal);
+                });
+            })
             ->orderBy('Dia')
             ->orderBy('Hora');
 
@@ -42,16 +49,18 @@ class HorariosController extends Controller
         }
 
         $estudiantes = Estudiante::activos()
-            ->with(['persona', 'profesor.persona', 'programa'])
+            ->with(['persona', 'profesor.persona', 'programa', 'sucursal'])
             ->withCount('horarios')
             ->get();
 
-        $profesores = Profesor::with('persona')->get();
-        $programas  = Programa::all();
+        $profesores  = Profesor::with('persona')->get();
+        $programas   = Programa::all();
+        $sucursales  = Sucursal::all();
 
         return view('administrador.horariosAdministrador', compact(
-            'horarios', 'estudiantes', 'profesores', 'programas', 'search',
-            'filtroDia', 'filtroProfesor', 'filtroPrograma', 'filtroHoraDesde', 'filtroHoraHasta'
+            'horarios', 'estudiantes', 'profesores', 'programas', 'sucursales', 'search',
+            'filtroDia', 'filtroProfesor', 'filtroPrograma',
+            'filtroHoraDesde', 'filtroHoraHasta', 'filtroSucursal'
         ));
     }
 
@@ -140,7 +149,7 @@ class HorariosController extends Controller
 
     public function buscarEstudiante($idEstudiante)
     {
-        $estudiante = Estudiante::with(['profesor.persona', 'programa'])->find($idEstudiante);
+        $estudiante = Estudiante::with(['profesor.persona', 'programa', 'sucursal'])->find($idEstudiante);
 
         if (!$estudiante) {
             return response()->json(['error' => 'Estudiante no encontrado'], 404);
@@ -154,7 +163,10 @@ class HorariosController extends Controller
                 : 'Sin profesor',
             'programa_nombre' => $estudiante->programa
                 ? $estudiante->programa->Nombre
-                : 'Sin programa'
+                : 'Sin programa',
+            'sucursal_nombre' => $estudiante->sucursal
+                ? $estudiante->sucursal->Nombre
+                : 'Sin sucursal',
         ]);
     }
 }
